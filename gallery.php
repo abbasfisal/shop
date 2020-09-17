@@ -1,2 +1,12 @@
-<h3> this is gallery page </h3>
-<h4> gallery select </h4>
+<style>
+.h3{
+	color:red;
+	
+}
+</style>
+<html>
+	<body>
+		<h3> this is gallery page </h3>
+	</body>
+</html>
+
