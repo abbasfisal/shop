@@ -1,0 +1,90 @@
+{{define "modules/admin/html/admin_index_product"}}
+
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <a href="/admins/products/create" class="btn btn-info float-right">محصول جدید</a>
+                        <br>
+                        <br>
+
+                        {{if .PRODUCTS.Data}}
+                            <table class="table-responsive align-content-center  table">
+                                <tr>
+                                    <td>#</td>
+                                    <td>عنوان</td>
+                                    <td>اسلاگ</td>
+                                    <td>sku</td>
+                                    <td>وضعیت</td>
+                                    <td>موجودی</td>
+                                    <td>قیمت اصلی</td>
+                                    <td>قیمت فروش</td>
+                                    <td>دسته بندی</td>
+                                    <td>عملیات</td>
+                                </tr>
+                                {{range .PRODUCTS.Data}}
+                                    <tr>
+                                        <td></td>
+                                        <td>{{.Title}}</td>
+                                        <td>{{.Slug}}</td>
+                                        <td>{{.Sku}}</td>
+                                        <td>
+                                            {{if eq .Status true}}
+                                                <span class="badge badge-success">فعال</span>
+                                            {{else}}
+                                                <span class="badge badge-danger">غیرفعال</span>
+                                            {{end}}
+                                        </td>
+                                        <td >{{.Quantity}}</td>
+                                        <td>{{.OriginalPrice}}</td>
+                                        <td>{{.SalePrice}}</td>
+                                        <td><a href="/admins/categories/{{.Category.ID}}">{{.Category.Title}}</a></td>
+                                        <td>
+                                            <a href="/admins/products/{{.ID}}">
+                                                <i class="nav-icon text-success fa fa-eye"></i>
+                                            </a> |
+                                            <a href="/admins/products/{{.ID}}/edit">
+                                                <i class="nav-icon text-info fa fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{end}}
+                            </table>
+                        {{end}}
+
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}
+

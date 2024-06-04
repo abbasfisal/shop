@@ -1,0 +1,48 @@
+{{define "modules/admin/html/admin_edit_category"}}
+    {{if not .AUTH}}
+        {{template "templates/html/layouts/navbar"}}
+    {{end}}
+    <h1>{{.TITLE}}</h1>
+    <form action="/admins/categories/{{.CATEGORY.ID}}" method="POST" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td>title</td>
+                <td><input type="text" name="title" placeholder="enter title"
+                           value="{{if.OLDS.title}}{{.OLD.title}}{{end}}{{if .CATEGORY.Title}}{{.CATEGORY.Title}}{{end}}">
+                </td>
+                <td>{{ .ERRORS.title}}</td>
+            </tr>
+            <tr>
+                <td>slug</td>
+                <td><input type="text" name="slug" placeholder="enter slug"
+                           value="{{if.OLDS.slug}}{{.OLD.slug}}{{end}}{{if .CATEGORY.Slug}}{{.CATEGORY.Slug}}{{end}}">
+                </td>
+                <td>{{ .ERRORS.slug}}</td>
+            </tr>
+            <tr>
+                <td>image</td>
+                <td><input type="file" name="image"></td>
+                <td>{{.ERRORS.image}}</td>
+            </tr>
+            <tr>
+                <td>status</td>
+                <td><input type="checkbox" name="status" {{if eq .CATEGORY.Status true}}checked{{end}}><br>
+                <td>{{.ERRORS.status}}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="create"></td>
+                <td>
+                    {{if .MESSAGE}} {{.MESSAGE}} {{end}}
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <hr>
+    {{range $a,$key:=.}}
+        {{$a}}:{{$key}}<br>
+    {{end}}
+
+{{end}}
+

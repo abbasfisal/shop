@@ -1,0 +1,16 @@
+{{define "modules/admin/html/admin_home"}}
+    {{if not .AUTH}}
+        {{template "templates/html/layouts/navbar"}}
+    {{end}}
+    <h1>admin Home Page</h1>
+
+    <h2><a href="/admins/categories">manage categories</a></h2>
+    <h2><a href="/admins/products">manage Products</a></h2>
+
+    <hr>
+    {{range $a,$key:=.}}
+        {{$a}}:{{$key}}<br>
+    {{end}}
+
+{{end}}
+<hr>

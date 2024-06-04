@@ -1,0 +1,76 @@
+{{define "modules/admin/html/admin_edit_product"}}
+    {{if not .AUTH}}
+        {{template "templates/html/layouts/navbar"}}
+    {{end}}
+    <h1>{{.TITLE}}</h1>
+    <form action="/admins/products/{{.PRODUCT.ID}}" method="POST" enctype="multipart/form-data">
+        {{$selectedCategory:=.PRODUCT.CategoryID}}
+        <form action="/admins/products/{{.ID}}" method="post">
+
+            <table style="border:1px solid pink">
+                <tr>
+                    <td>title</td>
+                    <td><input type="text" name="title" value="{{.PRODUCT.Title}}"></td>
+                    <td>{{.ERROR.title}}</td>
+                </tr>
+                <tr>
+                    <td>slug</td>
+                    <td><input type="text" name="slug" value="{{.PRODUCT.Slug}}"></td>
+                    <td>{{.ERROR.slug}}</td>
+                </tr>
+                <tr>
+                    <td>sku</td>
+                    <td><input type="text" name="sku" value="{{.PRODUCT.Sku}}"></td>
+                    <td>{{.ERROR.skue}}</td>
+                </tr>
+                <tr>
+                    <td>status</td>
+                    <td>
+                        <input name="status" type="checkbox" {{if eq .PRODUCT.Status true }} checked {{end}} >
+                    </td>
+                    <td>{{.ERROR.status}}</td>
+                </tr>
+                <tr>
+                    <td>quantity</td>
+                    <td><input type="text" name="quantity" value="{{.PRODUCT.Quantity}}"></td>
+                    <td>{{.ERROR.quantity}}</td>
+                </tr>
+                <tr>
+                    <td>original price</td>
+                    <td><input type="number" name="original_price" value="{{.PRODUCT.OriginalPrice}}"></td>
+                    <td>{{.ERROR.original_price}}</td>
+                </tr>
+                <tr>
+                    <td>sale price</td>
+                    <td><input type="number" name="sale_price" value="{{.PRODUCT.SalePrice}}"></td>
+                    <td>{{.ERROR.sale_price}}</td>
+                </tr>
+                <tr>
+                    <td>category</td>
+                    <td>
+                        <select name="category" id="">
+                            {{range .CATEGORIES.Data}}
+                                <option value="{{.ID}}" {{if eq $selectedCategory .ID}} selected {{end}}>{{.Title}}</option>
+                            {{end}}
+                        </select>
+                    </td>
+                    <td>{{.ERROR.category}}</td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="update"></td>
+                    <td>{{if .MESSAGE}}{{.MESSAGE}}{{end}}</td>
+                </tr>
+
+            </table>
+
+        </form>
+
+    </form>
+
+    <hr>
+    {{range $a,$key:=.}}
+        {{$a}}:{{$key}}<br>
+    {{end}}
+
+{{end}}
+

@@ -1,0 +1,46 @@
+{{define "modules/admin/html/admin_show_product"}}
+    {{if not .AUTH}}
+        {{template "templates/html/layouts/navbar"}}
+    {{end}}
+    <h1>{{.TITLE}}</h1>
+
+    {{if .PRODUCT}}
+        <table border="1px" align="center" style="border: 1px solid blue ;padding:3px;text-align: center">
+            <tr>
+                <td>#</td>
+                <td>title</td>
+                <td>slug</td>
+                <td>sku</td>
+                <td>status</td>
+                <td>quantity</td>
+                <td>original price</td>
+                <td>sale price</td>
+                <td>category</td>
+                <td>op</td>
+            </tr>
+
+                <tr>
+                    <td></td>
+                    <td>{{.PRODUCT.Title}}</td>
+                    <td>{{.PRODUCT.Slug}}</td>
+                    <td>{{.PRODUCT.Sku}}</td>
+                    <td>{{.PRODUCT.Status}}</td>
+                    <td>{{.PRODUCT.Quantity}}</td>
+                    <td>{{.PRODUCT.OriginalPrice}}</td>
+                    <td>{{.PRODUCT.SalePrice}}</td>
+                    <td><a href="/admins/categories/{{.Category.ID}}">{{.PRODUCT.Category.Title}}</a></td>
+                    <td>
+                        <a href="/admins/products/{{.PRODUCT.ID}}/edit">Edit</a>
+                    </td>
+                </tr>
+            {{end}}
+        </table>
+
+
+    <hr>
+    {{range $a,$key:=.}}
+        {{$a}}:{{$key}}<br>
+    {{end}}
+
+{{end}}
+

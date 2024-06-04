@@ -1,0 +1,32 @@
+{{define "modules/admin/html/admin_login"}}
+    {{template "templates/html/layouts/navbar"}}
+    <h1>admin login form</h1>
+
+    <form action="/admins/login" method="post">
+        <table>
+            <tr>
+                <td>mobile</td>
+                <td><input name="mobile" type="number" value="{{range .OLDS.mobile}}{{.}}{{end}}"></td>
+                <td>{{.ERRORS.mobile}}</td>
+            </tr>
+            <tr>
+                <td>password</td>
+                <td><input type="text" name="password" value=""></td>
+                <td>{{.ERRORS.password}}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="login"></td>
+                <td>
+                    {{.MESSAGE}}
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    {{range $a,$key:=.}}
+        {{$a}}:{{$key}}<br>
+    {{end}}
+
+{{end}}
+<hr>

@@ -1,0 +1,158 @@
+{{define "modules/admin/html/admin_create_product"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10 align-content-center">
+                        <form action="/admins/products" method="post" enctype="multipart/form-data">
+                            <table class="table table-primary ">
+                                <tr>
+                                    <td>انتخاب دسته بندی</td>
+                                    <td>
+                                        <select class="form-control" name="category_id">
+                                            {{range .CATEGORIES.Data}}
+                                                <option value="{{.ID}}">{{.Title}}</option>
+                                            {{end}}
+                                        </select>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>عنوان</td>
+                                    <td><input type="text" class="form-control"
+                                               value="{{range .OLDS.title}}{{.}}{{end}}"
+                                               name="title"></td>
+                                    <td class="text-danger">{{if .ERRORS.title}}{{.ERRORS.title}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>اسلاگ</td>
+                                    <td><input type="text"
+                                               class="form-control"
+                                               value="{{range .OLDS.slug}}{{.}}{{end}}" name="slug"></td>
+                                    <td class="text-danger">{{if .ERRORS.slug}}{{.ERRORS.slug}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>شناسه محصول sku</td>
+                                    <td><input type="text" class="form-control" value="{{range .OLDS.sku}}{{.}}{{end}}"
+                                               name="sku"></td>
+                                    <td class="text-danger">{{if .ERRORS.sku}}{{.ERRORS.sku}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>وضعیت</td>
+                                    <td><input type="checkbox" checked name="status"></td>
+                                    <td></td>
+                                </tr>
+
+                                <tr>
+                                    <td>موجودی</td>
+                                    <td><input class="form-control" type="number"
+                                               value="{{range .OLDS.quantity}}{{.}}{{end}}" name="quantity">
+                                    </td>
+                                    <td class="text-danger">{{if .ERRORS.quantity}}{{.ERRORS.quantity}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>قیمت اصلی</td>
+                                    <td><input class="form-control" type="number"
+                                               value="{{range .OLDS.original_price}}{{.}}{{end}}"
+                                               name="original_price"></td>
+                                    <td class="text-danger">{{if .ERRORS.originalprice}}{{.ERRORS.originalprice}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>قیمت فروش</td>
+                                    <td><input type="number"
+                                               class="form-control"
+                                               value="{{range .OLDS.sale_price}}{{.}}{{end}}"
+                                               name="sale_price"></td>
+                                    <td class="text-danger">{{if .ERRORS.saleprice}}{{.ERRORS.saleprice}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>توضیحات</td>
+                                    <td>
+                    <textarea name="description" cols="30"
+                              class="form-control"
+                              rows="10">{{range .OLDS.description}}{{.}}{{end}}</textarea>
+                                    </td>
+                                    <td class="text-danger">{{if .ERRORS.description}}{{.ERRORS.description}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>تصاویر</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" multiple name="images[]" class="custom-file-input"
+                                                       id="exampleInputFile">
+                                                <label class="custom-file-label" for="exampleInputFile">انتخاب
+                                                    فایل</label>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="">Upload</span>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                    <td>{{if .ERRORS.images}}{{.ERRORS.images}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td></td>
+                                    <td><input
+                                                class="btn  btn-primary btn-lg"
+                                                type="submit" value="ایجاد"></td>
+                                    <td class="text-info">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</td>
+                                </tr>
+
+                            </table>
+
+                        </form>
+
+                    </div>
+                    <!-- /.col-md-6 -->
+                    {{.AUTH.FirstName}}
+                    <br>
+                    {{range $a,$key:=.}}
+                        {{$a}}:{{$key}}<br>
+                    {{end}}
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+
+
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+{{end}}
+

@@ -1,0 +1,18 @@
+app:
+  name: shop
+  port: 8083
+  host: 127.0.0.1
+  debug: true
+  key: $2a$10$a2dUNHVqX2dTGgBH4O.gleTL6Yno858AvJGBdBFWScJQ0V9.6bM0O
+
+db:
+  driver: mysql
+  port: 3306
+  name: shop_go
+  host: 127.0.0.1
+  username: root
+  password: root
+
+upload:
+  categories: "uploads/media/categories/"
+  products: "uploads/media/products/"

@@ -1,0 +1,81 @@
+{{define "modules/admin/html/admin_show_category"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <a href="/admins/categories/create" class="btn btn-info float-right"><i class="fa fa-plus"></i>
+                            دسته بندی جدید</a>
+                        <br>
+                        <br>
+                        {{if .CATEGORY}}
+                            <table class="table-responsive align-content-center   table">
+                                <tr>
+                                    <td>#</td>
+                                    <td>عنوان</td>
+                                    <td>اسلاگ</td>
+                                    <td>عکس</td>
+                                    <td>وضعیت</td>
+                                    <td>عملیات</td>
+                                </tr>
+                                <tr>
+                                    <td>{{.CATEGORY.ID}}</td>
+                                    <td>{{.CATEGORY.Title}}</td>
+                                    <td>{{.CATEGORY.Slug}}</td>
+                                    <td>
+                                        <img src="/uploads/media/categories/{{.CATEGORY.Image}}" width="250" alt="">
+
+                                    </td>
+                                    <td>
+                                        {{if eq .CATEGORY.Status true}}
+                                            <span class="badge badge-success">فعال</span>
+                                        {{else}}
+                                            <span class="badge badge-danger">غیرفعال</span>
+                                        {{end}}
+
+                                    </td>
+                                    <td>
+                                        <a href="/admins/categories/{{.CATEGORY.ID}}/edit">
+                                            <i class="nav-icon text-danger fa fa-edit"></i>
+                                        </a>
+                                        |
+                                        <a class="text-success" href="/admins/categories/{{.ID}}">Products</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        {{end}}
+
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Main Footer -->
+    {{template "footer" .}}
+{{end}}
+

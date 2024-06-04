@@ -1,0 +1,100 @@
+{{define "modules/admin/html/admin_create_category"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10">
+                        <form action="/admins/categories" method="post" enctype="multipart/form-data">
+                            <table class="table table-primary ">
+                                <tr>
+                                    <td>عنوان</td>
+                                    <td><input type="text" name="title"
+                                               class="form-control"
+                                               value="{{range .OLDS.title}}{{.}}{{end}}"></td>
+                                    <td class="text-danger">{{ .ERRORS.title}}</td>
+                                </tr>
+                                <tr>
+                                    <td>اسلاگ</td>
+                                    <td><input type="text" name="slug"
+                                               class="form-control"
+                                               value="{{range .OLDS.slug}}{{.}}{{end}}"></td>
+                                    <td class="text-danger">{{ .ERRORS.slug}}</td>
+                                </tr>
+                                <tr>
+                                    <td>اپلود عکس</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" name="image" class="custom-file-input"
+                                                       id="exampleInputFile">
+                                                <label class="custom-file-label" for="exampleInputFile">انتخاب
+                                                    فایل</label>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="">Upload</span>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                    <td class="text-danger">{{.ERRORS.image}}</td>
+                                </tr>
+                                <tr>
+                                    <td>وضعیت</td>
+                                    <td><input type="checkbox" name="status"><br>
+                                    <td class="text-danger">{{.ERRORS.status}}</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><input class="btn  btn-primary btn-lg" type="submit" value="ایجاد"></td>
+                                    <td class="text-info border-white">
+                                        {{if .MESSAGE}} {{.MESSAGE}} {{end}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+
+
+                    </div>
+                    <!-- /.col-md-6 -->
+
+                    ss
+                    {{.AUTH.FirstName}}
+                    <br>
+                    {{range $a,$key:=.}}
+                        {{$a}}:{{$key}}<br>
+                    {{end}}
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}
+
