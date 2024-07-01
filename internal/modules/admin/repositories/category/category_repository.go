@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"gorm.io/gorm"
-	"shop/internal/database/mysql"
 	"shop/internal/entities"
 )
 
@@ -12,8 +11,8 @@ type CategoryRepository struct {
 	db *gorm.DB
 }
 
-func NewCategoryRepository() CategoryRepository {
-	return CategoryRepository{db: mysql.Get()}
+func NewCategoryRepository(db *gorm.DB) CategoryRepository {
+	return CategoryRepository{db: db}
 }
 
 func (cr CategoryRepository) GetAll(ctx context.Context) ([]entities.Category, error) {

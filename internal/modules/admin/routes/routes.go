@@ -3,8 +3,12 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"shop/internal/database/mysql"
 	"shop/internal/middlewares"
 	AdminHandler "shop/internal/modules/admin/handlers"
+	authRepository "shop/internal/modules/admin/repositories/auth"
+	categoryRepository "shop/internal/modules/admin/repositories/category"
+	productRepository "shop/internal/modules/admin/repositories/product"
 	"shop/internal/modules/admin/services/auth"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/product"
@@ -12,9 +16,15 @@ import (
 
 func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
-	authSrv := auth.NewAuthenticateService()
-	categorySrv := category.NewCategoryService()
-	productSrv := product.NewProductService()
+	authRepo := authRepository.NewAuthenticateRepository(mysql.Get())
+	authSrv := auth.NewAuthenticateService(authRepo)
+
+	categoryRepo := categoryRepository.NewCategoryRepository(mysql.Get())
+	categorySrv := category.NewCategoryService(categoryRepo)
+
+	productRepo := productRepository.NewProductRepository(mysql.Get())
+	productSrv := product.NewProductService(productRepo)
+
 	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, i18nBundle)
 
 	guestGrp := r.Group("/")

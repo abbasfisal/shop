@@ -16,9 +16,9 @@ type AuthenticateService struct {
 	authRepo auth.AuthenticateRepositoryInterface
 }
 
-func NewAuthenticateService() AuthenticateService {
+func NewAuthenticateService(authRepo auth.AuthenticateRepositoryInterface) AuthenticateService {
 	return AuthenticateService{
-		authRepo: auth.NewAuthenticateRepository(),
+		authRepo: authRepo,
 	}
 }
 

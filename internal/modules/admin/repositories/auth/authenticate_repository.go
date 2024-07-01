@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"gorm.io/gorm"
-	"shop/internal/database/mysql"
 	"shop/internal/entities"
 )
 
@@ -11,9 +10,9 @@ type AuthenticateRepository struct {
 	db *gorm.DB
 }
 
-func NewAuthenticateRepository() AuthenticateRepository {
+func NewAuthenticateRepository(db *gorm.DB) AuthenticateRepository {
 	return AuthenticateRepository{
-		db: mysql.Get(),
+		db: db,
 	}
 }
 

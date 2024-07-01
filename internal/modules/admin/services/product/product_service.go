@@ -16,8 +16,8 @@ type ProductService struct {
 	repo product.ProductRepositoryInterface
 }
 
-func NewProductService() *ProductService {
-	return &ProductService{repo: product.NewProductRepository()}
+func NewProductService(repo product.ProductRepositoryInterface) *ProductService {
+	return &ProductService{repo: repo}
 }
 
 func (p ProductService) Index(ctx context.Context) (responses.Products, custom_error.CustomError) {

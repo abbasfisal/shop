@@ -15,9 +15,9 @@ type CategoryService struct {
 	repo category.CategoryRepositoryInterface
 }
 
-func NewCategoryService() CategoryService {
+func NewCategoryService(categoryRepo category.CategoryRepositoryInterface) CategoryService {
 	return CategoryService{
-		repo: category.NewCategoryRepository(),
+		repo: categoryRepo,
 	}
 }
 func (cs CategoryService) Index(ctx context.Context) (responses.Categories, custom_error.CustomError) {

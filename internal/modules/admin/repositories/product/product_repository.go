@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"gorm.io/gorm"
-	"shop/internal/database/mysql"
 	"shop/internal/entities"
 )
 
@@ -12,8 +11,8 @@ type ProductRepository struct {
 	db *gorm.DB
 }
 
-func NewProductRepository() ProductRepository {
-	return ProductRepository{db: mysql.Get()}
+func NewProductRepository(db *gorm.DB) ProductRepository {
+	return ProductRepository{db: db}
 }
 
 func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, error) {
