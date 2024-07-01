@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"shop/internal/database/mysql"
 	adminAuthRepo "shop/internal/modules/admin/repositories/auth"
 	"shop/internal/pkg/sessions"
 	"strconv"
@@ -22,7 +23,7 @@ func IsGuest(c *gin.Context) {
 		return
 	}
 
-	repo := adminAuthRepo.NewAuthenticateRepository()
+	repo := adminAuthRepo.NewAuthenticateRepository(mysql.Get())
 	userID, _ := strconv.Atoi(authID)
 	user, _ := repo.FindByUserID(c, uint(userID))
 
