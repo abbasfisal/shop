@@ -1,16 +1,46 @@
 {{define "modules/admin/html/admin_home"}}
-    {{if not .AUTH}}
-        {{template "templates/html/layouts/navbar"}}
-    {{end}}
-    <h1>admin Home Page</h1>
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
 
-    <h2><a href="/admins/categories">manage categories</a></h2>
-    <h2><a href="/admins/products">manage Products</a></h2>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
 
-    <hr>
-    {{range $a,$key:=.}}
-        {{$a}}:{{$key}}<br>
-    {{end}}
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10">
+                        <a href="/admins/categories">مدیریت دسته بندی ها</a>
+                        <br>
+                        <a href="/admins/products">مدیریت محصولات</a>
+                        <hr>
+                    </div>
+                    <!-- /.col-md-6 -->
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
 
 {{end}}
-<hr>
+
