@@ -52,6 +52,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.GET("/admins/categories/:id", adminHlr.ShowCategory)
 		authGrp.GET("/admins/categories/:id/edit", adminHlr.EditCategory)
 		authGrp.POST("/admins/categories/:id", adminHlr.UpdateCategory)
+		authGrp.GET("/admins/categories/:id/products", adminHlr.CategoryProducts)
 
 		//products
 		authGrp.GET("/admins/products", adminHlr.IndexProduct)
