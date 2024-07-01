@@ -3,7 +3,10 @@ package errors
 import (
 	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"shop/internal/pkg/sessions"
 	"strings"
 )
 
@@ -66,4 +69,34 @@ func NewMyError(mainMessage string, message string, code int) MyError {
 }
 func (m MyError) Error() string {
 	return m.Message
+}
+
+// SetErrors will return validation errors which translated into persian lang
+func SetErrors(c *gin.Context, i18nBundle *i18n.Bundle, err error) {
+	localizer := i18n.NewLocalizer(i18nBundle, "fa")
+
+	switch err.(type) {
+	case validator.ValidationErrors:
+		errors := err.(validator.ValidationErrors)
+
+		var errorMessages []string
+		for _, e := range errors {
+			translation, _ := localizer.Localize(&i18n.LocalizeConfig{
+				MessageID: e.Tag(),
+				TemplateData: map[string]interface{}{
+					"Field": e.Field(),
+					"Param": e.Param(),
+				},
+			})
+			errorMessages = append(errorMessages, translation)
+		}
+		marshal, _ := json.Marshal(errorMessages)
+
+		sessions.Set(c, "errors", string(marshal))
+		break
+
+	default:
+		sessions.Set(c, "errors", string(err.Error()))
+	}
+
 }
