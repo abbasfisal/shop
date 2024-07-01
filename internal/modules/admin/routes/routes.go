@@ -2,13 +2,20 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"shop/internal/middlewares"
 	AdminHandler "shop/internal/modules/admin/handlers"
+	"shop/internal/modules/admin/services/auth"
+	"shop/internal/modules/admin/services/category"
+	"shop/internal/modules/admin/services/product"
 )
 
-func SetAdminRoutes(r *gin.Engine) {
+func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
-	adminHlr := AdminHandler.NewAdminHandler()
+	authSrv := auth.NewAuthenticateService()
+	categorySrv := category.NewCategoryService()
+	productSrv := product.NewProductService()
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, i18nBundle)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)

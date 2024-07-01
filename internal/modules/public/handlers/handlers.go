@@ -3,18 +3,21 @@ package handlers
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"net/http"
 	"shop/internal/modules/public/services/home"
 	"shop/internal/pkg/html"
 )
 
 type PublicHandler struct {
-	homeSrv home.HomeServiceInterface
+	homeSrv    home.HomeServiceInterface
+	i18nBundle *i18n.Bundle
 }
 
-func NewPublicHandler() PublicHandler {
+func NewPublicHandler(homeSrv home.HomeServiceInterface, i18nBundle *i18n.Bundle) PublicHandler {
 	return PublicHandler{
-		homeSrv: home.NewHomeService(),
+		homeSrv:    homeSrv,
+		i18nBundle: i18nBundle,
 	}
 }
 

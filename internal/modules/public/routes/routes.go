@@ -2,13 +2,16 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"shop/internal/middlewares"
 	PublicHandler "shop/internal/modules/public/handlers"
+	"shop/internal/modules/public/services/home"
 )
 
-func SetPublic(r *gin.Engine) {
+func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
-	publicHdl := PublicHandler.NewPublicHandler()
+	homeSrv := home.NewHomeService()
+	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
 
 	r.GET("/", publicHdl.Index)
 

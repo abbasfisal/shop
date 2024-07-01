@@ -47,10 +47,10 @@ func main() {
 	r.Static("uploads", "./uploads")
 	r.Static("assets", "./assets")
 	//Admin routes
-	AdminRoutes.SetAdminRoutes(r)
+	AdminRoutes.SetAdminRoutes(r, i18nBundle)
 
 	//public routes
-	PublicRoutes.SetPublic(r)
+	PublicRoutes.SetPublic(r, i18nBundle)
 
 	r.GET("/500", func(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "templates/html/errors/500", nil)

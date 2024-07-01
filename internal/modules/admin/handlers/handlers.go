@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
 	"net/http"
 	"os"
@@ -26,16 +27,23 @@ type AdminHandler struct {
 	authSrv     auth.AuthenticateServiceInterface
 	categorySrv category.CategoryServiceInterface
 	productSrv  product.ProductServiceInterface
+	i18nBundle  *i18n.Bundle
 	//order service
 	//user service
 	//cart service
 }
 
-func NewAdminHandler() AdminHandler {
+func NewAdminHandler(
+	authSrv auth.AuthenticateServiceInterface,
+	categorySrv category.CategoryService,
+	productSrv product.ProductServiceInterface,
+	i18nBundle *i18n.Bundle,
+) AdminHandler {
 	return AdminHandler{
-		authSrv:     auth.NewAuthenticateService(),
-		categorySrv: category.NewCategoryService(),
-		productSrv:  product.NewProductService(),
+		authSrv:     authSrv,
+		categorySrv: categorySrv,
+		productSrv:  productSrv,
+		i18nBundle:  i18nBundle,
 	}
 }
 
