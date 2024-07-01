@@ -57,9 +57,7 @@ func (a AdminHandler) PostLogin(c *gin.Context) {
 	c.Request.ParseForm()
 
 	if err := c.ShouldBind(&req); err != nil {
-		errors.Init()
-		errors.SetFromErrors(err)
-		sessions.Set(c, "errors", errors.ToString())
+		errors.SetErrors(c, a.i18nBundle, err)
 
 		old.Init()
 		old.Set(c)
@@ -282,6 +280,14 @@ func (a AdminHandler) EditCategory(c *gin.Context) {
 func (a AdminHandler) UpdateCategory(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"msg": "implement me",
+	})
+	return
+}
+
+func (a AdminHandler) CategoryProducts(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"category_id": c.Param("id"),
+		"msg":         "implement me",
 	})
 	return
 }
