@@ -79,16 +79,16 @@ func SetErrors(c *gin.Context, i18nBundle *i18n.Bundle, err error) {
 	case validator.ValidationErrors:
 		errors := err.(validator.ValidationErrors)
 
-		var errorMessages []string
+		var errorMessages = make(map[string]string)
 		for _, e := range errors {
 			translation, _ := localizer.Localize(&i18n.LocalizeConfig{
 				MessageID: e.Tag(),
 				TemplateData: map[string]interface{}{
-					"Field": e.Field(),
+					"Field": Mapper(strings.ToLower(e.Field())),
 					"Param": e.Param(),
 				},
 			})
-			errorMessages = append(errorMessages, translation)
+			errorMessages[strings.ToLower(e.Field())] = translation
 		}
 		marshal, _ := json.Marshal(errorMessages)
 
@@ -99,4 +99,15 @@ func SetErrors(c *gin.Context, i18nBundle *i18n.Bundle, err error) {
 		sessions.Set(c, "errors", string(err.Error()))
 	}
 
+}
+
+func Mapper(field string) string {
+	switch field {
+	case "mobile":
+		return "موبایل"
+	case "password":
+		return "کلمه عبور"
+	default:
+		return "فیلد"
+	}
 }
