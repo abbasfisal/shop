@@ -5,22 +5,36 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
+	"golang.org/x/text/language"
+	"gopkg.in/yaml.v2"
 	"log"
 	"net/http"
 	"shop/cmd/commands"
 	"shop/internal/database/mysql"
 	AdminRoutes "shop/internal/modules/admin/routes"
 	PublicRoutes "shop/internal/modules/public/routes"
+	"sync"
 )
+
+var validate *validator.Validate
+var i18nBundle *i18n.Bundle
+var Once sync.Once
 
 func main() {
 
-	//load config
-	configInit()
+	Once.Do(func() {
+		//load translation
+		loadTranslation()
 
-	//load mysql connection
-	mysql.Connect()
+		//load config
+		configInit()
+
+		//load mysql connection
+		mysql.Connect()
+	})
 
 	commands.Execute()
 
@@ -47,6 +61,16 @@ func main() {
 		log.Fatal("[Server start failed ] : ", err)
 	}
 
+}
+
+func loadTranslation() {
+	i18nBundle = i18n.NewBundle(language.Persian)
+	i18nBundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+	_, err := i18nBundle.LoadMessageFile("./internal/translation/active.fa.yaml")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 }
 
 func configInit() {
