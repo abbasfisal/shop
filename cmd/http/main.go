@@ -16,12 +16,14 @@ import (
 	"shop/internal/database/mysql"
 	AdminRoutes "shop/internal/modules/admin/routes"
 	PublicRoutes "shop/internal/modules/public/routes"
+	"shop/internal/pkg/logging"
 	"sync"
 )
 
 var validate *validator.Validate
 var i18nBundle *i18n.Bundle
 var Once sync.Once
+var logger logging.Logger
 
 func main() {
 
@@ -29,12 +31,16 @@ func main() {
 		//load translation
 		loadTranslation()
 
+		//load Logger
+		logger = logging.NewZapLogger()
+
 		//load config
 		configInit()
 
 		//load mysql connection
 		mysql.Connect()
 	})
+	logger.InfoF("this is just for info")
 
 	commands.Execute()
 
