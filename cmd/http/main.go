@@ -64,7 +64,7 @@ func main() {
 	})
 
 	if err := r.Run(fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))); err != nil {
-		log.Fatal("[Server start failed ] : ", err)
+		logger.FatalF("[Server start failed ] : ", err)
 	}
 
 }
