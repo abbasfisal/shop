@@ -96,3 +96,14 @@ func (cs CategoryService) GetAllCategories(ctx context.Context) (responses.Categ
 
 	return responses.ToCategories(categories), custom_error.CustomError{}
 }
+func (cs CategoryService) GetAllParentCategory(ctx context.Context) (responses.Categories, custom_error.CustomError) {
+	var response responses.Categories
+	categories, err := cs.repo.GetAllParent(ctx)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return response, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return response, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+	return responses.ToCategories(categories), custom_error.CustomError{}
+}

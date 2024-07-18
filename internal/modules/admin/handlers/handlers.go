@@ -534,9 +534,12 @@ func (a AdminHandler) EditProduct(c *gin.Context) {
 
 func (a AdminHandler) UpdateProduct(c *gin.Context) {}
 
+//----------------------
+//	ATTRIBUTE HANDLERS
+//----------------------
+
 func (a AdminHandler) CreateAttribute(c *gin.Context) {
-	//category where parent_id=null
-	categories, _ := a.categorySrv.GetAllCategories(c)
+	categories, _ := a.categorySrv.GetAllParentCategory(c)
 	html.Render(c, http.StatusFound, "admin_create_attribute", gin.H{
 		"TITLE":      "create new attribute",
 		"CATEGORIES": categories,
@@ -548,7 +551,7 @@ func (a AdminHandler) CreateAttributeValues(c *gin.Context) {
 
 	//category where parent_id=null
 	//attribute will fetch by ajax request
-	categories, _ := a.categorySrv.GetAllCategories(c)
+	categories, _ := a.categorySrv.GetAllParentCategory(c)
 	html.Render(c, http.StatusFound, "admin_create_attribute_values", gin.H{
 		"TITLE":      "create new attribute-values",
 		"CATEGORIES": categories,

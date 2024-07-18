@@ -21,6 +21,12 @@ func (cr CategoryRepository) GetAll(ctx context.Context) ([]entities.Category, e
 	return categories, err
 }
 
+func (cr CategoryRepository) GetAllParent(ctx context.Context) ([]entities.Category, error) {
+	var categories []entities.Category
+	err := cr.db.Where("parent_id IS NULL").Find(&categories).Error
+	return categories, err
+}
+
 func (cr CategoryRepository) SelectBy(ctx context.Context, categoryID int) (entities.Category, error) {
 	var category entities.Category
 	err := cr.db.First(&category, "id=?", categoryID).Error
