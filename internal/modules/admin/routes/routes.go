@@ -54,6 +54,12 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.POST("/admins/categories/:id", adminHlr.UpdateCategory)
 		authGrp.GET("/admins/categories/:id/products", adminHlr.CategoryProducts)
 
+		//attributes
+		authGrp.GET("/admins/attributes/create", adminHlr.CreateAttribute)
+
+		//attribute-values
+		authGrp.GET("/admins/attribute-values/create", adminHlr.CreateAttributeValues)
+
 		//products
 		authGrp.GET("/admins/products", adminHlr.IndexProduct)
 		authGrp.GET("/admins/products/create", adminHlr.CreateProduct)
@@ -61,6 +67,9 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.GET("/admins/products/:id", adminHlr.ShowProduct)
 		authGrp.GET("/admins/products/:id/edit", adminHlr.EditProduct)
 		authGrp.POST("/admins/products/:id", adminHlr.UpdateProduct)
+
+		//product-attribute
+		//product-inventory
 
 	}
 
