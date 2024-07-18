@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"shop/internal/modules/admin/requests"
 	"shop/internal/modules/admin/services/attribute"
+	attributeValue "shop/internal/modules/admin/services/attribute_value"
 	"shop/internal/modules/admin/services/auth"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/product"
@@ -29,7 +30,9 @@ type AdminHandler struct {
 	categorySrv  category.CategoryServiceInterface
 	productSrv   product.ProductServiceInterface
 	attributeSrv attribute.AttributeServiceInterface
-	i18nBundle   *i18n.Bundle
+	attrValueSrv attributeValue.AttributeValueServiceInterface
+
+	i18nBundle *i18n.Bundle
 	//order service
 	//user service
 	//cart service
@@ -40,6 +43,7 @@ func NewAdminHandler(
 	categorySrv category.CategoryService,
 	productSrv product.ProductServiceInterface,
 	attributeSrv attribute.AttributeServiceInterface,
+	attrValueSrv attributeValue.AttributeValueServiceInterface,
 	i18nBundle *i18n.Bundle,
 ) AdminHandler {
 	return AdminHandler{
@@ -47,7 +51,9 @@ func NewAdminHandler(
 		categorySrv:  categorySrv,
 		productSrv:   productSrv,
 		attributeSrv: attributeSrv,
-		i18nBundle:   i18nBundle,
+		attrValueSrv: attrValueSrv,
+
+		i18nBundle: i18nBundle,
 	}
 }
 

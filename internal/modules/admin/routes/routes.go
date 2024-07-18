@@ -7,10 +7,12 @@ import (
 	"shop/internal/middlewares"
 	AdminHandler "shop/internal/modules/admin/handlers"
 	attributeRepository "shop/internal/modules/admin/repositories/attribute"
+	attributeValueRepository "shop/internal/modules/admin/repositories/attribute_value"
 	authRepository "shop/internal/modules/admin/repositories/auth"
 	categoryRepository "shop/internal/modules/admin/repositories/category"
 	productRepository "shop/internal/modules/admin/repositories/product"
 	"shop/internal/modules/admin/services/attribute"
+	attributeValue "shop/internal/modules/admin/services/attribute_value"
 	"shop/internal/modules/admin/services/auth"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/product"
@@ -30,7 +32,10 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	attributeRep := attributeRepository.NewAttributeRepository(mysql.Get())
 	attributeSrv := attribute.NewAttributeService(attributeRep)
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, i18nBundle)
+	attributeValueRepo := attributeValueRepository.NewAttributeRepository(mysql.Get())
+	attributeValueSrv := attributeValue.NewAttributeValueService(attributeValueRepo)
+
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, i18nBundle)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
