@@ -11,4 +11,6 @@ type Category struct {
 	Status        bool       `gorm:"default true;no null"`
 	SubCategories []Category `gorm:"foreignKey:ParentID"`
 	Products      []Product  `gorm:"foreignKey:CategoryID"`
+
+	Attribute []Attribute `gorm:"foreignKey:CategoryID"`
 }

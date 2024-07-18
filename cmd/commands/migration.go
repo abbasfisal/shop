@@ -39,6 +39,7 @@ func migrate() {
 	err := db.AutoMigrate(
 		&entities.User{},
 		&entities.Category{},
+		&entities.Attribute{},
 		&entities.Product{},
 		&entities.ProductImages{},
 		&entities.Address{},
