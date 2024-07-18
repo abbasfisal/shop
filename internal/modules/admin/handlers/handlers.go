@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"shop/internal/modules/admin/requests"
+	"shop/internal/modules/admin/services/attribute"
 	"shop/internal/modules/admin/services/auth"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/product"
@@ -24,10 +25,11 @@ import (
 )
 
 type AdminHandler struct {
-	authSrv     auth.AuthenticateServiceInterface
-	categorySrv category.CategoryServiceInterface
-	productSrv  product.ProductServiceInterface
-	i18nBundle  *i18n.Bundle
+	authSrv      auth.AuthenticateServiceInterface
+	categorySrv  category.CategoryServiceInterface
+	productSrv   product.ProductServiceInterface
+	attributeSrv attribute.AttributeServiceInterface
+	i18nBundle   *i18n.Bundle
 	//order service
 	//user service
 	//cart service
@@ -37,13 +39,15 @@ func NewAdminHandler(
 	authSrv auth.AuthenticateServiceInterface,
 	categorySrv category.CategoryService,
 	productSrv product.ProductServiceInterface,
+	attributeSrv attribute.AttributeServiceInterface,
 	i18nBundle *i18n.Bundle,
 ) AdminHandler {
 	return AdminHandler{
-		authSrv:     authSrv,
-		categorySrv: categorySrv,
-		productSrv:  productSrv,
-		i18nBundle:  i18nBundle,
+		authSrv:      authSrv,
+		categorySrv:  categorySrv,
+		productSrv:   productSrv,
+		attributeSrv: attributeSrv,
+		i18nBundle:   i18nBundle,
 	}
 }
 
@@ -557,5 +561,40 @@ func (a AdminHandler) CreateAttributeValues(c *gin.Context) {
 		"CATEGORIES": categories,
 		"ATTRIBUTES": "attributes",
 	})
+	return
+}
+
+func (a AdminHandler) StoreAttribute(c *gin.Context) {
+	//todo: check uniqueness of title in given category
+
+	var req requests.CreateAttributeRequest
+
+	_ = c.Request.ParseForm()
+	err := c.ShouldBind(&req)
+	if err != nil {
+		fmt.Println("err:", err)
+		errors.Init()
+		errors.SetFromErrors(err)
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, "/admins/attributes/create")
+		return
+	}
+
+	newAttr, Aerr := a.attributeSrv.Create(c, req)
+
+	if Aerr != nil || newAttr.ID <= 0 {
+		fmt.Println("Error in creating new attribute : ", err)
+		sessions.Set(c, "message", "خطا در ایجاد ویژگی")
+		c.Redirect(http.StatusFound, "/admins/attributes/create")
+		return
+	}
+
+	sessions.Set(c, "message", "ایجاد دسته بندی با موفقیت انجام شد")
+	c.Redirect(http.StatusFound, "/admins/attributes/create")
 	return
 }

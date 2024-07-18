@@ -6,9 +6,11 @@ import (
 	"shop/internal/database/mysql"
 	"shop/internal/middlewares"
 	AdminHandler "shop/internal/modules/admin/handlers"
+	attributeRepository "shop/internal/modules/admin/repositories/attribute"
 	authRepository "shop/internal/modules/admin/repositories/auth"
 	categoryRepository "shop/internal/modules/admin/repositories/category"
 	productRepository "shop/internal/modules/admin/repositories/product"
+	"shop/internal/modules/admin/services/attribute"
 	"shop/internal/modules/admin/services/auth"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/product"
@@ -25,7 +27,10 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	productRepo := productRepository.NewProductRepository(mysql.Get())
 	productSrv := product.NewProductService(productRepo)
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, i18nBundle)
+	attributeRep := attributeRepository.NewAttributeRepository(mysql.Get())
+	attributeSrv := attribute.NewAttributeService(attributeRep)
+
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, i18nBundle)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
@@ -56,6 +61,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 		//attributes
 		authGrp.GET("/admins/attributes/create", adminHlr.CreateAttribute)
+		authGrp.POST("/admins/attributes", adminHlr.StoreAttribute)
 
 		//attribute-values
 		authGrp.GET("/admins/attribute-values/create", adminHlr.CreateAttributeValues)
