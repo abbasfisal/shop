@@ -117,8 +117,10 @@ func (a AdminHandler) IndexCategory(c *gin.Context) {
 }
 
 func (a AdminHandler) CreateCategory(c *gin.Context) {
+	categories, _ := a.categorySrv.GetAllCategories(c)
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_category", gin.H{
-		"TITLE": "create new category",
+		"TITLE":      "create new category",
+		"CATEGORIES": categories,
 	})
 	return
 }
@@ -158,56 +160,60 @@ func (a AdminHandler) StoreCategory(c *gin.Context) {
 	//	upload and save image
 	//------------------------
 	imageFile, imageErr := c.FormFile("image")
-	if imageErr != nil {
-		//validation on required tag
-		errors.Init()
-		errors.Add("image", custom_error.IsRequired)
-		sessions.Set(c, "errors", errors.ToString())
+	//require validation on image
+	//if imageErr != nil {
+	//	//validation on required tag
+	//	errors.Init()
+	//	errors.Add("image", custom_error.IsRequired)
+	//	sessions.Set(c, "errors", errors.ToString())
+	//
+	//	old.Init()
+	//	old.Set(c)
+	//	sessions.Set(c, "olds", old.ToString())
+	//
+	//	c.Redirect(http.StatusFound, "/admins/categories/create")
+	//
+	//	return
+	//}
 
-		old.Init()
-		old.Set(c)
-		sessions.Set(c, "olds", old.ToString())
+	pathToUpload := ""
+	if imageErr == nil {
+		// file extension validation
+		fileExtension := filepath.Ext(imageFile.Filename)
+		ok := slices.Contains(util.AllowImageExtensions(), fileExtension)
+		if !ok {
+			errors.Init()
+			errors.Add("image", custom_error.MustBeImage)
+			sessions.Set(c, "errors", errors.ToString())
 
-		c.Redirect(http.StatusFound, "/admins/categories/create")
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
 
-		return
+			c.Redirect(http.StatusFound, "/admins/categories/create")
+			return
+		}
+
+		//upload image and store on disk
+		newImageName := util.GenerateFilename(imageFile.Filename)
+		pathToUpload := viper.GetString("Upload.Categories") + newImageName
+		uploadErr := c.SaveUploadedFile(imageFile, pathToUpload)
+		if uploadErr != nil {
+			fmt.Println("upload error:", uploadErr)
+			errors.Init()
+			errors.Add("image", custom_error.UploadImageError)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, "/admins/categories/create")
+
+			return
+		}
+		req.Image = newImageName
 	}
-
-	// file extension validation
-	fileExtension := filepath.Ext(imageFile.Filename)
-	ok := slices.Contains(util.AllowImageExtensions(), fileExtension)
-	if !ok {
-		errors.Init()
-		errors.Add("image", custom_error.MustBeImage)
-		sessions.Set(c, "errors", errors.ToString())
-
-		old.Init()
-		old.Set(c)
-		sessions.Set(c, "olds", old.ToString())
-
-		c.Redirect(http.StatusFound, "/admins/categories/create")
-		return
-	}
-
-	//upload image and store on disk
-	newImageName := util.GenerateFilename(imageFile.Filename)
-	pathToUpload := viper.GetString("Upload.Categories") + newImageName
-	uploadErr := c.SaveUploadedFile(imageFile, pathToUpload)
-	if uploadErr != nil {
-		fmt.Println("upload error:", uploadErr)
-		errors.Init()
-		errors.Add("image", custom_error.UploadImageError)
-		sessions.Set(c, "errors", errors.ToString())
-
-		old.Init()
-		old.Set(c)
-		sessions.Set(c, "olds", old.ToString())
-
-		c.Redirect(http.StatusFound, "/admins/categories/create")
-
-		return
-	}
-	req.Image = newImageName
 
 	//---------------------------
 	//	end upload and save image

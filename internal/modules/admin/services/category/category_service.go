@@ -62,6 +62,7 @@ func (cs CategoryService) Create(ctx context.Context, req requests.CreateCategor
 	var response responses.Category
 
 	var cat = entities.Category{
+		//ParentID: &req.ParentID,
 		Title: req.Title,
 		Slug:  req.Slug,
 		Image: req.Image,

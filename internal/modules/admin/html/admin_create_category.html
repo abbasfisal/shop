@@ -29,6 +29,20 @@
                         <form action="/admins/categories" method="post" enctype="multipart/form-data">
                             <table class="table table-primary ">
                                 <tr>
+                                    <td>دسته بندی والد</td>
+                                    <td>
+                                        <select name="parent_id" id="">
+                                            <option value="0">بدون والد</option>
+
+                                            {{range .CATEGORIES.Data}}
+                                                <option value="{{.ID}}">
+                                                    {{.Title}}
+                                                </option>
+                                            {{end}}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>عنوان</td>
                                     <td><input type="text" name="title"
                                                class="form-control"
@@ -73,6 +87,7 @@
                                     </td>
                                 </tr>
                             </table>
+
                         </form>
 
 
