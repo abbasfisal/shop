@@ -1,1 +1,0 @@
-1: store parent in categories table when admin passed 0 value
