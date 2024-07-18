@@ -40,6 +40,7 @@ func migrate() {
 		&entities.User{},
 		&entities.Category{},
 		&entities.Attribute{},
+		&entities.AttributeValue{},
 		&entities.Product{},
 		&entities.ProductImages{},
 		&entities.Address{},
