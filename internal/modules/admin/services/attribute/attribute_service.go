@@ -30,3 +30,8 @@ func (as AttributeService) Create(ctx context.Context, req requests.CreateAttrib
 	}
 	return responses.ToAttribute(result), nil
 }
+
+func (as AttributeService) FetchByCategoryID(ctx context.Context, categoryID int) (responses.Attributes, error) {
+	attributes, err := as.repo.GetByCategory(ctx, categoryID)
+	return responses.ToAttributes(attributes), err
+}

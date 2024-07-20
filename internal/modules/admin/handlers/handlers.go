@@ -604,3 +604,23 @@ func (a AdminHandler) StoreAttribute(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/admins/attributes/create")
 	return
 }
+
+func (a AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
+	//todo: error for converting string to integer
+	cat, err := strconv.Atoi(c.Param("catID"))
+	fmt.Println(" category id : ", cat)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+		return
+	}
+
+	attributes, err := a.attributeSrv.FetchByCategoryID(c, cat)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch attributes"})
+		return
+	}
+
+	fmt.Println("response attributes : ", attributes)
+	c.JSON(http.StatusOK, attributes)
+}

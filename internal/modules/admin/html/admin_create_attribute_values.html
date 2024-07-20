@@ -31,7 +31,7 @@
                                 <tr>
                                     <td>دسته بندی والد</td>
                                     <td>
-                                        <select name="parent_id" id="">
+                                        <select name="parent_id" id="parent-category">
                                             {{range .CATEGORIES.Data}}
                                                 <option value="{{.ID}}">
                                                     {{.Title}}
@@ -43,12 +43,8 @@
                                 <tr>
                                     <td>ویژگی</td>
                                     <td>
-                                        <select name="parent_id" id="">
-                                            {{range .CATEGORIES.Data}}
-                                                <option value="{{.ID}}">
-                                                    {{.Title}}
-                                                </option>
-                                            {{end}}
+                                        <select name="attribute_id" id="attribute">
+                                            <option value="">انتخاب کنید</option>
                                         </select>
                                     </td>
                                 </tr>
@@ -61,23 +57,18 @@
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><input class="btn  btn-primary btn-lg" type="submit" value="ایجاد"></td>
+                                    <td><input class="btn btn-primary btn-lg" type="submit" value="ایجاد"></td>
                                     <td class="text-info border-white">
                                         {{if .MESSAGE}} {{.MESSAGE}} {{end}}
                                     </td>
                                 </tr>
                             </table>
-
                         </form>
-
-
                     </div>
                     <!-- /.col-md-6 -->
-
-                    ss
                     {{.AUTH.FirstName}}
                     <br>
-                    {{range $a,$key:=.}}
+                    {{range $a, $key := .}}
                         {{$a}}:{{$key}}<br>
                     {{end}}
                 </div>
@@ -91,5 +82,33 @@
     <!-- Main Footer -->
     {{template "footer" .}}
 
-{{end}}
+    <script>
+        $(document).ready(function () {
+            $('#parent-category').change(function () {
+                var parentId = $(this).val();
 
+                if (parentId) {
+                    $.ajax({
+                        url: '/admins/get-attributes/' + parentId,
+                        type: 'GET',
+                        success: function (response) {
+                            alert("success : " +response.Data)
+                            $('#attribute').empty();
+                            $('#attribute').append('<option value="">انتخاب کنید</option>');
+                            $.each(response.Data, function (index, attribute) {
+                                $('#attribute').append('<option value="' + attribute.ID + '">' + attribute.Title + '</option>');
+                            });
+                        },
+                        error: function (error) {
+                            alert("Error: " + error.responseText);
+                            console.log("Error fetching attributes:", error);
+                        }
+                    });
+                } else {
+                    $('#attribute').empty();
+                    $('#attribute').append('<option value="">انتخاب کنید</option>');
+                }
+            });
+        });
+    </script>
+{{end}}

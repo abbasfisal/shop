@@ -67,6 +67,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		//attributes
 		authGrp.GET("/admins/attributes/create", adminHlr.CreateAttribute)
 		authGrp.POST("/admins/attributes", adminHlr.StoreAttribute)
+		authGrp.GET("/admins/get-attributes/:catID", adminHlr.GetAttributesByCategoryID)
 
 		//attribute-values
 		authGrp.GET("/admins/attribute-values/create", adminHlr.CreateAttributeValues)
