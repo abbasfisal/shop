@@ -71,6 +71,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 		//attribute-values
 		authGrp.GET("/admins/attribute-values/create", adminHlr.CreateAttributeValues)
+		authGrp.POST("/admins/attribute-values", adminHlr.StoreAttributeValues)
 
 		//products
 		authGrp.GET("/admins/products", adminHlr.IndexProduct)

@@ -624,3 +624,31 @@ func (a AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
 	fmt.Println("response attributes : ", attributes)
 	c.JSON(http.StatusOK, attributes)
 }
+
+func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
+	//TODO: implement error handling
+	var req requests.CreateAttributeValueRequest
+	_ = c.Request.ParseForm()
+	err := c.ShouldBind(&req)
+	if err != nil {
+		c.JSON(429, gin.H{
+			"failed": err.Error(),
+		})
+		return
+	}
+	newAttrValue, err := a.attrValueSrv.Create(c, req)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"failed": "create new attribte value failed",
+			"msg ":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(201,
+		gin.H{
+			"created ": "successfully",
+			"data":     newAttrValue,
+		})
+	return
+}
