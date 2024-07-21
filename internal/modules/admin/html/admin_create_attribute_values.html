@@ -92,7 +92,6 @@
                         url: '/admins/get-attributes/' + parentId,
                         type: 'GET',
                         success: function (response) {
-                            alert("success : " +response.Data)
                             $('#attribute').empty();
                             $('#attribute').append('<option value="">انتخاب کنید</option>');
                             $.each(response.Data, function (index, attribute) {
@@ -100,7 +99,6 @@
                             });
                         },
                         error: function (error) {
-                            alert("Error: " + error.responseText);
                             console.log("Error fetching attributes:", error);
                         }
                     });
