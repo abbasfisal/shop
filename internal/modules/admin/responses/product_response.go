@@ -3,13 +3,13 @@ package responses
 import "shop/internal/entities"
 
 type Product struct {
-	ID            uint
-	CategoryID    uint
-	Title         string
-	Slug          string
-	Sku           string
-	Status        bool
-	Quantity      uint
+	ID         uint
+	CategoryID uint
+	Title      string
+	Slug       string
+	Sku        string
+	Status     bool
+	//Quantity      uint
 	OriginalPrice uint
 	SalePrice     uint
 	Description   string
@@ -30,13 +30,13 @@ func ToProducts(products []entities.Product) Products {
 }
 func ToProduct(p entities.Product) Product {
 	return Product{
-		ID:            p.ID,
-		CategoryID:    p.CategoryID,
-		Title:         p.Title,
-		Slug:          p.Slug,
-		Sku:           p.Sku,
-		Status:        p.Status,
-		Quantity:      p.Quantity,
+		ID:         p.ID,
+		CategoryID: p.CategoryID,
+		Title:      p.Title,
+		Slug:       p.Slug,
+		Sku:        p.Sku,
+		Status:     p.Status,
+		//Quantity:      p.Quantity,
 		OriginalPrice: p.OriginalPrice,
 		SalePrice:     p.SalePrice,
 		Description:   p.Description,

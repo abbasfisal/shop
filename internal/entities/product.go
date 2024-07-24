@@ -4,12 +4,12 @@ import "gorm.io/gorm"
 
 type Product struct {
 	gorm.Model
-	CategoryID    uint
-	Title         string
-	Slug          string `gorm:"unique"`
-	Sku           string `gorm:"unique"`
-	Status        bool
-	Quantity      uint `gorm:"not null"`
+	CategoryID uint
+	Title      string
+	Slug       string `gorm:"unique"`
+	Sku        string `gorm:"unique"`
+	Status     bool
+	//Quantity      uint `gorm:"not null"`
 	OriginalPrice uint
 	SalePrice     uint
 	Description   string

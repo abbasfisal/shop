@@ -59,7 +59,7 @@ func (p ProductService) Create(ctx context.Context, req requests.CreateProductRe
 			}
 			return true
 		}(),
-		Quantity:      req.Quantity,
+		//Quantity:      req.Quantity,
 		OriginalPrice: req.OriginalPrice,
 		SalePrice:     req.SalePrice,
 		Description:   strings.TrimSpace(req.Description),
