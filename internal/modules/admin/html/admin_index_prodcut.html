@@ -39,7 +39,6 @@
                                     <td>اسلاگ</td>
                                     <td>sku</td>
                                     <td>وضعیت</td>
-                                    <td>موجودی</td>
                                     <td>قیمت اصلی</td>
                                     <td>قیمت فروش</td>
                                     <td>دسته بندی</td>
@@ -58,7 +57,7 @@
                                                 <span class="badge badge-danger">غیرفعال</span>
                                             {{end}}
                                         </td>
-                                        <td >{{.Quantity}}</td>
+
                                         <td>{{.OriginalPrice}}</td>
                                         <td>{{.SalePrice}}</td>
                                         <td><a href="/admins/categories/{{.Category.ID}}">{{.Category.Title}}</a></td>
@@ -69,6 +68,8 @@
                                             <a href="/admins/products/{{.ID}}/edit">
                                                 <i class="nav-icon text-info fa fa-edit"></i>
                                             </a>
+                                            |
+                                            <a href="/admins/products/{{.ID}}/add-attributes">add-attr</a>
                                         </td>
                                     </tr>
                                 {{end}}
