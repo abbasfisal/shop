@@ -15,4 +15,6 @@ type Product struct {
 	Description   string
 	Category      Category        `gorm:"foreignKey:CategoryID"`
 	ProductImage  []ProductImages `gorm:"foreignKey:ProductID"`
+
+	ProductAttribute []ProductAttribute `gorm:"foreignKye:ProductID"`
 }
