@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/product"
@@ -92,4 +93,30 @@ func (p ProductService) CheckSkuIsUnique(ctx context.Context, sku string) (bool,
 		return false, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
 	}
 	return false, custom_error.CustomError{}
+}
+
+func (p ProductService) FetchByProductID(c *gin.Context, productID int) (responses.Product, custom_error.CustomError) {
+	product, err := p.repo.FindByID(c, productID)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 500)
+	}
+	return responses.ToProduct(product), custom_error.CustomError{}
+}
+
+func (p ProductService) FetchRootAttributes(c *gin.Context, productID int) (responses.Attributes, custom_error.CustomError) {
+
+	attributes, err := p.repo.GetRootAttributes(c, productID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return responses.Attributes{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return responses.Attributes{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 500)
+	}
+
+	return responses.ToAttributes(attributes), custom_error.CustomError{}
+
 }

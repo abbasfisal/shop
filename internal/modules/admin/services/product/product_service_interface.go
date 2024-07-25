@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"shop/internal/modules/admin/requests"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/pkg/custom_error"
@@ -12,4 +13,6 @@ type ProductServiceInterface interface {
 	Show(ctx context.Context, columnName string, value any) (responses.Product, custom_error.CustomError)
 	Create(ctx context.Context, req requests.CreateProductRequest) (responses.Product, custom_error.CustomError)
 	CheckSkuIsUnique(ctx context.Context, sku string) (bool, custom_error.CustomError)
+	FetchByProductID(c *gin.Context, productID int) (responses.Product, custom_error.CustomError)
+	FetchRootAttributes(c *gin.Context, productID int) (responses.Attributes, custom_error.CustomError)
 }
