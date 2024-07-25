@@ -3,6 +3,7 @@ package seeder
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
 )
@@ -21,84 +22,128 @@ func Seed() {
 	}
 
 	var category = entities.Category{
-		Title:  "Men Clothes",
-		Slug:   "men-clothes",
-		Image:  "categories/men.jpg",
-		Status: true,
-		Products: []entities.Product{
+
+		Title:    "لباس و پوشاک",
+		Slug:     "clothes",
+		ParentID: nil,
+		Image:    "",
+		Status:   true,
+		SubCategories: []entities.Category{
 			{
-				CategoryID: 0,
-				Title:      "T shirt",
-				Slug:       "t-shirt",
-				Sku:        "sku1000",
-				Status:     true,
-				//Quantity:      100,
-				OriginalPrice: 600000,
-				SalePrice:     500000,
-				Description:   "description goes here",
+				Model:    gorm.Model{},
+				Title:    "لباس مردانه",
+				Slug:     "men-clothes",
+				ParentID: nil,
+				Image:    "",
+				Status:   true,
+				SubCategories: []entities.Category{
+					{
+						Model:         gorm.Model{},
+						Title:         "تی شرت",
+						Slug:          "men-t-shirt",
+						ParentID:      nil,
+						Image:         "men-t-shirt.jpg",
+						Status:        true,
+						SubCategories: nil,
+						Products: []entities.Product{
+							{
+								Model:         gorm.Model{},
+								CategoryID:    0,
+								Title:         "تیشرت مردانه مدل هایما",
+								Slug:          "hima-men-t-shirt",
+								Sku:           "sku-32932",
+								Status:        true,
+								OriginalPrice: 20000,
+								SalePrice:     250000,
+								Description:   "توضیحات تیشرت هایما",
+								Category:      entities.Category{},
+								ProductImage:  nil,
+								//ProductAttribute: []entities.ProductAttribute{
+								//	{
+								//		Model:               gorm.Model{},
+								//		ProductID:           0,
+								//		AttributeID:         1,
+								//		AttributeTitle:      "سایز",
+								//		AttributeValueID:    1,
+								//		AttributeValueTitle: "s",
+								//		Attribute:           entities.Attribute{},
+								//		AttributeValue:      entities.AttributeValue{},
+								//	},
+								//	{
+								//		Model:               gorm.Model{},
+								//		ProductID:           0,
+								//		AttributeID:         1,
+								//		AttributeTitle:      "سایز",
+								//		AttributeValueID:    2,
+								//		AttributeValueTitle: "m",
+								//		Attribute:           entities.Attribute{},
+								//		AttributeValue:      entities.AttributeValue{},
+								//	},
+								//	{
+								//		Model:               gorm.Model{},
+								//		ProductID:           0,
+								//		AttributeID:         1,
+								//		AttributeTitle:      "سایز",
+								//		AttributeValueID:    3,
+								//		AttributeValueTitle: "l",
+								//		Attribute:           entities.Attribute{},
+								//		AttributeValue:      entities.AttributeValue{},
+								//	},
+								//},
+							},
+						},
+						Attribute: nil,
+					},
+				},
+				Products:  nil,
+				Attribute: nil,
 			},
+		},
+		Products: nil,
+		Attribute: []entities.Attribute{
 			{
+				Model:      gorm.Model{},
 				CategoryID: 0,
-				Title:      "Belt",
-				Slug:       "belt",
-				Sku:        "sku2000",
-				Status:     true,
-				//Quantity:      50,
-				OriginalPrice: 200000,
-				SalePrice:     100000,
-				Description:   "description goes here",
+				Title:      "سایز",
+				Category:   entities.Category{},
+				AttributeValues: []entities.AttributeValue{
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "سایز",
+						Value:          "s",
+					},
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "سایز",
+						Value:          "m",
+					},
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "سایز",
+						Value:          "l",
+					},
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "سایز",
+						Value:          "xl",
+					},
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "سایز",
+						Value:          "xxl",
+					},
+				},
 			},
 		},
 	}
 
-	//address
-	var address = entities.Address{
-		UserID:      1,
-		Floor:       1,
-		Number:      5,
-		Phase:       "A",
-		Block:       "B",
-		Description: "address description goes here",
-	}
-
-	var cart1 = entities.Cart{
-		UserID:    1,
-		ProductID: 1,
-		Count:     5,
-		Status:    0, //not paid
-	}
-	var cart2 = entities.Cart{
-		UserID:    1,
-		ProductID: 2,
-		Count:     4,
-		Status:    0, //not paid
-	}
-
-	var order1 = entities.Order{
-		UserID:         1,
-		TrackingNumber: "879821",
-		ProductID:      1,
-		Count:          5,
-		Status:         1, //successfully paid
-	}
-
-	var order2 = entities.Order{
-		UserID:         1,
-		TrackingNumber: "879821",
-		ProductID:      2,
-		Count:          4,
-		Status:         1, //successfully paid
-	}
-
 	db.Create(&user)
 	db.Create(&category)
-	db.Create(&address)
-
-	db.Create(&cart1)
-	db.Create(&cart2)
-
-	db.Create(&order1)
-	db.Create(&order2)
 
 	fmt.Println("[Seed] tables successfully")
 }
