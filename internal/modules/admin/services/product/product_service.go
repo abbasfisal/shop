@@ -120,3 +120,16 @@ func (p ProductService) FetchRootAttributes(c *gin.Context, productID int) (resp
 	return responses.ToAttributes(attributes), custom_error.CustomError{}
 
 }
+
+func (p ProductService) AddAttributeValues(c *gin.Context, productID int, attributes []string) custom_error.CustomError {
+	err := p.repo.StoreAttributeValues(c, productID, attributes)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+
+	}
+
+	return custom_error.CustomError{}
+}
