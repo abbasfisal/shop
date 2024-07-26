@@ -139,6 +139,32 @@ func Seed() {
 					},
 				},
 			},
+			{
+				Model:      gorm.Model{},
+				CategoryID: 0,
+				Title:      "رنگ",
+				Category:   entities.Category{},
+				AttributeValues: []entities.AttributeValue{
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "رنگ",
+						Value:          "آبی",
+					},
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "رنگ",
+						Value:          "قرمز",
+					},
+					{
+						Model:          gorm.Model{},
+						AttributeID:    0,
+						AttributeTitle: "رنگ",
+						Value:          "بنفش",
+					},
+				},
+			},
 		},
 	}
 
