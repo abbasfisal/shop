@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
+	"strconv"
+	"strings"
 )
 
 type ProductRepository struct {
@@ -80,11 +82,35 @@ func (p ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]e
 	).Scan(&category).Error
 
 	if err != nil {
-		fmt.Println("proudct repository _ root category not found")
+		fmt.Println("product repository _ root category not found")
 		return attributes, err
 	}
 
 	aErr := p.db.Preload("AttributeValues").Where("category_id = ? ", category.ID).Find(&attributes).Error
 
 	return attributes, aErr
+}
+
+func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error {
+	//find product by id
+	_, err := p.FindByID(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	//store []attributes values into product_attributes table
+	for _, v := range attValues {
+		parts := strings.Split(v, ":")
+
+		attributeID, _ := strconv.Atoi(parts[1])
+		attributeValueID, _ := strconv.Atoi(parts[5])
+		p.db.Create(&entities.ProductAttribute{
+			ProductID:           uint(productID),
+			AttributeID:         uint(attributeID),
+			AttributeTitle:      parts[3],
+			AttributeValueID:    uint(attributeValueID),
+			AttributeValueTitle: parts[7],
+		})
+	}
+	return nil
 }
