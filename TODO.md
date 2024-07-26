@@ -28,3 +28,11 @@ LIMIT 1;
 
 
 <br/>
+
+<ul>
+<li>add a page for product inventory  </li>
+<li>use transaction for add attr-values for a product</li>
+<li>implement upload media for a product</li>
+
+
+</ul>
