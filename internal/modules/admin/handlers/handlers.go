@@ -652,3 +652,68 @@ func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
 		})
 	return
 }
+
+// ProductsAddAttributes : show html form add attributes for given product
+func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
+
+	//fetch product
+	productID, err := strconv.Atoi(c.Param("id"))
+	fmt.Println("product id  : ", productID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Product ID"})
+		return
+	}
+
+	//fetch attributes with values
+	attributes, aErr := a.productSrv.FetchRootAttributes(c, productID)
+
+	if aErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	if aErr.Code == 500 {
+		html.Error500(c)
+		return
+	}
+	// end fetch attributes
+
+	html.Render(c, 200, "att", gin.H{
+		"ATTRIBUTES": attributes,
+		"PRODUCT_ID": productID,
+	})
+	return
+
+}
+
+func (a AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
+
+	productID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(422, gin.H{
+			"error": "fail converting id to integer",
+		})
+		return
+	}
+
+	attributes := c.PostFormArray("attributes")
+
+	pAttrErr := a.productSrv.AddAttributeValues(c, productID, attributes)
+	if pAttrErr.Code == 404 {
+		c.JSON(404, gin.H{
+			"message":      "product not found",
+			"err":          pAttrErr.DisplayMessage,
+			"err original": pAttrErr.OriginalMessage,
+		})
+		return
+	}
+	if pAttrErr.Code == 500 {
+		html.Error500(c)
+
+		return
+	}
+
+	sessions.Set(c, "message", "ایجاد ویژگی برای محصول با موفقیت ایجاد گردید")
+	c.Redirect(http.StatusFound, "/admins/products")
+	return
+}
