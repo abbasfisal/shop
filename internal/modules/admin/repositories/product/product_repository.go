@@ -114,3 +114,10 @@ func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int,
 	}
 	return nil
 }
+
+func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID int) (entities.Product, error) {
+	var product entities.Product
+	err := p.db.Preload("ProductAttributes").Where("id=?", productID).First(&product).Error
+
+	return product, err
+}

@@ -717,3 +717,32 @@ func (a AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/admins/products")
 	return
 }
+
+func (a AdminHandler) ShowProductInventory(c *gin.Context) {
+	productID, pErr := strconv.Atoi(c.Param("id"))
+	if pErr != nil {
+		c.JSON(429, gin.H{
+			"error": pErr.Error(),
+		})
+		return
+	}
+	//fetch product data
+	fmt.Println("show product inventory : product id : ", productID)
+	//product, err := a.productSrv.FetchByProductID(c, productID)
+	product, err := a.productSrv.FetchProductAttributes(c, productID)
+	if err.Code == 404 {
+		c.JSON(404, gin.H{
+			"code":    err.Code,
+			"message": err.DisplayMessage,
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"data": product,
+	})
+	return
+	html.Render(c, 200, "inventory", gin.H{
+		"TITTLE": "Product Inventory",
+	})
+	return
+}

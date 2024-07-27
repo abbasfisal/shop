@@ -64,7 +64,7 @@ func (p ProductService) Create(ctx context.Context, req requests.CreateProductRe
 		OriginalPrice: req.OriginalPrice,
 		SalePrice:     req.SalePrice,
 		Description:   strings.TrimSpace(req.Description),
-		ProductImage: func() []entities.ProductImages {
+		ProductImages: func() []entities.ProductImages {
 			var pImages []entities.ProductImages
 			for _, imageName := range req.ProductImage {
 				pImages = append(pImages, entities.ProductImages{
@@ -132,4 +132,16 @@ func (p ProductService) AddAttributeValues(c *gin.Context, productID int, attrib
 	}
 
 	return custom_error.CustomError{}
+}
+
+func (p ProductService) FetchProductAttributes(c *gin.Context, productID int) (responses.Product, custom_error.CustomError) {
+	//fetch product , and fetch product_attributes
+	product, err := p.repo.GetProductAndAttributes(c, productID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return responses.Product{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+	return responses.ToProduct(product), custom_error.CustomError{}
 }

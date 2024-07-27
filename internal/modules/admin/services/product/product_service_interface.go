@@ -16,4 +16,5 @@ type ProductServiceInterface interface {
 	FetchByProductID(c *gin.Context, productID int) (responses.Product, custom_error.CustomError)
 	FetchRootAttributes(c *gin.Context, productID int) (responses.Attributes, custom_error.CustomError)
 	AddAttributeValues(c *gin.Context, productID int, attributes []string) custom_error.CustomError
+	FetchProductAttributes(c *gin.Context, productID int) (responses.Product, custom_error.CustomError)
 }

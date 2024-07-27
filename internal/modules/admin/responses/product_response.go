@@ -10,11 +10,12 @@ type Product struct {
 	Sku        string
 	Status     bool
 	//Quantity      uint
-	OriginalPrice uint
-	SalePrice     uint
-	Description   string
-	Category      Category
-	Images        ImageProducts
+	OriginalPrice     uint
+	SalePrice         uint
+	Description       string
+	Category          Category
+	Images            ImageProducts
+	ProductAttributes ProductAttributes
 }
 
 type Products struct {
@@ -36,12 +37,13 @@ func ToProduct(p entities.Product) Product {
 		Slug:       p.Slug,
 		Sku:        p.Sku,
 		Status:     p.Status,
-		//Quantity:      p.Quantity,
-		OriginalPrice: p.OriginalPrice,
-		SalePrice:     p.SalePrice,
-		Description:   p.Description,
-		Category:      ToCategory(p.Category),
-		Images:        ToImageProducts(p.ProductImage),
+
+		OriginalPrice:     p.OriginalPrice,
+		SalePrice:         p.SalePrice,
+		Description:       p.Description,
+		Category:          ToCategory(p.Category),
+		Images:            ToImageProducts(p.ProductImages),
+		ProductAttributes: ToProductAttributes(p.ProductAttributes),
 	}
 }
 

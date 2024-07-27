@@ -13,4 +13,5 @@ type ProductRepositoryInterface interface {
 	Store(ctx context.Context, product entities.Product) (entities.Product, error)
 	GetRootAttributes(ctx *gin.Context, productID int) ([]entities.Attribute, error)
 	StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error
+	GetProductAndAttributes(ctx *gin.Context, productID int) (entities.Product, error)
 }

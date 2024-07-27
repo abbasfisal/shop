@@ -57,7 +57,7 @@ func Seed() {
 								SalePrice:     250000,
 								Description:   "توضیحات تیشرت هایما",
 								Category:      entities.Category{},
-								ProductImage:  nil,
+								ProductImages: nil,
 								//ProductAttribute: []entities.ProductAttribute{
 								//	{
 								//		Model:               gorm.Model{},

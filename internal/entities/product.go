@@ -14,7 +14,7 @@ type Product struct {
 	SalePrice     uint
 	Description   string
 	Category      Category        `gorm:"foreignKey:CategoryID"`
-	ProductImage  []ProductImages `gorm:"foreignKey:ProductID"`
+	ProductImages []ProductImages `gorm:"foreignKey:ProductID"`
 
-	ProductAttribute []ProductAttribute `gorm:"foreignKye:ProductID"`
+	ProductAttributes []ProductAttribute `gorm:"foreignKye:ProductID"`
 }
