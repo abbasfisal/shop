@@ -626,30 +626,39 @@ func (a AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
 }
 
 func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
-	//TODO: implement error handling
+
 	var req requests.CreateAttributeValueRequest
 	_ = c.Request.ParseForm()
 	err := c.ShouldBind(&req)
 	if err != nil {
-		c.JSON(429, gin.H{
-			"failed": err.Error(),
-		})
-		return
-	}
-	newAttrValue, err := a.attrValueSrv.Create(c, req)
-	if err != nil {
-		c.JSON(200, gin.H{
-			"failed": "create new attribte value failed",
-			"msg ":   err.Error(),
-		})
+		errors.Init()
+		errors.SetFromErrors(err)
+		if req.AttributeID <= 0 {
+			errors.Add("attribute_id", "The field is required.")
+		}
+		fmt.Println("validation failed : ", err.Error())
+		fmt.Println("attribute id : ", req.AttributeID)
+
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, "/admins/attribute-values/create")
 		return
 	}
 
-	c.JSON(201,
-		gin.H{
-			"created ": "successfully",
-			"data":     newAttrValue,
-		})
+	newAttrValue, err := a.attrValueSrv.Create(c, req)
+
+	if err != nil || newAttrValue.ID <= 0 {
+		sessions.Set(c, "message", "خطا در ایجاد ویژگی")
+		c.Redirect(http.StatusFound, "/admins/attribute-values/create")
+		return
+	}
+
+	sessions.Set(c, "message", "ایجاد ویژگی با موفقیت انجام شد")
+	c.Redirect(http.StatusFound, "/admins/attribute-values/create")
 	return
 }
 

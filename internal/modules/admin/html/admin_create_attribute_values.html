@@ -32,6 +32,7 @@
                                     <td>دسته بندی والد</td>
                                     <td>
                                         <select name="parent_id" id="parent-category">
+                                            <option value="">select</option>
                                             {{range .CATEGORIES.Data}}
                                                 <option value="{{.ID}}">
                                                     {{.Title}}
@@ -46,6 +47,7 @@
                                         <select name="attribute_id" id="attribute">
                                             <option data value="">انتخاب کنید</option>
                                         </select>
+                                        <span class="text-danger">{{ .ERRORS.attribute_id}}</span>
                                     </td>
                                 </tr>
                                 <tr>
