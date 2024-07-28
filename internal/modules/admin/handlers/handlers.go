@@ -737,12 +737,52 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{
-		"data": product,
+	//c.JSON(200, gin.H{
+	//	"data": product,
+	//})
+	//return
+	html.Render(c, 200, "inventory", gin.H{
+		"TITTLE":     "Product Inventory",
+		"PRODUCT_ID": product.ID,
+		"PRODUCT":    product,
 	})
 	return
-	html.Render(c, 200, "inventory", gin.H{
-		"TITTLE": "Product Inventory",
+}
+
+func (a AdminHandler) StoreProductInventory(c *gin.Context) {
+	productID, pErr := strconv.Atoi(c.Param("id"))
+	if pErr != nil {
+		errors.Init()
+		errors.SetFromErrors(pErr)
+		sessions.Set(c, "message", "id محصول اشتباه است")
+
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	//validation
+	var req requests.CreateProductInventoryRequest
+	c.Request.ParseForm()
+	_ = c.Request.ParseForm()
+	err := c.ShouldBind(&req)
+	if err != nil {
+		errors.Init()
+		errors.SetFromErrors(err)
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+	//end validation
+
+	//quantity , proudctAttributes
+	c.JSON(200, gin.H{
+		"data": req,
 	})
 	return
 }

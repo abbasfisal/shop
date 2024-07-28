@@ -86,6 +86,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.POST("/admins/products/:id/add-attributes", adminHlr.StoreProductsAddAttributes)
 		//product-inventory
 		authGrp.GET("/admins/products/:id/add-inventory", adminHlr.ShowProductInventory)
+		authGrp.POST("/admins/products/:id/add-inventory", adminHlr.StoreProductInventory)
 
 	}
 

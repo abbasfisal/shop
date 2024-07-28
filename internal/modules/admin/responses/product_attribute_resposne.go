@@ -3,6 +3,7 @@ package responses
 import "shop/internal/entities"
 
 type ProductAttribute struct {
+	ID        uint
 	ProductID uint
 
 	AttributeID    uint
@@ -17,6 +18,7 @@ type ProductAttributes struct {
 
 func ToProductAttribute(productAttribute entities.ProductAttribute) ProductAttribute {
 	return ProductAttribute{
+		ID:                  productAttribute.ID,
 		ProductID:           productAttribute.ProductID,
 		AttributeID:         productAttribute.AttributeID,
 		AttributeTitle:      productAttribute.AttributeTitle,
