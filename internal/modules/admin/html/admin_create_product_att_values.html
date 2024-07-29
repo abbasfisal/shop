@@ -33,11 +33,12 @@
                                     <div class="form-group">
                                         <h4>Multiple</h4>
                                         <select class="form-group-lg" name="attributes" multiple="multiple">
-                                            <option value="">Select Color</option>
+                                            <option value="">انتخاب کنید</option>
                                             {{range .ATTRIBUTES.Data}}
                                                 <optgroup label="{{.Title}}">
                                                     {{ range .AttributeValues.Data }}
-                                                        <option data-root-id="root2" value="attribute_id:{{.AttributeID}}:attribute_title:{{.AttributeTitle}}:value_id:{{.ID}}:value:{{.Title}}">{{.Title}}</option>
+                                                        <option data-root-id="root2"
+                                                                value="attribute_id:{{.AttributeID}}:attribute_title:{{.AttributeTitle}}:value_id:{{.ID}}:value:{{.Title}}">{{.Title}}</option>
                                                     {{ end }}
                                                 </optgroup>
                                                 {{.Title}} <br>
@@ -45,6 +46,12 @@
                                         </select>
                                     </div>
                                     <input type="submit" value="send">
+
+                                    <br>
+                                    <br>
+                                    <span class="text-info border-white">
+                                        {{if .MESSAGE}} {{.MESSAGE}} {{end}}
+                                    </span>
                                 </form>
                             </div>
                         </div>

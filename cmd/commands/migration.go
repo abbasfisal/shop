@@ -26,6 +26,7 @@ func migrate() {
 	if err := db.Migrator().DropTable(
 		&entities.User{},
 		&entities.Category{},
+		&entities.ProductInventory{},
 		&entities.Product{},
 		&entities.ProductAttribute{},
 		&entities.ProductImages{},
@@ -47,6 +48,7 @@ func migrate() {
 		&entities.Product{},
 		&entities.ProductAttribute{},
 		&entities.ProductImages{},
+		&entities.ProductInventory{},
 		&entities.Address{},
 		&entities.Cart{},
 		&entities.Order{},

@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
@@ -144,4 +145,16 @@ func (p ProductService) FetchProductAttributes(c *gin.Context, productID int) (r
 		return responses.Product{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
 	}
 	return responses.ToProduct(product), custom_error.CustomError{}
+}
+
+func (p ProductService) CreateInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) custom_error.CustomError {
+	_, err := p.repo.StoreProductInventory(c, productID, req)
+	if err != nil {
+		fmt.Println("create Inventory Error : ", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+	return custom_error.CustomError{}
 }

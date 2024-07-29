@@ -36,3 +36,14 @@ func ToProductAttributes(productAttributes []entities.ProductAttribute) ProductA
 
 	return response
 }
+
+///
+
+func ToInventoryProductAttributes(productAttributes []entities.ProductAttribute) []ProductAttribute {
+	var response []ProductAttribute
+
+	for _, productAtt := range productAttributes {
+		response = append(response, ToProductAttribute(productAtt))
+	}
+	return response
+}

@@ -496,7 +496,10 @@ func (a AdminHandler) ShowProduct(c *gin.Context) {
 		html.Error500(c)
 		return
 	}
-
+	c.JSON(200, gin.H{
+		"products:": selectedP,
+	})
+	return
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_show_product",
 		gin.H{
 			"TITLE":   "show product",
@@ -722,8 +725,9 @@ func (a AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
 		return
 	}
 
-	sessions.Set(c, "message", "ایجاد ویژگی برای محصول با موفقیت ایجاد گردید")
-	c.Redirect(http.StatusFound, "/admins/products")
+	sessions.Set(c, "message", " ویژگی ها برای محصول با موفقیت ایجاد گردید | لطفا موجودی اضافه نمایید")
+	url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
+	c.Redirect(http.StatusFound, url)
 	return
 }
 
@@ -739,11 +743,12 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 	fmt.Println("show product inventory : product id : ", productID)
 	//product, err := a.productSrv.FetchByProductID(c, productID)
 	product, err := a.productSrv.FetchProductAttributes(c, productID)
-	if err.Code == 404 {
-		c.JSON(404, gin.H{
-			"code":    err.Code,
-			"message": err.DisplayMessage,
-		})
+
+	if err.Code == 404 || len(product.ProductAttributes.Data) <= 0 {
+		url := fmt.Sprintf("/admins/products/%d/add-attributes", productID)
+
+		sessions.Set(c, "message", "ابتدا ویژگی برای محصول مورد نظر اضافه کنید")
+		c.Redirect(http.StatusFound, url)
 		return
 	}
 	//c.JSON(200, gin.H{
@@ -789,9 +794,20 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 	}
 	//end validation
 
-	//quantity , proudctAttributes
-	c.JSON(200, gin.H{
-		"data": req,
-	})
+	iErr := a.productSrv.CreateInventory(c, productID, req)
+	if iErr.Code == 404 {
+		sessions.Set(c, "message", "رکورد یافت نشد")
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	if iErr.Code == 500 {
+		html.Error500(c)
+		return
+	}
+	fmt.Println("inventory created")
+	sessions.Set(c, "message", "موجودی برای محصول با موفقیت اضافه گردید")
+	url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
+	c.Redirect(http.StatusFound, url)
 	return
+
 }

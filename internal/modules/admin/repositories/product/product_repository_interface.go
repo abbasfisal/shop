@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
+	"shop/internal/modules/admin/requests"
 )
 
 type ProductRepositoryInterface interface {
@@ -14,4 +15,5 @@ type ProductRepositoryInterface interface {
 	GetRootAttributes(ctx *gin.Context, productID int) ([]entities.Attribute, error)
 	StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error
 	GetProductAndAttributes(ctx *gin.Context, productID int) (entities.Product, error)
+	StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error)
 }

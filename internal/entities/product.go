@@ -16,5 +16,6 @@ type Product struct {
 	Category      Category        `gorm:"foreignKey:CategoryID"`
 	ProductImages []ProductImages `gorm:"foreignKey:ProductID"`
 
-	ProductAttributes []ProductAttribute `gorm:"foreignKye:ProductID"`
+	ProductAttributes  []ProductAttribute `gorm:"foreignKye:ProductID"`
+	ProductInventories []ProductInventory `gorm:"foreignKey:ProductID"`
 }

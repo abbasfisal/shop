@@ -16,6 +16,8 @@ type Product struct {
 	Category          Category
 	Images            ImageProducts
 	ProductAttributes ProductAttributes
+
+	ProductInventories ProductInventories
 }
 
 type Products struct {
@@ -44,6 +46,8 @@ func ToProduct(p entities.Product) Product {
 		Category:          ToCategory(p.Category),
 		Images:            ToImageProducts(p.ProductImages),
 		ProductAttributes: ToProductAttributes(p.ProductAttributes),
+
+		ProductInventories: ToProductInventories(p.ProductInventories),
 	}
 }
 

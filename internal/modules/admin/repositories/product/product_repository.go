@@ -2,10 +2,13 @@ package product
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
+	"shop/internal/modules/admin/requests"
+	"shop/internal/modules/admin/responses"
 	"strconv"
 	"strings"
 )
@@ -27,7 +30,7 @@ func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, erro
 func (p ProductRepository) FindBy(ctx context.Context, columnName string, value any) (entities.Product, error) {
 	var product entities.Product
 	condition := fmt.Sprintf("%s=?", columnName)
-	err := p.db.Preload("Category").Preload("ProductImage").First(&product, condition, value).Error
+	err := p.db.Preload("Category").Preload("ProductAttributes").Preload("ProductInventories").Preload("ProductImages").First(&product, condition, value).Error
 	return product, err
 }
 
@@ -120,4 +123,33 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 	err := p.db.Preload("ProductAttributes").Where("id=?", productID).First(&product).Error
 
 	return product, err
+}
+
+func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error) {
+
+	var productAttributes []entities.ProductAttribute
+	if err := p.db.Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
+		return entities.ProductInventory{}, err
+	}
+
+	if len(productAttributes) != len(req.ProductAttributes) {
+		return entities.ProductInventory{}, gorm.ErrRecordNotFound
+	}
+
+	productAttributesJson, errJ := json.Marshal(responses.ToInventoryProductAttributes(productAttributes))
+	if errJ != nil {
+		return entities.ProductInventory{}, errJ
+	}
+
+	inventory := entities.ProductInventory{
+		ProductID:      uint(productID),
+		Quantity:       uint(req.Quantity),
+		AttributesJson: productAttributesJson,
+	}
+
+	if iErr := p.db.Create(&inventory).Error; iErr != nil {
+		return entities.ProductInventory{}, errJ
+	}
+
+	return inventory, nil
 }
