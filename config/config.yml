@@ -1,6 +1,6 @@
 app:
   name: shop
-  port: 8083
+  port: 8082
   host: 127.0.0.1
   debug: true
   key: $2a$10$a2dUNHVqX2dTGgBH4O.gleTL6Yno858AvJGBdBFWScJQ0V9.6bM0O

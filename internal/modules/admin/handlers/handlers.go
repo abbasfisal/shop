@@ -496,10 +496,10 @@ func (a AdminHandler) ShowProduct(c *gin.Context) {
 		html.Error500(c)
 		return
 	}
-	c.JSON(200, gin.H{
-		"products:": selectedP,
-	})
-	return
+	//c.JSON(200, gin.H{
+	//	"products:": selectedP,
+	//})
+	//return
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_show_product",
 		gin.H{
 			"TITLE":   "show product",

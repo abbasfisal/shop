@@ -6,7 +6,6 @@
     {{template "sidebar" .}}
     <!-- CDN links -->
 
-
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -25,64 +24,60 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-9 align-content-center">
+                    <div class="col">
 
-                        <div class="/admins/" style="min-height:360px;">
-
-                            {{.PRODUCT}}
+                        <div class="form-control">
                             {{if .PRODUCT}}
-
-                                <table border="1px" align="center"
-                                       style="border: 1px solid blue ;padding:3px;text-align: center">
+                                <table class="table-bordered w-100 table-responsive-lg table-hover table-bordered text-center">
                                     <tr>
                                         <td>#</td>
                                         <td>title</td>
                                         <td>slug</td>
                                         <td>sku</td>
                                         <td>status</td>
-                                        <td>quantity</td>
                                         <td>original price</td>
                                         <td>sale price</td>
                                         <td>category</td>
                                         <td>op</td>
                                     </tr>
-
                                     <tr>
-                                        <td></td>
+                                        <td>{{.PRODUCT.ID}}</td>
                                         <td>{{.PRODUCT.Title}}</td>
                                         <td>{{.PRODUCT.Slug}}</td>
                                         <td>{{.PRODUCT.Sku}}</td>
                                         <td>{{.PRODUCT.Status}}</td>
-                                        <td>{{.PRODUCT.Quantity}}</td>
                                         <td>{{.PRODUCT.OriginalPrice}}</td>
                                         <td>{{.PRODUCT.SalePrice}}</td>
                                         <td>
-                                            <a href="/admins/categories/{{.Category.ID}}">{{.PRODUCT.Category.Title}}</a>
+                                            <a href="/admins/categories/{{.PRODUCT.Category.ID}}">{{.PRODUCT.Category.Title}}</a>
                                         </td>
                                         <td>
                                             <a href="/admins/products/{{.PRODUCT.ID}}/edit">Edit</a>
                                         </td>
                                     </tr>
                                 </table>
+                                <hr>
+                                <div class="d-flex ">
+                                    {{range .PRODUCT.ProductInventories.Data}}
+                                        <div class="form-control m-2 p-4">
+                                            <b>موجودی:</b> {{.Quantity}}<br>
+                                            <b>ویژگی ها:</b><br>
+                                            {{range .AttributesJson}}
+                                                - {{.AttributeTitle}}: {{.AttributeValueTitle}}<br>
+                                            {{end}}
+                                        </div>
+                                    {{end}}
+                                </div>
                             {{end}}
                         </div>
-                        <hr>
-                        ________________-
-                        <hr>
-                        {{.AUTH.FirstName}}
-                        <br>
-                        {{range $a,$key:=.}}
-                            {{$a}}:{{$key}}<br>
-                        {{end}}
+
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
     <!-- Main Footer -->
     {{template "footer" .}}
-
 {{end}}
-
