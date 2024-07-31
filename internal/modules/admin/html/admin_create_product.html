@@ -41,6 +41,20 @@
                                     <td></td>
                                 </tr>
                                 <tr>
+                                    <td>انتخاب برند</td>
+                                    <td>
+                                        <select class="form-control" name="brand_id">
+                                            <option value="0">انتخاب برند</option>
+                                            {{range .BRANDS}}
+                                                <option value="{{.ID}}">{{.Title}}</option>
+                                            {{end}}
+                                        </select>
+                                    </td>
+                                    <td></td>
+
+                                </tr>
+
+                                <tr>
                                     <td>عنوان</td>
                                     <td><input type="text" class="form-control"
                                                value="{{range .OLDS.title}}{{.}}{{end}}"

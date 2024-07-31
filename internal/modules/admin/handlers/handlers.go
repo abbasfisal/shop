@@ -349,9 +349,11 @@ func (a AdminHandler) CreateProduct(c *gin.Context) {
 		html.Error500(c)
 		return
 	}
+	brands, _ := a.brandSrv.Index(c)
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_product", gin.H{
 		"TITLE":      "create new product",
 		"CATEGORIES": categories,
+		"BRANDS":     brands.Data,
 	})
 	return
 }
