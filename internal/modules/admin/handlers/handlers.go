@@ -817,7 +817,7 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 }
 
 func (a AdminHandler) ShowCreateBrand(c *gin.Context) {
-	c.HTML(http.StatusFound, "create-brand", gin.H{"TITLE": "create brand"})
+	html.Render(c, 200, "create-brand", gin.H{"TITLE": "create new brand"})
 	return
 }
 
@@ -826,6 +826,7 @@ func (a AdminHandler) StoreBrand(c *gin.Context) {
 	var req requests.CreateBrandRequest
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
+		fmt.Println("error ---------- :", err)
 		errors.Init()
 		errors.SetFromErrors(err)
 
@@ -835,7 +836,7 @@ func (a AdminHandler) StoreBrand(c *gin.Context) {
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
 
-		c.Redirect(http.StatusFound, "create-brand")
+		c.Redirect(http.StatusFound, "/admins/brands/create")
 		return
 	}
 

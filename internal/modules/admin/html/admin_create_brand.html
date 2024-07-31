@@ -61,11 +61,6 @@
                                     <td class="text-danger">{{.ERRORS.image}}</td>
                                 </tr>
                                 <tr>
-                                    <td>وضعیت</td>
-                                    <td><input type="checkbox" name="status"><br>
-                                    <td class="text-danger">{{.ERRORS.status}}</td>
-                                </tr>
-                                <tr>
                                     <td></td>
                                     <td><input class="btn  btn-primary btn-lg" type="submit" value="ایجاد"></td>
                                     <td class="text-info border-white">
@@ -77,15 +72,15 @@
                         </form>
 
 
+                        <hr>
+                        {{.AUTH.FirstName}}
+                        <br>
+                        {{range $a,$key:=.}}
+                            {{$a}}:{{$key}}<br>
+                        {{end}}
                     </div>
                     <!-- /.col-md-6 -->
 
-                    ss
-                    {{.AUTH.FirstName}}
-                    <br>
-                    {{range $a,$key:=.}}
-                        {{$a}}:{{$key}}<br>
-                    {{end}}
                 </div>
                 <!-- /.row -->
             </div><!-- /.container-fluid -->
