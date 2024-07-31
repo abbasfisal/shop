@@ -16,3 +16,4 @@ db:
 upload:
   categories: "uploads/media/categories/"
   products: "uploads/media/products/"
+  brands: "uploads/media/brands/"

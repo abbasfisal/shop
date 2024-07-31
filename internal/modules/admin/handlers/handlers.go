@@ -822,7 +822,111 @@ func (a AdminHandler) ShowCreateBrand(c *gin.Context) {
 }
 
 func (a AdminHandler) StoreBrand(c *gin.Context) {
-	c.JSON(200, gin.H{"data": "store data"})
-	c.HTML(http.StatusFound, "create-brand", gin.H{"TITLE": "create brand"})
+
+	var req requests.CreateBrandRequest
+	_ = c.Request.ParseForm()
+	if err := c.ShouldBind(&req); err != nil {
+		errors.Init()
+		errors.SetFromErrors(err)
+
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, "create-brand")
+		return
+	}
+
+	//slug unique validation
+	if ok := a.brandSrv.CheckSlugUniqueness(context.TODO(), req.Slug); ok {
+		errors.Init()
+		errors.Add("slug", custom_error.MustBeUnique)
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, "/admins/brands/create")
+		return
+	}
+
+	//------------------------
+	//	upload and save image
+	//------------------------
+	imageFile, imageErr := c.FormFile("image")
+	//require validation on image
+	if imageErr != nil {
+		//validation on required tag
+		errors.Init()
+		errors.Add("image", custom_error.IsRequired)
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, "/admins/brands/create")
+
+		return
+	}
+
+	pathToUpload := ""
+	if imageErr == nil {
+		// file extension validation
+		fileExtension := filepath.Ext(imageFile.Filename)
+		ok := slices.Contains(util.AllowImageExtensions(), fileExtension)
+		if !ok {
+			errors.Init()
+			errors.Add("image", custom_error.MustBeImage)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, "/admins/brands/create")
+			return
+		}
+
+		//upload image and store on disk
+		newImageName := util.GenerateFilename(imageFile.Filename)
+		pathToUpload := viper.GetString("Upload.brands") + newImageName
+		uploadErr := c.SaveUploadedFile(imageFile, pathToUpload)
+		if uploadErr != nil {
+			fmt.Println("upload error:", uploadErr)
+			errors.Init()
+			errors.Add("image", custom_error.UploadImageError)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, "/admins/brands/create")
+
+			return
+		}
+		req.Image = newImageName
+	}
+
+	//---------------------------
+	//	end upload and save image
+	//---------------------------
+
+	newBrand, err := a.brandSrv.Create(context.TODO(), req)
+	if err != nil || newBrand.ID <= 0 {
+		_ = os.Remove(pathToUpload)
+		fmt.Println("----- error in creating brand ---- : ", err)
+		sessions.Set(c, "message", "خطا در ایجاد برند")
+		c.Redirect(http.StatusFound, "/admins/categories/create")
+		return
+	}
+
+	sessions.Set(c, "message", "ایجاد برند با موفقیت انجام شد")
+	c.Redirect(http.StatusFound, "/admins/brands/create")
 	return
+
 }
