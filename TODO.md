@@ -36,3 +36,8 @@ LIMIT 1;
 
 
 </ul>
+
+- add brand [title , slug ,image(just one image)]
+- add brand_id to products table (nullable) [add its relation in product entity]
+- check product images
+- ability to upload videos of product (use product videos to upload videos [must use tusd pkg , fmtp to reduce video size])

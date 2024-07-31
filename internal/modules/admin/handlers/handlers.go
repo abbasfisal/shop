@@ -13,6 +13,7 @@ import (
 	"shop/internal/modules/admin/services/attribute"
 	attributeValue "shop/internal/modules/admin/services/attribute_value"
 	"shop/internal/modules/admin/services/auth"
+	"shop/internal/modules/admin/services/brand"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/product"
 	"shop/internal/pkg/custom_error"
@@ -31,6 +32,7 @@ type AdminHandler struct {
 	productSrv   product.ProductServiceInterface
 	attributeSrv attribute.AttributeServiceInterface
 	attrValueSrv attributeValue.AttributeValueServiceInterface
+	brandSrv     brand.BrandServiceInterface
 
 	i18nBundle *i18n.Bundle
 	//order service
@@ -44,6 +46,7 @@ func NewAdminHandler(
 	productSrv product.ProductServiceInterface,
 	attributeSrv attribute.AttributeServiceInterface,
 	attrValueSrv attributeValue.AttributeValueServiceInterface,
+	brandSrv brand.BrandServiceInterface,
 	i18nBundle *i18n.Bundle,
 ) AdminHandler {
 	return AdminHandler{
@@ -52,6 +55,7 @@ func NewAdminHandler(
 		productSrv:   productSrv,
 		attributeSrv: attributeSrv,
 		attrValueSrv: attrValueSrv,
+		brandSrv:     brandSrv,
 
 		i18nBundle: i18nBundle,
 	}
@@ -810,4 +814,15 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 	c.Redirect(http.StatusFound, url)
 	return
 
+}
+
+func (a AdminHandler) ShowCreateBrand(c *gin.Context) {
+	c.HTML(http.StatusFound, "create-brand", gin.H{"TITLE": "create brand"})
+	return
+}
+
+func (a AdminHandler) StoreBrand(c *gin.Context) {
+	c.JSON(200, gin.H{"data": "store data"})
+	c.HTML(http.StatusFound, "create-brand", gin.H{"TITLE": "create brand"})
+	return
 }
