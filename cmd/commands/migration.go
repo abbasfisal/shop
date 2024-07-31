@@ -25,6 +25,7 @@ func migrate() {
 	db := mysql.Get()
 	if err := db.Migrator().DropTable(
 		&entities.User{},
+		&entities.Brand{},
 		&entities.Category{},
 		&entities.ProductInventory{},
 		&entities.Product{},
@@ -42,6 +43,7 @@ func migrate() {
 
 	err := db.AutoMigrate(
 		&entities.User{},
+		&entities.Brand{},
 		&entities.Category{},
 		&entities.Attribute{},
 		&entities.AttributeValue{},
