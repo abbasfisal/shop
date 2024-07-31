@@ -2,10 +2,13 @@ package brand
 
 import (
 	"context"
+	"errors"
+	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/brand"
 	"shop/internal/modules/admin/requests"
 	"shop/internal/modules/admin/responses"
+	"shop/internal/pkg/custom_error"
 )
 
 type BrandService struct {
@@ -40,4 +43,20 @@ func (bs BrandService) Create(ctx context.Context, req requests.CreateBrandReque
 	}
 
 	return responses.ToBrand(newBrand), nil
+}
+
+func (bs BrandService) Index(ctx context.Context) (responses.Brands, custom_error.CustomError) {
+	var response responses.Brands
+
+	brands, err := bs.repo.GetAll(ctx)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return response, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return response, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+
+	return responses.ToBrands(brands), custom_error.CustomError{}
+
 }

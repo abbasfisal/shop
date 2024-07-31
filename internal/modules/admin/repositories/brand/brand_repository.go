@@ -26,3 +26,9 @@ func (br BrandRepository) Store(ctx context.Context, brand entities.Brand) (enti
 	err := br.db.Create(&brand).Error
 	return brand, err
 }
+
+func (br BrandRepository) GetAll(ctx context.Context) ([]entities.Brand, error) {
+	var brands []entities.Brand
+	err := br.db.Find(&brands).Error
+	return brands, err
+}

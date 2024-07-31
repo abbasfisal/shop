@@ -931,3 +931,24 @@ func (a AdminHandler) StoreBrand(c *gin.Context) {
 	return
 
 }
+
+func (a AdminHandler) IndexBrand(c *gin.Context) {
+	//categories, err := a.categorySrv.Index(c)
+	brands, err := a.brandSrv.Index(c)
+
+	if err.Code == 404 {
+		sessions.Set(c, "message", "برندی موجود نمی باشد")
+		c.Redirect(http.StatusFound, "/admins/brands/")
+		return
+
+	} else if err.Code == 500 {
+		html.Error500(c)
+		return
+	}
+
+	html.Render(c, 200, "modules/admin/html/admin_index_brand", gin.H{
+		"TITLE":  "Index Brand",
+		"BRANDS": brands,
+	})
+	return
+}
