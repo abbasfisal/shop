@@ -30,6 +30,9 @@
                             برند جدید</a>
                         <br>
                         <br>
+                        {{if .MESSAGE}} <span class="text-info p-5">{{.MESSAGE}}</span> {{end}}
+                        <br>
+                        <br>
                         {{if .BRANDS.Data}}
                             <table class="table-responsive  table">
                                 <tr>
