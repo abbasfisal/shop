@@ -1,15 +1,12 @@
 package logging
 
 import (
-	"os"
-	"path/filepath"
-	"sync"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
+	"path/filepath"
 )
 
-var once sync.Once
 var zapSinLogger *zap.SugaredLogger
 
 type ZapLogger struct {
@@ -40,36 +37,35 @@ func (l *ZapLogger) getLogLevel() zapcore.Level {
 }
 
 func (l *ZapLogger) Init() {
-	once.Do(func() {
-		stdoutWriter := zapcore.Lock(os.Stdout)
 
-		logDir := "./storage/logs"
-		if err := os.MkdirAll(logDir, 0755); err != nil {
-			panic(err)
-		}
+	stdoutWriter := zapcore.Lock(os.Stdout)
 
-		// Create a file to write logs (if it doesn't exist, create it)
-		logFile := filepath.Join(logDir, "app.log")
-		file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			panic(err)
-		}
+	logDir := "./storage/logs"
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		panic(err)
+	}
 
-		// Setup the writers for stdout and file
-		fileWriter := zapcore.AddSync(file)
-		multiWriteSyncer := zapcore.NewMultiWriteSyncer(stdoutWriter, fileWriter)
+	// Create a file to write logs (if it doesn't exist, create it)
+	logFile := filepath.Join(logDir, "app.log")
+	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
 
-		encoderConfig := zap.NewProductionEncoderConfig()
-		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-		stdoutCore := zapcore.NewCore(
-			zapcore.NewJSONEncoder(encoderConfig),
-			multiWriteSyncer,
-			l.getLogLevel(),
-		)
+	// Setup the writers for stdout and file
+	fileWriter := zapcore.AddSync(file)
+	multiWriteSyncer := zapcore.NewMultiWriteSyncer(stdoutWriter, fileWriter)
 
-		logger := zap.New(stdoutCore, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel)).Sugar()
-		zapSinLogger = logger.With("AppName", "MyApp").With("LoggerName", "ZapLog")
-	})
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	stdoutCore := zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderConfig),
+		multiWriteSyncer,
+		l.getLogLevel(),
+	)
+	logger := zap.New(stdoutCore, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel)).Sugar()
+	zapSinLogger = logger.With("AppName", "MyApp").With("LoggerName", "ZapLog")
+
 	l.logger = zapSinLogger
 }
 

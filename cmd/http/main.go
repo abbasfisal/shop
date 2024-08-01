@@ -40,7 +40,6 @@ func main() {
 		//load mysql connection
 		mysql.Connect()
 	})
-	logger.InfoF("this is just for info")
 
 	commands.Execute()
 
