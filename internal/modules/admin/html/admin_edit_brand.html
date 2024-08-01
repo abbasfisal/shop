@@ -1,0 +1,109 @@
+{{define "edit-brand"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10">
+                        <form action="/admins/brands/{{.BRAND_ID}}/edit" method="post" enctype="multipart/form-data">
+                            <table class="table table-primary ">
+                                <tr>
+                                    <td>عنوان</td>
+                                    <td>
+                                        <input type="text" name="title"
+                                               class="form-control"
+                                                {{if .OLDS.title}}
+                                                    value="{{range .OLDS.title}}{{.}}{{end}}"
+                                                {{end}}
+                                               value="{{.BRAND.Title}}">
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.title}}</td>
+                                </tr>
+                                <tr>
+                                    <td>اسلاگ</td>
+                                    <td>
+                                        <input type="text" name="slug"
+                                               class="form-control"
+                                                {{if .OLDS.slug}}
+                                                    value="{{range .OLDS.slug}}{{.}}{{end}}"
+                                                {{end}}
+                                               value="{{.BRAND.Slug}}">
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.slug}}</td>
+                                </tr>
+                                <tr>
+                                    <td>اپلود عکس</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" name="image" class="custom-file-input"
+                                                       id="exampleInputFile">
+                                                <label class="custom-file-label" for="exampleInputFile">
+                                                    انتخاب عکس
+                                                </label>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="">Upload</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-danger">{{.ERRORS.image}}</td>
+                                </tr>
+                                <tr>
+                                    <td>image</td>
+                                    <td>
+                                        <img src="{{.BRAND.Image}}" width="300px" height="300px" alt="">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><input class="btn  btn-primary btn-lg" type="submit"
+                                               value="بروز رسانی"></td>
+                                    <td class="text-info border-white">
+                                        {{if .MESSAGE}} {{.MESSAGE}} {{end}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                        <hr>
+                        {{.AUTH.FirstName}}
+                        <br>
+                        {{range $a,$key:=.}}
+                            {{$a}}:{{$key}}<br>
+                        {{end}}
+                    </div>
+                    <!-- /.col-md-6 -->
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}
+

@@ -3,6 +3,7 @@ package brand
 import (
 	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/brand"
@@ -69,7 +70,23 @@ func (bs BrandService) Show(ctx context.Context, brandID int) (responses.Brand, 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return response, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
 		}
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return response, custom_error.New(err.Error(), custom_error.MustBeUnique, 1062)
+		}
 		return response, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+
+	return responses.ToBrand(brand), custom_error.CustomError{}
+}
+
+func (bs BrandService) Update(c *gin.Context, brandID int, req requests.UpdateBrandRequest) (responses.Brand, custom_error.CustomError) {
+	brand, err := bs.repo.Update(c, brandID, req)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return responses.Brand{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return responses.Brand{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+
 	}
 
 	return responses.ToBrand(brand), custom_error.CustomError{}

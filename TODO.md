@@ -11,15 +11,16 @@ we need 3 page for this approach:
 <br/>
 
 explain WITH RECURSIVE CategoryHierarchy AS (
-    SELECT id, title, parent_id
-    FROM categories
-    WHERE id = (SELECT category_id FROM products WHERE id = 1)
+SELECT id, title, parent_id
+FROM categories
+WHERE id = (SELECT category_id FROM products WHERE id = 1)
 
     UNION ALL
 
     SELECT c.id, c.title, c.parent_id
     FROM categories c
              INNER JOIN CategoryHierarchy ch ON c.id = ch.parent_id
+
 )
 SELECT *
 FROM CategoryHierarchy
@@ -40,4 +41,6 @@ LIMIT 1;
 - add brand [title , slug ,image(just one image)]
 - add brand_id to products table (nullable) [add its relation in product entity]
 - check product images
-- ability to upload videos of product (use product videos to upload videos [must use tusd pkg , fmtp to reduce video size])
+- ability to upload videos of product (use product videos to upload
+  videos [must use tusd pkg , fmtp to reduce video size])
+- remove whitespace when u wanna insert any record to db [insert,update]
