@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type Product struct {
 	gorm.Model
 	CategoryID uint
-	BrandID    *uint
+	BrandID    uint //todo: check you can use nullable in gorm?
 	Title      string
 	Slug       string `gorm:"unique"`
 	Sku        string `gorm:"unique"`

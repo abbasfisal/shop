@@ -52,6 +52,7 @@ func (p ProductService) Create(ctx context.Context, req requests.CreateProductRe
 
 	var prepareProduct = entities.Product{
 		CategoryID: uint(req.CategoryID),
+		BrandID:    req.BrandID,
 		Title:      strings.TrimSpace(req.Title),
 		Slug:       strings.TrimSpace(req.Title),
 		Sku:        strings.TrimSpace(req.Title),

@@ -2,6 +2,7 @@ package requests
 
 type CreateProductRequest struct {
 	CategoryID int    `form:"category_id" binding:"required"`
+	BrandID    uint   `form:"brand_id"`
 	Title      string `form:"title" binding:"required"`
 	Slug       string `form:"slug" binding:"required"`
 	Sku        string `form:"sku" binding:"required"`
