@@ -954,3 +954,29 @@ func (a AdminHandler) IndexBrand(c *gin.Context) {
 	})
 	return
 }
+
+func (a AdminHandler) ShowBrand(c *gin.Context) {
+	brandID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", "ID برند صحیح نمی باشد.")
+		c.Redirect(http.StatusFound, "/admins/brands")
+	}
+	brand, bErr := a.brandSrv.Show(c, brandID)
+	if bErr.Code == 404 {
+		sessions.Set(c, "message", "برند موجود نمی باشد.")
+		c.Redirect(http.StatusFound, "/admins/brands")
+		return
+	}
+	if bErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/brands")
+		return
+	}
+
+	html.Render(c, http.StatusOK, "show-brand", gin.H{
+		"TITLE":    "show brand",
+		"BRAND_ID": brandID,
+		"BRAND":    brand,
+	})
+	return
+}

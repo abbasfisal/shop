@@ -32,3 +32,10 @@ func (br BrandRepository) GetAll(ctx context.Context) ([]entities.Brand, error) 
 	err := br.db.Find(&brands).Error
 	return brands, err
 }
+
+func (br BrandRepository) SelectBy(ctx context.Context, brandID int) (entities.Brand, error) {
+	var brand entities.Brand
+	err := br.db.First(&brand, "id=?", brandID).Error
+
+	return brand, err
+}

@@ -60,3 +60,17 @@ func (bs BrandService) Index(ctx context.Context) (responses.Brands, custom_erro
 	return responses.ToBrands(brands), custom_error.CustomError{}
 
 }
+
+func (bs BrandService) Show(ctx context.Context, brandID int) (responses.Brand, custom_error.CustomError) {
+	var response responses.Brand
+
+	brand, err := bs.repo.SelectBy(ctx, brandID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return response, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return response, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+
+	return responses.ToBrand(brand), custom_error.CustomError{}
+}

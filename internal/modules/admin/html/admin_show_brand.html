@@ -1,0 +1,79 @@
+{{define "show-brand"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="">
+                <div class="row">
+                    <div class="col-lg">
+                        <form>
+                            <table class="form-control ">
+                                <tr>
+                                    <td>عنوان</td>
+                                    <td><input type="text" name="title"
+                                               class="form-control"
+                                               DISABLED
+                                               value="{{ .BRAND.Title}}"></td>
+                                </tr>
+                                <tr>
+                                    <td>اسلاگ</td>
+                                    <td><input type="text" name="slug"
+                                               class="form-control"
+                                               DISABLED
+                                               value="{{.BRAND.Slug}}"></td>
+
+                                </tr>
+                                <tr>
+                                    <td> عکس</td>
+                                    <td>
+                                        <div class="">
+                                            <div class="">
+                                                <img src="{{.BRAND.Image}}" width="400px" height="400px" alt="">
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                    <td class="text-danger">{{.ERRORS.image}}</td>
+                                </tr>
+
+                            </table>
+
+                        </form>
+
+
+                    </div>
+                    <!-- /.col-md-6 -->
+
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}
+
