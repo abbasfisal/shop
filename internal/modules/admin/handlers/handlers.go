@@ -1069,8 +1069,7 @@ func (a AdminHandler) UpdateBrand(c *gin.Context) {
 		pathToUpload = viper.GetString("Upload.Brands") + newImageName
 
 	}
-	//update new data with old aata ,
-	//if was successfull then remove old image , upload and save new image
+
 	if req.Title == "" {
 		req.Title = brand.Title
 	}
@@ -1095,7 +1094,6 @@ func (a AdminHandler) UpdateBrand(c *gin.Context) {
 		uploadErr := c.SaveUploadedFile(imageFile, pathToUpload)
 
 		if uploadErr != nil {
-			fmt.Println("upload error:", uploadErr)
 			errors.Init()
 			errors.Add("image", custom_error.UploadImageError)
 			sessions.Set(c, "errors", errors.ToString())
