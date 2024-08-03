@@ -1,6 +1,7 @@
 package custom_messages
 
 const (
-	ImageDeletedSuccessfully = "تصویر با موفقیت حذف گردید"
-	ImageNotRemovedFromDisk  = "تصویر از دیسک حذف نشد/ رکورد تصویر نیز از پایگاه داده حذف نگردید."
+	ImageDeletedSuccessfully   = "تصویر با موفقیت حذف گردید."
+	ImagesUploadedSuccessfully = "تصاویر با موفقیت آپلود و ذخیره گردید."
+	ImageNotRemovedFromDisk    = "تصویر از دیسک حذف نشد/ رکورد تصویر نیز از پایگاه داده حذف نگردید."
 )

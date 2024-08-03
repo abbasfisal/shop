@@ -909,3 +909,90 @@ func (a AdminHandler) DeleteProductImage(c *gin.Context) {
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
 }
+
+func (a AdminHandler) UploadProductImages(c *gin.Context) {
+
+	productID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products/")
+		return
+	}
+
+	imagesForm, _ := c.MultipartForm()
+	imagesFile := imagesForm.File["images[]"]
+	//check required validation
+	if imagesFile == nil {
+		errors.Init()
+		errors.Add("images", custom_error.IsRequired)
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	var imagesStoredPath []string
+	for _, image := range imagesFile {
+		extension := filepath.Ext(image.Filename)
+
+		// file extension validation
+		ok := slices.Contains(util.AllowImageExtensions(), extension)
+		if !ok {
+			errors.Init()
+			errors.Add("images", custom_error.MustBeImage)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, c.Request.Referer())
+			return
+
+		}
+
+		//generate file name
+		imageGenerateFileName := util.GenerateFilename(image.Filename)
+		imagesStoredPath = append(imagesStoredPath, imageGenerateFileName)
+
+		//store images on disk
+		saveUploadedImage := c.SaveUploadedFile(image, viper.GetString("Upload.Products")+imageGenerateFileName)
+		if saveUploadedImage != nil {
+			for _, imageStorePath := range imagesStoredPath {
+				_ = os.Remove(viper.GetString("Upload.Products") + imageStorePath)
+			}
+
+			errors.Init()
+			errors.Add("images", custom_error.StoreImageOnDiskFailed)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, "/admins/products/create")
+			return
+		}
+	}
+
+	uploadImageErr := a.productSrv.UploadImage(c, productID, imagesStoredPath)
+	if uploadImageErr.Code > 0 {
+		//remove images from disk
+		for _, img := range imagesStoredPath {
+			_ = os.Remove(viper.GetString("Upload.products") + img)
+		}
+
+		sessions.Set(c, "message", custom_error.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	sessions.Set(c, "message", custom_messages.ImagesUploadedSuccessfully)
+	c.Redirect(http.StatusFound, c.Request.Referer())
+	return
+
+}

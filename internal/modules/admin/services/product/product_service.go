@@ -183,3 +183,14 @@ func (p ProductService) RemoveImage(c *gin.Context, imageID int) custom_error.Cu
 	}
 	return custom_error.CustomError{}
 }
+
+func (p ProductService) UploadImage(c *gin.Context, productID int, imageStoredPath []string) custom_error.CustomError {
+	err := p.repo.StoreImages(c, productID, imageStoredPath)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+	return custom_error.CustomError{}
+}

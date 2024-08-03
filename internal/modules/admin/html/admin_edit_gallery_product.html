@@ -31,7 +31,8 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-10 align-content-center">
-                        <form action="/admins/products" method="post">
+                        <form action="/admins/products/{{.PRODUCT.ID}}/add-images" method="post"
+                              enctype="multipart/form-data">
                             <table class="table table-primary ">
                                 <tr>
                                     <td>سایر عملیات</td>
@@ -75,7 +76,7 @@
                                 <tr>
                                     <td></td>
                                     <td>
-                                        <input class="btn  btn-primary btn-lg" type="submit" value="بروزرسانی">
+                                        <input class="btn  btn-primary btn-lg" type="submit" value="آپلود تصاویر">
                                     </td>
                                     <td class="text-info">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</td>
                                 </tr>
@@ -87,7 +88,7 @@
                         {{range .PRODUCT.Images.Data}}
                             <a href="/{{.FullPath}}" target="_blank">سایز اصلی</a> |
                             <a href="/admins/products/images/{{.ID}}/delete">حذف</a>
-                            <img  src="/{{.FullPath}}" width="450px" alt="">
+                            <img src="/{{.FullPath}}" width="450px" alt="">
                             <br>
                             <br>
                         {{end}}

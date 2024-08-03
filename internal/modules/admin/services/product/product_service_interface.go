@@ -20,4 +20,5 @@ type ProductServiceInterface interface {
 	CreateInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) custom_error.CustomError
 	FetchImage(c *gin.Context, imageID int) (responses.ImageProduct, custom_error.CustomError)
 	RemoveImage(c *gin.Context, imageID int) custom_error.CustomError
+	UploadImage(c *gin.Context, productID int, imageStoredPath []string) custom_error.CustomError
 }

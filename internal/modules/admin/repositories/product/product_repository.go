@@ -162,3 +162,15 @@ func (p ProductRepository) GetImage(c *gin.Context, imageID int) (entities.Produ
 func (p ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
 	return p.db.WithContext(c).Unscoped().Delete(&entities.ProductImages{}, imageID).Error
 }
+func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStoredPath []string) error {
+	var images []entities.ProductImages
+	for _, image := range imageStoredPath {
+		images = append(images, entities.ProductImages{
+			ProductID: uint(productID),
+			Path:      image,
+		},
+		)
+	}
+
+	return p.db.Create(&images).Error
+}
