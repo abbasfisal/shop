@@ -18,4 +18,6 @@ type ProductServiceInterface interface {
 	AddAttributeValues(c *gin.Context, productID int, attributes []string) custom_error.CustomError
 	FetchProductAttributes(c *gin.Context, productID int) (responses.Product, custom_error.CustomError)
 	CreateInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) custom_error.CustomError
+	FetchImage(c *gin.Context, imageID int) (responses.ImageProduct, custom_error.CustomError)
+	RemoveImage(c *gin.Context, imageID int) custom_error.CustomError
 }

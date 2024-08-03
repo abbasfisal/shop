@@ -159,3 +159,27 @@ func (p ProductService) CreateInventory(c *gin.Context, productID int, req reque
 	}
 	return custom_error.CustomError{}
 }
+
+func (p ProductService) FetchImage(c *gin.Context, imageID int) (responses.ImageProduct, custom_error.CustomError) {
+	image, err := p.repo.GetImage(c, imageID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return responses.ImageProduct{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+		}
+		return responses.ImageProduct{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+	}
+	return responses.ToImageProduct(image), custom_error.CustomError{}
+}
+
+func (p ProductService) RemoveImage(c *gin.Context, imageID int) custom_error.CustomError {
+	err := p.repo.DeleteImage(c, imageID)
+	if err != nil {
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
+			}
+			return custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+		}
+	}
+	return custom_error.CustomError{}
+}

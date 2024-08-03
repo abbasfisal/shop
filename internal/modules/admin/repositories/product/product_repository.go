@@ -153,3 +153,12 @@ func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, 
 
 	return inventory, nil
 }
+
+func (p ProductRepository) GetImage(c *gin.Context, imageID int) (entities.ProductImages, error) {
+	var image entities.ProductImages
+	err := p.db.Find(&image, imageID).Error
+	return image, err
+}
+func (p ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
+	return p.db.WithContext(c).Unscoped().Delete(&entities.ProductImages{}, imageID).Error
+}

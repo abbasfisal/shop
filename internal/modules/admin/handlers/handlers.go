@@ -17,6 +17,7 @@ import (
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/product"
 	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/errors"
 	"shop/internal/pkg/html"
 	"shop/internal/pkg/old"
@@ -829,4 +830,82 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 	c.Redirect(http.StatusFound, url)
 	return
 
+}
+
+func (a AdminHandler) ShowProductGallery(c *gin.Context) {
+	pID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.Redirect(http.StatusFound, "/admins/products/")
+		return
+	}
+
+	product, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+
+	if pErr.Code == 404 {
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	if pErr.Code == 500 {
+		html.Error500(c)
+		return
+	}
+	html.Render(c, http.StatusFound, "edit-gallery-product", gin.H{
+		"TITLE":   "edit gallery product",
+		"PRODUCT": product,
+	})
+	return
+}
+
+func (a AdminHandler) DeleteProductImage(c *gin.Context) {
+
+	imageID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products/")
+		return
+	}
+
+	image, iErr := a.productSrv.FetchImage(c, imageID)
+	if iErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+	if iErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	//remove image from disk
+	imageDelErr := os.Remove(image.FullPath)
+
+	if imageDelErr == nil {
+		//remove image form db
+		rImageErr := a.productSrv.RemoveImage(c, imageID)
+
+		if rImageErr.Code > 0 {
+			//image record  removed from db
+			fmt.Println("---- RemoveImage --- err : ", rImageErr)
+			if rImageErr.Code == 404 {
+				sessions.Set(c, "message", custom_error.RecordNotFound)
+				c.Redirect(http.StatusFound, c.Request.Referer())
+				return
+			}
+			if rImageErr.Code == 500 {
+				sessions.Set(c, "message", custom_error.InternalServerError)
+				c.Redirect(http.StatusFound, c.Request.Referer())
+				return
+			}
+		} else {
+			// image record deleted successfully
+			sessions.Set(c, "message", custom_messages.ImageDeletedSuccessfully)
+			c.Redirect(http.StatusFound, c.Request.Referer())
+		}
+	}
+
+	fmt.Println("---- image not removed form disk : err: ------ ", imageDelErr)
+	sessions.Set(c, "message", custom_messages.ImageNotRemovedFromDisk)
+	c.Redirect(http.StatusFound, c.Request.Referer())
+	return
 }

@@ -16,4 +16,6 @@ type ProductRepositoryInterface interface {
 	StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error
 	GetProductAndAttributes(ctx *gin.Context, productID int) (entities.Product, error)
 	StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error)
+	GetImage(c *gin.Context, imageID int) (entities.ProductImages, error)
+	DeleteImage(c *gin.Context, imageID int) error
 }
