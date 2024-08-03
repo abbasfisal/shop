@@ -5,6 +5,7 @@ import "shop/internal/entities"
 type Product struct {
 	ID         uint
 	CategoryID uint
+	BrandID    uint
 	Title      string
 	Slug       string
 	Sku        string
@@ -14,6 +15,7 @@ type Product struct {
 	SalePrice         uint
 	Description       string
 	Category          Category
+	Brand             Brand
 	Images            ImageProducts
 	ProductAttributes ProductAttributes
 
@@ -44,11 +46,10 @@ func ToProduct(p entities.Product) Product {
 		SalePrice:         p.SalePrice,
 		Description:       p.Description,
 		Category:          ToCategory(p.Category),
+		Brand:             ToBrand(p.Brand),
 		Images:            ToImageProducts(p.ProductImages),
 		ProductAttributes: ToProductAttributes(p.ProductAttributes),
 
 		ProductInventories: ToProductInventories(p.ProductInventories),
 	}
 }
-
-// کتگوری در پروداکت ریسپانس رودرست نشون نمیده

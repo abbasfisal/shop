@@ -42,6 +42,7 @@
                                     <td>قیمت اصلی</td>
                                     <td>قیمت فروش</td>
                                     <td>دسته بندی</td>
+                                    <td>برند</td>
                                     <td>عملیات</td>
                                 </tr>
                                 {{range .PRODUCTS.Data}}
@@ -61,6 +62,7 @@
                                         <td>{{.OriginalPrice}}</td>
                                         <td>{{.SalePrice}}</td>
                                         <td><a href="/admins/categories/{{.Category.ID}}">{{.Category.Title}}</a></td>
+                                        <td>{{.Brand.Title}}</td>
                                         <td>
                                             <a href="/admins/products/{{.ID}}">
                                                 <i class="nav-icon text-success fa fa-eye"></i>

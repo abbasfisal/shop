@@ -23,7 +23,7 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 
 func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, error) {
 	var products []entities.Product
-	err := p.db.Preload("Category").Find(&products).Error
+	err := p.db.Preload("Category").Preload("Brand").Find(&products).Error
 	return products, err
 }
 
