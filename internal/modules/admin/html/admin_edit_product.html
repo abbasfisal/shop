@@ -1,76 +1,209 @@
 {{define "modules/admin/html/admin_edit_product"}}
-    {{if not .AUTH}}
-        {{template "templates/html/layouts/navbar"}}
-    {{end}}
-    <h1>{{.TITLE}}</h1>
-    <form action="/admins/products/{{.PRODUCT.ID}}" method="POST" enctype="multipart/form-data">
-        {{$selectedCategory:=.PRODUCT.CategoryID}}
-        <form action="/admins/products/{{.ID}}" method="post">
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
 
-            <table style="border:1px solid pink">
-                <tr>
-                    <td>title</td>
-                    <td><input type="text" name="title" value="{{.PRODUCT.Title}}"></td>
-                    <td>{{.ERROR.title}}</td>
-                </tr>
-                <tr>
-                    <td>slug</td>
-                    <td><input type="text" name="slug" value="{{.PRODUCT.Slug}}"></td>
-                    <td>{{.ERROR.slug}}</td>
-                </tr>
-                <tr>
-                    <td>sku</td>
-                    <td><input type="text" name="sku" value="{{.PRODUCT.Sku}}"></td>
-                    <td>{{.ERROR.skue}}</td>
-                </tr>
-                <tr>
-                    <td>status</td>
-                    <td>
-                        <input name="status" type="checkbox" {{if eq .PRODUCT.Status true }} checked {{end}} >
-                    </td>
-                    <td>{{.ERROR.status}}</td>
-                </tr>
-                <tr>
-                    <td>quantity</td>
-                    <td><input type="text" name="quantity" value="{{.PRODUCT.Quantity}}"></td>
-                    <td>{{.ERROR.quantity}}</td>
-                </tr>
-                <tr>
-                    <td>original price</td>
-                    <td><input type="number" name="original_price" value="{{.PRODUCT.OriginalPrice}}"></td>
-                    <td>{{.ERROR.original_price}}</td>
-                </tr>
-                <tr>
-                    <td>sale price</td>
-                    <td><input type="number" name="sale_price" value="{{.PRODUCT.SalePrice}}"></td>
-                    <td>{{.ERROR.sale_price}}</td>
-                </tr>
-                <tr>
-                    <td>category</td>
-                    <td>
-                        <select name="category" id="">
-                            {{range .CATEGORIES.Data}}
-                                <option value="{{.ID}}" {{if eq $selectedCategory .ID}} selected {{end}}>{{.Title}}</option>
-                            {{end}}
-                        </select>
-                    </td>
-                    <td>{{.ERROR.category}}</td>
-                </tr>
-                <tr>
-                    <td><input type="submit" value="update"></td>
-                    <td>{{if .MESSAGE}}{{.MESSAGE}}{{end}}</td>
-                </tr>
 
-            </table>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
 
-        </form>
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
 
-    </form>
 
-    <hr>
-    {{range $a,$key:=.}}
-        {{$a}}:{{$key}}<br>
-    {{end}}
+        <!-- Main content -->
+        <div class="content">
+            {{$selectedCategory:=.PRODUCT.CategoryID}}
 
+            {{$selectedBrand :=.PRODUCT.BrandID}}
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10 align-content-center">
+                        <form action="/admins/products" method="post" >
+                            <table class="table table-primary ">
+                                <tr>
+                                    <td>سایر عملیات</td>
+                                    <td>
+                                        <a href="#"> <b> ویرایش و مشاهده تصاویر</b> </a> |
+                                        <a href="#">
+                                            <b>ویرایش و مشاهده ویژگی ها</b>
+                                        </a> |
+                                        <a href="#">
+                                            <b>ویرایش و مشاهده موجودی</b>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>انتخاب دسته بندی</td>
+                                    <td>
+                                        <select class="form-control" name="category_id">
+                                            {{range .CATEGORIES.Data}}
+                                                <option value="{{.ID}}" {{if eq $selectedCategory .ID}} selected {{end}}>{{.Title}}</option>
+                                            {{end}}
+                                        </select>
+
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>انتخاب برند</td>
+                                    <td>
+                                        <select class="form-control" name="brand_id">
+                                            <option value="0">انتخاب برند</option>
+                                            {{range .BRANDS.Data}}
+                                                <option value="{{.ID}}" {{if eq $selectedBrand .ID}} selected {{end}}>{{.Title}}</option>
+                                            {{end}}
+                                        </select>
+                                    </td>
+                                    <td></td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>عنوان</td>
+                                    <td><input type="text" class="form-control"
+                                                {{if .OLDS.title}}
+                                                    value="{{range .OLDS.title}}{{.}}{{end}}"
+                                                {{else }}
+                                                    value="{{.PRODUCT.Title}}"
+                                                {{end}}
+                                               name="title"></td>
+                                    <td class="text-danger">{{if .ERRORS.title}}{{.ERRORS.title}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>اسلاگ</td>
+                                    <td><input type="text"
+                                               class="form-control"
+                                                {{if .OLDS.title}}
+                                                    value="{{range .OLDS.title}}{{.}}{{end}}"
+                                                {{else }}
+                                                    value="{{.PRODUCT.Slug}}"
+                                                {{end}}
+                                        >
+                                    <td class="text-danger">{{if .ERRORS.slug}}{{.ERRORS.slug}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>شناسه محصول sku</td>
+                                    <td><input type="text" class="form-control"
+                                                {{if .OLDS.sku}}
+                                                    value="{{range .OLDS.sku}}{{.}}{{end}}"
+                                                {{else }}
+                                                    value="{{.PRODUCT.Sku}}"
+                                                {{end}}
+                                               name="sku">
+                                    </td>
+                                    <td class="text-danger">{{if .ERRORS.sku}}{{.ERRORS.sku}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>وضعیت</td>
+                                    <td><input type="checkbox" checked name="status"></td>
+                                    <td></td>
+                                </tr>
+
+                                {{/*                                <tr>*/}}
+                                {{/*                                    <td>موجودی</td>*/}}
+                                {{/*                                    <td><input class="form-control" type="number"*/}}
+                                {{/*                                               value="{{range .OLDS.quantity}}{{.}}{{end}}" name="quantity">*/}}
+                                {{/*                                    </td>*/}}
+                                {{/*                                    <td class="text-danger">{{if .ERRORS.quantity}}{{.ERRORS.quantity}}{{end}}</td>*/}}
+                                {{/*                                </tr>*/}}
+
+                                <tr>
+                                    <td>قیمت اصلی</td>
+                                    <td><input class="form-control" type="number"
+                                                {{if .OLDS.original_price}}
+                                                    value="{{range .OLDS.original_price}}{{.}}{{end}}"
+                                                {{else }}
+                                                    value="{{.PRODUCT.OriginalPrice}}"
+                                                {{end}}
+                                               name="original_price"></td>
+                                    <td class="text-danger">{{if .ERRORS.originalprice}}{{.ERRORS.originalprice}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>قیمت فروش</td>
+                                    <td><input type="number"
+                                               class="form-control"
+                                                {{if .OLDS.sale_price}}
+                                                    value="{{range .OLDS.sale_price}}{{.}}{{end}}"
+                                                {{else }}
+                                                    value="{{.PRODUCT.SalePrice}}"
+                                                {{end}}
+                                               name="sale_price"></td>
+                                    <td class="text-danger">{{if .ERRORS.saleprice}}{{.ERRORS.saleprice}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>توضیحات</td>
+                                    <td>
+                                        <textarea name="description" cols="30" class="form-control" rows="10">{{if .OLDS.description}}{{range .OLDS.description}}{{.}}{{end}}{{else }}{{.PRODUCT.Description}}{{end}}</textarea>
+                                    </td>
+                                    <td class="text-danger">{{if .ERRORS.description}}{{.ERRORS.description}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>تصاویر</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" multiple name="images[]" class="custom-file-input"
+                                                       id="exampleInputFile">
+                                                <label class="custom-file-label" for="exampleInputFile">انتخاب
+                                                    فایل</label>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="">Upload</span>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                    <td>{{if .ERRORS.images}}{{.ERRORS.images}}{{end}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td></td>
+                                    <td><input
+                                                class="btn  btn-primary btn-lg"
+                                                type="submit" value="بروزرسانی"></td>
+                                    <td class="text-info">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</td>
+                                </tr>
+
+                            </table>
+
+                        </form>
+
+                    </div>
+                    <!-- /.col-md-6 -->
+                    {{.AUTH.FirstName}}
+                    <br>
+                    {{range $a,$key:=.}}
+                        {{$a}}:{{$key}}<br>
+                    {{end}}
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+
+
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
 {{end}}
-

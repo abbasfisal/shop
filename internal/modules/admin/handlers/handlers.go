@@ -541,11 +541,24 @@ func (a AdminHandler) EditProduct(c *gin.Context) {
 		return
 	}
 
+	brands, bErr := a.brandSrv.Index(c)
+	if bErr.Code == 404 {
+		sessions.Set(c, "message", "برند یافت نشد")
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	if bErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	fmt.Println("------- product : ", product.BrandID)
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_edit_product",
 		gin.H{
 			"TITLE":      "edit product",
 			"PRODUCT":    product,
 			"CATEGORIES": categories,
+			"BRANDS":     brands,
 		},
 	)
 	return

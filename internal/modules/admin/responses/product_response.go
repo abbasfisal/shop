@@ -37,6 +37,7 @@ func ToProduct(p entities.Product) Product {
 	return Product{
 		ID:         p.ID,
 		CategoryID: p.CategoryID,
+		BrandID:    p.BrandID,
 		Title:      p.Title,
 		Slug:       p.Slug,
 		Sku:        p.Sku,
