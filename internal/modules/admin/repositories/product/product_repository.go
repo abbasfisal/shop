@@ -30,7 +30,7 @@ func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, erro
 func (p ProductRepository) FindBy(ctx context.Context, columnName string, value any) (entities.Product, error) {
 	var product entities.Product
 	condition := fmt.Sprintf("%s=?", columnName)
-	err := p.db.Preload("Category").Preload("ProductAttributes").Preload("ProductInventories").Preload("ProductImages").First(&product, condition, value).Error
+	err := p.db.Preload("Category").Preload("Brand").Preload("ProductAttributes").Preload("ProductInventories").Preload("ProductImages").First(&product, condition, value).Error
 	return product, err
 }
 

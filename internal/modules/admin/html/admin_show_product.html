@@ -38,6 +38,7 @@
                                         <td>original price</td>
                                         <td>sale price</td>
                                         <td>category</td>
+                                        <td>برند</td>
                                         <td>op</td>
                                     </tr>
                                     <tr>
@@ -51,6 +52,7 @@
                                         <td>
                                             <a href="/admins/categories/{{.PRODUCT.Category.ID}}">{{.PRODUCT.Category.Title}}</a>
                                         </td>
+                                        <td>{{.PRODUCT.Brand.Title}}</td>
                                         <td>
                                             <a href="/admins/products/{{.PRODUCT.ID}}/edit">Edit</a>
                                         </td>
