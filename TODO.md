@@ -44,3 +44,5 @@ LIMIT 1;
 - ability to upload videos of product (use product videos to upload
   videos [must use tusd pkg , fmtp to reduce video size])
 - remove whitespace when u wanna insert any record to db [insert,update]
+- implement show and edit product attributes
+- implement show and edit product inventory
