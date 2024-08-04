@@ -23,7 +23,7 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 
 func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, error) {
 	var products []entities.Product
-	err := p.db.Preload("Category").Preload("Brand").Find(&products).Error
+	err := p.db.WithContext(ctx).Preload("Category").Preload("Brand").Find(&products).Error
 	return products, err
 }
 
@@ -36,14 +36,13 @@ func (p ProductRepository) FindBy(ctx context.Context, columnName string, value 
 
 func (p ProductRepository) FindByID(ctx context.Context, ID int) (entities.Product, error) {
 	var product entities.Product
-
-	err := p.db.Where("id = ? ", ID).First(&product).Error
+	err := p.db.WithContext(ctx).Where("id = ?", ID).First(&product).Error
 	return product, err
 }
 
 func (p ProductRepository) Store(ctx context.Context, product entities.Product) (entities.Product, error) {
 
-	err := p.db.Create(&product).Error
+	err := p.db.WithContext(ctx).Create(&product).Error
 	//for _, Ip := range product.ProductImage {
 	//	fmt.Println("insed ", Ip, "| product id : ", product.ID)
 	//	p.db.Create(entities.ProductImages{
@@ -60,7 +59,7 @@ func (p ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]e
 	var attributes []entities.Attribute
 
 	var product entities.Product
-	pErr := p.db.Where("id = ? ", productID).First(&product).Error
+	pErr := p.db.WithContext(c).Where("id = ? ", productID).First(&product).Error
 
 	if pErr != nil {
 		return attributes, pErr
@@ -89,7 +88,7 @@ func (p ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]e
 		return attributes, err
 	}
 
-	aErr := p.db.Preload("AttributeValues").Where("category_id = ? ", category.ID).Find(&attributes).Error
+	aErr := p.db.WithContext(c).Preload("AttributeValues").Where("category_id = ? ", category.ID).Find(&attributes).Error
 
 	return attributes, aErr
 }
@@ -120,7 +119,7 @@ func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int,
 
 func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID int) (entities.Product, error) {
 	var product entities.Product
-	err := p.db.Preload("ProductAttributes").Where("id=?", productID).First(&product).Error
+	err := p.db.WithContext(ctx).Preload("ProductAttributes").Where("id=?", productID).First(&product).Error
 
 	return product, err
 }
@@ -128,7 +127,7 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error) {
 
 	var productAttributes []entities.ProductAttribute
-	if err := p.db.Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
+	if err := p.db.WithContext(c).Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
 		return entities.ProductInventory{}, err
 	}
 
@@ -147,7 +146,7 @@ func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, 
 		AttributesJson: productAttributesJson,
 	}
 
-	if iErr := p.db.Create(&inventory).Error; iErr != nil {
+	if iErr := p.db.WithContext(c).Create(&inventory).Error; iErr != nil {
 		return entities.ProductInventory{}, errJ
 	}
 
@@ -172,5 +171,5 @@ func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStore
 		)
 	}
 
-	return p.db.Create(&images).Error
+	return p.db.WithContext(c).Create(&images).Error
 }
