@@ -3,6 +3,7 @@ package brand
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
@@ -46,14 +47,14 @@ func (br BrandRepository) SelectBy(ctx context.Context, brandID int) (entities.B
 	return brand, err
 }
 
-func (br BrandRepository) Update(ctx context.Context, brandID int, req requests.UpdateBrandRequest) (entities.Brand, error) {
+func (br BrandRepository) Update(c *gin.Context, brandID int, req requests.UpdateBrandRequest) (entities.Brand, error) {
 	var brand entities.Brand
-	err := br.db.WithContext(ctx).First(&brand, brandID).Error
+	err := br.db.WithContext(c).First(&brand, brandID).Error
 	if err != nil {
 		return brand, err
 	}
 
-	err = br.db.WithContext(ctx).Model(&brand).Updates(entities.Brand{
+	err = br.db.WithContext(c).Model(&brand).Updates(entities.Brand{
 		Title: strings.TrimSpace(req.Title),
 		Slug:  strings.TrimSpace(req.Slug),
 		Image: strings.TrimSpace(req.Image),
