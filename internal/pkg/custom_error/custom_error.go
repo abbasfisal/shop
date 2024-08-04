@@ -1,5 +1,10 @@
 package custom_error
 
+import (
+	"errors"
+	"gorm.io/gorm"
+)
+
 type CustomError struct {
 	OriginalMessage string
 	DisplayMessage  string //will set to user
@@ -30,3 +35,10 @@ const (
 	StoreImageOnDiskFailed  string = "خطا در ذخیره عکس بر روی هارددیسک"
 	IDIsNotCorrect          string = "شناسه صحیح نمی باشد"
 )
+
+func HandleError(err error, notFoundMsg string) CustomError {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return New(err.Error(), notFoundMsg, 404)
+	}
+	return New(err.Error(), InternalServerError, 500)
+}

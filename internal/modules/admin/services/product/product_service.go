@@ -3,7 +3,6 @@ package product
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
@@ -26,12 +25,8 @@ func (p ProductService) Index(ctx context.Context) (responses.Products, custom_e
 	var response responses.Products
 	products, err := p.repo.GetAll(ctx)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return response, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return response, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+		return response, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-
 	return responses.ToProducts(products), custom_error.CustomError{}
 }
 
@@ -39,13 +34,9 @@ func (p ProductService) Show(ctx context.Context, columnName string, value any) 
 
 	product, err := p.repo.FindBy(ctx, columnName, value)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 500)
+		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToProduct(product), custom_error.CustomError{}
-
 }
 
 func (p ProductService) Create(ctx context.Context, req requests.CreateProductRequest) (responses.Product, custom_error.CustomError) {
@@ -62,28 +53,25 @@ func (p ProductService) Create(ctx context.Context, req requests.CreateProductRe
 			}
 			return true
 		}(),
-		//Quantity:      req.Quantity,
 		OriginalPrice: req.OriginalPrice,
 		SalePrice:     req.SalePrice,
 		Description:   strings.TrimSpace(req.Description),
-		ProductImages: func() []entities.ProductImages {
-			var pImages []entities.ProductImages
-			for _, imageName := range req.ProductImage {
-				pImages = append(pImages, entities.ProductImages{
-					Model:     gorm.Model{},
-					ProductID: 0,
-					Path:      imageName,
-				})
-			}
-			return pImages
-		}(),
+		ProductImages: prepareProductImages(req.ProductImage),
 	}
 
 	newProduct, err := p.repo.Store(ctx, prepareProduct)
 	if err != nil {
-		return responses.Product{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToProduct(newProduct), custom_error.CustomError{}
+}
+
+func prepareProductImages(imageNames []string) []entities.ProductImages {
+	var pImages []entities.ProductImages
+	for _, imageName := range imageNames {
+		pImages = append(pImages, entities.ProductImages{Path: imageName})
+	}
+	return pImages
 }
 
 func (p ProductService) CheckSkuIsUnique(ctx context.Context, sku string) (bool, custom_error.CustomError) {
@@ -101,10 +89,7 @@ func (p ProductService) FetchByProductID(c *gin.Context, productID int) (respons
 	product, err := p.repo.FindByID(c, productID)
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 500)
+		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToProduct(product), custom_error.CustomError{}
 }
@@ -112,25 +97,17 @@ func (p ProductService) FetchByProductID(c *gin.Context, productID int) (respons
 func (p ProductService) FetchRootAttributes(c *gin.Context, productID int) (responses.Attributes, custom_error.CustomError) {
 
 	attributes, err := p.repo.GetRootAttributes(c, productID)
+
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return responses.Attributes{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return responses.Attributes{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 500)
+		return responses.Attributes{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-
 	return responses.ToAttributes(attributes), custom_error.CustomError{}
-
 }
 
 func (p ProductService) AddAttributeValues(c *gin.Context, productID int, attributes []string) custom_error.CustomError {
-	err := p.repo.StoreAttributeValues(c, productID, attributes)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return custom_error.New(err.Error(), custom_error.InternalServerError, 500)
 
+	if err := p.repo.StoreAttributeValues(c, productID, attributes); err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 
 	return custom_error.CustomError{}
@@ -140,10 +117,7 @@ func (p ProductService) FetchProductAttributes(c *gin.Context, productID int) (r
 	//fetch product , and fetch product_attributes
 	product, err := p.repo.GetProductAndAttributes(c, productID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return responses.Product{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return responses.Product{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToProduct(product), custom_error.CustomError{}
 }
@@ -151,11 +125,7 @@ func (p ProductService) FetchProductAttributes(c *gin.Context, productID int) (r
 func (p ProductService) CreateInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) custom_error.CustomError {
 	_, err := p.repo.StoreProductInventory(c, productID, req)
 	if err != nil {
-		fmt.Println("create Inventory Error : ", err)
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
 }
@@ -163,23 +133,14 @@ func (p ProductService) CreateInventory(c *gin.Context, productID int, req reque
 func (p ProductService) FetchImage(c *gin.Context, imageID int) (responses.ImageProduct, custom_error.CustomError) {
 	image, err := p.repo.GetImage(c, imageID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return responses.ImageProduct{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return responses.ImageProduct{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+		return responses.ImageProduct{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToImageProduct(image), custom_error.CustomError{}
 }
 
 func (p ProductService) RemoveImage(c *gin.Context, imageID int) custom_error.CustomError {
-	err := p.repo.DeleteImage(c, imageID)
-	if err != nil {
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-			}
-			return custom_error.New(err.Error(), custom_error.InternalServerError, 500)
-		}
+	if err := p.repo.DeleteImage(c, imageID); err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
 }
