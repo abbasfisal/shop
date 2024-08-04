@@ -30,8 +30,6 @@ func (bs BrandService) CheckSlugUniqueness(ctx context.Context, slug string) boo
 
 func (bs BrandService) Create(ctx context.Context, req requests.CreateBrandRequest) (responses.Brand, error) {
 
-	var response responses.Brand
-
 	var brand = entities.Brand{
 		Title: req.Title,
 		Slug:  req.Slug,
@@ -40,26 +38,19 @@ func (bs BrandService) Create(ctx context.Context, req requests.CreateBrandReque
 
 	newBrand, err := bs.repo.Store(ctx, brand)
 	if err != nil {
-		return response, err
+		return responses.Brand{}, err
 	}
 
 	return responses.ToBrand(newBrand), nil
 }
 
 func (bs BrandService) Index(ctx context.Context) (responses.Brands, custom_error.CustomError) {
-	var response responses.Brands
 
 	brands, err := bs.repo.GetAll(ctx)
-
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return response, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return response, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
+		return responses.Brands{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-
 	return responses.ToBrands(brands), custom_error.CustomError{}
-
 }
 
 func (bs BrandService) Show(ctx context.Context, brandID int) (responses.Brand, custom_error.CustomError) {
@@ -80,14 +71,10 @@ func (bs BrandService) Show(ctx context.Context, brandID int) (responses.Brand, 
 }
 
 func (bs BrandService) Update(c *gin.Context, brandID int, req requests.UpdateBrandRequest) (responses.Brand, custom_error.CustomError) {
+
 	brand, err := bs.repo.Update(c, brandID, req)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return responses.Brand{}, custom_error.New(err.Error(), custom_error.RecordNotFound, 404)
-		}
-		return responses.Brand{}, custom_error.New(err.Error(), custom_error.InternalServerError, 500)
-
+		return responses.Brand{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-
 	return responses.ToBrand(brand), custom_error.CustomError{}
 }
