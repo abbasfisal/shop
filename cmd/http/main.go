@@ -20,70 +20,74 @@ import (
 	"sync"
 )
 
-var validate *validator.Validate
-var i18nBundle *i18n.Bundle
-var Once sync.Once
-var logger logging.Logger
+var (
+	validate   *validator.Validate
+	i18nBundle *i18n.Bundle
+	once       sync.Once
+	logger     logging.Logger
+)
 
 func main() {
-
-	Once.Do(func() {
-		//load translation
-		loadTranslation()
-
-		//load Logger
-		logger = logging.NewZapLogger()
-
-		//load config
-		configInit()
-
-		//load mysql connection
-		mysql.Connect()
-	})
+	once.Do(initialize)
 
 	commands.Execute()
 
 	r := gin.Default()
+	setupSessions(r)
+	setupRoutes(r)
 
-	store := cookie.NewStore([]byte(viper.GetString("App.Key")))
-	r.Use(sessions.Sessions("session", store))
-
-	r.LoadHTMLGlob("internal/**/**/**/*.html")
-	r.Static("uploads", "./uploads")
-	r.Static("assets", "./assets")
-	//Admin routes
-	AdminRoutes.SetAdminRoutes(r, i18nBundle)
-
-	//public routes
-	PublicRoutes.SetPublic(r, i18nBundle)
-
-	r.GET("/500", func(c *gin.Context) {
-		c.HTML(http.StatusInternalServerError, "templates/html/errors/500", nil)
-		return
-	})
-
-	if err := r.Run(fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))); err != nil {
-		logger.FatalF("[Server start failed ] : ", err)
+	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
+	if err := r.Run(addr); err != nil {
+		logger.FatalF("[Server start failed]: %v", err)
 	}
+}
 
+func initialize() {
+	loadTranslation()
+	initializeLogger()
+	loadConfig()
+	initializeDatabase()
 }
 
 func loadTranslation() {
 	i18nBundle = i18n.NewBundle(language.Persian)
 	i18nBundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-	_, err := i18nBundle.LoadMessageFile("./internal/translation/active.fa.yaml")
-	if err != nil {
-		log.Fatal(err)
-		return
+	if _, err := i18nBundle.LoadMessageFile("./internal/translation/active.fa.yaml"); err != nil {
+		log.Fatalf("Error loading translation file: %v", err)
 	}
 }
 
-func configInit() {
+func initializeLogger() {
+	logger = logging.NewZapLogger()
+}
+
+func loadConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
 	viper.AddConfigPath("./config/")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal("error reading config file ", err)
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file: %v", err)
 	}
+}
+
+func initializeDatabase() {
+	mysql.Connect()
+}
+
+func setupSessions(r *gin.Engine) {
+	store := cookie.NewStore([]byte(viper.GetString("App.Key")))
+	r.Use(sessions.Sessions("session", store))
+}
+
+func setupRoutes(r *gin.Engine) {
+	r.LoadHTMLGlob("internal/**/**/**/*.html")
+	r.Static("uploads", "./uploads")
+	r.Static("assets", "./assets")
+
+	AdminRoutes.SetAdminRoutes(r, i18nBundle)
+	PublicRoutes.SetPublic(r, i18nBundle)
+
+	r.GET("/500", func(c *gin.Context) {
+		c.HTML(http.StatusInternalServerError, "templates/html/errors/500", nil)
+	})
 }
