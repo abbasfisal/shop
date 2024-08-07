@@ -3,11 +3,12 @@ package responses
 import "shop/internal/entities"
 
 type Category struct {
-	ID     uint
-	Title  string
-	Slug   string
-	Image  string
-	Status bool
+	ID       uint
+	ParentID *uint
+	Title    string
+	Slug     string
+	Image    string
+	Status   bool
 }
 type Categories struct {
 	Data []Category
@@ -15,11 +16,12 @@ type Categories struct {
 
 func ToCategory(category entities.Category) Category {
 	return Category{
-		ID:     category.ID,
-		Title:  category.Title,
-		Slug:   category.Slug,
-		Image:  category.Image,
-		Status: category.Status,
+		ID:       category.ID,
+		ParentID: category.ParentID,
+		Title:    category.Title,
+		Slug:     category.Slug,
+		Image:    category.Image,
+		Status:   category.Status,
 	}
 }
 

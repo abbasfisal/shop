@@ -274,35 +274,168 @@ func (a AdminHandler) ShowCategory(c *gin.Context) {
 }
 
 func (a AdminHandler) EditCategory(c *gin.Context) {
-	catID, err := strconv.Atoi(c.Param("00"))
+	catID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
 		c.Redirect(http.StatusFound, "/admins/categories/")
 		return
 	}
 
 	cat, cErr := a.categorySrv.Show(context.TODO(), catID)
+	categories, _ := a.categorySrv.GetAllCategories(c)
 
 	if cErr.Code == 500 {
-		html.Error500(c)
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/categories/")
 		return
 	}
-	if cErr.Code > 0 {
-		c.Redirect(http.StatusFound, "/admins/categories")
+	if cErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/categories/")
 		return
 	}
 
-	html.Render(c, http.StatusFound, "modules/admin/html/admin_edit_category", gin.H{
-		"TITLE":    "edit category",
-		"CATEGORY": cat,
+	html.Render(c, http.StatusFound, "admin_edit_category", gin.H{
+		"TITLE":      "edit category",
+		"CATEGORY":   cat,
+		"CATEGORIES": categories,
 	})
 	return
 }
 
 func (a AdminHandler) UpdateCategory(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"msg": "implement me",
-	})
+
+	catID, catIDErr := strconv.Atoi(c.Param("id"))
+	if catIDErr != nil {
+		fmt.Println("----- string to id err : ", catIDErr)
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, "/admins/categories/")
+		return
+	}
+
+	url := fmt.Sprintf("/admins/categories/%d/edit", catID)
+
+	var req requests.UpdateCategoryRequest
+	_ = c.Request.ParseForm()
+	if err := c.ShouldBind(&req); err != nil {
+		fmt.Println("------- bind err : ", err)
+		errors.Init()
+		errors.SetFromErrors(err)
+
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	categoryData, catErr := a.categorySrv.Show(c, catID)
+	if catErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+	if catErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/categories/")
+		return
+	}
+
+	//slug unique validation
+	if categoryData.Slug != req.Slug {
+		if ok := a.categorySrv.CheckSlugUniqueness(context.TODO(), req.Slug); ok {
+			errors.Init()
+			errors.Add("slug", custom_error.MustBeUnique)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+	}
+
+	//------------------------
+	//	upload and save image
+	//------------------------
+	imageFile, imageErr := c.FormFile("image")
+
+	pathToUpload := ""
+	if imageErr != nil {
+		req.Image = categoryData.Image
+	}
+	if imageErr == nil {
+		// file extension validation
+		fileExtension := filepath.Ext(imageFile.Filename)
+		ok := slices.Contains(util.AllowImageExtensions(), fileExtension)
+		if !ok {
+			errors.Init()
+			errors.Add("image", custom_error.MustBeImage)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+
+		//upload image and store on disk
+		newImageName := util.GenerateFilename(imageFile.Filename)
+		pathToUpload = viper.GetString("Upload.Categories") + newImageName
+		uploadErr := c.SaveUploadedFile(imageFile, pathToUpload)
+		if uploadErr != nil {
+			fmt.Println("upload error:", uploadErr)
+			errors.Init()
+			errors.Add("image", custom_error.UploadImageError)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+
+			return
+		}
+		req.Image = newImageName
+	}
+
+	//---------------------------
+	//	end upload and save image
+	//---------------------------
+
+	categoryUpdateErr := a.categorySrv.Edit(c, catID, req)
+	fmt.Println("----- hanlder category edit : error  ", categoryUpdateErr)
+	if categoryUpdateErr.Code > 0 {
+		fmt.Println("------- update category err : ", categoryUpdateErr.Error())
+		if categoryUpdateErr.Code == 404 {
+			sessions.Set(c, "message", custom_error.RecordNotFound)
+			c.Redirect(http.StatusFound, "/admins/categories/")
+			return
+		}
+		if categoryUpdateErr.Code == 500 {
+			sessions.Set(c, "message", custom_error.InternalServerError)
+			c.Redirect(http.StatusFound, "/admins/categories/")
+			return
+		}
+	}
+
+	sessions.Set(c, "message", custom_messages.CategoryUpdatedSucc)
+	c.Redirect(http.StatusFound, "/admins/categories/")
 	return
+
 }
 
 func (a AdminHandler) CategoryProducts(c *gin.Context) {
