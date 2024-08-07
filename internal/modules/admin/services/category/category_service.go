@@ -2,6 +2,7 @@ package category
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/category"
 	"shop/internal/modules/admin/requests"
@@ -83,4 +84,13 @@ func (cs CategoryService) GetAllParentCategory(ctx context.Context) (responses.C
 		return responses.Categories{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategories(categories), custom_error.CustomError{}
+}
+
+func (cs CategoryService) Edit(c *gin.Context, categoryID int, req requests.UpdateCategoryRequest) custom_error.CustomError {
+	_, err := cs.repo.Update(c, categoryID, req)
+
+	if err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
 }
