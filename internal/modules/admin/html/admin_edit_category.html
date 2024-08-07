@@ -1,48 +1,113 @@
-{{define "modules/admin/html/admin_edit_category"}}
-    {{if not .AUTH}}
-        {{template "templates/html/layouts/navbar"}}
-    {{end}}
-    <h1>{{.TITLE}}</h1>
-    <form action="/admins/categories/{{.CATEGORY.ID}}" method="POST" enctype="multipart/form-data">
-        <table>
-            <tr>
-                <td>title</td>
-                <td><input type="text" name="title" placeholder="enter title"
-                           value="{{if.OLDS.title}}{{.OLD.title}}{{end}}{{if .CATEGORY.Title}}{{.CATEGORY.Title}}{{end}}">
-                </td>
-                <td>{{ .ERRORS.title}}</td>
-            </tr>
-            <tr>
-                <td>slug</td>
-                <td><input type="text" name="slug" placeholder="enter slug"
-                           value="{{if.OLDS.slug}}{{.OLD.slug}}{{end}}{{if .CATEGORY.Slug}}{{.CATEGORY.Slug}}{{end}}">
-                </td>
-                <td>{{ .ERRORS.slug}}</td>
-            </tr>
-            <tr>
-                <td>image</td>
-                <td><input type="file" name="image"></td>
-                <td>{{.ERRORS.image}}</td>
-            </tr>
-            <tr>
-                <td>status</td>
-                <td><input type="checkbox" name="status" {{if eq .CATEGORY.Status true}}checked{{end}}><br>
-                <td>{{.ERRORS.status}}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><input type="submit" value="create"></td>
-                <td>
-                    {{if .MESSAGE}} {{.MESSAGE}} {{end}}
-                </td>
-            </tr>
-        </table>
-    </form>
+{{define "admin_edit_category"}}
+{{template "head" .}}
+<!-- navbar -->
+{{template "navbar" .}}
+<!-- Main Sidebar Container -->
+{{template "sidebar" .}}
 
-    <hr>
-    {{range $a,$key:=.}}
-        {{$a}}:{{$key}}<br>
-    {{end}}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                </div><!-- /.col -->
+
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-10">
+                    <form action="/admins/categories/{{.CATEGORY.ID}}" method="POST" enctype="multipart/form-data">
+                        <table class="table form-control">
+                            <tr>
+                                <td>image</td>
+                                <td>
+                                    <img src="{{.CATEGORY.Image}}" width="300px" height="200px" alt="">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>  {{if eq .CATEGORY.ParentID nil}}yes {{end}}سطح</td>
+                                <td>
+                                    <select class="form-control" name="category_id" id="">
+
+                                        <option value="0" {{if eq .CATEGORY.ParentID nil}} selected{{end}}>روت
+                                        </option>
+
+                                        {{range .CATEGORIES.Data}}
+                                        <option value="{{.ID}}"
+                                                {{if and ( ne $.CATEGORY.ParentID nil) (eq .ID $.CATEGORY.ID)}}
+                                                    selected
+                                                {{end}}
+                                        >
+                                            {{.Title}} {{if eq .ParentID nil}} [روت] {{end}}
+                                        </option>
+                                        {{end}}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>title</td>
+                                <td>
+                                    <input class="form-control" type="text" name="title" placeholder="enter title"
+                                           value="{{if.OLDS.title}}{{.OLD.title}}{{end}}{{if .CATEGORY.Title}}{{.CATEGORY.Title}}{{end}}">
+                                </td>
+                                <td>{{ .ERRORS.title}}</td>
+                            </tr>
+                            <tr>
+                                <td>slug</td>
+                                <td><input class="form-control" type="text" name="slug" placeholder="enter slug"
+                                           value="{{if.OLDS.slug}}{{.OLD.slug}}{{end}}{{if .CATEGORY.Slug}}{{.CATEGORY.Slug}}{{end}}">
+                                </td>
+                                <td>{{ .ERRORS.slug}}</td>
+                            </tr>
+                            <tr>
+                                <td>image</td>
+                                <td><input class="form-control" type="file" name="image"></td>
+                                <td>{{.ERRORS.image}}</td>
+                            </tr>
+                            <tr>
+                                <td>status</td>
+                                <td><input type="checkbox" name="status"
+                                           {{if eq .CATEGORY.Status true}}checked{{end}}><br>
+                                <td>{{.ERRORS.status}}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><input type="submit" value="بروز رسانی"></td>
+                                <td>
+                                    {{if .MESSAGE}} {{.MESSAGE}} {{end}}
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+                <!-- /.col-md-6 -->
+
+                ss
+                {{.AUTH.FirstName}}
+                <br>
+                {{range $a,$key:=.}}
+                    {{$a}}:{{$key}}<br>
+                {{end}}
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<!-- Main Footer -->
+    {{template "footer" .}}
 
 {{end}}
-
