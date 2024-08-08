@@ -34,3 +34,10 @@ func (ar AttributeValueRepository) GetAllAttribute(c *gin.Context) ([]entities.A
 	err := ar.db.WithContext(c).Preload("AttributeValues").Find(&attributes).Error
 	return attributes, err
 }
+
+func (ar AttributeValueRepository) Find(c *gin.Context, attributeValueID int) (entities.AttributeValue, error) {
+	var attValue entities.AttributeValue
+	err := ar.db.First(&attValue, attributeValueID).Error
+
+	return attValue, err
+}

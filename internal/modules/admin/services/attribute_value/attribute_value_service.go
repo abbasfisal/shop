@@ -40,3 +40,12 @@ func (av AttributeValueService) IndexAttribute(c *gin.Context) (responses.Attrib
 	}
 	return responses.ToAttributes(attributes), custom_error.CustomError{}
 }
+
+func (av AttributeValueService) Show(c *gin.Context, attributeValueID int) (responses.AttributeValue, custom_error.CustomError) {
+	attValue, err := av.repo.Find(c, attributeValueID)
+	if err != nil {
+		return responses.AttributeValue{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+
+	return responses.ToAttributeValue(attValue), custom_error.CustomError{}
+}

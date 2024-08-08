@@ -1299,3 +1299,45 @@ func (a AdminHandler) ShowAttributeValues(c *gin.Context) {
 	})
 	return
 }
+
+func (a AdminHandler) EditAttributeValues(c *gin.Context) {
+	attValID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+
+	attributes, attrsErr := a.attributeSrv.Index(c)
+	if attrsErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+	if attrsErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+
+	attributeValueData, avErr := a.attrValueSrv.Show(c, attValID)
+
+	if avErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+	if avErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+
+	html.Render(c, 200, "admin_show_attribute_values_edit", gin.H{
+		"TITLE":          "edit attribute-values of a attribute ",
+		"ATTRIBUTEVALUE": attributeValueData,
+		"ATTRIBUTES":     attributes,
+	})
+	return
+
+}
