@@ -712,10 +712,8 @@ func (a AdminHandler) UpdateProduct(c *gin.Context) {}
 //----------------------
 
 func (a AdminHandler) CreateAttribute(c *gin.Context) {
-	categories, _ := a.categorySrv.GetAllParentCategory(c)
 	html.Render(c, http.StatusFound, "admin_create_attribute", gin.H{
-		"TITLE":      "create new attribute",
-		"CATEGORIES": categories,
+		"TITLE": "create new attribute",
 	})
 	return
 }
@@ -758,12 +756,12 @@ func (a AdminHandler) StoreAttribute(c *gin.Context) {
 
 	if Aerr != nil || newAttr.ID <= 0 {
 		fmt.Println("Error in creating new attribute : ", err)
-		sessions.Set(c, "message", "خطا در ایجاد ویژگی")
+		sessions.Set(c, "message", custom_messages.AttributeCreateFailed)
 		c.Redirect(http.StatusFound, "/admins/attributes/create")
 		return
 	}
 
-	sessions.Set(c, "message", "ایجاد دسته بندی با موفقیت انجام شد")
+	sessions.Set(c, "message", custom_messages.AttributeCreateSuccessful)
 	c.Redirect(http.StatusFound, "/admins/attributes/create")
 	return
 }

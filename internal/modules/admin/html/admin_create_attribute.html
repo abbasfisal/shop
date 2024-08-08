@@ -28,18 +28,7 @@
                     <div class="col-lg-10">
                         <form action="/admins/attributes" method="post">
                             <table class="table table-primary ">
-                                <tr>
-                                    <td>دسته بندی والد</td>
-                                    <td>
-                                        <select name="category_id" >
-                                            {{range .CATEGORIES.Data}}
-                                                <option value="{{.ID}}">
-                                                    {{.Title}}
-                                                </option>
-                                            {{end}}
-                                        </select>
-                                    </td>
-                                </tr>
+
                                 <tr>
                                     <td>عنوان</td>
                                     <td><input type="text" name="title"

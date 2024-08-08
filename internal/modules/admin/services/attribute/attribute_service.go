@@ -22,7 +22,6 @@ func (as AttributeService) Create(ctx context.Context, req requests.CreateAttrib
 	var res responses.Attribute
 
 	attr := entities.Attribute{
-		//CategoryID: req.CategoryID,
 		Title: req.Title,
 	}
 
