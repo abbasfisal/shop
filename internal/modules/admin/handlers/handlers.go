@@ -432,6 +432,13 @@ func (a AdminHandler) UpdateCategory(c *gin.Context) {
 		}
 	}
 
+	if pathToUpload != "" {
+		delImg := os.Remove(viper.GetString("upload.categories") + categoryData.Image)
+		if delImg != nil {
+			fmt.Println("----- dele image  err: ", delImg.Error())
+		}
+		fmt.Println("--- delete succ imag")
+	}
 	sessions.Set(c, "message", custom_messages.CategoryUpdatedSucc)
 	c.Redirect(http.StatusFound, "/admins/categories/")
 	return
