@@ -38,7 +38,7 @@ func (ar AttributeRepository) GetAll(c *gin.Context) ([]entities.Attribute, erro
 
 func (ar AttributeRepository) GetByID(c context.Context, attributeID int) (entities.Attribute, error) {
 	var att entities.Attribute
-	err := ar.db.WithContext(c).First(&att, attributeID).Error
+	err := ar.db.WithContext(c).Preload("AttributeValues").First(&att, attributeID).Error
 	return att, err
 }
 

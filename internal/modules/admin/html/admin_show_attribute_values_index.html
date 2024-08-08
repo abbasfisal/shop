@@ -1,4 +1,4 @@
-{{define "admin_index_attribute_value"}}
+{{define "admin_show_attribute_values_index"}}
     {{template "head" .}}
     <!-- navbar -->
     {{template "navbar" .}}
@@ -21,40 +21,32 @@
         </div>
         <!-- /.content-header -->
 
-
         <!-- Main content -->
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <a href="/admins/attribute-values/create" class="btn btn-info float-right">attribute-value
-                            جدید</a>
+                        <a href="/admins/attributes/create" class="btn btn-info float-right"><i class="fa fa-plus"></i>
+                            ویژگی جدید </a>
                         <br>
                         <br>
                         {{if .MESSAGE}} <span class="text-info p-5">{{.MESSAGE}}</span> {{end}}
                         <br>
                         <br>
-                        {{if .ATTRIBUTES.Data}}
-                            <table class="table">
+                        {{if .ATTRIBUTE}}
+                            <table class="table-responsive  table">
                                 <tr>
                                     <td>#</td>
                                     <td>title</td>
-
                                     <td>op</td>
                                 </tr>
-                                {{range .ATTRIBUTES.Data}}
+                                {{range .ATTRIBUTE.AttributeValues.Data}}
                                     <tr>
                                         <td>{{.ID}}</td>
                                         <td>{{.Title}}</td>
 
                                         <td>
-                                            <select name="" id="" class="form-control">
-                                                {{range .AttributeValues.Data}}
-                                                    <option value="">{{.Title}}</option>
-                                                {{end}}
-                                            </select>
-                                            <a href="/admins/attribute/values/{{.ID}}/show">
-                                                مشاهده و ویرایش
+                                            <a href="/admins/attributes-values/{{.ID}}/edit">
                                                 <i class="nav-icon text-danger fa fa-edit"></i>
                                             </a>
                                         </td>

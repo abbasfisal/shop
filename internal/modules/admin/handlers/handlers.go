@@ -1271,3 +1271,31 @@ func (a AdminHandler) IndexAttributeValues(c *gin.Context) {
 	})
 
 }
+
+func (a AdminHandler) ShowAttributeValues(c *gin.Context) {
+	attributeID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	attributeData, oldErr := a.attributeSrv.Show(c, attributeID)
+
+	if oldErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+	if oldErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+
+	html.Render(c, 200, "admin_show_attribute_values_index", gin.H{
+		"TITLE":     "Show values of attribute ",
+		"ATTRIBUTE": attributeData,
+	})
+	return
+}
