@@ -85,6 +85,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 		authGrp.GET("/admins/attribute/values/:id/show", adminHlr.ShowAttributeValues) //show attribute-values of a attribute
 		authGrp.GET("/admins/attribute-values/:id/edit", adminHlr.EditAttributeValues)
+		authGrp.POST("/admins/attribute-values/:id/edit", adminHlr.UpdateAttributeValues)
 		///admins/attributes-values/{{.ID}}/edit
 
 		//products

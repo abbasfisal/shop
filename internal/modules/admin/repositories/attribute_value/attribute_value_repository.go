@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
+	"shop/internal/modules/admin/requests"
+	"strings"
 )
 
 type AttributeValueRepository struct {
@@ -40,4 +42,26 @@ func (ar AttributeValueRepository) Find(c *gin.Context, attributeValueID int) (e
 	err := ar.db.First(&attValue, attributeValueID).Error
 
 	return attValue, err
+}
+
+func (ar AttributeValueRepository) Update(c *gin.Context, attributeValueID int, req requests.UpdateAttributeValueRequest) (entities.AttributeValue, error) {
+	var attributeValue entities.AttributeValue
+
+	err := ar.db.WithContext(c).Preload("Attribute").First(&attributeValue, attributeValueID).Error
+	if err != nil {
+		return attributeValue, err
+	}
+
+	updateErr := ar.db.
+		Model(&attributeValue).
+		Update("attribute_id", req.AttributeID).
+		Update("attribute_title", attributeValue.Attribute.Title).
+		Update("value", strings.TrimSpace(req.Value)).
+		Error
+
+	if updateErr != nil {
+		return entities.AttributeValue{}, updateErr
+	}
+
+	return attributeValue, nil
 }

@@ -2,6 +2,7 @@ package attributeValue
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/attribute_value"
@@ -48,4 +49,15 @@ func (av AttributeValueService) Show(c *gin.Context, attributeValueID int) (resp
 	}
 
 	return responses.ToAttributeValue(attValue), custom_error.CustomError{}
+}
+
+func (av AttributeValueService) Update(c *gin.Context, attributeValueID int, req requests.UpdateAttributeValueRequest) custom_error.CustomError {
+	attributeValue, err := av.repo.Update(c, attributeValueID, req)
+
+	fmt.Println("--- update succ att-value : ", attributeValue)
+	if err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+
 }

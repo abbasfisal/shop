@@ -1341,3 +1341,71 @@ func (a AdminHandler) EditAttributeValues(c *gin.Context) {
 	return
 
 }
+
+func (a AdminHandler) UpdateAttributeValues(c *gin.Context) {
+
+	//convert string id to int
+	attValID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+
+	url := fmt.Sprintf("/admins/attribute-values/%d/edit", attValID)
+
+	//bind data
+	var req requests.UpdateAttributeValueRequest
+	_ = c.Request.ParseForm()
+	bindErr := c.ShouldBind(&req)
+	if bindErr != nil {
+		errors.Init()
+		errors.SetFromErrors(err)
+		if req.AttributeID <= 0 {
+			errors.Add("attribute_id", custom_messages.SelectOne)
+		}
+		fmt.Println("validation failed : ", err.Error())
+		fmt.Println("attribute id : ", req.AttributeID)
+
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	//find attribute-value
+	_, oldErr := a.attrValueSrv.Show(c, attValID)
+	if oldErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+	if oldErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+
+	//update attribute-value
+	updateErr := a.attrValueSrv.Update(c, attValID, req)
+	if updateErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+	if updateErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	//update was successful
+	sessions.Set(c, "message", custom_messages.AttributeValueUpdateSuccessfully)
+	c.Redirect(http.StatusFound, "/admins/attribute-values")
+	return
+
+}
