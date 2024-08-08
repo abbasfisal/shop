@@ -28,24 +28,15 @@
                     <div class="col-lg-10">
                         <form action="/admins/attribute-values" method="post">
                             <table class="table table-primary ">
-                                <tr>
-                                    <td>دسته بندی والد</td>
-                                    <td>
-                                        <select name="parent_id" id="parent-category">
-                                            <option value="">select</option>
-                                            {{range .CATEGORIES.Data}}
-                                                <option value="{{.ID}}">
-                                                    {{.Title}}
-                                                </option>
-                                            {{end}}
-                                        </select>
-                                    </td>
-                                </tr>
+
                                 <tr>
                                     <td>ویژگی</td>
                                     <td>
-                                        <select name="attribute_id" id="attribute">
-                                            <option data value="">انتخاب کنید</option>
+                                        <select class="form-control" name="attribute_id" id="attribute">
+                                            <option data value="0">انتخاب کنید</option>
+                                            {{range .ATTRIBUTES.Data}}
+                                                <option value="{{.ID}}">{{.Title}}</option>
+                                            {{end}}
                                         </select>
                                         <span class="text-danger">{{ .ERRORS.attribute_id}}</span>
                                     </td>

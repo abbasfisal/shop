@@ -17,10 +17,13 @@ func NewAttributeRepository(db *gorm.DB) AttributeValueRepository {
 func (ar AttributeValueRepository) Store(ctx context.Context, attr entities.AttributeValue) (entities.AttributeValue, error) {
 
 	var attribute entities.Attribute
-	ar.db.Where("id = ? ", attr.AttributeID).First(&attribute)
+	err := ar.db.First(&attribute, attr.AttributeID).Error
+	if err != nil {
+		return entities.AttributeValue{}, err
+	}
+
 	attr.AttributeTitle = attribute.Title
+	attErr := ar.db.Create(&attr).Error
 
-	err := ar.db.Create(&attr).Error
-
-	return attr, err
+	return attr, attErr
 }

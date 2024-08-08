@@ -10,4 +10,8 @@ const (
 	AttributeCreateFailed        = "خطا در ایجاد ویژگی"
 	AttributeCreateSuccessful    = "ایجاد ویژگی با موفقیت انجام شد"
 	AttributeUpdatedSuccessfully = "ویژگی با موفقیت بروزرسانی شاد"
+
+	AttValueCreatedSuccessfully = "ایجاد attribute-value با موفقیت انجام شد"
+
+	SelectOne = "لطفا یکی از گزینه های موجود را انتخاب کنید"
 )

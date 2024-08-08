@@ -721,13 +721,10 @@ func (a AdminHandler) CreateAttribute(c *gin.Context) {
 
 func (a AdminHandler) CreateAttributeValues(c *gin.Context) {
 
-	//category where parent_id=null
-	//attribute will fetch by ajax request
-	categories, _ := a.categorySrv.GetAllParentCategory(c)
+	attributes, _ := a.attributeSrv.Index(c)
 	html.Render(c, http.StatusFound, "admin_create_attribute_values", gin.H{
 		"TITLE":      "create new attribute-values",
-		"CATEGORIES": categories,
-		"ATTRIBUTES": "attributes",
+		"ATTRIBUTES": attributes,
 	})
 	return
 }
@@ -791,12 +788,13 @@ func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
 
 	var req requests.CreateAttributeValueRequest
 	_ = c.Request.ParseForm()
+
 	err := c.ShouldBind(&req)
 	if err != nil {
 		errors.Init()
 		errors.SetFromErrors(err)
 		if req.AttributeID <= 0 {
-			errors.Add("attribute_id", "The field is required.")
+			errors.Add("attribute_id", custom_messages.SelectOne)
 		}
 		fmt.Println("validation failed : ", err.Error())
 		fmt.Println("attribute id : ", req.AttributeID)
@@ -811,15 +809,20 @@ func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
 		return
 	}
 
-	newAttrValue, err := a.attrValueSrv.Create(c, req)
+	_, attErr := a.attrValueSrv.Create(c, req)
 
-	if err != nil || newAttrValue.ID <= 0 {
-		sessions.Set(c, "message", "خطا در ایجاد ویژگی")
-		c.Redirect(http.StatusFound, "/admins/attribute-values/create")
+	if attErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+	if attErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
 		return
 	}
 
-	sessions.Set(c, "message", "ایجاد ویژگی با موفقیت انجام شد")
+	sessions.Set(c, "message", custom_messages.AttValueCreatedSuccessfully)
 	c.Redirect(http.StatusFound, "/admins/attribute-values/create")
 	return
 }

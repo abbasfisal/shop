@@ -6,6 +6,7 @@ import (
 	"shop/internal/modules/admin/repositories/attribute_value"
 	"shop/internal/modules/admin/requests"
 	"shop/internal/modules/admin/responses"
+	"shop/internal/pkg/custom_error"
 )
 
 type AttributeValueService struct {
@@ -16,15 +17,16 @@ func NewAttributeValueService(repo attributeValue.AttributeValueRepositoryInterf
 	return AttributeValueService{repo: repo}
 }
 
-func (av AttributeValueService) Create(ctx context.Context, req requests.CreateAttributeValueRequest) (responses.AttributeValue, error) {
+func (av AttributeValueService) Create(ctx context.Context, req requests.CreateAttributeValueRequest) (responses.AttributeValue, custom_error.CustomError) {
 
 	newAttrValue, err := av.repo.Store(ctx, entities.AttributeValue{
 		AttributeID: req.AttributeID,
 		Value:       req.Value,
 	})
+
 	if err != nil {
-		return responses.AttributeValue{}, err
+		return responses.AttributeValue{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 
-	return responses.ToAttributeValue(newAttrValue), nil
+	return responses.ToAttributeValue(newAttrValue), custom_error.CustomError{}
 }
