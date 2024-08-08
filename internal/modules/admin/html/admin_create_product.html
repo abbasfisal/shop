@@ -38,7 +38,7 @@
                                             {{end}}
                                         </select>
                                     </td>
-                                    <td></td>
+                                    <td class="text-danger">{{if .ERRORS.categoryid}}{{.ERRORS.categoryid}}{{end}}</td>
                                 </tr>
                                 <tr>
                                     <td>انتخاب برند</td>
@@ -50,7 +50,7 @@
                                             {{end}}
                                         </select>
                                     </td>
-                                    <td></td>
+                                    <td class="text-danger">{{if .ERRORS.brandid}}{{.ERRORS.brandid}}{{end}}</td>
 
                                 </tr>
 

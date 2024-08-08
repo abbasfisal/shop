@@ -1,6 +1,6 @@
 package requests
 
-type CreateProductRequest struct {
+type UpdateProductRequest struct {
 	CategoryID    int    `form:"category_id" binding:"required"`
 	BrandID       uint   `form:"brand_id" binding:"required"`
 	Title         string `form:"title" binding:"required"`
@@ -10,6 +10,4 @@ type CreateProductRequest struct {
 	OriginalPrice uint   `form:"original_price" binding:"required"`
 	SalePrice     uint   `form:"sale_price" binding:"required"`
 	Description   string `form:"description" binding:"required"`
-
-	ProductImage []string
 }

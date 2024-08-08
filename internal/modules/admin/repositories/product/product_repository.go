@@ -36,7 +36,7 @@ func (p ProductRepository) FindBy(ctx context.Context, columnName string, value 
 
 func (p ProductRepository) FindByID(ctx context.Context, ID int) (entities.Product, error) {
 	var product entities.Product
-	err := p.db.WithContext(ctx).Where("id = ?", ID).First(&product).Error
+	err := p.db.WithContext(ctx).First(&product, ID).Error
 	return product, err
 }
 
@@ -172,4 +172,37 @@ func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStore
 	}
 
 	return p.db.WithContext(c).Create(&images).Error
+}
+
+func (p ProductRepository) Update(c *gin.Context, productID int, req requests.UpdateProductRequest) (entities.Product, error) {
+
+	var product entities.Product
+	pErr := p.db.WithContext(c).First(&product, productID).Error
+	if pErr != nil {
+		fmt.Println("---- repo product find err : 182 ", pErr)
+		return product, pErr
+	}
+
+	updateErr := p.db.WithContext(c).Model(&product).Update("category_id", req.CategoryID).
+		Update("brand_id", req.BrandID).
+		Update("title", strings.TrimSpace(req.Title)).
+		Update("slug", strings.TrimSpace(req.Slug)).
+		Update("sku", strings.TrimSpace(req.Sku)).
+		Update("status", func() bool {
+			if req.Status == "" {
+				return false
+			}
+			return true
+		}()).
+		Update("original_price", req.OriginalPrice).
+		Update("sale_price", req.SalePrice).
+		Update("description", req.Description).Error
+
+	if updateErr != nil {
+		fmt.Println("---- repo product update  err : 201 ", updateErr)
+
+		return entities.Product{}, pErr
+	}
+	fmt.Println("---- repo product udpate succ ")
+	return product, nil
 }

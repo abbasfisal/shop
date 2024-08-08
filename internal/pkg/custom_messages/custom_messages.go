@@ -18,5 +18,12 @@ const (
 	AttValueCreatedSuccessfully      = "ایجاد attribute-value با موفقیت انجام شد"
 	AttributeValueUpdateSuccessfully = "بروزرسانی attribute-value با موفقیت انجام شد."
 
+	//proudct
+	ProductUpdateFailed        = "خطا در بروزرسانی محصول"
+	ProductUpdatedSuccessfully = "محصول باموفقیت برزورسانی شد"
+
 	SelectOne = "لطفا یکی از گزینه های موجود را انتخاب کنید"
+
+	ThereIsNoAnyCategories = "هیچ کتگوری وجود ندارد / لطفا حداقل یک کتگوری ایجاد کنید"
+	ThereIsNoAnyBrand      = "هیچ برندی وجود ندارد / لطفا حداقل یک برند ایجاد کنید"
 )

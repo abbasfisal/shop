@@ -31,14 +31,15 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-10 align-content-center">
-                        <form action="/admins/products" method="post" >
+                        <form action="/admins/products/{{.PRODUCT.ID}}" method="post">
                             <table class="table table-primary ">
                                 <tr>
                                     <td>سایر عملیات</td>
                                     <td>
                                         <a href="/admins/products/{{.PRODUCT.ID}}"><b>مشاهده محصول</b></a> |
 
-                                        <a href="/admins/products/{{.PRODUCT.ID}}/show-gallery"> <b> ویرایش و مشاهده تصاویر</b> </a> |
+                                        <a href="/admins/products/{{.PRODUCT.ID}}/show-gallery"> <b> ویرایش و مشاهده
+                                                تصاویر</b> </a> |
                                         <a href="#">
                                             <b>ویرایش و مشاهده ویژگی ها</b>
                                         </a> |
@@ -55,9 +56,8 @@
                                                 <option value="{{.ID}}" {{if eq $selectedCategory .ID}} selected {{end}}>{{.Title}}</option>
                                             {{end}}
                                         </select>
-
                                     </td>
-                                    <td></td>
+                                    <td class="text-danger">{{if .ERRORS.categoryid}}{{.ERRORS.categoryid}}{{end}}</td>
                                 </tr>
                                 <tr>
                                     <td>انتخاب برند</td>
@@ -69,7 +69,7 @@
                                             {{end}}
                                         </select>
                                     </td>
-                                    <td></td>
+                                    <td class="text-danger">{{if .ERRORS.brandid}}{{.ERRORS.brandid}}{{end}}</td>
 
                                 </tr>
 
@@ -88,6 +88,7 @@
                                 <tr>
                                     <td>اسلاگ</td>
                                     <td><input type="text"
+                                               name="slug"
                                                class="form-control"
                                                 {{if .OLDS.title}}
                                                     value="{{range .OLDS.title}}{{.}}{{end}}"
@@ -113,7 +114,8 @@
 
                                 <tr>
                                     <td>وضعیت</td>
-                                    <td><input type="checkbox" checked name="status"></td>
+                                    <td><input type="checkbox"{{if eq .PRODUCT.Status true}} checked{{end}}
+                                               name="status"></td>
                                     <td></td>
                                 </tr>
 
@@ -153,30 +155,11 @@
                                 <tr>
                                     <td>توضیحات</td>
                                     <td>
-                                        <textarea name="description" cols="30" class="form-control" rows="10">{{if .OLDS.description}}{{range .OLDS.description}}{{.}}{{end}}{{else }}{{.PRODUCT.Description}}{{end}}</textarea>
+                                        <textarea name="description" cols="30" class="form-control"
+                                                  rows="10">{{if .OLDS.description}}{{range .OLDS.description}}{{.}}{{end}}{{else }}{{.PRODUCT.Description}}{{end}}</textarea>
                                     </td>
                                     <td class="text-danger">{{if .ERRORS.description}}{{.ERRORS.description}}{{end}}</td>
                                 </tr>
-
-                                <tr>
-                                    <td>تصاویر</td>
-                                    <td>
-                                        <div class="input-group">
-                                            <div class="custom-file">
-                                                <input type="file" multiple name="images[]" class="custom-file-input"
-                                                       id="exampleInputFile">
-                                                <label class="custom-file-label" for="exampleInputFile">انتخاب
-                                                    فایل</label>
-                                            </div>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" id="">Upload</span>
-                                            </div>
-                                        </div>
-
-                                    </td>
-                                    <td>{{if .ERRORS.images}}{{.ERRORS.images}}{{end}}</td>
-                                </tr>
-
                                 <tr>
                                     <td></td>
                                     <td><input

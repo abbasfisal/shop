@@ -484,14 +484,28 @@ func (a AdminHandler) IndexProduct(c *gin.Context) {
 func (a AdminHandler) CreateProduct(c *gin.Context) {
 	categories, err := a.categorySrv.GetAllCategories(c)
 	if err.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
 	if err.Code == 500 {
-		html.Error500(c)
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
+	if len(categories.Data) == 0 {
+		sessions.Set(c, "message", custom_messages.ThereIsNoAnyCategories)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
 	brands, _ := a.brandSrv.Index(c)
+	if len(brands.Data) == 0 {
+		sessions.Set(c, "message", custom_messages.ThereIsNoAnyBrand)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_product", gin.H{
 		"TITLE":      "create new product",
 		"CATEGORIES": categories,
@@ -504,7 +518,7 @@ func (a AdminHandler) StoreProduct(c *gin.Context) {
 	var req requests.CreateProductRequest
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
-
+		fmt.Println("=== bind err : ", err)
 		errors.Init()
 		errors.SetFromErrors(err)
 
@@ -543,13 +557,23 @@ func (a AdminHandler) StoreProduct(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("here======")
 	//check category_id existence
 	_, cErr := a.categorySrv.Show(c, req.CategoryID)
 	if cErr.Code > 0 {
-		html.Error500(c)
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		sessions.Set(c, "message", "شناسه کتگوری نامعتبر است")
+		c.Redirect(http.StatusFound, "/admins/products/create")
 		return
 	}
 
+	//c.JSON(200, gin.H{
+	//	"data": req,
+	//})
+	//return
 	imagesForm, _ := c.MultipartForm()
 	imagesFile := imagesForm.File["images[]"]
 	//check required validation
@@ -641,13 +665,11 @@ func (a AdminHandler) ShowProduct(c *gin.Context) {
 		return
 	}
 	if pErr.Code == 500 {
-		html.Error500(c)
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
-	//c.JSON(200, gin.H{
-	//	"products:": selectedP,
-	//})
-	//return
+
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_show_product",
 		gin.H{
 			"TITLE":   "show product",
@@ -706,7 +728,144 @@ func (a AdminHandler) EditProduct(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) UpdateProduct(c *gin.Context) {}
+func (a AdminHandler) UpdateProduct(c *gin.Context) {
+	//convert string id to int
+	productID, convErr := strconv.Atoi(c.Param("id"))
+	if convErr != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, "/admins/products/")
+		return
+	}
+
+	//var req
+	var req requests.UpdateProductRequest
+	_ = c.Request.ParseForm()
+
+	//var url
+	url := fmt.Sprintf("/admins/products/%d/edit", productID)
+
+	//bind request
+	if err := c.ShouldBind(&req); err != nil {
+		fmt.Println("=== bind err : ", err)
+		errors.Init()
+		errors.SetFromErrors(err)
+
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	//select product from db
+	selectedProduct, pErr := a.productSrv.Show(context.TODO(), "id", productID)
+	if pErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	if pErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	//check brand id existence
+	if selectedProduct.BrandID != req.BrandID {
+		//selectedBrand
+		_, bErr := a.brandSrv.Show(c, int(req.BrandID))
+		if bErr.Code == 404 {
+			sessions.Set(c, "message", "شناسه برند نامعتبر می باشد")
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+		if bErr.Code == 500 {
+			sessions.Set(c, "message", custom_error.InternalServerError)
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+	}
+
+	//check category id existence
+	if selectedProduct.CategoryID != uint(req.CategoryID) {
+		//selectedCategory
+		_, cErr := a.categorySrv.Show(c, req.CategoryID)
+		if cErr.Code == 404 {
+			sessions.Set(c, "message", "شناسه کتگوری نامعتبر می باشد")
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+		if cErr.Code == 500 {
+			sessions.Set(c, "message", custom_error.InternalServerError)
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+	}
+
+	//check uniqueness of sku
+	if selectedProduct.Sku != strings.TrimSpace(req.Sku) {
+		IsUnique, CheckErr := a.productSrv.CheckSkuIsUnique(c, req.Sku)
+		if CheckErr.Code == 500 {
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			sessions.Set(c, "message", custom_error.SomethingWrongHappened)
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+		if !IsUnique {
+			fmt.Println("unique error :", CheckErr)
+			errors.Init()
+			errors.Add("sku", custom_error.MustBeUnique)
+			sessions.Set(c, "errors", errors.ToString())
+
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+
+			c.Redirect(http.StatusFound, url)
+			return
+		}
+	}
+
+	//update product
+	updateErr := a.productSrv.Update(c, productID, req)
+	if updateErr.Code > 0 {
+		fmt.Println("--- handler update product : 857 : err : ", updateErr)
+		sessions.Set(c, "message", custom_messages.ProductUpdateFailed)
+		c.Redirect(http.StatusFound, "/admins/products/")
+	}
+
+	sessions.Set(c, "message", custom_messages.ProductUpdatedSuccessfully)
+	c.Redirect(http.StatusFound, url)
+	return
+
+}
 
 //----------------------
 //	ATTRIBUTE HANDLERS

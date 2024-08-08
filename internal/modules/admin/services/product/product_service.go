@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
@@ -150,4 +151,16 @@ func (p ProductService) UploadImage(c *gin.Context, productID int, imageStoredPa
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
+}
+
+func (p ProductService) Update(c *gin.Context, productID int, req requests.UpdateProductRequest) custom_error.CustomError {
+
+	product, err := p.repo.Update(c, productID, req)
+	fmt.Println("---- proudct service update : 159  ; proudct data : ", product)
+	if err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+
+	return custom_error.CustomError{}
+
 }

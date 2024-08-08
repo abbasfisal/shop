@@ -4,16 +4,19 @@ import "gorm.io/gorm"
 
 type Product struct {
 	gorm.Model
-	CategoryID uint
-	BrandID    uint
-	Title      string
-	Slug       string `gorm:"unique"`
-	Sku        string `gorm:"unique"`
-	Status     bool
-	//Quantity      uint `gorm:"not null"`
+	CategoryID    uint
+	BrandID       uint
+	Title         string
+	Slug          string `gorm:"unique"`
+	Sku           string `gorm:"unique"`
+	Status        bool
 	OriginalPrice uint
 	SalePrice     uint
 	Description   string
+
+	//--------------relations
+	///////////////////////////////////
+
 	Category      Category        `gorm:"foreignKey:CategoryID"`
 	Brand         Brand           `gorm:"foreignKey:BrandID"`
 	ProductImages []ProductImages `gorm:"foreignKey:ProductID"`
