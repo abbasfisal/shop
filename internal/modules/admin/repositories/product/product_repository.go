@@ -88,7 +88,7 @@ func (p ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]e
 		return attributes, err
 	}
 
-	aErr := p.db.WithContext(c).Preload("AttributeValues").Where("category_id = ? ", category.ID).Find(&attributes).Error
+	aErr := p.db.WithContext(c).Preload("AttributeValues").Find(&attributes).Error
 
 	return attributes, aErr
 }

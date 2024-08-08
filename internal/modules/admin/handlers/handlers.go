@@ -989,29 +989,30 @@ func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
 // ProductsAddAttributes : show html form add attributes for given product
 func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
 
-	//fetch product
+	//convert string id to int
 	productID, err := strconv.Atoi(c.Param("id"))
 	fmt.Println("product id  : ", productID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Product ID"})
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
 
 	//fetch attributes with values
 	attributes, aErr := a.productSrv.FetchRootAttributes(c, productID)
-
 	if aErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
 	if aErr.Code == 500 {
-		html.Error500(c)
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
-	// end fetch attributes
 
 	html.Render(c, 200, "att", gin.H{
+		"TITLE":      "Add Attribute-Value to a Product",
 		"ATTRIBUTES": attributes,
 		"PRODUCT_ID": productID,
 	})
