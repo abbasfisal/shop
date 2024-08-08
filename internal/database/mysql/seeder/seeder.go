@@ -58,111 +58,75 @@ func Seed() {
 								Description:   "توضیحات تیشرت هایما",
 								Category:      entities.Category{},
 								ProductImages: nil,
-								//ProductAttribute: []entities.ProductAttribute{
-								//	{
-								//		Model:               gorm.Model{},
-								//		ProductID:           0,
-								//		AttributeID:         1,
-								//		AttributeTitle:      "سایز",
-								//		AttributeValueID:    1,
-								//		AttributeValueTitle: "s",
-								//		Attribute:           entities.Attribute{},
-								//		AttributeValue:      entities.AttributeValue{},
-								//	},
-								//	{
-								//		Model:               gorm.Model{},
-								//		ProductID:           0,
-								//		AttributeID:         1,
-								//		AttributeTitle:      "سایز",
-								//		AttributeValueID:    2,
-								//		AttributeValueTitle: "m",
-								//		Attribute:           entities.Attribute{},
-								//		AttributeValue:      entities.AttributeValue{},
-								//	},
-								//	{
-								//		Model:               gorm.Model{},
-								//		ProductID:           0,
-								//		AttributeID:         1,
-								//		AttributeTitle:      "سایز",
-								//		AttributeValueID:    3,
-								//		AttributeValueTitle: "l",
-								//		Attribute:           entities.Attribute{},
-								//		AttributeValue:      entities.AttributeValue{},
-								//	},
-								//},
 							},
 						},
-						Attribute: nil,
 					},
 				},
-				Products:  nil,
-				Attribute: nil,
+				Products: nil,
 			},
 		},
 		Products: nil,
-		Attribute: []entities.Attribute{
-			{
-				Model:      gorm.Model{},
-				CategoryID: 0,
-				Title:      "سایز",
-				Category:   entities.Category{},
-				AttributeValues: []entities.AttributeValue{
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "سایز",
-						Value:          "s",
-					},
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "سایز",
-						Value:          "m",
-					},
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "سایز",
-						Value:          "l",
-					},
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "سایز",
-						Value:          "xl",
-					},
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "سایز",
-						Value:          "xxl",
-					},
+	}
+
+	var attributes = []entities.Attribute{
+		{
+			Model: gorm.Model{},
+			Title: "سایز",
+
+			AttributeValues: []entities.AttributeValue{
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "s",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "m",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "l",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "xl",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "xxl",
 				},
 			},
-			{
-				Model:      gorm.Model{},
-				CategoryID: 0,
-				Title:      "رنگ",
-				Category:   entities.Category{},
-				AttributeValues: []entities.AttributeValue{
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "رنگ",
-						Value:          "آبی",
-					},
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "رنگ",
-						Value:          "قرمز",
-					},
-					{
-						Model:          gorm.Model{},
-						AttributeID:    0,
-						AttributeTitle: "رنگ",
-						Value:          "بنفش",
-					},
+		},
+		{
+			Model: gorm.Model{},
+			Title: "رنگ",
+			AttributeValues: []entities.AttributeValue{
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "رنگ",
+					Value:          "آبی",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "رنگ",
+					Value:          "قرمز",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "رنگ",
+					Value:          "بنفش",
 				},
 			},
 		},
@@ -170,6 +134,6 @@ func Seed() {
 
 	db.Create(&user)
 	db.Create(&category)
-
+	db.Create(&attributes)
 	fmt.Println("[Seed] tables successfully")
 }

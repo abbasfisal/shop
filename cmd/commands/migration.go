@@ -23,6 +23,8 @@ var migrationCmd = &cobra.Command{
 func migrate() {
 
 	db := mysql.Get()
+	db.Exec("SET foreign_key_checks = 0")
+
 	if err := db.Migrator().DropTable(
 		&entities.User{},
 		&entities.Brand{},
@@ -55,6 +57,8 @@ func migrate() {
 		&entities.Cart{},
 		&entities.Order{},
 	)
+	db.Exec("SET foreign_key_checks = 1")
+
 	if err != nil {
 		log.Fatal("[Migrate] table migration failed ", err)
 		return

@@ -12,5 +12,5 @@ type Category struct {
 	SubCategories []Category `gorm:"foreignKey:ParentID"`
 	Products      []Product  `gorm:"foreignKey:CategoryID"`
 
-	Attribute []Attribute `gorm:"foreignKey:CategoryID"`
+	//Attribute []Attribute `gorm:"foreignKey:CategoryID"`
 }

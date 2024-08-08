@@ -1136,3 +1136,23 @@ func (a AdminHandler) UploadProductImages(c *gin.Context) {
 	return
 
 }
+
+func (a AdminHandler) IndexAttribute(c *gin.Context) {
+
+	attributes, err := a.attributeSrv.Index(c)
+
+	if err.Code == 400 {
+		c.JSON(200, gin.H{
+			"data": "empty",
+		})
+	} else if err.Code == 500 {
+		html.Error500(c)
+		return
+	}
+	html.Render(c, 200, "admin_index_attribute", gin.H{
+		"TITLE":      "Index Attributes",
+		"ATTRIBUTES": attributes,
+	})
+	return
+
+}

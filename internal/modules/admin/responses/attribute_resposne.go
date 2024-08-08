@@ -3,8 +3,8 @@ package responses
 import "shop/internal/entities"
 
 type Attribute struct {
-	ID              uint
-	CategoryID      uint
+	ID uint
+	//CategoryID      uint
 	Title           string
 	AttributeValues AttributeValues
 }
@@ -14,8 +14,8 @@ type Attributes struct {
 
 func ToAttribute(attr entities.Attribute) Attribute {
 	return Attribute{
-		ID:              attr.ID,
-		CategoryID:      attr.CategoryID,
+		ID: attr.ID,
+		//CategoryID:      attr.CategoryID,
 		Title:           attr.Title,
 		AttributeValues: ToAttributeValues(attr.AttributeValues),
 	}
