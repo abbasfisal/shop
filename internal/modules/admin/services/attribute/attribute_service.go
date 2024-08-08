@@ -43,3 +43,11 @@ func (as AttributeService) Index(c *gin.Context) (responses.Attributes, custom_e
 	}
 	return responses.ToAttributes(attributes), custom_error.CustomError{}
 }
+
+func (as AttributeService) Show(c context.Context, attributeID int) (responses.Attribute, custom_error.CustomError) {
+	att, err := as.repo.GetByID(c, attributeID)
+	if err != nil {
+		return responses.Attribute{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return responses.ToAttribute(att), custom_error.CustomError{}
+}

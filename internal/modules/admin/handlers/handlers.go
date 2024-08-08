@@ -1154,3 +1154,30 @@ func (a AdminHandler) IndexAttribute(c *gin.Context) {
 	return
 
 }
+
+func (a AdminHandler) ShowAttribute(c *gin.Context) {
+	attributeID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+
+	attribute, attErr := a.attributeSrv.Show(c, attributeID)
+	if attErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+	if attErr.Code == 500 {
+		html.Error500(c)
+		return
+	}
+
+	html.Render(c, http.StatusFound, "admin_show_attribute",
+		gin.H{
+			"TITLE":     "show attribute",
+			"ATTRIBUTE": attribute,
+		},
+	)
+}
