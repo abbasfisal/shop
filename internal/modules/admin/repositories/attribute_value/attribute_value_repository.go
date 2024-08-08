@@ -2,6 +2,7 @@ package attributeValue
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
 )
@@ -26,4 +27,10 @@ func (ar AttributeValueRepository) Store(ctx context.Context, attr entities.Attr
 	attErr := ar.db.Create(&attr).Error
 
 	return attr, attErr
+}
+
+func (ar AttributeValueRepository) GetAllAttribute(c *gin.Context) ([]entities.Attribute, error) {
+	var attributes []entities.Attribute
+	err := ar.db.WithContext(c).Preload("AttributeValues").Find(&attributes).Error
+	return attributes, err
 }

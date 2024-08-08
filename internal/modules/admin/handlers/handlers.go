@@ -1250,3 +1250,24 @@ func (a AdminHandler) UpdateAttribute(c *gin.Context) {
 	sessions.Set(c, "message", custom_messages.AttributeUpdatedSuccessfully)
 	c.Redirect(http.StatusFound, "/admins/attributes")
 }
+
+func (a AdminHandler) IndexAttributeValues(c *gin.Context) {
+
+	attributes, err := a.attrValueSrv.IndexAttribute(c)
+	if err.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+	if err.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attribute-values")
+		return
+	}
+
+	html.Render(c, 200, "admin_index_attribute_value", gin.H{
+		"TITLE":      "index attribute-value",
+		"ATTRIBUTES": attributes,
+	})
+
+}
