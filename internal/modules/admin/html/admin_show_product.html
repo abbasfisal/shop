@@ -34,12 +34,16 @@
                                         <td>
                                             <a href="/admins/products/{{.PRODUCT.ID}}/show-gallery"> <b> ویرایش و مشاهده
                                                     تصاویر</b> </a> |
-                                            <a href="#">
-                                                <b>ویرایش و مشاهده ویژگی ها</b>
-                                            </a> |
-                                            <a href="#">
-                                                <b>ویرایش و مشاهده موجودی</b>
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-attributes">افزودن ویژگی</a> |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-inventory">
+                                                <b>افزودن موجودی</b>
                                             </a>
+                                            |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/edit-inventory">
+                                                <b>ویرایش موجودی</b>
+                                            </a>
+
+
                                         </td>
                                     </tr>
                                 </table>

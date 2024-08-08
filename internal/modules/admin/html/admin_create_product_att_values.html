@@ -11,10 +11,32 @@
         <!-- Content Header (Page header) -->
         <div class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row ">
                     <div class="col-sm-6">
                         <h1 class="m-0 text-dark">{{.TITLE}}</h1>
                     </div><!-- /.col -->
+                    <br>
+                    <div class="form-control">
+                        <table class="table-bordered w-100 table-responsive-lg table-hover table-bordered text-center">
+                            <tr>
+                                <td>سایر عملیات</td>
+                                <td>
+                                    <a href="/admins/products/{{.PRODUCT_ID}}">مشاهده محصول</a> |
+                                    <a href="/admins/products/{{.PRODUCT_ID}}/show-gallery"> <b> ویرایش و مشاهده
+                                            تصاویر</b> </a> |
+
+                                    <a href="/admins/products/{{.PRODUCT_ID}}/add-inventory">
+                                        <b>افزودن موجودی</b>
+                                    </a>
+                                    |
+                                    <a href="/admins/products/{{.PRODUCT_ID}}/edit-inventory">
+                                        <b>ویرایش موجودی</b>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
 
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
