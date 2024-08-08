@@ -70,7 +70,8 @@ func (cr CategoryRepository) Update(c *gin.Context, categoryID int, req requests
 			if req.CategoryID == 0 {
 				return nil
 			}
-			return &category.ID
+			return &req.CategoryID
+
 		}()).
 		Update("status", func() bool {
 			if req.Status == "" {
