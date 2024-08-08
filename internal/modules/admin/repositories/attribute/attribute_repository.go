@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
+	"shop/internal/modules/admin/requests"
+	"strings"
 )
 
 type AttributeRepository struct {
@@ -38,4 +40,17 @@ func (ar AttributeRepository) GetByID(c context.Context, attributeID int) (entit
 	var att entities.Attribute
 	err := ar.db.WithContext(c).First(&att, attributeID).Error
 	return att, err
+}
+
+func (ar AttributeRepository) Update(c *gin.Context, attributeID int, req requests.CreateAttributeRequest) error {
+
+	var att entities.Attribute
+	err := ar.db.First(&att, attributeID).Error
+	if err != nil {
+		return err
+	}
+
+	uErr := ar.db.Model(&att).Update("title", strings.TrimSpace(req.Title)).Error
+
+	return uErr
 }

@@ -7,6 +7,7 @@ const (
 
 	CategoryUpdatedSucc = "دسته بندی مورد نظر با موفقیت به روز رسانی شد"
 
-	AttributeCreateFailed     = "خطا در ایجاد ویژگی"
-	AttributeCreateSuccessful = "ایجاد دسته بندی با موفقیت انجام شد"
+	AttributeCreateFailed        = "خطا در ایجاد ویژگی"
+	AttributeCreateSuccessful    = "ایجاد ویژگی با موفقیت انجام شد"
+	AttributeUpdatedSuccessfully = "ویژگی با موفقیت بروزرسانی شاد"
 )

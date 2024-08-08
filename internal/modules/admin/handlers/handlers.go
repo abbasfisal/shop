@@ -25,6 +25,7 @@ import (
 	"shop/internal/pkg/util"
 	"slices"
 	"strconv"
+	"strings"
 )
 
 type AdminHandler struct {
@@ -1180,4 +1181,69 @@ func (a AdminHandler) ShowAttribute(c *gin.Context) {
 			"ATTRIBUTE": attribute,
 		},
 	)
+}
+
+func (a AdminHandler) UpdateAttribute(c *gin.Context) {
+
+	attributeID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+
+	url := fmt.Sprintf("/admins/attributes/%d/edit", attributeID)
+
+	oldAttribute, oldErr := a.attributeSrv.Show(c, attributeID)
+
+	if oldErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+	if oldErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+
+	var req requests.CreateAttributeRequest
+
+	_ = c.Request.ParseForm()
+	bErr := c.ShouldBind(&req)
+	if bErr != nil {
+		fmt.Println(" ---- update attr bErr:", bErr)
+		errors.Init()
+		errors.SetFromErrors(bErr)
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	//don't need to update
+	if oldAttribute.Title == strings.TrimSpace(req.Title) {
+		sessions.Set(c, "message", custom_messages.AttributeUpdatedSuccessfully)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+
+	updateErr := a.attributeSrv.Update(c, attributeID, req)
+	if updateErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+	if updateErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/attributes")
+		return
+	}
+
+	sessions.Set(c, "message", custom_messages.AttributeUpdatedSuccessfully)
+	c.Redirect(http.StatusFound, "/admins/attributes")
 }

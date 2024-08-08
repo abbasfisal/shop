@@ -51,3 +51,11 @@ func (as AttributeService) Show(c context.Context, attributeID int) (responses.A
 	}
 	return responses.ToAttribute(att), custom_error.CustomError{}
 }
+
+func (as AttributeService) Update(c *gin.Context, attributeID int, req requests.CreateAttributeRequest) custom_error.CustomError {
+	err := as.repo.Update(c, attributeID, req)
+	if err != nil {
+		return custom_error.HandleError(err, custom_error.IDIsNotCorrect)
+	}
+	return custom_error.CustomError{}
+}
