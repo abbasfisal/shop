@@ -38,7 +38,7 @@ func main() {
 
 	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
 	if err := r.Run(addr); err != nil {
-		logger.FatalF("[Server start failed]: %v", err)
+		logging.GlobalLog.FatalF("[Server start failed]: %v", err)
 	}
 }
 
@@ -58,7 +58,7 @@ func loadTranslation() {
 }
 
 func initializeLogger() {
-	logger = logging.NewZapLogger()
+	logging.GlobalLog = logging.NewZapLogger()
 }
 
 func loadConfig() {

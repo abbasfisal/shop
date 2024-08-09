@@ -1,5 +1,7 @@
 package logging
 
+var GlobalLog Logger
+
 type Logger interface {
 	Init()
 	Debug(category Category, subCategory SubCategory, message string, extra map[ExtraKey]interface{})
