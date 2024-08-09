@@ -1022,34 +1022,35 @@ func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
 
 func (a AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
 
+	//convert string id to int
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(422, gin.H{
-			"error": "fail converting id to integer",
-		})
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
+
+	url := fmt.Sprintf("/admins/products/%d/add-attributes", productID)
 
 	attributes := c.PostFormArray("attributes")
 
+	//store attributes
 	pAttrErr := a.productSrv.AddAttributeValues(c, productID, attributes)
 	if pAttrErr.Code == 404 {
-		c.JSON(404, gin.H{
-			"message":      "product not found",
-			"err":          pAttrErr.DisplayMessage,
-			"err original": pAttrErr.OriginalMessage,
-		})
+		fmt.Println("error ---------- store product attribute :", err)
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, url)
 		return
 	}
 	if pAttrErr.Code == 500 {
-		html.Error500(c)
-
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, url)
 		return
 	}
 
 	sessions.Set(c, "message", " ویژگی ها برای محصول با موفقیت ایجاد گردید | لطفا موجودی اضافه نمایید")
-	url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
-	c.Redirect(http.StatusFound, url)
+
+	c.Redirect(http.StatusFound, fmt.Sprintf("/admins/products/%d/add-inventory", productID))
 	return
 }
 
@@ -1073,10 +1074,7 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 		c.Redirect(http.StatusFound, url)
 		return
 	}
-	//c.JSON(200, gin.H{
-	//	"data": product,
-	//})
-	//return
+
 	html.Render(c, 200, "inventory", gin.H{
 		"TITTLE":     "Product Inventory",
 		"PRODUCT_ID": product.ID,
@@ -1096,9 +1094,8 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 		return
 	}
 
-	//validation
+	//binding
 	var req requests.CreateProductInventoryRequest
-	c.Request.ParseForm()
 	_ = c.Request.ParseForm()
 	err := c.ShouldBind(&req)
 	if err != nil {
@@ -1114,20 +1111,23 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 		c.Redirect(http.StatusFound, url)
 		return
 	}
-	//end validation
 
+	//insert with transaction [product inventory - product-inventory-attribute ]
 	iErr := a.productSrv.CreateInventory(c, productID, req)
 	if iErr.Code == 404 {
-		sessions.Set(c, "message", "رکورد یافت نشد")
+		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
 	if iErr.Code == 500 {
-		html.Error500(c)
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
+
 	fmt.Println("inventory created")
-	sessions.Set(c, "message", "موجودی برای محصول با موفقیت اضافه گردید")
+	sessions.Set(c, "message", custom_messages.ProductInventoryCreatedSuccessfully)
+
 	url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
 	c.Redirect(http.StatusFound, url)
 	return

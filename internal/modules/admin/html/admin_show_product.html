@@ -85,10 +85,16 @@
                                         <div class="form-control m-2 p-4">
                                             <b>موجودی:</b> {{.Quantity}}<br>
                                             <b>ویژگی ها:</b><br>
-                                            {{range .AttributesJson}}
-                                                - {{.AttributeTitle}}: {{.AttributeValueTitle}}<br>
-                                            {{end}}
+
+                                            <br>
+                                            <div class="form-control">
+                                                <a href="">افزودن ویژگی</a> |
+                                                <a href="">ویرایش ویژگی</a> |
+                                                <a href="">ویرایش موجودی</a> |
+                                                <a href="">حذف موجودی</a>
+                                            </div>
                                         </div>
+
                                     {{end}}
                                 </div>
                             {{end}}

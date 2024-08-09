@@ -19,8 +19,10 @@ const (
 	AttributeValueUpdateSuccessfully = "بروزرسانی attribute-value با موفقیت انجام شد."
 
 	//proudct
-	ProductUpdateFailed        = "خطا در بروزرسانی محصول"
-	ProductUpdatedSuccessfully = "محصول باموفقیت برزورسانی شد"
+	ProductUpdateFailed                 = "خطا در بروزرسانی محصول"
+	ProductUpdatedSuccessfully          = "محصول باموفقیت برزورسانی شد"
+	ProductCreatedSuccessfully          = "محصول با موفقیت ایجاد گردید"
+	ProductInventoryCreatedSuccessfully = "موجودی محصول با موفقیت ایجاد گردید"
 
 	SelectOne = "لطفا یکی از گزینه های موجود را انتخاب کنید"
 

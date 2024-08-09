@@ -2,13 +2,11 @@ package product
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
-	"shop/internal/modules/admin/responses"
 	"strconv"
 	"strings"
 )
@@ -126,28 +124,48 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 
 func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error) {
 
-	var productAttributes []entities.ProductAttribute
-	if err := p.db.WithContext(c).Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
-		return entities.ProductInventory{}, err
-	}
+	var inventory entities.ProductInventory
 
-	if len(productAttributes) != len(req.ProductAttributes) {
-		return entities.ProductInventory{}, gorm.ErrRecordNotFound
-	}
+	//start transaction
+	txErr := p.db.WithContext(c).Transaction(func(tx *gorm.DB) error {
+		var productAttributes []entities.ProductAttribute
 
-	productAttributesJson, errJ := json.Marshal(responses.ToInventoryProductAttributes(productAttributes))
-	if errJ != nil {
-		return entities.ProductInventory{}, errJ
-	}
+		//fetch product-attributes
+		if err := p.db.WithContext(c).Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
+			return err
+		}
+		//check len retrieved product-attribute
+		if len(productAttributes) != len(req.ProductAttributes) {
+			return gorm.ErrRecordNotFound
+		}
 
-	inventory := entities.ProductInventory{
-		ProductID:      uint(productID),
-		Quantity:       uint(req.Quantity),
-		AttributesJson: productAttributesJson,
-	}
+		inventory = entities.ProductInventory{
+			ProductID: uint(productID),
+			Quantity:  uint(req.Quantity),
+		}
 
-	if iErr := p.db.WithContext(c).Create(&inventory).Error; iErr != nil {
-		return entities.ProductInventory{}, errJ
+		//store inventory
+		if iErr := tx.Create(&inventory).Error; iErr != nil {
+			return iErr
+		}
+
+		//store product-attribute in product-inventory-attribute table
+		for _, attr := range productAttributes {
+			inventoryAttr := entities.ProductInventoryAttribute{
+				ProductID:          uint(productID),
+				ProductInventoryID: inventory.ID,
+				ProductAttributeID: attr.ID,
+			}
+			if err := tx.Create(&inventoryAttr).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if txErr != nil {
+		fmt.Println("---- create inventory product err: ", txErr)
+		return entities.ProductInventory{}, txErr
 	}
 
 	return inventory, nil
