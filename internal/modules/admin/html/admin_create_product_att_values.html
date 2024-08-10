@@ -36,6 +36,7 @@
                             </tr>
                         </table>
 
+
                     </div>
 
                 </div><!-- /.row -->
@@ -70,6 +71,12 @@
 
                                     <br>
                                     <br>
+                                    <div>
+
+                                        {{range .PRODUCT.ProductAttributes.Data }}
+                                            <lable> {{.AttributeTitle}}:{{.AttributeValueTitle}}</lable> <br>
+                                        {{end}}
+                                    </div>
                                     <span class="text-info border-white">
                                         {{if .MESSAGE}} {{.MESSAGE}} {{end}}
                                     </span>
@@ -79,15 +86,10 @@
 
                     </div>
                 </div>
+
             </div>
             <hr>
 
-            <hr>
-            {{.AUTH.FirstName}}
-            <br>
-            {{range $a,$key:=.}}
-                {{$a}}:{{$key}}<br>
-            {{end}}
         </div>
     </div>
 

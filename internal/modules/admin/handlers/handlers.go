@@ -998,6 +998,8 @@ func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
 		return
 	}
 
+	productData, _ := a.productSrv.FetchByProductID(c, productID)
+
 	//fetch attributes with values
 	attributes, aErr := a.productSrv.FetchRootAttributes(c, productID)
 	if aErr.Code == 404 {
@@ -1015,6 +1017,7 @@ func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
 		"TITLE":      "Add Attribute-Value to a Product",
 		"ATTRIBUTES": attributes,
 		"PRODUCT_ID": productID,
+		"PRODUCT":    productData,
 	})
 	return
 
