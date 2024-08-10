@@ -12,6 +12,12 @@ import (
 
 func Render(c *gin.Context, code int, name string, data gin.H) {
 	data = WithGlobalData(c, data)
+
+	format := c.DefaultQuery("format", "html")
+	if format == "json" {
+		c.JSON(code, data)
+		return
+	}
 	c.HTML(code, name, data)
 }
 
