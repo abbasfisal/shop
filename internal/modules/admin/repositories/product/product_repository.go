@@ -116,20 +116,18 @@ func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int,
 }
 
 func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID int) (map[string]interface{}, error) {
-
-	//todo: rename method name
-
 	type InventoryWithAttributes struct {
-		InventoryID         uint
-		Quantity            uint
-		AttributeTitle      string
-		AttributeValueTitle string
+		InventoryID                 uint
+		Quantity                    uint
+		AttributeID                 uint
+		AttributeTitle              string
+		AttributeValueID            uint
+		AttributeValueTitle         string
+		ProductInventoryAttributeID uint
 	}
 
 	var product entities.Product
 	aerr := p.db.WithContext(ctx).
-		//Preload("ProductImages").
-		//Preload("ProductAttributes").
 		Where("id = ?", productID).
 		First(&product).Error
 
@@ -143,9 +141,11 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 
 	serr := p.db.WithContext(ctx).
 		Table("product_inventories").
-		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_title, product_attributes.attribute_value_title").
+		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, product_inventory_attributes.id AS product_inventory_attribute_id").
 		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id").
 		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id").
+		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id").
+		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id").
 		Where("product_inventories.product_id = ?", productID).
 		Scan(&inventories).Error
 
@@ -157,15 +157,22 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 	for _, inventory := range inventories {
 		if _, exists := inventoryMap[inventory.InventoryID]; !exists {
 			inventoryMap[inventory.InventoryID] = map[string]interface{}{
-				"quantity":   inventory.Quantity,
-				"attributes": []map[string]string{},
+				"quantity":         inventory.Quantity,
+				"delete_inventory": fmt.Sprintf("/admins/inventories/%d/delete", inventory.InventoryID), //remove record from product_inventories table
+				"edit_inventory":   fmt.Sprintf("/admins/inventories/%d/edit", inventory.InventoryID),   //edit quantity of a product inventory (product_inventories)
+				"inventory_id":     inventory.InventoryID,
+				"attributes":       []map[string]interface{}{},
 			}
 		}
 
-		attributes := inventoryMap[inventory.InventoryID]["attributes"].([]map[string]string)
-		attributes = append(attributes, map[string]string{
-			"attribute_title":       inventory.AttributeTitle,
-			"attribute_value_title": inventory.AttributeValueTitle,
+		attributes := inventoryMap[inventory.InventoryID]["attributes"].([]map[string]interface{})
+		attributes = append(attributes, map[string]interface{}{
+			"attribute_id":                   inventory.AttributeID,
+			"attribute_title":                inventory.AttributeTitle,
+			"attribute_value_id":             inventory.AttributeValueID,
+			"attribute_value_title":          inventory.AttributeValueTitle,
+			"product_inventory_attribute_id": inventory.ProductInventoryAttributeID,
+			"delete_attribute":               fmt.Sprintf("/admins/inventories/%d/attributes/delete", inventory.ProductInventoryAttributeID), //remove from product_inventory_attributes
 		})
 		inventoryMap[inventory.InventoryID]["attributes"] = attributes
 	}
@@ -174,16 +181,6 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 	result["inventories"] = inventoryMap
 
 	return result, nil
-
-	//var product entities.Product
-	//err := p.db.WithContext(ctx).
-	//	Preload("ProductInventoryAttributes.ProductInventory").
-	//	Preload("ProductInventoryAttributes.ProductAttribute").
-	//	Preload("ProductInventories").
-	//	Preload("ProductAttributes").
-	//	Where("id=?", productID).
-	//	First(&product).Error
-	//return product, err
 }
 
 func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error) {
