@@ -115,11 +115,75 @@ func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int,
 	return nil
 }
 
-func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID int) (entities.Product, error) {
-	var product entities.Product
-	err := p.db.WithContext(ctx).Preload("ProductAttributes").Where("id=?", productID).First(&product).Error
+func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID int) (map[string]interface{}, error) {
 
-	return product, err
+	//todo: rename method name
+
+	type InventoryWithAttributes struct {
+		InventoryID         uint
+		Quantity            uint
+		AttributeTitle      string
+		AttributeValueTitle string
+	}
+
+	var product entities.Product
+	aerr := p.db.WithContext(ctx).
+		//Preload("ProductImages").
+		//Preload("ProductAttributes").
+		Where("id = ?", productID).
+		First(&product).Error
+
+	if aerr != nil {
+		return map[string]interface{}{}, aerr
+	}
+
+	var inventories []InventoryWithAttributes
+
+	result := make(map[string]interface{})
+
+	serr := p.db.WithContext(ctx).
+		Table("product_inventories").
+		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_title, product_attributes.attribute_value_title").
+		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id").
+		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id").
+		Where("product_inventories.product_id = ?", productID).
+		Scan(&inventories).Error
+
+	if serr != nil {
+		return map[string]interface{}{}, serr
+	}
+
+	inventoryMap := make(map[uint]map[string]interface{})
+	for _, inventory := range inventories {
+		if _, exists := inventoryMap[inventory.InventoryID]; !exists {
+			inventoryMap[inventory.InventoryID] = map[string]interface{}{
+				"quantity":   inventory.Quantity,
+				"attributes": []map[string]string{},
+			}
+		}
+
+		attributes := inventoryMap[inventory.InventoryID]["attributes"].([]map[string]string)
+		attributes = append(attributes, map[string]string{
+			"attribute_title":       inventory.AttributeTitle,
+			"attribute_value_title": inventory.AttributeValueTitle,
+		})
+		inventoryMap[inventory.InventoryID]["attributes"] = attributes
+	}
+
+	result["product"] = product
+	result["inventories"] = inventoryMap
+
+	return result, nil
+
+	//var product entities.Product
+	//err := p.db.WithContext(ctx).
+	//	Preload("ProductInventoryAttributes.ProductInventory").
+	//	Preload("ProductInventoryAttributes.ProductAttribute").
+	//	Preload("ProductInventories").
+	//	Preload("ProductAttributes").
+	//	Where("id=?", productID).
+	//	First(&product).Error
+	//return product, err
 }
 
 func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error) {
