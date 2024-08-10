@@ -3,7 +3,6 @@ package product
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
@@ -114,13 +113,13 @@ func (p ProductService) AddAttributeValues(c *gin.Context, productID int, attrib
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) FetchProductAttributes(c *gin.Context, productID int) (responses.Product, custom_error.CustomError) {
-	//fetch product , and fetch product_attributes
+func (p ProductService) FetchProductAttributes(c *gin.Context, productID int) (map[string]interface{}, custom_error.CustomError) {
+	//fetch product and its attribute and also inventories
 	product, err := p.repo.GetProductAndAttributes(c, productID)
 	if err != nil {
-		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return product, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-	return responses.ToProduct(product), custom_error.CustomError{}
+	return product, custom_error.CustomError{}
 }
 
 func (p ProductService) CreateInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) custom_error.CustomError {
@@ -154,13 +153,9 @@ func (p ProductService) UploadImage(c *gin.Context, productID int, imageStoredPa
 }
 
 func (p ProductService) Update(c *gin.Context, productID int, req requests.UpdateProductRequest) custom_error.CustomError {
-
-	product, err := p.repo.Update(c, productID, req)
-	fmt.Println("---- proudct service update : 159  ; proudct data : ", product)
+	_, err := p.repo.Update(c, productID, req)
 	if err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-
 	return custom_error.CustomError{}
-
 }

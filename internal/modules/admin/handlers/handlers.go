@@ -1057,15 +1057,14 @@ func (a AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
 func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 	productID, pErr := strconv.Atoi(c.Param("id"))
 	if pErr != nil {
-		c.JSON(429, gin.H{
-			"error": pErr.Error(),
-		})
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
-	//fetch product data
+
+	//fetch product data and product-attributes relation
 	fmt.Println("show product inventory : product id : ", productID)
-	//product, err := a.productSrv.FetchByProductID(c, productID)
-	product, err := a.productSrv.FetchProductAttributes(c, productID)
+	product, err := a.productSrv.FetchByProductID(c, productID)
 
 	if err.Code == 404 || len(product.ProductAttributes.Data) <= 0 {
 		url := fmt.Sprintf("/admins/products/%d/add-attributes", productID)
@@ -1075,10 +1074,23 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 		return
 	}
 
+	productData, productErr := a.productSrv.FetchProductAttributes(c, productID)
+	if productErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "admins/products")
+		return
+	}
+	if productErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "admins/products")
+		return
+	}
+
 	html.Render(c, 200, "inventory", gin.H{
 		"TITTLE":     "Product Inventory",
-		"PRODUCT_ID": product.ID,
+		"PRODUCT_ID": productID,
 		"PRODUCT":    product,
+		"INVENTORY":  productData,
 	})
 	return
 }

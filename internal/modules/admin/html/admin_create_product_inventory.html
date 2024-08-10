@@ -57,8 +57,29 @@
 
                                     </div>
 
-                                    <input type="submit" value="send">
+                                    <input class="btn-success form-control btn" type="submit" value="send">
                                 </form>
+
+                                <div class="d-flex ">
+                                    {{range .INVENTORY.inventories}}
+                                        <div class="form-control m-2 p-4">
+                                            <b>موجودی:</b> {{.quantity}}<br>
+                                            <b>ویژگی ها:</b><br>
+                                            {{range .attributes}}
+                                                {{.attribute_title}} : {{.attribute_value_title}}
+                                                <br>
+                                            {{end}}
+                                            <br>
+                                            <div class="text-center border">
+                                                <a href="">ویرایش </a> |
+                                                <a href="">حذف </a>
+                                            </div>
+                                        </div>
+
+                                    {{end}}
+                                </div>
+
+
                             </div>
                         </div>
 
@@ -67,9 +88,7 @@
             </div>
             <hr>
 
-            {{range $a , $b:=.PRODUCT.ProductAttributes.Data}}
-                {{$b.AttributeTitle}}
-            {{end}}
+
 
             ________________-
             <hr>

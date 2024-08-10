@@ -34,7 +34,7 @@ func (p ProductRepository) FindBy(ctx context.Context, columnName string, value 
 
 func (p ProductRepository) FindByID(ctx context.Context, ID int) (entities.Product, error) {
 	var product entities.Product
-	err := p.db.WithContext(ctx).First(&product, ID).Error
+	err := p.db.WithContext(ctx).Preload("ProductAttributes").First(&product, ID).Error
 	return product, err
 }
 
