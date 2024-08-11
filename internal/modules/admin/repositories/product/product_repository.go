@@ -142,11 +142,11 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 	serr := p.db.WithContext(ctx).
 		Table("product_inventories").
 		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, product_inventory_attributes.id AS product_inventory_attribute_id").
-		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id").
-		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id").
-		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id").
-		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id").
-		Where("product_inventories.product_id = ?", productID).
+		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id AND product_inventory_attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id AND product_attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
+		Where("product_inventories.product_id = ? and product_inventories.deleted_at IS NULL", productID).
 		Scan(&inventories).Error
 
 	if serr != nil {
@@ -298,6 +298,36 @@ func (p ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInven
 	//delete from product_inventory_attributes table
 	if piaErr := p.db.WithContext(c).Unscoped().Delete(&productInventoryAttribute).Error; piaErr != nil {
 		return piaErr
+	}
+
+	return nil
+}
+
+func (p ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) error {
+
+	txErr := p.db.WithContext(c).Transaction(func(tx *gorm.DB) error {
+
+		var inventory entities.ProductInventory
+
+		//find inventory
+		if iErr := p.db.WithContext(c).First(&inventory, inventoryID).Error; iErr != nil {
+			return iErr
+		}
+
+		//delete all product-attribute inventory
+		var productInventoryAttributes []entities.ProductInventoryAttribute
+		if deleteErr := p.db.Where("product_inventory_id = ? ", inventory.ID).Delete(&productInventoryAttributes).Error; deleteErr != nil {
+			return deleteErr
+		}
+
+		//delete inventory
+		if iDelete := p.db.WithContext(c).Delete(&inventory).Error; iDelete != nil {
+			return iDelete
+		}
+		return nil
+	})
+	if txErr != nil {
+		return txErr
 	}
 
 	return nil

@@ -21,4 +21,5 @@ type ProductRepositoryInterface interface {
 	StoreImages(c *gin.Context, productID int, imageStoredPath []string) error
 	Update(c *gin.Context, productID int, req requests.UpdateProductRequest) (entities.Product, error)
 	DeleteInventoryAttribute(c *gin.Context, inventoryID int) error
+	DeleteInventory(c *gin.Context, inventoryID int) error
 }

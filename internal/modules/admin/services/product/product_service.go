@@ -168,3 +168,10 @@ func (p ProductService) DeleteInventoryAttribute(c *gin.Context, productInventor
 	}
 	return custom_error.CustomError{}
 }
+
+func (p ProductService) DeleteInventory(c *gin.Context, inventoryID int) custom_error.CustomError {
+	if err := p.repo.DeleteInventory(c, inventoryID); err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+}

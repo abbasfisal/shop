@@ -1614,3 +1614,29 @@ func (a AdminHandler) DeleteProductInventoryAttribute(c *gin.Context) {
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
 }
+
+func (a AdminHandler) DeleteInventory(c *gin.Context) {
+	inventoryID, convErr := strconv.Atoi(c.Param("id"))
+	if convErr != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	//delete
+	dErr := a.productSrv.DeleteInventory(c, inventoryID)
+	if dErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	if dErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	sessions.Set(c, "message", custom_messages.DeleteSuccessfully)
+	c.Redirect(http.StatusFound, c.Request.Referer())
+	return
+}
