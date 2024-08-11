@@ -22,4 +22,5 @@ type ProductServiceInterface interface {
 	RemoveImage(c *gin.Context, imageID int) custom_error.CustomError
 	UploadImage(c *gin.Context, productID int, imageStoredPath []string) custom_error.CustomError
 	Update(c *gin.Context, productID int, req requests.UpdateProductRequest) custom_error.CustomError
+	DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) custom_error.CustomError
 }

@@ -24,7 +24,8 @@ const (
 	ProductCreatedSuccessfully          = "محصول با موفقیت ایجاد گردید"
 	ProductInventoryCreatedSuccessfully = "موجودی محصول با موفقیت ایجاد گردید"
 
-	SelectOne = "لطفا یکی از گزینه های موجود را انتخاب کنید"
+	SelectOne          = "لطفا یکی از گزینه های موجود را انتخاب کنید"
+	DeleteSuccessfully = "با موفقیت حذف گردید"
 
 	ThereIsNoAnyCategories = "هیچ کتگوری وجود ندارد / لطفا حداقل یک کتگوری ایجاد کنید"
 	ThereIsNoAnyBrand      = "هیچ برندی وجود ندارد / لطفا حداقل یک برند ایجاد کنید"

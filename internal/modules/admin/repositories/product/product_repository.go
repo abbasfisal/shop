@@ -173,7 +173,7 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 			"attribute_value_id":             inventory.AttributeValueID,
 			"attribute_value_title":          inventory.AttributeValueTitle,
 			"product_inventory_attribute_id": inventory.ProductInventoryAttributeID,
-			"delete_attribute_link":          fmt.Sprintf("/admins/inventories/%d/attributes/delete", inventory.ProductInventoryAttributeID), //remove from product_inventory_attributes
+			"delete_attribute_link":          fmt.Sprintf("/admins/product-inventory-attributes/%d/delete", inventory.ProductInventoryAttributeID), //remove from product_inventory_attributes
 		})
 		inventoryMap[inventory.InventoryID]["attributes"] = attributes
 	}
@@ -285,4 +285,20 @@ func (p ProductRepository) Update(c *gin.Context, productID int, req requests.Up
 	}
 	fmt.Println("---- repo product udpate succ ")
 	return product, nil
+}
+
+func (p ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) error {
+
+	//find
+	var productInventoryAttribute entities.ProductInventoryAttribute
+	if err := p.db.First(&productInventoryAttribute, productInventoryAttributeID).Error; err != nil {
+		return err
+	}
+
+	//delete from product_inventory_attributes table
+	if piaErr := p.db.WithContext(c).Unscoped().Delete(&productInventoryAttribute).Error; piaErr != nil {
+		return piaErr
+	}
+
+	return nil
 }

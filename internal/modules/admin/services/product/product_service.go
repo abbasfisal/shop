@@ -159,3 +159,12 @@ func (p ProductService) Update(c *gin.Context, productID int, req requests.Updat
 	}
 	return custom_error.CustomError{}
 }
+
+// DeleteInventoryAttribute delete record form product_inventory_attributes table
+func (p ProductService) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) custom_error.CustomError {
+	err := p.repo.DeleteInventoryAttribute(c, productInventoryAttributeID)
+	if err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+}

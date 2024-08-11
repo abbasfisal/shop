@@ -67,15 +67,20 @@
 
                                             <b>موجودی:</b> {{.quantity}}<br>
                                             <b>ویژگی ها:</b><br>
+
                                             {{range .attributes}}
-                                                {{.attribute_title}} : {{.attribute_value_title}}
-                                                <a onclick="return confirm('آیا اطمینان دارید؟')" href="{{.delete_attribute_link}}" class="text-sm">حذف ویژگی</a>
+                                                {{if gt .attribute_id 0 }}
+                                                    {{.attribute_title}} : {{.attribute_value_title}}
+                                                    <a onclick="return confirm('آیا اطمینان دارید؟')"
+                                                       href="{{.delete_attribute_link}}" class="text-sm">حذف ویژگی</a>
+                                                {{end}}
                                                 <br>
                                             {{end}}
                                             <br>
                                             <div class="text-center border text-sm">
-                                                <a href="{{.edit_inventory_link}}" >ویرایش موجودی </a> |
-                                                <a href="{{.delete_inventory_link}}" onclick="return confirm('آیا اطمینان دارید؟')">حذف موجودی </a>
+                                                <a href="{{.edit_inventory_link}}">ویرایش موجودی </a> |
+                                                <a href="{{.delete_inventory_link}}"
+                                                   onclick="return confirm('آیا اطمینان دارید؟')">حذف موجودی </a>
                                             </div>
                                         </div>
 
