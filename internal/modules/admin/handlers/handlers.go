@@ -1080,20 +1080,23 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 	productData, productErr := a.productSrv.FetchProductAttributes(c, productID)
 	if productErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
-		c.Redirect(http.StatusFound, "admins/products")
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
 	if productErr.Code == 500 {
 		sessions.Set(c, "message", custom_error.InternalServerError)
-		c.Redirect(http.StatusFound, "admins/products")
+		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
 
 	html.Render(c, 200, "inventory", gin.H{
 		"TITTLE":     "Product Inventory",
 		"PRODUCT_ID": productID,
-		"PRODUCT":    product,
-		"INVENTORY":  productData,
+		"PRODUCT": gin.H{
+			"Inventory": productData["inventories"],
+			"Product":   productData["product"],
+		},
+		"PRODUCT_ATTRIBUTES": product.ProductAttributes,
 	})
 	return
 }

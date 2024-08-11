@@ -157,11 +157,12 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 	for _, inventory := range inventories {
 		if _, exists := inventoryMap[inventory.InventoryID]; !exists {
 			inventoryMap[inventory.InventoryID] = map[string]interface{}{
-				"quantity":         inventory.Quantity,
-				"delete_inventory": fmt.Sprintf("/admins/inventories/%d/delete", inventory.InventoryID), //remove record from product_inventories table
-				"edit_inventory":   fmt.Sprintf("/admins/inventories/%d/edit", inventory.InventoryID),   //edit quantity of a product inventory (product_inventories)
-				"inventory_id":     inventory.InventoryID,
-				"attributes":       []map[string]interface{}{},
+				"add_attribute_link":    fmt.Sprintf("/admins/inventories/%d/attributes/add", inventory.InventoryID), //add attribute-value to specific inventory
+				"edit_inventory_link":   fmt.Sprintf("/admins/inventories/%d/edit", inventory.InventoryID),           //edit quantity of a product inventory (product_inventories)
+				"delete_inventory_link": fmt.Sprintf("/admins/inventories/%d/delete", inventory.InventoryID),         //remove record from product_inventories table
+				"quantity":              inventory.Quantity,
+				"inventory_id":          inventory.InventoryID,
+				"attributes":            []map[string]interface{}{},
 			}
 		}
 
@@ -172,7 +173,7 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 			"attribute_value_id":             inventory.AttributeValueID,
 			"attribute_value_title":          inventory.AttributeValueTitle,
 			"product_inventory_attribute_id": inventory.ProductInventoryAttributeID,
-			"delete_attribute":               fmt.Sprintf("/admins/inventories/%d/attributes/delete", inventory.ProductInventoryAttributeID), //remove from product_inventory_attributes
+			"delete_attribute_link":          fmt.Sprintf("/admins/inventories/%d/attributes/delete", inventory.ProductInventoryAttributeID), //remove from product_inventory_attributes
 		})
 		inventoryMap[inventory.InventoryID]["attributes"] = attributes
 	}

@@ -34,7 +34,7 @@
                                         <h4>inventory</h4>
                                         <select class="form-group-lg" name="productAttributes" multiple="multiple">
                                             <option value="">انتخاب کنید</option>
-                                            {{range .PRODUCT.ProductAttributes.Data}}
+                                            {{range .PRODUCT_ATTRIBUTES.Data}}
                                                 <option value="{{.ID}}">{{.AttributeTitle}}
                                                     :{{.AttributeValueTitle}}</option>
 
@@ -61,18 +61,21 @@
                                 </form>
 
                                 <div class="d-flex ">
-                                    {{range .INVENTORY.inventories}}
+                                    {{range .PRODUCT.Inventory}}
                                         <div class="form-control m-2 p-4">
+                                            <a href="{{.add_attribute_link}}">افزودن ویژگی</a><br>
+
                                             <b>موجودی:</b> {{.quantity}}<br>
                                             <b>ویژگی ها:</b><br>
                                             {{range .attributes}}
                                                 {{.attribute_title}} : {{.attribute_value_title}}
+                                                <a href="{{.delete_attribute_link}}" class="text-sm">حذف ویژگی</a>
                                                 <br>
                                             {{end}}
                                             <br>
                                             <div class="text-center border">
-                                                <a href="">ویرایش </a> |
-                                                <a href="">حذف </a>
+                                                <a href="{{.edit_inventory_link}}">ویرایش موجودی </a> |
+                                                <a href="{{.delete_inventory_link}}">حذف موجودی </a>
                                             </div>
                                         </div>
 
@@ -87,16 +90,6 @@
                 </div>
             </div>
             <hr>
-
-
-
-            ________________-
-            <hr>
-            {{.AUTH.FirstName}}
-            <br>
-            {{range $a,$key:=.}}
-                {{$a}}:{{$key}}<br>
-            {{end}}
         </div>
     </div>
 
