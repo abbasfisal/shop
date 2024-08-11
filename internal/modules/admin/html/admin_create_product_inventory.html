@@ -64,7 +64,18 @@
                                     {{range .PRODUCT.Inventory}}
                                         <div class="form-control m-2 p-4">
                                             <a href="{{.add_attribute_link}}" class="text-sm">افزودن ویژگی</a><br>
+                                            <form action="/admins/inventories/{{.inventory_id}}/append-attributes" method="post">
+                                                <select class="form-group-lg" name="attributes"
+                                                        multiple="multiple">
+                                                    <option value="">انتخاب کنید</option>
+                                                    {{range $.PRODUCT_ATTRIBUTES.Data}}
+                                                        <option value="{{.ID}}">{{.AttributeTitle}}
+                                                            :{{.AttributeValueTitle}}</option>
 
+                                                    {{end}}
+                                                </select>
+                                                <button class="btn-success btn btn-sm" type="submit">افزودن ویژگی</button>
+                                            </form>
                                             <b>موجودی:</b> {{.quantity}}<br>
                                             <b>ویژگی ها:</b><br>
 

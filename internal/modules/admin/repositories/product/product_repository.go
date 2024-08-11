@@ -238,9 +238,11 @@ func (p ProductRepository) GetImage(c *gin.Context, imageID int) (entities.Produ
 	err := p.db.Find(&image, imageID).Error
 	return image, err
 }
+
 func (p ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
 	return p.db.WithContext(c).Unscoped().Delete(&entities.ProductImages{}, imageID).Error
 }
+
 func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStoredPath []string) error {
 	var images []entities.ProductImages
 	for _, image := range imageStoredPath {
@@ -330,5 +332,47 @@ func (p ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) erro
 		return txErr
 	}
 
+	return nil
+}
+
+func (p ProductRepository) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) error {
+
+	var productInventory entities.ProductInventory
+
+	//find productInventory
+	if err := p.db.WithContext(c).First(&productInventory, inventoryID).Error; err != nil {
+		return err
+	}
+
+	//start transaction
+	txErr := p.db.WithContext(c).Transaction(func(tx *gorm.DB) error {
+		var productAttributes []entities.ProductAttribute
+
+		//fetch product-attributes
+		if err := p.db.WithContext(c).Where("id IN ? ", attributes).Find(&productAttributes).Error; err != nil {
+			return err
+		}
+		//check len retrieved product-attribute
+		if len(productAttributes) != len(attributes) {
+			return gorm.ErrRecordNotFound
+		}
+
+		//store product-attribute in product-inventory-attribute table
+		for _, attr := range productAttributes {
+			inventoryAttr := entities.ProductInventoryAttribute{
+				ProductID:          productInventory.ProductID,
+				ProductInventoryID: uint(inventoryID),
+				ProductAttributeID: attr.ID,
+			}
+			if err := tx.Create(&inventoryAttr).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if txErr != nil {
+		return txErr
+	}
 	return nil
 }

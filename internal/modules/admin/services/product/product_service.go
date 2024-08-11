@@ -175,3 +175,10 @@ func (p ProductService) DeleteInventory(c *gin.Context, inventoryID int) custom_
 	}
 	return custom_error.CustomError{}
 }
+
+func (p ProductService) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) custom_error.CustomError {
+	if err := p.repo.AppendAttributesToInventory(c, inventoryID, attributes); err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+}

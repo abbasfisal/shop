@@ -107,7 +107,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.POST("/admins/products/:id/add-inventory", adminHlr.StoreProductInventory)
 		authGrp.GET("/admins/product-inventory-attributes/:id/delete", adminHlr.DeleteProductInventoryAttribute)
 		authGrp.GET("/admins/inventories/:id/delete", adminHlr.DeleteInventory)
-
+		authGrp.POST("/admins/inventories/:id//append-attributes", adminHlr.AppendAttribute)
 		//brand
 		authGrp.GET("/admins/brands", adminHlr.IndexBrand)
 		authGrp.GET("/admins/brands/create", adminHlr.ShowCreateBrand)

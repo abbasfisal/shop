@@ -1,5 +1,6 @@
 package handlers
 
+import "C"
 import (
 	"context"
 	"fmt"
@@ -1637,6 +1638,41 @@ func (a AdminHandler) DeleteInventory(c *gin.Context) {
 	}
 
 	sessions.Set(c, "message", custom_messages.DeleteSuccessfully)
+	c.Redirect(http.StatusFound, c.Request.Referer())
+	return
+}
+
+func (a AdminHandler) AppendAttribute(c *gin.Context) {
+
+	//convert string id to int
+	inventoryID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+	attributes := c.PostFormArray("attributes")
+	if len(attributes) <= 0 {
+		sessions.Set(c, "message", "لطفا یک ویژگی انتخاب کنید")
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	//store attributes
+	pAttrErr := a.productSrv.AppendAttributesToInventory(c, inventoryID, attributes)
+	if pAttrErr.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+	if pAttrErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	sessions.Set(c, "message", custom_error.SuccessfullyCreated)
+
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
 }

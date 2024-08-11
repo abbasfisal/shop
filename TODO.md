@@ -48,7 +48,7 @@ LIMIT 1;
 - implement show and edit product inventory
 - impl edit inventory and edit product_attribute
 - show attribute-value in add-attributes page
-
+- use record lock when editing or delete product records 
 # todos
 ## 1. مدیریت محصولات
 - [x] **افزودن/ویرایش/حذف محصولات:** امکان اضافه کردن محصولات جدید، ویرایش مشخصات محصولات (مانند قیمت، توضیحات، تصاویر)، و حذف محصولات قدیمی.
@@ -90,3 +90,4 @@ LIMIT 1;
 ___
 - [x] api for delete product inventory attribute
 - [x] api for delete inventory and its attributes in the product_inventory_attributes table
+- [x] Add attributes to an existing inventory
