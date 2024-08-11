@@ -1,4 +1,4 @@
-{{define "modules/admin/html/admin_show_product"}}
+{{define "admin_show_product"}}
     {{template "head" .}}
     <!-- navbar -->
     {{template "navbar" .}}
@@ -34,16 +34,10 @@
                                         <td>
                                             <a href="/admins/products/{{.PRODUCT.ID}}/show-gallery"> <b> ویرایش و مشاهده
                                                     تصاویر</b> </a> |
-                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-attributes">افزودن ویژگی</a> |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-attributes">مشاهده و ویرایش ویژگی</a> |
                                             <a href="/admins/products/{{.PRODUCT.ID}}/add-inventory">
-                                                <b>افزودن موجودی</b>
+                                                <b>مشاهده و ویرایش موجودی</b>
                                             </a>
-                                            |
-                                            <a href="/admins/products/{{.PRODUCT.ID}}/edit-inventory">
-                                                <b>ویرایش موجودی</b>
-                                            </a>
-
-
                                         </td>
                                     </tr>
                                 </table>
@@ -80,6 +74,7 @@
                                     </tr>
                                 </table>
                                 <hr>
+
                                 <div class="d-flex ">
                                     {{range .PRODUCT.ProductInventories.Data}}
                                         <div class="form-control m-2 p-4">
@@ -87,12 +82,7 @@
                                             <b>ویژگی ها:</b><br>
 
                                             <br>
-                                            <div class="form-control">
-                                                <a href="">افزودن ویژگی</a> |
-                                                <a href="">ویرایش ویژگی</a> |
-                                                <a href="">ویرایش موجودی</a> |
-                                                <a href="">حذف موجودی</a>
-                                            </div>
+
                                         </div>
 
                                     {{end}}

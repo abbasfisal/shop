@@ -670,7 +670,7 @@ func (a AdminHandler) ShowProduct(c *gin.Context) {
 		return
 	}
 
-	html.Render(c, http.StatusFound, "modules/admin/html/admin_show_product",
+	html.Render(c, http.StatusFound, "admin_show_product",
 		gin.H{
 			"TITLE":   "show product",
 			"PRODUCT": selectedP,
@@ -1013,7 +1013,7 @@ func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
 		return
 	}
 
-	html.Render(c, 200, "att", gin.H{
+	html.Render(c, 200, "admin_create_product_att_values", gin.H{
 		"TITLE":      "Add Attribute-Value to a Product",
 		"ATTRIBUTES": attributes,
 		"PRODUCT_ID": productID,

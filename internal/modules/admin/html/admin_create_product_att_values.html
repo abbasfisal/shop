@@ -1,4 +1,4 @@
-{{define "att"}}
+{{define "admin_create_product_att_values"}}
     {{template "head" .}}
     <!-- navbar -->
     {{template "navbar" .}}
@@ -23,14 +23,10 @@
                                 <td>
                                     <a href="/admins/products/{{.PRODUCT_ID}}">مشاهده محصول</a> |
                                     <a href="/admins/products/{{.PRODUCT_ID}}/show-gallery"> <b> ویرایش و مشاهده
-                                            تصاویر</b> </a> |
-
-                                    <a href="/admins/products/{{.PRODUCT_ID}}/add-inventory">
-                                        <b>افزودن موجودی</b>
-                                    </a>
+                                            تصاویر</b> </a>
                                     |
-                                    <a href="/admins/products/{{.PRODUCT_ID}}/edit-inventory">
-                                        <b>ویرایش موجودی</b>
+                                    <a href="/admins/products/{{.PRODUCT_ID}}/add-inventory">
+                                        <b>مشاهده و ویرایش موجودی</b>
                                     </a>
                                 </td>
                             </tr>
@@ -74,9 +70,23 @@
                                     <br>
                                     <div>
 
-                                        {{range .PRODUCT.ProductAttributes.Data }}
-                                            <lable> {{.AttributeTitle}}:{{.AttributeValueTitle}}</lable> <br>
-                                        {{end}}
+                                        <table class="table table-hover">
+                                            <tr>
+                                                <td>#</td>
+                                                <td>عنوان</td>
+                                                <td>مقدار</td>
+                                                <td>عملیات</td>
+                                            </tr>
+                                            {{$index:=1}}
+                                            {{range .PRODUCT.ProductAttributes.Data }}
+                                                <tr>
+                                                    <td>#</td>
+                                                    <td>{{.AttributeTitle}}</td>
+                                                    <td>{{.AttributeValueTitle}}</td>
+                                                    <td><a class="text-danger" href="/admins/products-attributes/{{.ID}}/delete">حذف</a></td>
+                                                </tr>
+                                            {{end}}
+                                        </table>
                                     </div>
                                     <span class="text-info border-white">
                                         {{if .MESSAGE}} {{.MESSAGE}} {{end}}
