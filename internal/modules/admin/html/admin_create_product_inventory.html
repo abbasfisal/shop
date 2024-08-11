@@ -63,19 +63,19 @@
                                 <div class="d-flex ">
                                     {{range .PRODUCT.Inventory}}
                                         <div class="form-control m-2 p-4">
-                                            <a href="{{.add_attribute_link}}">افزودن ویژگی</a><br>
+                                            <a href="{{.add_attribute_link}}" class="text-sm">افزودن ویژگی</a><br>
 
                                             <b>موجودی:</b> {{.quantity}}<br>
                                             <b>ویژگی ها:</b><br>
                                             {{range .attributes}}
                                                 {{.attribute_title}} : {{.attribute_value_title}}
-                                                <a href="{{.delete_attribute_link}}" class="text-sm">حذف ویژگی</a>
+                                                <a onclick="return confirm('آیا اطمینان دارید؟')" href="{{.delete_attribute_link}}" class="text-sm">حذف ویژگی</a>
                                                 <br>
                                             {{end}}
                                             <br>
-                                            <div class="text-center border">
-                                                <a href="{{.edit_inventory_link}}">ویرایش موجودی </a> |
-                                                <a href="{{.delete_inventory_link}}">حذف موجودی </a>
+                                            <div class="text-center border text-sm">
+                                                <a href="{{.edit_inventory_link}}" >ویرایش موجودی </a> |
+                                                <a href="{{.delete_inventory_link}}" onclick="return confirm('آیا اطمینان دارید؟')">حذف موجودی </a>
                                             </div>
                                         </div>
 
