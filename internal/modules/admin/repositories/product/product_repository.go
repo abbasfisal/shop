@@ -157,9 +157,9 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 	for _, inventory := range inventories {
 		if _, exists := inventoryMap[inventory.InventoryID]; !exists {
 			inventoryMap[inventory.InventoryID] = map[string]interface{}{
-				"add_attribute_link":    fmt.Sprintf("/admins/inventories/%d/attributes/add", inventory.InventoryID), //add attribute-value to specific inventory
-				"edit_inventory_link":   fmt.Sprintf("/admins/inventories/%d/edit", inventory.InventoryID),           //edit quantity of a product inventory (product_inventories)
-				"delete_inventory_link": fmt.Sprintf("/admins/inventories/%d/delete", inventory.InventoryID),         //remove record from product_inventories table
+				"add_attribute_link":    fmt.Sprintf("/admins/inventories/%d/attributes/add", inventory.InventoryID),  //add attribute-value to specific inventory
+				"edit_inventory_link":   fmt.Sprintf("/admins/inventories/%d/update-quantity", inventory.InventoryID), //edit quantity of a product inventory (product_inventories)
+				"delete_inventory_link": fmt.Sprintf("/admins/inventories/%d/delete", inventory.InventoryID),          //remove record from product_inventories table
 				"quantity":              inventory.Quantity,
 				"inventory_id":          inventory.InventoryID,
 				"attributes":            []map[string]interface{}{},
@@ -373,6 +373,18 @@ func (p ProductRepository) AppendAttributesToInventory(c *gin.Context, inventory
 
 	if txErr != nil {
 		return txErr
+	}
+	return nil
+}
+
+func (p ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) error {
+	var inventory entities.ProductInventory
+	if iErr := p.db.WithContext(c).First(&inventory, inventoryID).Error; iErr != nil {
+		return iErr
+	}
+
+	if updateErr := p.db.WithContext(c).Model(&inventory).Update("quantity", quantity).Error; updateErr != nil {
+		return updateErr
 	}
 	return nil
 }

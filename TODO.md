@@ -91,3 +91,4 @@ ___
 - [x] api for delete product inventory attribute
 - [x] api for delete inventory and its attributes in the product_inventory_attributes table
 - [x] Add attributes to an existing inventory
+- [x] update inventory quantity

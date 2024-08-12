@@ -182,3 +182,10 @@ func (p ProductService) AppendAttributesToInventory(c *gin.Context, inventoryID 
 	}
 	return custom_error.CustomError{}
 }
+func (p ProductService) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) custom_error.CustomError {
+	if err := p.repo.UpdateInventoryQuantity(c, inventoryID, quantity); err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+
+}

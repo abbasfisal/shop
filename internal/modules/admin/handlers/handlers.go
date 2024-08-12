@@ -1653,7 +1653,6 @@ func (a AdminHandler) AppendAttribute(c *gin.Context) {
 	}
 	attributes := c.PostFormArray("attributes")
 	if len(attributes) <= 0 {
-		sessions.Set(c, "message", "لطفا یک ویژگی انتخاب کنید")
 		c.Redirect(http.StatusFound, c.Request.Referer())
 		return
 	}
@@ -1673,6 +1672,43 @@ func (a AdminHandler) AppendAttribute(c *gin.Context) {
 
 	sessions.Set(c, "message", custom_error.SuccessfullyCreated)
 
+	c.Redirect(http.StatusFound, c.Request.Referer())
+	return
+}
+
+func (a AdminHandler) UpdateQuantity(c *gin.Context) {
+	//convert string id to int
+	inventoryID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	var req = struct {
+		Quantity uint `form:"update_quantity"`
+	}{}
+
+	bindErr := c.ShouldBind(&req)
+	if bindErr != nil {
+		sessions.Set(c, "UPDATEMESSAGE", custom_error.SomethingWrongHappened)
+		c.JSON(200, gin.H{"err": bindErr})
+		return
+	}
+
+	if req.Quantity == 0 {
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	updateErr := a.productSrv.UpdateInventoryQuantity(c, inventoryID, req.Quantity)
+	if updateErr.Code > 0 {
+		//pass appropriate msg
+		sessions.Set(c, "message", custom_error.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+	sessions.Set(c, "message", custom_error.SuccessfullyUpdated)
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
 }

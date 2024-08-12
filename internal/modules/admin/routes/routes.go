@@ -83,7 +83,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.GET("/admins/attribute-values/create", adminHlr.CreateAttributeValues)
 		authGrp.POST("/admins/attribute-values", adminHlr.StoreAttributeValues)
 
-		authGrp.GET("/admins/attribute/values/:id/show", adminHlr.ShowAttributeValues) //show attribute-values of a attribute
+		authGrp.GET("/admins/attribute/values/:id/show", adminHlr.ShowAttributeValues) //show attribute-values of an attribute
 		authGrp.GET("/admins/attribute-values/:id/edit", adminHlr.EditAttributeValues)
 		authGrp.POST("/admins/attribute-values/:id/edit", adminHlr.UpdateAttributeValues)
 		///admins/attributes-values/{{.ID}}/edit
@@ -107,7 +107,8 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.POST("/admins/products/:id/add-inventory", adminHlr.StoreProductInventory)
 		authGrp.GET("/admins/product-inventory-attributes/:id/delete", adminHlr.DeleteProductInventoryAttribute)
 		authGrp.GET("/admins/inventories/:id/delete", adminHlr.DeleteInventory)
-		authGrp.POST("/admins/inventories/:id//append-attributes", adminHlr.AppendAttribute)
+		authGrp.POST("/admins/inventories/:id/append-attributes", adminHlr.AppendAttribute)
+		authGrp.POST("/admins/inventories/:id/update-quantity", adminHlr.UpdateQuantity)
 		//brand
 		authGrp.GET("/admins/brands", adminHlr.IndexBrand)
 		authGrp.GET("/admins/brands/create", adminHlr.ShowCreateBrand)

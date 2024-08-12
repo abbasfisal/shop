@@ -27,81 +27,137 @@
                 <div class="row">
                     <div class="col-lg-9 align-content-center">
 
-                        <div class="/admins/" style="min-height:360px;">
+                        <h2>مدیریت انبار</h2>
+                        <div class="" style="min-height:360px;">
                             <div class="">
-                                <form action="/admins/products/{{.PRODUCT_ID}}/add-inventory" method="post">
-                                    <div class="form-group">
-                                        <h4>inventory</h4>
-                                        <select class="form-group-lg" name="productAttributes" multiple="multiple">
-                                            <option value="">انتخاب کنید</option>
-                                            {{range .PRODUCT_ATTRIBUTES.Data}}
-                                                <option value="{{.ID}}">{{.AttributeTitle}}
-                                                    :{{.AttributeValueTitle}}</option>
+                                <div class="">
+                                    <form action="/admins/products/{{.PRODUCT_ID}}/add-inventory" method="post">
+                                        <table class="table">
+                                            <tr>
+                                                <td>انتخاب کنید</td>
+                                                <td>
+                                                    <select style="padding: 20px !important;" class="form-control"
+                                                            name="productAttributes"
+                                                            multiple="multiple">
+                                                        {{range .PRODUCT_ATTRIBUTES.Data}}
+                                                            <option value="{{.ID}}">{{.AttributeTitle}}
+                                                                :{{.AttributeValueTitle}}</option>
+                                                        {{end}}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <span class="text-danger">{{ .ERRORS.productAttributes}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>موجودی</td>
+                                                <td>
+                                                    <input type="number"
+                                                           name="quantity"
+                                                           placeholder="موجودی"
+                                                           class="form-control form-text"
+                                                           value="{{range .OLDS.quantity}}{{.}}{{end}}">
+                                                </td>
+                                                <td>
+                                                    <span class="text-danger">{{ .ERRORS.quantity}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <input class="btn-success form-control btn" type="submit"
+                                                           value="ایجاد">
+                                                </td>
+                                                <td>
+                                                     <span class="text-info border-white">
+                                                         {{if .MESSAGE}} {{.MESSAGE}} {{end}}
+                                                     </span>
+                                                </td>
+                                            </tr>
+                                        </table>
 
-                                            {{end}}
-                                        </select>
-                                        <span class="text-danger">{{ .ERRORS.productAttributes}}</span>
-                                        <br>
-                                        <br>
-                                        <br>
-                                        <input type="number" name="quantity" placeholder="موجودی"
-                                               class="form-control form-text"
-                                               value="{{range .OLDS.quantity}}{{.}}{{end}}">
-                                        <span class="text-danger">{{ .ERRORS.quantity}}</span>
 
-                                        <br>
-                                        <br>
-                                        <span class="text-info border-white">
-                                             {{if .MESSAGE}} {{.MESSAGE}} {{end}}
-                                        </span>
-
-                                    </div>
-
-                                    <input class="btn-success form-control btn" type="submit" value="send">
-                                </form>
-
+                                    </form>
+                                </div>
+                                <hr>
+                                <h3 class="">مدیریت ویژگی ها و انبار</h3>
                                 <div class="d-flex ">
                                     {{range .PRODUCT.Inventory}}
                                         <div class="form-control m-2 p-4">
-                                            <a href="{{.add_attribute_link}}" class="text-sm">افزودن ویژگی</a><br>
-                                            <form action="/admins/inventories/{{.inventory_id}}/append-attributes" method="post">
-                                                <select class="form-group-lg" name="attributes"
+                                            <form action="/admins/inventories/{{.inventory_id}}/append-attributes"
+                                                  method="post">
+                                                <select style="padding: 10px !important;" class="form-control"
+                                                        name="attributes"
                                                         multiple="multiple">
-                                                    <option value="">انتخاب کنید</option>
                                                     {{range $.PRODUCT_ATTRIBUTES.Data}}
                                                         <option value="{{.ID}}">{{.AttributeTitle}}
                                                             :{{.AttributeValueTitle}}</option>
 
                                                     {{end}}
                                                 </select>
-                                                <button class="btn-success btn btn-sm" type="submit">افزودن ویژگی</button>
+                                                <button class="btn-success btn btn-sm" type="submit">افزودن ویژگی
+                                                </button>
+                                                <span class="text-info border-white">
+                                                         {{if .HI}} {{.HI}} {{end}}
+                                                     </span>
                                             </form>
-                                            <b>موجودی:</b> {{.quantity}}<br>
-                                            <b>ویژگی ها:</b><br>
-
-                                            {{range .attributes}}
-                                                {{if gt .attribute_id 0 }}
-                                                    {{.attribute_title}} : {{.attribute_value_title}}
-                                                    <a onclick="return confirm('آیا اطمینان دارید؟')"
-                                                       href="{{.delete_attribute_link}}" class="text-sm">حذف ویژگی</a>
-                                                {{end}}
-                                                <br>
-                                            {{end}}
                                             <br>
-                                            <div class="text-center border text-sm">
-                                                <a href="{{.edit_inventory_link}}">ویرایش موجودی </a> |
-                                                <a href="{{.delete_inventory_link}}"
-                                                   onclick="return confirm('آیا اطمینان دارید؟')">حذف موجودی </a>
+                                            <table class="table-sm table table-hover">
+                                                <tr>
+                                                    <td class="">
+                                                        <span class="badge badge-info">
+                                                            موجودی
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {{.quantity}}
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+
+                                                {{range .attributes}}
+                                                    <tr>
+                                                        {{if gt .attribute_id 0 }}
+                                                            <td class="">
+                                                                <span class="badge badge-info">
+                                                                 {{.attribute_title}}
+                                                                </span>
+                                                            </td>
+                                                            <td>{{.attribute_value_title}}</td>
+                                                            <td>
+                                                                <a onclick="return confirm('آیا اطمینان دارید؟')"
+                                                                   href="{{.delete_attribute_link}}"
+                                                                   class=" badge-danger badge">حذف ویژگی</a>
+                                                            </td>
+
+                                                        {{end}}
+                                                        <br>
+                                                    </tr>
+                                                {{end}}
+
+                                            </table>
+                                            <div class="text-center  text-sm">
+                                                <form action="{{.edit_inventory_link}}" method="post">
+                                                    <div class="">
+                                                        <input type="number" name="update_quantity" placeholder="موجودی"
+                                                               class="form-control form-text"
+                                                               value="{{range .OLDS.update_quantity}}{{.}}{{end}}">
+                                                        <span class="text-danger">{{ .ERRORS.update_quantity}}</span>
+                                                        <br>
+                                                        <span class="text-info border-white">{{if .UPDATEMESSAGE}} {{.UPDATEMESSAGE}} {{end}}</span>
+                                                    </div>
+                                                    <input class="btn-success  btn" type="submit"
+                                                           value="بروزرسانی تعداد">
+
+                                                    <a href="{{.delete_inventory_link}}" class="btn btn-danger"
+                                                       onclick="return confirm('آیا اطمینان دارید؟')">حذف انبار </a>
+                                                </form>
                                             </div>
                                         </div>
-
                                     {{end}}
                                 </div>
-
-
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

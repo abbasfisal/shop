@@ -25,4 +25,5 @@ type ProductServiceInterface interface {
 	DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) custom_error.CustomError
 	DeleteInventory(c *gin.Context, inventoryID int) custom_error.CustomError
 	AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) custom_error.CustomError
+	UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) custom_error.CustomError
 }
