@@ -27,11 +27,11 @@
                 <div class="row">
                     <div class="col-lg-10">
                         <form action="/admins/categories" method="post" enctype="multipart/form-data">
-                            <table class="table table-primary ">
+                            <table class="table table-hover ">
                                 <tr>
                                     <td>دسته بندی والد</td>
                                     <td>
-                                        <select name="parent_id" id="">
+                                        <select name="parent_id" class="form-control" id="">
                                             <option value="0">بدون والد</option>
 
                                             {{range .CATEGORIES.Data}}
@@ -93,13 +93,6 @@
 
                     </div>
                     <!-- /.col-md-6 -->
-
-                    ss
-                    {{.AUTH.FirstName}}
-                    <br>
-                    {{range $a,$key:=.}}
-                        {{$a}}:{{$key}}<br>
-                    {{end}}
                 </div>
                 <!-- /.row -->
             </div><!-- /.container-fluid -->

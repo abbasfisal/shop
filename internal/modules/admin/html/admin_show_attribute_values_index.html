@@ -34,17 +34,18 @@
                         <br>
                         <br>
                         {{if .ATTRIBUTE}}
-                            <table class="table-responsive  table">
+                            <table class="table-hover  table">
+                                <thead>
                                 <tr>
-                                    <td>#</td>
+                                    <td>ID</td>
                                     <td>title</td>
                                     <td>op</td>
                                 </tr>
+                                </thead>
                                 {{range .ATTRIBUTE.AttributeValues.Data}}
                                     <tr>
                                         <td>{{.ID}}</td>
                                         <td>{{.Title}}</td>
-
                                         <td>
                                             <a href="/admins/attribute-values/{{.ID}}/edit">
                                                 <i class="nav-icon text-danger fa fa-edit"></i>

@@ -35,7 +35,8 @@
 
                         {{if .PRODUCTS.Data}}
                             <table class="table-responsive align-content-center  table">
-                                <tr>
+                                <thead>
+                                <tr class="text-sm text-bold">
                                     <td>#</td>
                                     <td>عنوان</td>
                                     <td>اسلاگ</td>
@@ -47,6 +48,7 @@
                                     <td>برند</td>
                                     <td>عملیات</td>
                                 </tr>
+                                </thead>
                                 {{range .PRODUCTS.Data}}
                                     <tr>
                                         <td></td>

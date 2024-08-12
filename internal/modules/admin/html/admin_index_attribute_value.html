@@ -35,13 +35,15 @@
                         <br>
                         <br>
                         {{if .ATTRIBUTES.Data}}
-                            <table class="table">
+                            <table class="table table-hover">
+                                <thead>
                                 <tr>
-                                    <td>#</td>
-                                    <td>title</td>
-
-                                    <td>op</td>
+                                    <td>ID</td>
+                                    <td>attribute</td>
+                                    <td>attribute value</td>
+                                    <td>عملیات</td>
                                 </tr>
+                                </thead>
                                 {{range .ATTRIBUTES.Data}}
                                     <tr>
                                         <td>{{.ID}}</td>
@@ -53,6 +55,9 @@
                                                     <option value="">{{.Title}}</option>
                                                 {{end}}
                                             </select>
+
+                                        </td>
+                                        <td>
                                             <a href="/admins/attribute/values/{{.ID}}/show">
                                                 مشاهده و ویرایش
                                                 <i class="nav-icon text-danger fa fa-edit"></i>
