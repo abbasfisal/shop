@@ -12,5 +12,6 @@ type Customer struct {
 	//DateOfBirth
 
 	//--------- Relation
-	Address Address `gorm:"foreignKey:CustomerID"`
+	Address Address   `gorm:"foreignKey:CustomerID"`
+	Session []Session `gorm:"foreignKey:CustomerID"`
 }
