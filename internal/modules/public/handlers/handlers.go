@@ -106,3 +106,16 @@ func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 	return
 
 }
+
+func (p PublicHandler) ShowLogin(c *gin.Context) {
+	html.Render(c, 200, "customer_login", gin.H{
+		"data": "hi",
+	})
+}
+
+func (p PublicHandler) ShowVerifyOtp(c *gin.Context) {
+	html.Render(c, 200, "customer_verify_phone_number", gin.H{
+		"TITLE":        "تایید شماره موبایل",
+		"PHONE_NUMBER": "093500000000",
+	})
+}

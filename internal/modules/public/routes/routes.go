@@ -20,6 +20,9 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 	r.GET("/:category_slug", publicHdl.ShowProductsByCategory)
 
+	r.GET("/login", publicHdl.ShowLogin)
+	r.GET("/verify", publicHdl.ShowVerifyOtp)
+
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
 	{
