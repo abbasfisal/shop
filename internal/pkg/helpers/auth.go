@@ -23,3 +23,19 @@ func Auth(c *gin.Context) entities.User {
 
 	return user
 }
+
+func CustomerAuth(c *gin.Context) entities.Customer {
+	//authID := sessions.GET(c, "auth_id")
+	//fmt.Println("authid:", authID)
+	//if authID == "" {
+	//	return entities.User{}
+	//}
+	//
+	//repo := adminAuthRepo.NewAuthenticateRepository(mysql.Get())
+	//userID, _ := strconv.Atoi(authID)
+	//user, _ := repo.FindByUserID(c, uint(userID))
+	//
+	//return user
+
+	return entities.Customer{}
+}

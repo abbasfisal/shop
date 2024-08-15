@@ -38,3 +38,36 @@ func WithGlobalData(c *gin.Context, data gin.H) gin.H {
 func Error500(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/500")
 }
+
+/**
+*-----------------------------
+|		customer render 🛍
+*-----------------------------
+*/
+
+func CustomerRender(c *gin.Context, code int, name string, data gin.H) {
+	data = customerWithGlobalData(c, data)
+
+	format := c.DefaultQuery("format", "html")
+	if format == "json" {
+		c.JSON(code, data)
+		return
+	}
+	c.HTML(code, name, data)
+}
+
+func customerWithGlobalData(c *gin.Context, data gin.H) gin.H {
+	data["APP_NAME"] = viper.Get("APP.Name")
+	data["ERRORS"] = converters.StringToMap(sessions.Flash(c, "errors"))
+	data["OLDS"] = converters.StringToUrlValues(sessions.Flash(c, "olds"))
+	data["MESSAGE"] = sessions.Flash(c, "message")
+
+	customer := helpers.CustomerAuth(c)
+	//if customer.ID != 0 {
+	if customer.ID == 0 {
+		//data["AUTH"] = responses.ToUserResponse(user)
+		data["AUTH"] = map[string]string{"Name": "Mohammad-customer"}
+	}
+
+	return data
+}
