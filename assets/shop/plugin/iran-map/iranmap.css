@@ -1,0 +1,139 @@
+/*
+ * Iran Map - SVG and Responsive.
+ * By: Alireza Roshanaie
+ * Web: https://mihanjs.com/
+ */
+
+#cities-map{
+    display: block;
+    position: relative;
+    direction: rtl;
+    text-align: right;
+    padding: 0;
+    font-size: 13px;
+    width: 100%;
+    /* float: right; */
+}
+
+#cities-map .map{
+    display: block;
+    float: left;
+    width: 60%;
+    text-align: left;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+#cities-map .map svg{
+    height: auto;
+    width: 90%;
+}
+#cities-map .map .border path, #cities-map .map .island path{
+    fill: #fff;
+}
+#cities-map .map .province path{
+    fill: #d2d2d2;
+}
+#cities-map .map .sea path, #cities-map .map .lake path{
+    fill: #6caed8;
+}
+#cities-map .map .province path:hover, #cities-map .map .island path:hover, #cities-map .map .province path.hover, #cities-map .map .island path.hover{
+    fill: #54caff !important;
+    cursor: pointer;
+}
+#cities-map .map .province path.active{
+    fill: #03a9f4 !important;
+}
+
+#cities-map .list{
+    display: block;
+    float: right;
+    width: 40%;
+}
+#cities-map .list ul{
+    padding: 0;
+}
+#cities-map .list>ul{
+    margin-left: 10px;
+}
+#cities-map .list li{
+    list-style: none;
+}
+#cities-map .list span{
+    background: #242424;
+    color: #ecf0f1;
+    display: block;
+    margin: 0 2px;
+    padding: 0 8px;
+    line-height: 26px;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+#cities-map .list li ul li{
+    display: inline-block;
+    float: right;
+    width: 49.9999999%;
+}
+#cities-map .list li ul li a{
+    color: #575757;
+    display: block;
+    padding: 0 10px;
+    line-height: 26px;
+    margin: 3px 5px;
+    text-decoration: none;
+    border-radius: 10px;
+    border: 1px solid #d2d2d2;
+}
+#cities-map .list li ul li a:hover, #cities-map .list li ul li a.hover{
+    background: #ee384e;
+    color: #fff;
+}
+#cities-map .list li ul li a.active{
+    background: #ee384e;
+    color: #fff;
+    font-weight: bold;
+}
+#cities-map .list ul:before, #cities-map .list ul:after{
+    display: table;
+    content: " ";
+}
+#cities-map .list ul, #cities-map .list ul:after{
+    clear: both;
+}
+
+#cities-map .city{
+    clear: both;
+    padding: 10px 0;
+}
+
+@media(max-width: 930px){
+    #cities-map .list{
+        width: 50%;
+    }
+}
+@media(max-width: 745px){
+    #cities-map .list li ul li{
+        width: 50%;
+    }
+}
+@media(max-width: 515px){
+    #cities-map .list, #cities-map .map{
+        width: 100%;
+    }
+    #cities-map .list li ul li{
+        width: 33.33333333333333%;
+    }
+    #cities-map .list li ul li a{
+        font-size: 12px !important;
+    }
+}
+@media(max-width: 515px){
+    #cities-map .list li ul li{
+        width: 50%;
+    }
+}
+@media(max-width: 250px){
+    #cities-map .list li ul li{
+        width: 100%;
+    }
+}
