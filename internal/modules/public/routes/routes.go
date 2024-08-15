@@ -13,7 +13,8 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	homeSrv := home.NewHomeService()
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
 
-	r.GET("/", publicHdl.Index)
+	r.GET("/", publicHdl.HomePage)
+	r.GET("/products/single", publicHdl.SingleProduct)
 
 	//find by sku (detail of  a product )
 	r.GET("/:category_slug/:product_slug/:sku", publicHdl.ShowProduct)
