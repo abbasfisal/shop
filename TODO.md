@@ -92,3 +92,9 @@ ___
 - [x] api for delete inventory and its attributes in the product_inventory_attributes table
 - [x] Add attributes to an existing inventory
 - [x] update inventory quantity
+- [x] add home page html
+- [x] add login / register html form
+- [ ] implement login / register for customer
+- [ ] add customer profile html form
+- [ ] add customer address html form
+- [ ] add product recom by elastic
