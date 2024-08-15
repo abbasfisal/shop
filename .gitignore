@@ -2,3 +2,8 @@
 storage
 ./uploads
 uploads/*
+
+
+#shop assets
+/assets/shop/css/main.css
+#end shop assets
