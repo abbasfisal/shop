@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/spf13/viper"
 	"net/http"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/services/home"
@@ -13,6 +14,7 @@ import (
 	"shop/internal/pkg/html"
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
+	"time"
 )
 
 type PublicHandler struct {
@@ -114,6 +116,12 @@ func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 }
 
 func (p PublicHandler) ShowLogin(c *gin.Context) {
+
+	if sessions.GET(c, "otp_created_at") != "" || sessions.GET(c, "mobile") != "" {
+		c.Redirect(http.StatusFound, "/verify")
+		return
+	}
+
 	html.Render(c, 200, "customer_login", gin.H{
 		"TITLE": "اسم فروشگاه",
 		"data":  "data",
@@ -121,9 +129,38 @@ func (p PublicHandler) ShowLogin(c *gin.Context) {
 }
 
 func (p PublicHandler) ShowVerifyOtp(c *gin.Context) {
+	//sessions.Set(c, "mobile", req.Mobile)
+	//	sessions.Set(c, "otp_to_expire", otpToExpire)
+	//	sessions.Set(c, "otp_created_at", otpCreateAt)
+
+	if sessions.GET(c, "otp_created_at") == "" || sessions.GET(c, "mobile") == "" {
+		fmt.Println(" ==== show verify otp form null ----- ")
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	otpCreatedAt, err := time.Parse(time.RFC3339, sessions.GET(c, "otp_created_at"))
+	if err != nil {
+		sessions.ClearAll(c)
+		fmt.Println(" ==== show verify otp created at ----- ")
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	fmt.Println("====== time since ========: ", time.Since(otpCreatedAt))
+
+	otpTTL := time.Duration(viper.GetInt("app.otp_expiration_time")) * time.Minute //in minute
+	if time.Since(otpCreatedAt) > otpTTL {
+		sessions.ClearAll(c)
+		fmt.Println(" ==== otp is expired ====== ")
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
 	html.Render(c, 200, "customer_verify_phone_number", gin.H{
-		"TITLE":  "خرید از باآف باکیفیت و مقرون به صرفه",
-		"MOBILE": sessions.GET(c, "mobile"),
+		"TITLE":    "خرید از باآف باکیفیت و مقرون به صرفه",
+		"MOBILE":   sessions.GET(c, "mobile"),
+		"TOEXPIRE": otpTTL.Seconds() - time.Since(otpCreatedAt).Seconds(),
 	})
 }
 
@@ -180,9 +217,63 @@ func (p PublicHandler) PostLogin(c *gin.Context) {
 	fmt.Println("--- step 4 ----")
 
 	fmt.Println("-------- new otp generated----- : ", newOTP)
+
+	otpCreateAt := time.Now().Format(time.RFC3339)
+
+	fmt.Println("\n ----- otp created at ---- : ", otpCreateAt)
+
 	sessions.Set(c, "mobile", req.Mobile)
+	sessions.Set(c, "otp_created_at", otpCreateAt)
 
 	fmt.Println("--- step 6 ----")
+
+	c.Redirect(http.StatusFound, "/verify")
+	return
+
+}
+
+func (p PublicHandler) PostVerifyOtp(c *gin.Context) {
+
+}
+
+func (p PublicHandler) ResendOtp(c *gin.Context) {
+	mobile := sessions.GET(c, "mobile")
+	otpCreatedAt, err := time.Parse(time.RFC3339, sessions.GET(c, "otp_created_at"))
+
+	if mobile == "" || sessions.GET(c, "otp_created_at") == "" || !util.ValidateIRMobile(mobile) || err != nil {
+		sessions.ClearAll(c)
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	//check otp expire time
+	otpTTL := time.Duration(viper.GetInt("app.otp_expiration_time")) * time.Minute //in minute
+	if time.Since(otpCreatedAt) < otpTTL {
+		c.Redirect(http.StatusFound, "/verify")
+		return
+	}
+
+	//otp is expired , resend new otp
+	newOTP, otpErr := p.homeSrv.SendOtp(c, mobile)
+	if otpErr.Code > 0 {
+		if otpErr.Code == custom_error.OTPTooSoonCode {
+			sessions.Set(c, "message", "باید از آخرین درخواست ۴ دقیقه بگذرد")
+			fmt.Println("------ redirect to verify : to soon request : ")
+			c.Redirect(http.StatusFound, "/verify")
+			return
+		}
+		sessions.Set(c, "message", otpErr.DisplayMessage)
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	fmt.Println("-------- new otp generated----- : ", newOTP)
+	otpCreateAt := time.Now().Format(time.RFC3339)
+
+	fmt.Println("\n ----- otp created at ---- : ", otpCreateAt)
+
+	sessions.Set(c, "mobile", mobile)
+	sessions.Set(c, "otp_created_at", otpCreateAt)
 
 	c.Redirect(http.StatusFound, "/verify")
 	return
