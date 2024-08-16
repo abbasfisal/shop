@@ -27,6 +27,9 @@ func migrate() {
 
 	if err := db.Migrator().DropTable(
 		&entities.User{},
+		&entities.Customer{},
+		&entities.OTP{},
+		&entities.Session{},
 		&entities.Brand{},
 		&entities.Category{},
 		&entities.ProductInventoryAttribute{},
@@ -46,6 +49,9 @@ func migrate() {
 
 	err := db.AutoMigrate(
 		&entities.User{},
+		&entities.Customer{},
+		&entities.OTP{},
+		&entities.Session{},
 		&entities.Brand{},
 		&entities.Category{},
 		&entities.ProductInventoryAttribute{},
@@ -57,6 +63,7 @@ func migrate() {
 		&entities.ProductInventory{},
 		&entities.Address{},
 		&entities.Cart{},
+
 		&entities.Order{},
 	)
 	db.Exec("SET foreign_key_checks = 1")
