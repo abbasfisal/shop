@@ -12,4 +12,7 @@ type Session struct {
 	SessionID  string
 	IsActive   bool
 	ExpiredAt  time.Time
+
+	//relation
+	Customer Customer `gorm:"foreignKey:CustomerID"`
 }
