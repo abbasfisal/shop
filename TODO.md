@@ -94,7 +94,9 @@ ___
 - [x] update inventory quantity
 - [x] add home page html
 - [x] add login / register html form
-- [ ] implement login / register for customer
+- [x] implement login / register for customer
+- [x] send otp 
+- [x] resend otp
 - [ ] add customer profile html form
 - [ ] add customer address html form
 - [ ] add product recom by elastic
