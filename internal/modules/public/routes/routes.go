@@ -24,7 +24,8 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	r.GET("/login", publicHdl.ShowLogin)
 	r.POST("/login", publicHdl.PostLogin)
 	r.GET("/verify", publicHdl.ShowVerifyOtp)
-
+	r.POST("/verify", publicHdl.PostVerifyOtp)
+	r.GET("/resend-otp", publicHdl.ResendOtp)
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
 	{
