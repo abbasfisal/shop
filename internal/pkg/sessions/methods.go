@@ -51,3 +51,9 @@ func Remove(c *gin.Context, key string) {
 	session.Delete(key)
 	session.Save()
 }
+
+func ClearAll(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+}
