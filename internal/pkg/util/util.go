@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"math"
+	"math/big"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -109,4 +110,15 @@ func StructToMap(yourStruct interface{}) map[string]interface{} {
 
 func AllowImageExtensions() []string {
 	return []string{".jpg", ".png", ".jpeg"}
+}
+
+func ValidateIRMobile(mobile string) bool {
+	// الگوی بررسی شماره موبایل ایران
+	re := regexp.MustCompile(`^09\d{9}$`)
+	return re.MatchString(mobile)
+}
+
+func Random4Digit() int64 {
+	n, _ := rand.Int(rand.Reader, big.NewInt(9000))
+	return n.Int64() + 1000
 }
