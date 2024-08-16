@@ -4,6 +4,7 @@ app:
   host: 127.0.0.1
   debug: true
   key: $2a$10$a2dUNHVqX2dTGgBH4O.gleTL6Yno858AvJGBdBFWScJQ0V9.6bM0O
+  otp_expiration_time: 4 #4 minute
 
 db:
   driver: mysql
