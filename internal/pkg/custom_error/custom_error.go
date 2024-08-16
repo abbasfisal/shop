@@ -7,7 +7,7 @@ import (
 
 type CustomError struct {
 	OriginalMessage string
-	DisplayMessage  string //will set to user
+	DisplayMessage  string //will show to user
 	Code            int
 }
 
@@ -35,6 +35,16 @@ const (
 	SuccessfullyUpdated     string = "با موفقیت بروزرسانی گردید"
 	StoreImageOnDiskFailed  string = "خطا در ذخیره عکس بر روی هارددیسک"
 	IDIsNotCorrect          string = "شناسه صحیح نمی باشد"
+
+	//OTP
+
+	OTPRequestTooSoon = "باید ۴ دقیقه صبر کنید برای دریافت کد جدید"
+	OTPTooManyRequest = "شما در حال حاضر به سقف درخواست‌ها برای این شماره در یک ساعت گذشته رسیده‌اید"
+)
+const (
+	OTPTooSoonCode            = 4152
+	OTPTooManyRequestCode     = 4150
+	OtpSomethingGoesWrongCode = 4053
 )
 
 func HandleError(err error, notFoundMsg string) CustomError {

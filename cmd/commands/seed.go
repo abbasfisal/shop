@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+	"os"
 	"shop/internal/database/mysql/seeder"
 )
 
@@ -14,5 +15,6 @@ var seedCmd = &cobra.Command{
 	Short: "Seed  Tables",
 	Run: func(cmd *cobra.Command, args []string) {
 		seeder.Seed()
+		os.Exit(1)
 	},
 }

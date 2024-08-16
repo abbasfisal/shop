@@ -22,6 +22,7 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	r.GET("/:category_slug", publicHdl.ShowProductsByCategory)
 
 	r.GET("/login", publicHdl.ShowLogin)
+	r.POST("/login", publicHdl.PostLogin)
 	r.GET("/verify", publicHdl.ShowVerifyOtp)
 
 	guestGrp := r.Group("/")

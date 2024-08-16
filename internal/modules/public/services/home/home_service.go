@@ -2,6 +2,7 @@ package home
 
 import (
 	"context"
+	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/repositories/home"
 	"shop/internal/pkg/custom_error"
@@ -69,4 +70,10 @@ func (h HomeService) ShowCategory(ctx context.Context, columnName string, value 
 		return responses.Category{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategory(category), custom_error.CustomError{}
+}
+
+//
+
+func (h HomeService) SendOtp(ctx context.Context, Mobile string) (entities.OTP, custom_error.CustomError) {
+	return h.repo.NewOtp(ctx, Mobile)
 }

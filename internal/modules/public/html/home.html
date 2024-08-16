@@ -281,7 +281,7 @@
                                         ورود و عضویت
                                     </a>
                             {{else}}
-                                <a href="#">{{.AUTH.CustomerName}} <i class="fad fa-chevron-down text-sm mr-1"></i>
+                                <a href="#">{{.AUTH.Name}} <i class="fad fa-chevron-down text-sm mr-1"></i>
                                 </a>
                                 <ul class="dropdown--wrapper">
                                     <li class="header-profile-dropdown-account-container">
@@ -1787,6 +1787,7 @@
                         <img src="/assets/shop/img/svg/logo.svg" alt="logo">
                     </a>
                 </div>
+                {{/*cart icon in mobile view*/}}
                 <div class="header-tools">
                     <a href="#">
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
@@ -1799,6 +1800,7 @@
                     </a>
                 </div>
             </div>
+            {{/*search input and profile icon in mobile view */}}
             <div class="header-bottom">
                 <div class="search-box">
                     <form action="#">
@@ -1854,6 +1856,7 @@
                     </div>
                 </div>
                 <div class="header-tools">
+                    {{/*profile icon in mobile view*/}}
                     <a href="#">
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg">

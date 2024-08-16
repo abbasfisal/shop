@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
+	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/util"
+	"strconv"
+	"time"
 )
 
 type HomeRepository struct {
@@ -55,4 +59,38 @@ func (h HomeRepository) GetCategoryBy(ctx context.Context, columnName string, va
 	err := h.db.Where(fmt.Sprintf("%s = ?", columnName), value).Find(&category).Error
 
 	return category, err
+}
+
+func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP, custom_error.CustomError) {
+	var maxOTPRequestPerHour = 4
+	var lastOtp entities.OTP
+	var otpCount int64
+
+	oneHourAgo := time.Now().Add(-1 * time.Hour)
+	h.db.Model(entities.OTP{}).Where("mobile = ? AND created_at >= ?", mobile, oneHourAgo).Count(&otpCount)
+
+	if otpCount >= int64(maxOTPRequestPerHour) {
+		fmt.Println("---- to many request otp ---line : 73  ---- ")
+		return lastOtp, custom_error.New(custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequestCode)
+	}
+
+	//check under 4 min
+	h.db.Where("mobile = ? AND is_expired = ? ", mobile, false).Order("created_at desc").First(&lastOtp)
+	fmt.Println("-------- before check --------- : ", lastOtp)
+	fmt.Println(" ******** time since ******: ", time.Since(lastOtp.CreatedAt))
+	if lastOtp.ID != 0 && time.Since(lastOtp.CreatedAt) <= 4*time.Minute {
+		fmt.Println("---- to many request otp ---line : 73  ---- ")
+		return lastOtp, custom_error.New(custom_error.OTPRequestTooSoon, custom_error.OTPRequestTooSoon, custom_error.OTPTooSoonCode)
+	}
+
+	newOtp := entities.OTP{
+		Mobile:    mobile,
+		Code:      strconv.FormatInt(util.Random4Digit(), 10),
+		IsExpired: false,
+	}
+
+	if err := h.db.Create(&newOtp).Error; err != nil {
+		return newOtp, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, custom_error.OtpSomethingGoesWrongCode)
+	}
+	return newOtp, custom_error.CustomError{}
 }

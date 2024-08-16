@@ -2,6 +2,7 @@ package home
 
 import (
 	"context"
+	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/pkg/custom_error"
 )
@@ -12,4 +13,8 @@ type HomeServiceInterface interface {
 	ShowCategory(ctx context.Context, columnName string, value any) (responses.Category, custom_error.CustomError)
 	ShowProductDetail(ctx context.Context, productSlug, sku string) (responses.Product, custom_error.CustomError)
 	ShowProductsByCategorySlug(ctx context.Context, value any) (responses.Products, custom_error.CustomError)
+
+	//
+
+	SendOtp(ctx context.Context, Mobile string) (entities.OTP, custom_error.CustomError)
 }

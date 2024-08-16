@@ -1,5 +1,5 @@
 {{define "customer_verify_phone_number"}}
-   {{template "customer_head" .}}
+    {{template "customer_head" .}}
 
     <body style="padding-top: 0;">
     <div class="wrapper">
@@ -15,8 +15,9 @@
                             <div class="section-title title-wide mb-1 no-after-title-wide">
                                 <h2 class="font-weight-bold">تایید شماره</h2>
                             </div>
+                            <input type="hidden" name="mobile" {{ .MOBILE }}>
                             <div class="message-light">
-                                برای شماره همراه {{.PHONE_NUMBER}} کد تایید ارسال گردید
+                                برای شماره همراه {{.MOBILE}} کد تایید ارسال گردید
                                 <a href="#" class="btn-link-border">
                                     ویرایش شماره
                                 </a>
@@ -32,12 +33,20 @@
                                             <input type="text" class="line-number" maxlength="1">
                                             <input type="text" class="line-number" maxlength="1">
                                             <input type="text" class="line-number" maxlength="1">
-                                            <input type="text" class="line-number" maxlength="1">
                                         </div>
                                     </div>
                                 </div>
+                                {{if .MESSAGE}}
+                                    <div class="form-row mt-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="text-primary text-info ml-1">{{.MESSAGE}}</span>
+                                        </div>
+                                    </div>
+                                {{end}}
                                 <div class="form-row mt-3">
                                     <div class="d-flex align-items-center">
+
+                                        <br>
                                         <span class="text-primary btn-link-border ml-1">دریافت مجدد کد تایید</span>
                                         <span>(</span>
                                         <p id="countdown-verify-end"></p>
@@ -89,7 +98,7 @@
                 var $countdownOptionEnd = $("#countdown-verify-end");
 
                 $countdownOptionEnd.countdown({
-                    date: new Date().getTime() + 180 * 1000, // 2 minute later
+                    date: new Date().getTime() + 240 * 1000, // 4 minute later
                     text: '<span class="day">%s</span><span class="hour">%s</span><span>: %s</span><span>%s</span>',
                     end: function () {
                         $countdownOptionEnd.html(

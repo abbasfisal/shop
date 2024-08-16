@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
+	"os"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
 )
@@ -75,4 +76,5 @@ func migrate() {
 
 	fmt.Println("[Create] tables successfully")
 
+	os.Exit(1)
 }

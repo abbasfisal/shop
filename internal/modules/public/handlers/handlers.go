@@ -2,11 +2,17 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"net/http"
+	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/services/home"
+	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/errors"
 	"shop/internal/pkg/html"
+	"shop/internal/pkg/sessions"
+	"shop/internal/pkg/util"
 )
 
 type PublicHandler struct {
@@ -116,8 +122,8 @@ func (p PublicHandler) ShowLogin(c *gin.Context) {
 
 func (p PublicHandler) ShowVerifyOtp(c *gin.Context) {
 	html.Render(c, 200, "customer_verify_phone_number", gin.H{
-		"TITLE":        "تایید شماره موبایل",
-		"PHONE_NUMBER": "093500000000",
+		"TITLE":  "خرید از باآف باکیفیت و مقرون به صرفه",
+		"MOBILE": sessions.GET(c, "mobile"),
 	})
 }
 
@@ -131,4 +137,54 @@ func (p PublicHandler) SingleProduct(c *gin.Context) {
 	html.Render(c, 200, "customer_single_product", gin.H{
 		"TITLE": "عنوان فروشگاه",
 	})
+}
+
+func (p PublicHandler) PostLogin(c *gin.Context) {
+	var req requests.CustomerLoginRequest
+	fmt.Println("--- step 1 ----")
+	//bind
+	_ = c.Request.ParseForm()
+	if err := c.ShouldBind(&req); err != nil {
+		errors.SetErrors(c, p.i18nBundle, err)
+
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	fmt.Println("--- step 2 ----")
+
+	//validate mobile
+	if !util.ValidateIRMobile(req.Mobile) {
+		errors.Init()
+		errors.Add("mobile", "شماره موبایل معتبر وارد کنید")
+		sessions.Set(c, "errors", errors.ToString())
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	fmt.Println("--- step 3 ----")
+
+	newOTP, otpErr := p.homeSrv.SendOtp(c, req.Mobile)
+	if otpErr.Code > 0 {
+		if otpErr.Code == custom_error.OTPTooSoonCode {
+			sessions.Set(c, "message", "باید از آخرین درخواست ۴ دقیقه بگذرد")
+			fmt.Println("------ redirect to verify : to soon request : ")
+			c.Redirect(http.StatusFound, "/verify")
+			return
+		}
+		sessions.Set(c, "message", otpErr.DisplayMessage)
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	fmt.Println("--- step 4 ----")
+
+	fmt.Println("-------- new otp generated----- : ", newOTP)
+	sessions.Set(c, "mobile", req.Mobile)
+
+	fmt.Println("--- step 6 ----")
+
+	c.Redirect(http.StatusFound, "/verify")
+	return
+
 }

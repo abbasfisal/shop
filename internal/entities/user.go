@@ -10,7 +10,7 @@ type User struct {
 	Password    string
 	Type        string `gorm:"type:enum('admin','client');not null;default:'client'"`
 
-	Address Address //fk (1:1)
-	Cart    Cart    //fk
-	Order   Order
+	//Address Address //fk (1:1)
+	Cart  Cart //fk
+	Order Order
 }

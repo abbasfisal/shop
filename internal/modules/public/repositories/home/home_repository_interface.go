@@ -3,6 +3,7 @@ package home
 import (
 	"context"
 	"shop/internal/entities"
+	"shop/internal/pkg/custom_error"
 )
 
 type HomeRepositoryInterface interface {
@@ -12,4 +13,5 @@ type HomeRepositoryInterface interface {
 	GetProduct(ctx context.Context, productSlug, sku string) (entities.Product, error)
 	GetProductsBy(ctx context.Context, columnName string, value any) ([]entities.Product, error)
 	GetCategoryBy(ctx context.Context, columnName string, value any) (entities.Category, error)
+	NewOtp(ctx context.Context, mobile string) (entities.OTP, custom_error.CustomError)
 }
