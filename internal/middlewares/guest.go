@@ -15,7 +15,7 @@ func IsGuest(c *gin.Context) {
 	fmt.Println("Guest middleware ")
 
 	authID := sessions.GET(c, "auth_id")
-	fmt.Println("authid:", authID)
+	fmt.Println("middleware - authid:", authID)
 	if authID == "" {
 		fmt.Println("guest auth not found")
 		sessions.Remove(c, "auth_id")
