@@ -84,6 +84,8 @@ func setupRoutes(r *gin.Engine) {
 	r.Static("uploads", "./uploads")
 	r.Static("assets", "./assets")
 
+	r.StaticFile("/favicon.ico", "./assets/shop/img/seller-logo.png")
+
 	AdminRoutes.SetAdminRoutes(r, i18nBundle)
 	PublicRoutes.SetPublic(r, i18nBundle)
 
