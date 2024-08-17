@@ -29,4 +29,7 @@ const (
 
 	ThereIsNoAnyCategories = "هیچ کتگوری وجود ندارد / لطفا حداقل یک کتگوری ایجاد کنید"
 	ThereIsNoAnyBrand      = "هیچ برندی وجود ندارد / لطفا حداقل یک برند ایجاد کنید"
+
+	// otp
+	OTPIsNotValid = "کد نامعتبر است"
 )
