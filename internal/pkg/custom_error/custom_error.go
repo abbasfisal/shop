@@ -45,6 +45,10 @@ const (
 	OTPTooSoonCode            = 4152
 	OTPTooManyRequestCode     = 4150
 	OtpSomethingGoesWrongCode = 4053
+
+	//sesion
+
+	CreateSessionFailedCode = 8001
 )
 
 func HandleError(err error, notFoundMsg string) CustomError {
