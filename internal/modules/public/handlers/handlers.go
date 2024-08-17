@@ -10,6 +10,7 @@ import (
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/services/home"
 	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/errors"
 	"shop/internal/pkg/html"
 	"shop/internal/pkg/sessions"
@@ -122,7 +123,7 @@ func (p PublicHandler) ShowLogin(c *gin.Context) {
 		return
 	}
 
-	html.Render(c, 200, "customer_login", gin.H{
+	html.CustomerRender(c, 200, "customer_login", gin.H{
 		"TITLE": "اسم فروشگاه",
 		"data":  "data",
 	})
@@ -157,7 +158,7 @@ func (p PublicHandler) ShowVerifyOtp(c *gin.Context) {
 		return
 	}
 
-	html.Render(c, 200, "customer_verify_phone_number", gin.H{
+	html.CustomerRender(c, 200, "customer_verify_phone_number", gin.H{
 		"TITLE":    "خرید از باآف باکیفیت و مقرون به صرفه",
 		"MOBILE":   sessions.GET(c, "mobile"),
 		"TOEXPIRE": otpTTL.Seconds() - time.Since(otpCreatedAt).Seconds(),
@@ -220,8 +221,6 @@ func (p PublicHandler) PostLogin(c *gin.Context) {
 
 	otpCreateAt := time.Now().Format(time.RFC3339)
 
-	fmt.Println("\n ----- otp created at ---- : ", otpCreateAt)
-
 	sessions.Set(c, "mobile", req.Mobile)
 	sessions.Set(c, "otp_created_at", otpCreateAt)
 
@@ -233,7 +232,60 @@ func (p PublicHandler) PostLogin(c *gin.Context) {
 }
 
 func (p PublicHandler) PostVerifyOtp(c *gin.Context) {
+	mobile := sessions.GET(c, "mobile")
+	otpCreatedAt, err := time.Parse(time.RFC3339, sessions.GET(c, "otp_created_at"))
 
+	if mobile == "" || sessions.GET(c, "otp_created_at") == "" || !util.ValidateIRMobile(mobile) || err != nil {
+		sessions.ClearAll(c)
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	//check otp is expired?
+	otpTTL := time.Duration(viper.GetInt("app.otp_expiration_time")) * time.Minute //in minute
+	if time.Since(otpCreatedAt) > otpTTL {
+		sessions.Set(c, "message", "کد otp منقضی شده است")
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	//bind
+	var req requests.CustomerVerifyRequest
+	bindErr := c.ShouldBind(&req)
+	if bindErr != nil {
+		sessions.Set(c, "message", custom_error.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	//verify otp
+	otpVerifyErr := p.homeSrv.VerifyOtp(c, mobile, req)
+	if otpVerifyErr.Code == 404 {
+		sessions.Set(c, "message", custom_messages.OTPIsNotValid)
+		c.Redirect(http.StatusFound, "/verify")
+		c.Abort()
+		return
+	}
+	if otpVerifyErr.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
+		return
+	}
+
+	//create record in sessions and customers table
+	customerSession, pcaErr := p.homeSrv.ProcessCustomerAuthentication(c, mobile)
+	if pcaErr.Code > 0 {
+		fmt.Println("---- handler PostVerifyOtp --- err : ", pcaErr.Error())
+		sessions.Set(c, "message", custom_error.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, "/verify")
+		return
+	}
+
+	//store session(uuid) in session
+	sessions.Set(c, "session_id", customerSession.SessionID)
+	c.Redirect(http.StatusFound, "/")
+	return
 }
 
 func (p PublicHandler) ResendOtp(c *gin.Context) {
