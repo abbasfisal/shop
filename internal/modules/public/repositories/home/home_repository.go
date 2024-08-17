@@ -2,10 +2,14 @@ package home
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
+	"shop/internal/modules/public/requests"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/util"
 	"strconv"
@@ -70,7 +74,7 @@ func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP
 	h.db.Model(entities.OTP{}).Where("mobile = ? AND created_at >= ?", mobile, oneHourAgo).Count(&otpCount)
 
 	if otpCount >= int64(maxOTPRequestPerHour) {
-		fmt.Println("---- to many request otp ---line : 73  ---- ")
+		fmt.Println("---- to many request otp ---line : 77  ---- ")
 		return lastOtp, custom_error.New(custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequestCode)
 	}
 
@@ -79,7 +83,7 @@ func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP
 	fmt.Println("-------- before check --------- : ", lastOtp)
 	fmt.Println(" ******** time since ******: ", time.Since(lastOtp.CreatedAt))
 	if lastOtp.ID != 0 && time.Since(lastOtp.CreatedAt) <= 4*time.Minute {
-		fmt.Println("---- to many request otp ---line : 73  ---- ")
+		fmt.Println("---- to soon request otp ---line : 86  ---- ")
 		return lastOtp, custom_error.New(custom_error.OTPRequestTooSoon, custom_error.OTPRequestTooSoon, custom_error.OTPTooSoonCode)
 	}
 
@@ -93,4 +97,84 @@ func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP
 		return newOtp, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, custom_error.OtpSomethingGoesWrongCode)
 	}
 	return newOtp, custom_error.CustomError{}
+}
+
+func (h HomeRepository) VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) (entities.OTP, error) {
+	var otp entities.OTP
+	otpCode := fmt.Sprintf("%s%s%s%s", req.N1, req.N2, req.N3, req.N4)
+	fmt.Println("------ VerifyOtp : home repository : 105 : otp : ", otpCode)
+	fmt.Println("------ VerifyOtp : home repository : 105 : mobile : ", mobile)
+	err := h.db.Where("mobile = ? AND code = ? ", mobile, otpCode).First(&otp).Error
+
+	fmt.Println("--- verify otp err:--- ", err)
+	return otp, err
+}
+
+func (h HomeRepository) ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error) {
+
+	tx := h.db.Begin()
+	if tx.Error != nil {
+		return entities.Session{}, tx.Error
+	}
+
+	//find customer
+	var customer entities.Customer
+	customerErr := tx.WithContext(c).Where("mobile = ? ", mobile).First(&customer).Error
+	if customerErr != nil {
+		if errors.Is(customerErr, gorm.ErrRecordNotFound) {
+
+			//customer not found , fill customer
+			customer = entities.Customer{
+				Mobile:    mobile,
+				FirstName: "",
+				LastName:  "",
+				Active:    true,
+			}
+
+			//store customer in db
+			if createCustomerErr := tx.WithContext(c).Create(&customer).Error; createCustomerErr != nil {
+				tx.Rollback()
+				fmt.Println("create new customer err : ", createCustomerErr.Error())
+				return entities.Session{}, createCustomerErr
+			}
+		} else {
+			//some internal error
+			tx.Rollback()
+			fmt.Println("--- database internal err : ", customerErr.Error())
+			return entities.Session{}, customerErr
+		}
+	}
+
+	//generate uuid
+	uuidValue, uuidErr := uuid.NewUUID()
+	if uuidErr != nil {
+		tx.Rollback()
+		fmt.Println("---- generate uuid was failed :", uuidErr)
+		return entities.Session{}, uuidErr
+	}
+
+	//fill session
+	sess := entities.Session{
+		Mobile:     customer.Mobile,
+		CustomerID: customer.ID,
+		SessionID:  uuidValue.String(),
+		IsActive:   true,
+		ExpiredAt:  time.Now().Add(365 * (24 * time.Hour)),
+	}
+
+	//store session in db
+	if sessCreateErr := tx.WithContext(c).Create(&sess).Error; sessCreateErr != nil {
+		fmt.Println("---- create a session failed : ", sessCreateErr)
+		tx.Rollback()
+		return entities.Session{}, sessCreateErr
+	}
+
+	//commit tx
+	if commitErr := tx.Commit().Error; commitErr != nil {
+		fmt.Println("--- commit was failed : ", commitErr)
+		tx.Rollback()
+		return entities.Session{}, commitErr
+	}
+	return sess, nil
+
 }
