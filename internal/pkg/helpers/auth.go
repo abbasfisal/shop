@@ -14,7 +14,7 @@ import (
 
 func Auth(c *gin.Context) entities.User {
 	authID := sessions.GET(c, "auth_id")
-	fmt.Println("authid:", authID)
+	fmt.Println("helpers - Auth() - authid:", authID)
 	if authID == "" {
 		return entities.User{}
 	}
@@ -28,7 +28,7 @@ func Auth(c *gin.Context) entities.User {
 
 func CustomerAuth(c *gin.Context) customerResponse.Customer {
 	sessionID := sessions.GET(c, "session_id") //session uuid
-	fmt.Println("-- helpers/auth.go/CustomerAuth  ---  customer sessionID [uuid ]:", sessionID)
+	fmt.Println("-- helpers/auth.go/CustomerAuth  ---  customer sessionID [uuid ]:", sessionID, "--- url path : ", c.Request.URL.Path)
 	if sessionID == "" {
 		return customerResponse.Customer{}
 	}
