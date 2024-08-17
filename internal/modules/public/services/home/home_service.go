@@ -2,10 +2,15 @@ package home
 
 import (
 	"context"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/repositories/home"
+	"shop/internal/modules/public/requests"
+	CustomerRes "shop/internal/modules/public/responses"
 	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/custom_messages"
 )
 
 type HomeService struct {
@@ -76,4 +81,25 @@ func (h HomeService) ShowCategory(ctx context.Context, columnName string, value 
 
 func (h HomeService) SendOtp(ctx context.Context, Mobile string) (entities.OTP, custom_error.CustomError) {
 	return h.repo.NewOtp(ctx, Mobile)
+}
+
+func (h HomeService) VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) custom_error.CustomError {
+	otp, err := h.repo.VerifyOtp(c, mobile, req)
+
+	if err != nil {
+		return custom_error.HandleError(err, custom_messages.OTPIsNotValid)
+	}
+
+	fmt.Println("--- home_service:VerifyOtp ---  otp is :--- ", otp)
+	return custom_error.CustomError{}
+}
+
+func (h HomeService) ProcessCustomerAuthentication(c *gin.Context, mobile string) (CustomerRes.CustomerSession, custom_error.CustomError) {
+	sess, err := h.repo.ProcessCustomerAuthenticate(c, mobile)
+	if err != nil {
+		fmt.Println("------ error ProcessCustomerAuthentication: line : 99 ", err)
+		return CustomerRes.CustomerSession{}, custom_error.New(err.Error(), "مشکل در ایجاد سشن", custom_error.CreateSessionFailedCode)
+	}
+
+	return CustomerRes.ToCustomerSession(sess), custom_error.CustomError{}
 }
