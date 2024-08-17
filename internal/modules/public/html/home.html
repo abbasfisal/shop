@@ -278,10 +278,11 @@
                         <div class="user-item account">
                             {{if not .AUTH}}
                                 <a href="/login" class="btn-auth"><i class="fal fa-user-circle"></i>
-                                        ورود و عضویت
-                                    </a>
+                                    ورود و عضویت
+                                </a>
                             {{else}}
-                                <a href="#">{{.AUTH.Name}} <i class="fad fa-chevron-down text-sm mr-1"></i>
+                                <a href="#">{{if not .AUTH.FirstName}}{{.AUTH.Mobile}}{{else}}{{.AUTH.FirstName}} {{end}}
+                                    <i class="fad fa-chevron-down text-sm mr-1"></i>
                                 </a>
                                 <ul class="dropdown--wrapper">
                                     <li class="header-profile-dropdown-account-container">
