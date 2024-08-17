@@ -2,7 +2,9 @@ package home
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
+	"shop/internal/modules/public/requests"
 	"shop/internal/pkg/custom_error"
 )
 
@@ -14,4 +16,6 @@ type HomeRepositoryInterface interface {
 	GetProductsBy(ctx context.Context, columnName string, value any) ([]entities.Product, error)
 	GetCategoryBy(ctx context.Context, columnName string, value any) (entities.Category, error)
 	NewOtp(ctx context.Context, mobile string) (entities.OTP, custom_error.CustomError)
+	VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) (entities.OTP, error)
+	ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error)
 }
