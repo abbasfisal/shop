@@ -19,7 +19,7 @@ func NewAuthenticateRepository(db *gorm.DB) AuthenticateRepository {
 func (ar AuthenticateRepository) FindCustomerBySessionID(c *gin.Context, sessionID string) (entities.Customer, error) {
 	var sess entities.Session
 
-	err := ar.db.WithContext(c).Preload("Customer").Where("session_id = ", sessionID).First(&sess).Error
+	err := ar.db.WithContext(c).Preload("Customer").Where("session_id = ?", sessionID).First(&sess).Error
 	if err != nil {
 		return entities.Customer{}, err
 	}
