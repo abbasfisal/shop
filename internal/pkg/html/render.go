@@ -1,6 +1,7 @@
 package html
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 )
 
 func Render(c *gin.Context, code int, name string, data gin.H) {
+	fmt.Println("--- render.go - Render() : url : ", c.Request.URL)
 	data = WithGlobalData(c, data)
 
 	format := c.DefaultQuery("format", "html")
@@ -63,10 +65,9 @@ func customerWithGlobalData(c *gin.Context, data gin.H) gin.H {
 	data["MESSAGE"] = sessions.Flash(c, "message")
 
 	customer := helpers.CustomerAuth(c)
-	//if customer.ID != 0 {
-	if customer.ID == 0 {
-		//data["AUTH"] = responses.ToUserResponse(user)
-		data["AUTH"] = map[string]string{"Name": "Mohammad-customer"}
+
+	if customer.ID > 0 {
+		data["AUTH"] = customer
 	}
 
 	return data
