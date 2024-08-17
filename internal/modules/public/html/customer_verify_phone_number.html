@@ -15,24 +15,30 @@
                             <div class="section-title title-wide mb-1 no-after-title-wide">
                                 <h2 class="font-weight-bold">تایید شماره</h2>
                             </div>
-                            <input type="hidden" name="mobile" {{ .MOBILE }}>
+                            <div>
+                                all data : <br>
+                                {{range $index,$value:=.}}
+                                    {{$index}} =>  {{$value}} <br>
+                                {{end}}
+                            </div>
+                            <input type="hidden" name="mobile" value="{{.MOBILE}}">
                             <div class="message-light">
                                 برای شماره همراه {{.MOBILE}} کد تایید ارسال گردید
                                 <a href="#" class="btn-link-border">
                                     ویرایش شماره
                                 </a>
                             </div>
-                            <form action="#">
+                            <form action="/verify" method="post">
                                 <div class="form-row-title">
                                     <h3>کد تایید را وارد کنید</h3>
                                 </div>
                                 <div class="form-row">
                                     <div class="numbers-verify">
                                         <div class="lines-number-input">
-                                            <input type="text" class="line-number" maxlength="1" autofocus="">
-                                            <input type="text" class="line-number" maxlength="1">
-                                            <input type="text" class="line-number" maxlength="1">
-                                            <input type="text" class="line-number" maxlength="1">
+                                            <input type="text" class="line-number" name="n1" maxlength="1" autofocus="">
+                                            <input type="text" class="line-number" name="n2" maxlength="1">
+                                            <input type="text" class="line-number" name="n3" maxlength="1">
+                                            <input type="text" class="line-number" name="n4" maxlength="1">
                                         </div>
                                     </div>
                                 </div>
@@ -96,16 +102,16 @@
             /*-------------------- verify-phone-number --*/
             if ($("#countdown-verify-end").length) {
                 var $countdownOptionEnd = $("#countdown-verify-end");
-
-                $countdownOptionEnd.countdown({
-                    date: new Date().getTime() + 240 * 1000, // 4 minute later
-                    text: '<span class="day">%s</span><span class="hour">%s</span><span>: %s</span><span>%s</span>',
-                    end: function () {
-                        $countdownOptionEnd.html(
-                            "<a href='' class='btn-link-border'>ارسال مجدد</a>"
-                        );
-                    },
-                });
+                var expireSec ={{.TOEXPIRE}}
+                    $countdownOptionEnd.countdown({
+                        date: new Date().getTime() + expireSec * 1000,
+                        text: '<span class="day">%s</span><span class="hour">%s</span><span>: %s</span><span>%s</span>',
+                        end: function () {
+                            $countdownOptionEnd.html(
+                                "<a href='/resend-otp' class='btn-link-border'>ارسال مجدد</a>"
+                            );
+                        },
+                    });
 
                 $(".line-number").keyup(function () {
                     $(this).next().focus();
