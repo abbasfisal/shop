@@ -100,3 +100,4 @@ ___
 - [ ] add customer profile html form
 - [ ] add customer address html form
 - [ ] add product recom by elastic
+- [x] add logOut
