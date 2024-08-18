@@ -11,6 +11,7 @@ import (
 	CustomerRes "shop/internal/modules/public/responses"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
+	"shop/internal/pkg/sessions"
 )
 
 type HomeService struct {
@@ -102,4 +103,15 @@ func (h HomeService) ProcessCustomerAuthentication(c *gin.Context, mobile string
 	}
 
 	return CustomerRes.ToCustomerSession(sess), custom_error.CustomError{}
+}
+
+func (h HomeService) LogOut(c *gin.Context) bool {
+	err := h.repo.LogOut(c)
+	fmt.Println("---- error log for LogOut : ", err, " -------- ")
+	if err != nil {
+		return false
+	}
+
+	sessions.ClearAll(c)
+	return true
 }

@@ -18,4 +18,5 @@ type HomeRepositoryInterface interface {
 	NewOtp(ctx context.Context, mobile string) (entities.OTP, custom_error.CustomError)
 	VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) (entities.OTP, error)
 	ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error)
+	LogOut(c *gin.Context) error
 }

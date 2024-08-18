@@ -331,3 +331,16 @@ func (p PublicHandler) ResendOtp(c *gin.Context) {
 	return
 
 }
+
+func (p PublicHandler) LogOut(c *gin.Context) {
+
+	result := p.homeSrv.LogOut(c)
+
+	if !result {
+		fmt.Println("--- logOut was failed ;) ---- ")
+	}
+	fmt.Println("---- logOut was success ----")
+	c.Redirect(http.StatusFound, "/")
+	c.Abort()
+	return
+}

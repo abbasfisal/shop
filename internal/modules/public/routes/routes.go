@@ -22,14 +22,21 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 	r.GET("/:category_slug", publicHdl.ShowProductsByCategory)
 
-	customerRoute := r
-	customerRoute.Use(CustomerMiddlewares.CheckCustomerSessionID)
+	publicAuthGrp := r.RouterGroup
+	customerRoute := r.RouterGroup
+	customerRoute.Use(CustomerMiddlewares.CheckCustomerSessionID())
 	{
-		r.GET("/login", publicHdl.ShowLogin)
-		r.POST("/login", publicHdl.PostLogin)
-		r.GET("/verify", publicHdl.ShowVerifyOtp)
-		r.POST("/verify", publicHdl.PostVerifyOtp)
-		r.GET("/resend-otp", publicHdl.ResendOtp)
+		customerRoute.GET("/login", publicHdl.ShowLogin)
+		customerRoute.POST("/login", publicHdl.PostLogin)
+		customerRoute.GET("/verify", publicHdl.ShowVerifyOtp)
+		customerRoute.POST("/verify", publicHdl.PostVerifyOtp)
+		customerRoute.GET("/resend-otp", publicHdl.ResendOtp)
+	}
+
+	publicAuthGrp.Use(CustomerMiddlewares.CustomerMustLogin())
+	{
+		publicAuthGrp.GET("/logout", publicHdl.LogOut)
+
 	}
 
 	guestGrp := r.Group("/")

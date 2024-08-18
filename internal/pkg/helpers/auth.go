@@ -28,15 +28,13 @@ func Auth(c *gin.Context) entities.User {
 
 func CustomerAuth(c *gin.Context) customerResponse.Customer {
 	sessionID := sessions.GET(c, "session_id") //session uuid
-	fmt.Println("-- helpers/auth.go/CustomerAuth  ---  customer sessionID [uuid ]:", sessionID, "--- url path : ", c.Request.URL.Path)
+
 	if sessionID == "" {
-		fmt.Println("session-id not exist")
 		return customerResponse.Customer{}
 	}
 
 	repo := customerAuthRepo.NewAuthenticateRepository(mysql.Get())
 	customer, err := repo.FindCustomerBySessionID(c, sessionID)
-	fmt.Println("--- customerAuth : ", customer)
 	if err != nil {
 		return customerResponse.Customer{}
 	}

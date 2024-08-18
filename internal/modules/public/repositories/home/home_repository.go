@@ -11,6 +11,7 @@ import (
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
 	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
 	"strconv"
 	"time"
@@ -177,4 +178,10 @@ func (h HomeRepository) ProcessCustomerAuthenticate(c *gin.Context, mobile strin
 	}
 	return sess, nil
 
+}
+
+func (h HomeRepository) LogOut(c *gin.Context) error {
+	session_id := sessions.GET(c, "session_id")
+
+	return h.db.Where("session_id = ?", session_id).Delete(&entities.Session{}).Error
 }
