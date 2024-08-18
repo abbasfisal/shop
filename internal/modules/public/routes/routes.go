@@ -5,6 +5,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"shop/internal/middlewares"
 	PublicHandler "shop/internal/modules/public/handlers"
+	CustomerMiddlewares "shop/internal/modules/public/middlewares"
 	"shop/internal/modules/public/services/home"
 )
 
@@ -21,11 +22,16 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 	r.GET("/:category_slug", publicHdl.ShowProductsByCategory)
 
-	r.GET("/login", publicHdl.ShowLogin)
-	r.POST("/login", publicHdl.PostLogin)
-	r.GET("/verify", publicHdl.ShowVerifyOtp)
-	r.POST("/verify", publicHdl.PostVerifyOtp)
-	r.GET("/resend-otp", publicHdl.ResendOtp)
+	customerRoute := r
+	customerRoute.Use(CustomerMiddlewares.CheckCustomerSessionID)
+	{
+		r.GET("/login", publicHdl.ShowLogin)
+		r.POST("/login", publicHdl.PostLogin)
+		r.GET("/verify", publicHdl.ShowVerifyOtp)
+		r.POST("/verify", publicHdl.PostVerifyOtp)
+		r.GET("/resend-otp", publicHdl.ResendOtp)
+	}
+
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
 	{
