@@ -22,6 +22,11 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 	r.GET("/:category_slug", publicHdl.ShowProductsByCategory)
 
+	//movie this route into publicAuthGrp
+	r.GET("/profile", publicHdl.ShowProfile)
+	r.GET("/profile/edit", publicHdl.EditProfile)
+	r.POST("/profile/edit", publicHdl.UpdateProfile)
+
 	publicAuthGrp := r.RouterGroup
 	customerRoute := r.RouterGroup
 	customerRoute.Use(CustomerMiddlewares.CheckCustomerSessionID())

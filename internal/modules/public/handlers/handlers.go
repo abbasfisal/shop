@@ -13,6 +13,7 @@ import (
 	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/errors"
 	"shop/internal/pkg/html"
+	"shop/internal/pkg/old"
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
 	"time"
@@ -343,4 +344,42 @@ func (p PublicHandler) LogOut(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 	c.Abort()
 	return
+}
+
+func (p PublicHandler) ShowProfile(c *gin.Context) {
+	html.CustomerRender(c, http.StatusFound, "customer_profile", gin.H{
+		"TITLE": "مدیریت پروفایل",
+	})
+	return
+}
+
+func (p PublicHandler) EditProfile(c *gin.Context) {
+	html.CustomerRender(c, http.StatusFound, "customer_edit_profile",
+		gin.H{
+			"TITLE": "ویرایش پروفایل",
+		},
+	)
+	return
+}
+
+func (p PublicHandler) UpdateProfile(c *gin.Context) {
+	var req requests.CustomerProfileRequest
+
+	//binding
+	bErr := c.ShouldBind(&req)
+	if bErr != nil {
+		fmt.Println("-- err : -- ", bErr)
+		errors.Init()
+		errors.SetErrors(c, p.i18nBundle, bErr)
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+	c.JSON(200, gin.H{
+		"e": req,
+	})
+
 }

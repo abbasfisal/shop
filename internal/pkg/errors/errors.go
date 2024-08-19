@@ -103,6 +103,10 @@ func SetErrors(c *gin.Context, i18nBundle *i18n.Bundle, err error) {
 
 func Mapper(field string) string {
 	switch field {
+	case "firstname":
+		return "نام"
+	case "lastname":
+		return "نام خانوادگی"
 	case "mobile":
 		return "موبایل"
 	case "password":

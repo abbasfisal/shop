@@ -1,4 +1,4 @@
-{{define "home"}}
+{{define "customer_profile"}}
     <!DOCTYPE html>
     <html lang="fa" dir="rtl">
     <head>
@@ -6,7 +6,7 @@
         <link rel="shortcut icon" href="/assets/shop/img/seller-logo.png" type="image/icon">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title> دیجی پرس</title>
+        <title>{{.TITLE}}</title>
         <link rel="stylesheet" href="/assets/shop/css/vendor/font-awesome.min.css">
         <link rel="stylesheet" href="/assets/shop/css/vendor/bootstrap.min.css">
         <link rel="stylesheet" href="/assets/shop/css/vendor/bootstrap-slider.min.css">
@@ -82,7 +82,7 @@
                     <div class="d-flex align-items-center">
                         <div class="site-logo">
                             <a href="#">
-                                <img src="/assets/shop/img/svg/logo.svg" alt="logo">
+                                <img src="assets/img/svg/logo.svg" alt="logo">
                             </a>
                         </div>
                         <div class="search-box">
@@ -170,7 +170,7 @@
                                         <li class="cart-item">
                                 <span class="d-flex align-items-center mb-2">
                                 <a href="#">
-                                    <img src="/assets/shop/img/cart/item-1.jpg" alt="">
+                                    <img src="assets/img/cart/item-1.jpg" alt="">
                                 </a>
                                 <span>
                                     <a href="#">
@@ -202,7 +202,7 @@
                                         <li class="cart-item">
                                 <span class="d-flex align-items-center mb-2">
                                 <a href="#">
-                                    <img src="/assets/shop/img/cart/item-2.jpg" alt="">
+                                    <img src="assets/img/cart/item-2.jpg" alt="">
                                 </a>
                                 <span>
                                     <a href="#">
@@ -234,7 +234,7 @@
                                         <li class="cart-item">
                                 <span class="d-flex align-items-center mb-2">
                                 <a href="#">
-                                    <img src="/assets/shop/img/cart/item-3.jpg" alt="">
+                                    <img src="assets/img/cart/item-3.jpg" alt="">
                                 </a>
                                 <span>
                                     <a href="#">
@@ -279,17 +279,17 @@
                             <!-- <a href="#" class="btn-auth"><i class="fal fa-user-circle"></i>
                                     ورود و عضویت
                                 </a> -->
-                            <a href="#">محمد رضایی <i class="fad fa-chevron-down text-sm mr-1"></i>
+                            <a href="#">abbas momeni <i class="fad fa-chevron-down text-sm mr-1"></i>
                             </a>
                             <ul class="dropdown--wrapper">
                                 <li class="header-profile-dropdown-account-container">
                                     <a href="#" class="d-block">
                             <span class="header-profile-dropdown-user">
                                 <span class="header-profile-dropdown-user-img">
-                                <img src="/assets/shop/img/avatar/avatar.png">
+                                <img src="assets/img/avatar/avatar.png">
                                 </span>
                                 <span class="header-profile-dropdown-user-info">
-                                <p class="header-profile-dropdown-user-name">محمد رضایی </p>
+                                <p class="header-profile-dropdown-user-name">abbas momeni </p>
                                 <span class="header-profile-dropdown-user-profile-link">مشاهده حساب کاربری</span>
                                 </span>
                             </span>
@@ -1337,7 +1337,7 @@
                     <div class="side-navigation">
                         <div class="site-logo">
                             <a href="#">
-                                <img src="/assets/shop/img/svg/logo.svg" alt="logo">
+                                <img src="assets/img/svg/logo.svg" alt="logo">
                             </a>
                         </div>
                         <div class="divider"></div>
@@ -1538,7 +1538,7 @@
                             <li class="has-children">
                                 <a href="#">مد و پوشاک</a>
                                 <ul>
-                                    <li>گوشی موبایل</li>
+                                    <li>لباس زنانه</li>
                                 </ul>
                             </li>
                             <li class="has-children">
@@ -1793,10 +1793,9 @@
                 </div>
                 <div class="site-logo">
                     <a href="#">
-                        <img src="/assets/shop/img/svg/logo.svg" alt="logo">
+                        <img src="assets/img/svg/logo.svg" alt="logo">
                     </a>
                 </div>
-                {{/*cart icon in mobile view*/}}
                 <div class="header-tools">
                     <a href="#">
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
@@ -1809,7 +1808,6 @@
                     </a>
                 </div>
             </div>
-            {{/*search input and profile icon in mobile view */}}
             <div class="header-bottom">
                 <div class="search-box">
                     <form action="#">
@@ -1865,7 +1863,6 @@
                     </div>
                 </div>
                 <div class="header-tools">
-                    {{/*profile icon in mobile view*/}}
                     <a href="#">
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
@@ -1895,1687 +1892,486 @@
         <!--------------------------------- Main Content -->
         <main class="main-content dt-sl mb-3">
             <div class="container main-container">
-                <!-- Start Main-Slider -->
-                <div class="row mb-5">
-                    <aside class="sidebar col-lg-4 hidden-md order-2 pr-0 hidden-md">
-                        <!-- Start banner -->
-                        <div class="sidebar-inner dt-sl">
-                            <div class="sidebar-banner">
-                                <div class="row">
-                                    <div class="col-12 mb-1">
-                                        <div class="widget-banner">
-                                            <a href="#">
-                                                <img style="margin-bottom: 7px;"
-                                                     src="/assets/shop/img/banner/banner-side-slider-1.jpg" alt="">
+                <div class="row" style="margin-top: 20px; margin-bottom: 20px; transform: none;">
+                    <!-- Start Sidebar -->
+                    <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12 sticky-sidebar">
+                        <div class="profile-sidebar dt-sl">
+                            <div class="dt-sl dt-sn border mb-3">
+                                <div class="profile-sidebar-header dt-sl">
+                                    <div class="d-flex align-items-center">
+                                        <div class="profile-avatar">
+                                            <img src="/assets/shop/img/svg/avatar-1.svg" alt="">
+                                        </div>
+                                        <div class="profile-header-content mr-3 mt-2">
+                                            <span class="d-block profile-username">abbas momeni</span>
+                                            <span class="d-block profile-phone">09xxxxxxxxx</span>
+                                        </div>
+                                    </div>
+                                    <div class="profile-point mt-3 mb-2 dt-sl">
+                                        <span class="label-profile-point">امتیاز شما:</span>
+                                        <span class="float-left value-profile-point">120</span>
+                                    </div>
+                                    <div class="profile-link mt-2 dt-sl">
+                                        <div class="row">
+                                            <div class="col-6 text-center">
+                                                <a href="#">
+                                                    <i>
+                                                        <svg width="23px" height="23px" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path opacity="0.5"
+                                                                  d="M2 16C2 13.1716 2 11.7574 2.87868 10.8787C3.75736 10 5.17157 10 8 10H16C18.8284 10 20.2426 10 21.1213 10.8787C22 11.7574 22 13.1716 22 16C22 18.8284 22 20.2426 21.1213 21.1213C20.2426 22 18.8284 22 16 22H8C5.17157 22 3.75736 22 2.87868 21.1213C2 20.2426 2 18.8284 2 16Z"
+                                                                  fill="#1C274C"/>
+                                                            <path d="M8 17C8.55228 17 9 16.5523 9 16C9 15.4477 8.55228 15 8 15C7.44772 15 7 15.4477 7 16C7 16.5523 7.44772 17 8 17Z"
+                                                                  fill="#1C274C"/>
+                                                            <path d="M12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16C11 16.5523 11.4477 17 12 17Z"
+                                                                  fill="#1C274C"/>
+                                                            <path d="M17 16C17 16.5523 16.5523 17 16 17C15.4477 17 15 16.5523 15 16C15 15.4477 15.4477 15 16 15C16.5523 15 17 15.4477 17 16Z"
+                                                                  fill="#1C274C"/>
+                                                            <path d="M6.75 8C6.75 5.10051 9.10051 2.75 12 2.75C14.8995 2.75 17.25 5.10051 17.25 8V10.0036C17.8174 10.0089 18.3135 10.022 18.75 10.0546V8C18.75 4.27208 15.7279 1.25 12 1.25C8.27208 1.25 5.25 4.27208 5.25 8V10.0546C5.68651 10.022 6.18264 10.0089 6.75 10.0036V8Z"
+                                                                  fill="#1C274C"/>
+                                                        </svg>
+                                                    </i>
+                                                    <span class="d-block mt-1">تغییر رمز</span>
+                                                </a>
+                                            </div>
+                                            <div class="col-6 text-center">
+                                                <a href="#">
+                                                    <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path opacity="0.5"
+                                                              d="M9 4.5H8C5.64298 4.5 4.46447 4.5 3.73223 5.23223C3 5.96447 3 7.14298 3 9.5V14.5C3 16.857 3 18.0355 3.73223 18.7678C4.46447 19.5 5.64298 19.5 8 19.5H9"
+                                                              stroke="#1C274C" stroke-width="1.5"/>
+                                                        <path d="M9 6.4764C9 4.18259 9 3.03569 9.70725 2.4087C10.4145 1.78171 11.4955 1.97026 13.6576 2.34736L15.9864 2.75354C18.3809 3.17118 19.5781 3.37999 20.2891 4.25826C21 5.13652 21 6.40672 21 8.94711V15.0529C21 17.5933 21 18.8635 20.2891 19.7417C19.5781 20.62 18.3809 20.8288 15.9864 21.2465L13.6576 21.6526C11.4955 22.0297 10.4145 22.2183 9.70725 21.5913C9 20.9643 9 19.8174 9 17.5236V6.4764Z"
+                                                              stroke="#1C274C" stroke-width="1.5"/>
+                                                        <path opacity="0.5" d="M12 11V13" stroke="#1C274C"
+                                                              stroke-width="1.5" stroke-linecap="round"/>
+                                                    </svg>
+                                                    <span class="d-block mt-1">خروج از حساب</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dt-sl dt-sn border mb-3">
+                                <div class="profile-menu-section dt-sl">
+                                    <div class="label-profile-menu mt-2 mb-2">
+                                        <span>حساب کاربری شما</span>
+                                    </div>
+                                    <div class="profile-menu">
+                                        <ul>
+                                            <li>
+                                                <a href="#" class="active">
+                                                    <svg style="margin-left: 3px;" width="23px" height="23px"
+                                                         viewBox="0 0 24 24" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path opacity="0.4"
+                                                              d="M12.1207 12.78C12.0507 12.77 11.9607 12.77 11.8807 12.78C10.1207 12.72 8.7207 11.28 8.7207 9.50998C8.7207 7.69998 10.1807 6.22998 12.0007 6.22998C13.8107 6.22998 15.2807 7.69998 15.2807 9.50998C15.2707 11.28 13.8807 12.72 12.1207 12.78Z"
+                                                              stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke-linejoin="round"/>
+                                                        <path opacity="0.34"
+                                                              d="M18.7398 19.3801C16.9598 21.0101 14.5998 22.0001 11.9998 22.0001C9.39977 22.0001 7.03977 21.0101 5.25977 19.3801C5.35977 18.4401 5.95977 17.5201 7.02977 16.8001C9.76977 14.9801 14.2498 14.9801 16.9698 16.8001C18.0398 17.5201 18.6398 18.4401 18.7398 19.3801Z"
+                                                              stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke-linejoin="round"/>
+                                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                                              stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke-linejoin="round"/>
+                                                    </svg>
+                                                    پروفایل
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <svg style="margin-left: 3px;" width="25px" height="25px"
+                                                         viewBox="0 0 24 24" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path opacity="0.15" d="M3 10H21L19 20H5L3 10Z"
+                                                              fill="#000000"></path>
+                                                        <path d="M3 10H21M3 10L5 20H19L21 10M3 10L9 4M21 10L15 4"
+                                                              stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke-linejoin="round"></path>
+                                                    </svg>
+                                                    همه سفارش ها
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <svg style="margin-left: 3px;" style="margin-left: 3px;"
+                                                         fill="#000000" width="23px" height="23px" viewBox="0 0 256 256"
+                                                         id="Flat" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M224,56V200a7.99977,7.99977,0,0,1-8,8H40a7.99977,7.99977,0,0,1-8-8V56a7.99977,7.99977,0,0,1,8-8H216A7.99977,7.99977,0,0,1,224,56Z"
+                                                              opacity="0.2"/>
+                                                        <path d="M184,104v32a8.00039,8.00039,0,0,1-8,8H99.314l10.34327,10.34277a8.00053,8.00053,0,0,1-11.31446,11.31446l-24-24c-.05664-.05664-.10449-.11768-.15869-.17578-.12549-.13282-.251-.26514-.36719-.40625-.0913-.11084-.17138-.22706-.25537-.3418-.07031-.09522-.14453-.188-.21093-.28662-.085-.12647-.15918-.25782-.23584-.38819-.05567-.09423-.11524-.186-.167-.2832-.06933-.12891-.12841-.26172-.18994-.39355-.04931-.10547-.10205-.209-.147-.31641-.05225-.12695-.09522-.25586-.14063-.38477-.042-.11816-.0874-.23437-.124-.355-.03906-.1289-.06787-.25976-.10058-.39013-.03077-.12305-.06543-.24414-.09034-.36914-.02978-.15186-.04834-.30469-.06933-.45752-.01465-.106-.03516-.20948-.0459-.3169a8.02276,8.02276,0,0,1,0-1.584c.01074-.10742.03125-.21094.0459-.3169.021-.15283.03955-.30566.06933-.45752.02491-.125.05957-.24609.09034-.36914.03271-.13037.06152-.26123.10058-.39013.03662-.12061.082-.23682.124-.355.04541-.12891.08838-.25782.14063-.38477.04492-.10742.09766-.21094.147-.31641.06153-.13183.12061-.26464.18994-.39355.05176-.09717.11133-.189.167-.2832.07666-.13037.15087-.26172.23584-.38819.0664-.09863.14062-.1914.21093-.28662.084-.11474.16407-.231.25537-.3418.11622-.14111.2417-.27343.36719-.40625.0542-.0581.10205-.11914.15869-.17578l24-24a8.00053,8.00053,0,0,1,11.31446,11.31446L99.314,128H168V104a8,8,0,0,1,16,0Zm48-48V200a16.01833,16.01833,0,0,1-16,16H40a16.01833,16.01833,0,0,1-16-16V56A16.01833,16.01833,0,0,1,40,40H216A16.01833,16.01833,0,0,1,232,56ZM216.00977,200,216,56H40V200H216.00977Z"/>
+                                                    </svg>
+                                                    درخواست مرجوعی
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <svg style="margin-left: 3px;" width="23px" height="23px"
+                                                         viewBox="0 0 24 24" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path opacity="0.15"
+                                                              d="M4.3314 12.0474L12 20L19.6686 12.0474C20.5211 11.1633 21 9.96429 21 8.71405C21 6.11055 18.9648 4 16.4543 4C15.2487 4 14.0925 4.49666 13.24 5.38071L12 6.66667L10.76 5.38071C9.90749 4.49666 8.75128 4 7.54569 4C5.03517 4 3 6.11055 3 8.71405C3 9.96429 3.47892 11.1633 4.3314 12.0474Z"
+                                                              fill="#000000"></path>
+                                                        <path d="M4.3314 12.0474L12 20L19.6686 12.0474C20.5211 11.1633 21 9.96429 21 8.71405C21 6.11055 18.9648 4 16.4543 4C15.2487 4 14.0925 4.49666 13.24 5.38071L12 6.66667L10.76 5.38071C9.90749 4.49666 8.75128 4 7.54569 4C5.03517 4 3 6.11055 3 8.71405C3 9.96429 3.47892 11.1633 4.3314 12.0474Z"
+                                                              stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke-linejoin="round"></path>
+                                                    </svg>
+                                                    لیست علاقمندی ها
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <svg style="margin-left: 3px;" width="23px" height="23px"
+                                                         viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+                                                         aria-hidden="true" role="img" class="iconify iconify--noto"
+                                                         preserveAspectRatio="xMidYMid meet">
+                                                        <g opacity=".8" fill="#90caf9">
+                                                            <path d="M52.44 53.27c-1.03-1.71-3.17-5.28-18.55-5.69c-10.54-.36-16.68.93-18.81 3.97c-.93 1.46-1.85 5-.95 13.57c1.56 14.33 8.76 14.71 17.89 15.18l.69.04c.99.05 1.92.08 2.8.08c12.94 0 15.2-5.65 16.86-13.48c1.48-6.67 1.51-11.26.07-13.67z">
+                                                            </path>
+                                                            <path d="M112.7 51.51c-2.1-3.01-8.24-4.29-18.78-3.93c-15.39.42-17.53 3.98-18.56 5.69c-1.44 2.41-1.42 7 .08 13.64c1.67 7.85 3.92 13.49 16.86 13.49c.88 0 1.82-.03 2.8-.08l.69-.04c9.12-.47 16.33-.85 17.89-15.18c.89-8.55-.03-12.09-.98-13.59z">
+                                                            </path>
+                                                        </g>
+                                                        <path d="M123.8 47.84s-1-1.7-19.03-3.41c-18.93-1.8-28.35 2-32.25 4.41c-.7.3-1.9.6-3.31.5h-.3c-1.9-.1-3.61-.2-5.61-.2h-.1c-1.1 0-3.51.1-5.21.2c-.8.1-1.5 0-2.1-.2c-3.61-2.4-13.02-6.61-32.75-4.71C5.1 46.14 4.1 47.84 4.1 47.84L4 54.65s2.7.8 4.41 2.9c1.7 2.1 2.5 14.12 5.41 19.73c4.4 8.72 26.14 6.52 26.14 6.52s8.91.7 13.22-6.81c3.71-6.41 5.21-15.43 5.61-17.63c.9-.9 2.6-2 5.11-2.1c2.8 0 4.61 1.4 5.41 2.4c.4 2.7 1.9 11.22 5.51 17.33c4.31 7.51 13.22 6.81 13.22 6.81s21.74 2.2 26.14-6.51c2.8-5.61 3.61-17.63 5.41-19.73c1.7-2.2 4.41-2.9 4.41-2.9l-.2-6.82zM51.38 66.71c-1.7 8.01-3.91 13.42-18.63 12.62c-9.52-.5-16.13-.5-17.63-14.32c-.9-8.61.1-11.82.8-12.92c.7-1 3.21-4.01 17.93-3.51c14.72.4 16.83 3.71 17.73 5.21c.9 1.5 1.6 4.91-.2 12.92zm61.3-1.7c-1.5 13.82-8.11 13.82-17.63 14.32c-14.72.8-16.93-4.61-18.63-12.62c-1.8-8.01-1.1-11.42-.2-12.92c.9-1.5 3.01-4.81 17.73-5.21c14.72-.5 17.23 2.5 17.93 3.51c.7 1.1 1.7 4.3.8 12.92z"
+                                                              fill="#804833">
+                                                        </path>
+                                                        <path d="M26.82 52.22c4.33-.84 5.79 1.26 5.37 3.14c-.77 3.47-4.11 1.62-9 4.6c-2.06 1.26-2.9 2.16-3.66 2.13c-.73-.03-1.36-.78-1.01-2.2c.63-2.58 1.68-6.39 8.3-7.67z"
+                                                              opacity=".7" fill="#ffffff">
+                                                        </path>
+                                                        <path d="M83.66 53.21c1.77-.99 6.74-1.88 7.27.73c.54 2.69-1.99 3.43-3.78 4.04c-4.23 1.44-4.93 3.49-5.81 4.05c-.59.37-2.33 1.21-2.14-1.34c.22-3.24 1.28-5.69 4.46-7.48z"
+                                                              opacity=".7" fill="#ffffff">
+                                                        </path>
+                                                    </svg>
+                                                    نقد و نظرات
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <svg style="margin-left: 3px;" width="23px" height="23px"
+                                                         viewBox="-1.99 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <g id="direction" transform="translate(-4 -2)">
+                                                            <path id="secondary" fill="#2ca9bc"
+                                                                  d="M6,6A1,1,0,0,0,5,7v4a1,1,0,0,0,1,1H16.67a1,1,0,0,0,.83-.45l1.33-2a1,1,0,0,0,0-1.1l-1.33-2A1,1,0,0,0,16.67,6Z"/>
+                                                            <path id="primary"
+                                                                  d="M7,21h8M13,6V4a1,1,0,0,0-1-1H10A1,1,0,0,0,9,4V6ZM9,12v9h4V12ZM6,6A1,1,0,0,0,5,7v4a1,1,0,0,0,1,1H16.67a1,1,0,0,0,.83-.45l1.33-2a1,1,0,0,0,0-1.1l-1.33-2A1,1,0,0,0,16.67,6Z"
+                                                                  fill="none" stroke="#000000" stroke-linecap="round"
+                                                                  stroke-linejoin="round" stroke-width="2"/>
+                                                        </g>
+                                                    </svg>
+                                                    آدرس ها
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <svg style="margin-left: 3px;" width="20px" height="20px"
+                                                         viewBox="0 0 24 24" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path opacity="0.1" fill-rule="evenodd" clip-rule="evenodd"
+                                                              d="M16.8494 7.05025C14.1158 4.31658 9.6836 4.31658 6.94993 7.05025L4.82861 9.17157C3.49528 10.5049 2.82861 11.1716 2.82861 12C2.82861 12.8284 3.49528 13.4951 4.82861 14.8284L6.94993 16.9497C9.6836 19.6834 14.1158 19.6834 16.8494 16.9497L18.9707 14.8284C20.3041 13.4951 20.9707 12.8284 20.9707 12C20.9707 11.1716 20.3041 10.5049 18.9707 9.17157L16.8494 7.05025ZM12.0002 8.75C10.2053 8.75 8.75019 10.2051 8.75019 12C8.75019 13.7949 10.2053 15.25 12.0002 15.25C13.7951 15.25 15.2502 13.7949 15.2502 12C15.2502 10.2051 13.7951 8.75 12.0002 8.75Z"
+                                                              fill="#323232"/>
+                                                        <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z"
+                                                              stroke="#323232" stroke-width="2"/>
+                                                        <path d="M6.94975 7.05025C9.68342 4.31658 14.1156 4.31658 16.8492 7.05025L18.9706 9.17157C20.3039 10.5049 20.9706 11.1716 20.9706 12C20.9706 12.8284 20.3039 13.4951 18.9706 14.8284L16.8492 16.9497C14.1156 19.6834 9.68342 19.6834 6.94975 16.9497L4.82843 14.8284C3.49509 13.4951 2.82843 12.8284 2.82843 12C2.82843 11.1716 3.49509 10.5049 4.82843 9.17157L6.94975 7.05025Z"
+                                                              stroke="#323232" stroke-width="2"
+                                                              stroke-linejoin="round"/>
+                                                    </svg>
+                                                    بازدیدهای اخیر
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <svg style="margin-left: 3px;" width="20px" height="20px"
+                                                         viewBox="0 0 24 24" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path opacity="0.15" d="M4 20H8L18 10L14 6L4 16V20Z"
+                                                              fill="#000000"/>
+                                                        <path d="M12 20H20.5M18 10L21 7L17 3L14 6M18 10L8 20H4V16L14 6M18 10L14 6"
+                                                              stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke-linejoin="round"/>
+                                                    </svg>
+                                                    اطلاعات شخصی
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Sidebar -->
+                    <!-- Start Content -->
+                    <div class="col-xl-9 col-lg-8 col-md-8 col-sm-12">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-12">
+                                <div class="px-3">
+                                    <div
+                                            class="section-title text-sm-title title-wide mb-1 no-after-title-wide dt-sl mb-2">
+                                        <h2>اطلاعات شخصی</h2>
+                                    </div>
+                                    <div class="profile-section dt-sl">
+                                        <div class="row" style="margin-bottom: 30px;">
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="label-info">
+                                                    <span>نام و نام خانوادگی:</span>
+                                                </div>
+                                                <div class="value-info">
+                                                    <span>abbas momeni</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="label-info">
+                                                    <span>پست الکترونیک:</span>
+                                                </div>
+                                                <div class="value-info">
+                                                    <span>info@gmail.com</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="label-info">
+                                                    <span>شماره تلفن همراه:</span>
+                                                </div>
+                                                <div class="value-info">
+                                                    <span>09xxxxxxxxx</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="label-info">
+                                                    <span>کد ملی:</span>
+                                                </div>
+                                                <div class="value-info">
+                                                    <span>-</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="label-info">
+                                                    <span>دریافت خبرنامه:</span>
+                                                </div>
+                                                <div class="value-info">
+                                                    <span>خیر</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="label-info">
+                                                    <span>شماره کارت:</span>
+                                                </div>
+                                                <div class="value-info">
+                                                    <span>-</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="profile-section-link">
+                                            <a href="#" class="border-bottom-dt">
+                                                <i class="mdi mdi-account-edit-outline"></i>
+                                                ویرایش اطلاعات شخصی
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <div class="widget-banner">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/banner/banner-side-slider-2.jpg" alt="">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-12">
+                                <div class="px-3">
+                                    <div
+                                            class="section-title text-sm-title title-wide mb-1 no-after-title-wide dt-sl mb-2">
+                                        <h2>لیست آخرین علاقه‌مندی‌ها</h2>
+                                    </div>
+                                    <div class="profile-section dt-sl">
+                                        <ul class="list-favorites">
+                                            <li>
+                                                <a href="#">
+                                                    <img src="/assets/shop/img/products/p1.jpg" alt="">
+                                                    <span>کت مردانه مجلسی</span>
+                                                </a>
+                                                <button>
+                                                    <i>
+                                                        <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6.52381C3 6.12932 3.32671 5.80952 3.72973 5.80952H8.51787C8.52437 4.9683 8.61554 3.81504 9.45037 3.01668C10.1074 2.38839 11.0081 2 12 2C12.9919 2 13.8926 2.38839 14.5496 3.01668C15.3844 3.81504 15.4756 4.9683 15.4821 5.80952H20.2703C20.6733 5.80952 21 6.12932 21 6.52381C21 6.9183 20.6733 7.2381 20.2703 7.2381H3.72973C3.32671 7.2381 3 6.9183 3 6.52381Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path opacity="0.5"
+                                                                  d="M11.5956 22.0001H12.4044C15.1871 22.0001 16.5785 22.0001 17.4831 21.1142C18.3878 20.2283 18.4803 18.7751 18.6654 15.8686L18.9321 11.6807C19.0326 10.1037 19.0828 9.31524 18.6289 8.81558C18.1751 8.31592 17.4087 8.31592 15.876 8.31592H8.12405C6.59127 8.31592 5.82488 8.31592 5.37105 8.81558C4.91722 9.31524 4.96744 10.1037 5.06788 11.6807L5.33459 15.8686C5.5197 18.7751 5.61225 20.2283 6.51689 21.1142C7.42153 22.0001 8.81289 22.0001 11.5956 22.0001Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M9.42543 11.4815C9.83759 11.4381 10.2051 11.7547 10.2463 12.1885L10.7463 17.4517C10.7875 17.8855 10.4868 18.2724 10.0747 18.3158C9.66253 18.3592 9.29499 18.0426 9.25378 17.6088L8.75378 12.3456C8.71256 11.9118 9.01327 11.5249 9.42543 11.4815Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M14.5747 11.4815C14.9868 11.5249 15.2875 11.9118 15.2463 12.3456L14.7463 17.6088C14.7051 18.0426 14.3376 18.3592 13.9254 18.3158C13.5133 18.2724 13.2126 17.8855 13.2538 17.4517L13.7538 12.1885C13.795 11.7547 14.1625 11.4381 14.5747 11.4815Z"
+                                                                  fill="#1C274C"></path>
+                                                        </svg>
+                                                    </i>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <img src="/assets/shop/img/products/p2.jpg" alt="">
+                                                    <span>کت مردانه مجلسی</span>
+                                                </a>
+                                                <button>
+                                                    <i>
+                                                        <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6.52381C3 6.12932 3.32671 5.80952 3.72973 5.80952H8.51787C8.52437 4.9683 8.61554 3.81504 9.45037 3.01668C10.1074 2.38839 11.0081 2 12 2C12.9919 2 13.8926 2.38839 14.5496 3.01668C15.3844 3.81504 15.4756 4.9683 15.4821 5.80952H20.2703C20.6733 5.80952 21 6.12932 21 6.52381C21 6.9183 20.6733 7.2381 20.2703 7.2381H3.72973C3.32671 7.2381 3 6.9183 3 6.52381Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path opacity="0.5"
+                                                                  d="M11.5956 22.0001H12.4044C15.1871 22.0001 16.5785 22.0001 17.4831 21.1142C18.3878 20.2283 18.4803 18.7751 18.6654 15.8686L18.9321 11.6807C19.0326 10.1037 19.0828 9.31524 18.6289 8.81558C18.1751 8.31592 17.4087 8.31592 15.876 8.31592H8.12405C6.59127 8.31592 5.82488 8.31592 5.37105 8.81558C4.91722 9.31524 4.96744 10.1037 5.06788 11.6807L5.33459 15.8686C5.5197 18.7751 5.61225 20.2283 6.51689 21.1142C7.42153 22.0001 8.81289 22.0001 11.5956 22.0001Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M9.42543 11.4815C9.83759 11.4381 10.2051 11.7547 10.2463 12.1885L10.7463 17.4517C10.7875 17.8855 10.4868 18.2724 10.0747 18.3158C9.66253 18.3592 9.29499 18.0426 9.25378 17.6088L8.75378 12.3456C8.71256 11.9118 9.01327 11.5249 9.42543 11.4815Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M14.5747 11.4815C14.9868 11.5249 15.2875 11.9118 15.2463 12.3456L14.7463 17.6088C14.7051 18.0426 14.3376 18.3592 13.9254 18.3158C13.5133 18.2724 13.2126 17.8855 13.2538 17.4517L13.7538 12.1885C13.795 11.7547 14.1625 11.4381 14.5747 11.4815Z"
+                                                                  fill="#1C274C"></path>
+                                                        </svg>
+                                                    </i>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    <img src="/assets/shop/img/products/p3.jpg" alt="">
+                                                    <span>کت مردانه مجلسی</span>
+                                                </a>
+                                                <button>
+                                                    <i>
+                                                        <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6.52381C3 6.12932 3.32671 5.80952 3.72973 5.80952H8.51787C8.52437 4.9683 8.61554 3.81504 9.45037 3.01668C10.1074 2.38839 11.0081 2 12 2C12.9919 2 13.8926 2.38839 14.5496 3.01668C15.3844 3.81504 15.4756 4.9683 15.4821 5.80952H20.2703C20.6733 5.80952 21 6.12932 21 6.52381C21 6.9183 20.6733 7.2381 20.2703 7.2381H3.72973C3.32671 7.2381 3 6.9183 3 6.52381Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path opacity="0.5"
+                                                                  d="M11.5956 22.0001H12.4044C15.1871 22.0001 16.5785 22.0001 17.4831 21.1142C18.3878 20.2283 18.4803 18.7751 18.6654 15.8686L18.9321 11.6807C19.0326 10.1037 19.0828 9.31524 18.6289 8.81558C18.1751 8.31592 17.4087 8.31592 15.876 8.31592H8.12405C6.59127 8.31592 5.82488 8.31592 5.37105 8.81558C4.91722 9.31524 4.96744 10.1037 5.06788 11.6807L5.33459 15.8686C5.5197 18.7751 5.61225 20.2283 6.51689 21.1142C7.42153 22.0001 8.81289 22.0001 11.5956 22.0001Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M9.42543 11.4815C9.83759 11.4381 10.2051 11.7547 10.2463 12.1885L10.7463 17.4517C10.7875 17.8855 10.4868 18.2724 10.0747 18.3158C9.66253 18.3592 9.29499 18.0426 9.25378 17.6088L8.75378 12.3456C8.71256 11.9118 9.01327 11.5249 9.42543 11.4815Z"
+                                                                  fill="#1C274C"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M14.5747 11.4815C14.9868 11.5249 15.2875 11.9118 15.2463 12.3456L14.7463 17.6088C14.7051 18.0426 14.3376 18.3592 13.9254 18.3158C13.5133 18.2724 13.2126 17.8855 13.2538 17.4517L13.7538 12.1885C13.795 11.7547 14.1625 11.4381 14.5747 11.4815Z"
+                                                                  fill="#1C274C"></path>
+                                                        </svg>
+                                                    </i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                        <div class="profile-section-link">
+                                            <a href="#" class="border-bottom-dt">
+                                                <i class="mdi mdi-square-edit-outline"></i>
+                                                مشاهده و ویرایش لیست مورد علاقه
                                             </a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- End banner -->
-                    </aside>
-
-                    <div class="col-lg-8 col-md-12 order-1">
-                        <!-- Start main-slider -->
-                        <section id="main-slider"
-                                 class="main-slider main-slider-cs mt-1 carousel slide carousel-fade card hidden-sm"
-                                 data-ride="carousel" data-bs-ride="carousel">
-                            <ol class="carousel-indicators">
-                                <li data-bs-target="#main-slider" data-bs-slide-to="0" class="active"></li>
-                                <li data-bs-target="#main-slider" data-bs-slide-to="1"></li>
-                                <li data-bs-target="#main-slider" data-bs-slide-to="2"></li>
-                                <li data-bs-target="#main-slider" data-bs-slide-to="3"></li>
-                            </ol>
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/img-slider/1.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <div
+                                        class="section-title text-sm-title title-wide mb-1 no-after-title-wide dt-sl mb-2 px-res-1">
+                                    <h2>آخرین سفارش‌ها</h2>
                                 </div>
-                                <div class="carousel-item">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/img-slider/2.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
-                                </div>
-                                <div class="carousel-item">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/img-slider/3.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
-                                </div>
-                                <div class="carousel-item">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/img-slider/4.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
+                                <div class="dt-sl">
+                                    <div class="table-responsive">
+                                        <table class="table table-order">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>شماره سفارش</th>
+                                                <th>تاریخ ثبت سفارش</th>
+                                                <th>مبلغ قابل پرداخت</th>
+                                                <th>مبلغ کل</th>
+                                                <th>عملیات پرداخت</th>
+                                                <th>جزییات</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>DK-123456789</td>
+                                                <td>20 تیر 1403</td>
+                                                <td>۰</td>
+                                                <td>۹,۹00,۰۰۰ تومان</td>
+                                                <td>لغو شده</td>
+                                                <td class="details-link">
+                                                    <a href="#">
+                                                        <i>
+                                                            <svg width="25px" height="25px" viewBox="0 0 24 24"
+                                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path opacity="0.1"
+                                                                      d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                                      fill="#323232"></path>
+                                                                <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                                      stroke="#323232" stroke-width="2"></path>
+                                                                <path d="M13 9L10.2625 11.7375V11.7375C10.1175 11.8825 10.1175 12.1175 10.2625 12.2625V12.2625L13 15"
+                                                                      stroke="#323232" stroke-width="2"
+                                                                      stroke-linecap="round"
+                                                                      stroke-linejoin="round"></path>
+                                                            </svg>
+                                                        </i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>DK-123456789</td>
+                                                <td>20 تیر 1403</td>
+                                                <td>۰</td>
+                                                <td>۹,۹00,۰۰۰ تومان</td>
+                                                <td>لغو شده</td>
+                                                <td class="details-link">
+                                                    <a href="#">
+                                                        <i>
+                                                            <svg width="25px" height="25px" viewBox="0 0 24 24"
+                                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path opacity="0.1"
+                                                                      d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                                      fill="#323232"></path>
+                                                                <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                                      stroke="#323232" stroke-width="2"></path>
+                                                                <path d="M13 9L10.2625 11.7375V11.7375C10.1175 11.8825 10.1175 12.1175 10.2625 12.2625V12.2625L13 15"
+                                                                      stroke="#323232" stroke-width="2"
+                                                                      stroke-linecap="round"
+                                                                      stroke-linejoin="round"></path>
+                                                            </svg>
+                                                        </i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>DK-123456789</td>
+                                                <td>25 تیر 1403</td>
+                                                <td>۰</td>
+                                                <td>۹,۹00,۰۰۰ تومان</td>
+                                                <td>لغو شده</td>
+                                                <td class="details-link">
+                                                    <a href="#">
+                                                        <i>
+                                                            <svg width="25px" height="25px" viewBox="0 0 24 24"
+                                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path opacity="0.1"
+                                                                      d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                                      fill="#323232"></path>
+                                                                <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                                      stroke="#323232" stroke-width="2"></path>
+                                                                <path d="M13 9L10.2625 11.7375V11.7375C10.1175 11.8825 10.1175 12.1175 10.2625 12.2625V12.2625L13 15"
+                                                                      stroke="#323232" stroke-width="2"
+                                                                      stroke-linecap="round"
+                                                                      stroke-linejoin="round"></path>
+                                                            </svg>
+                                                        </i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="link-to-orders" colspan="7"><a href="#">مشاهده لیست سفارش
+                                                        ها</a></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                            <a class="carousel-control-prev" data-bs-slide="prev" data-bs-target="#main-slider"
-                               type="button">
-                                <i>
-                                    <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.1"
-                                              d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              fill="#323232"></path>
-                                        <path d="M11 15L13.7158 12.2842V12.2842C13.8728 12.1272 13.8728 11.8728 13.7158 11.7158V11.7158L11 9"
-                                              stroke="#323232" stroke-width="2" stroke-linecap="round"
-                                              stroke-linejoin="round"></path>
-                                        <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              stroke="#323232" stroke-width="2"></path>
-                                    </svg>
-                                </i>
-                            </a>
-                            <a class="carousel-control-next" data-bs-target="#main-slider" data-bs-slide="next"
-                               type="button">
-                                <i>
-                                    <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.1"
-                                              d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              fill="#323232"/>
-                                        <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              stroke="#323232" stroke-width="2"/>
-                                        <path d="M13 9L10.2625 11.7375V11.7375C10.1175 11.8825 10.1175 12.1175 10.2625 12.2625V12.2625L13 15"
-                                              stroke="#323232" stroke-width="2" stroke-linecap="round"
-                                              stroke-linejoin="round"/>
-                                    </svg>
-                                </i>
-                            </a>
-                        </section>
-                        <section id="main-slider-res"
-                                 class="mt-4 main-slider carousel slide carousel-fade card d-none show-sm"
-                                 data-ride="carousel">
-                            <ol class="carousel-indicators">
-                                <li data-bs-target="#main-slider-res" data-bs-slide-to="0" class="active"></li>
-                                <li data-bs-target="#main-slider-res" data-bs-slide-to="1"></li>
-                                <li data-bs-target="#main-slider-res" data-bs-slide-to="2"></li>
-                                <li data-bs-target="#main-slider-res" data-bs-slide-to="3"></li>
-                            </ol>
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/slider-responsive/1.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
-                                </div>
-                                <div class="carousel-item">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/slider-responsive/2.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
-                                </div>
-                                <div class="carousel-item">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/slider-responsive/3.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
-                                </div>
-                                <div class="carousel-item">
-                                    <a class="main-slider-slide" href="#">
-                                        <img src="/assets/shop/img/main-slider/slider-responsive/4.jpg" alt=""
-                                             class="img-fluid">
-                                    </a>
-                                </div>
-                            </div>
-                            <a class="carousel-control-prev" data-bs-target="#main-slider-res" role="button"
-                               data-bs-slide="prev">
-                                <i>
-                                    <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.1"
-                                              d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              fill="#323232"></path>
-                                        <path d="M11 15L13.7158 12.2842V12.2842C13.8728 12.1272 13.8728 11.8728 13.7158 11.7158V11.7158L11 9"
-                                              stroke="#323232" stroke-width="2" stroke-linecap="round"
-                                              stroke-linejoin="round"></path>
-                                        <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              stroke="#323232" stroke-width="2"></path>
-                                    </svg>
-                                </i>
-                            </a>
-                            <a class="carousel-control-next" data-bs-target="#main-slider-res" data-bs-slide="next">
-                                <i>
-                                    <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.1"
-                                              d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              fill="#323232"/>
-                                        <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
-                                              stroke="#323232" stroke-width="2"/>
-                                        <path d="M13 9L10.2625 11.7375V11.7375C10.1175 11.8825 10.1175 12.1175 10.2625 12.2625V12.2625L13 15"
-                                              stroke="#323232" stroke-width="2" stroke-linecap="round"
-                                              stroke-linejoin="round"/>
-                                    </svg>
-                                </i>
-                            </a>
-                        </section>
-                        <!-- End main-slider -->
+                        </div>
                     </div>
+                    <!-- End Content -->
                 </div>
-                <!-- End Main-Slider -->
-            </div>
-            <!-- Start Product-Slider -->
-            <section class="slider-section mb-5 amazing-section" style="background: #ef394e">
-                <div class="container main-container">
-                    <div class="row mb-3">
-                        <!-- Start Product-Slider -->
-                        <div class="col-12">
-                            <div class="product-carousel carousel-lg owl-carousel owl-theme">
-                                <div class="item">
-                                    <div class="amazing-product text-center pt-5">
-                                        <a href="search.html">
-                                            <img src="/assets/shop/img/theme/amazing-1.png" alt="">
-                                        </a>
-                                        <a href="search.html" class="view-all-amazing-btn">
-                                            مشاهده همه
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>40%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="single-product.html">
-                                            <img src="/assets/shop/img/products/p35.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="single-product.html">samsung A34 5G</a>
-                                            </h5>
-                                            <a class="product-meta" href="single-product.html"> گوشی موبایل سامسونگ</a>
-                                            <span class="product-price">6,300,000 تومان</span>
-                                            <span class="line-through" style="text-decoration-line: line-through;"
-                                                  class="product-price">9,000,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star "></i>
-                                                <i class="mdi mdi-star "></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>25%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="single-product.html">
-                                            <img src="/assets/shop/img/products/p36.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="single-product.html">samsung A35 5G</a>
-                                            </h5>
-                                            <a class="product-meta" href="single-product.html">گوشی موبایل سامسونگ</a>
-                                            <span class="product-price">9,750,000 تومان</span>
-                                            <span class="line-through" style="text-decoration-line: line-through;"
-                                                  class="product-price">13,000,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>17%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="single-product.html">
-                                            <img src="/assets/shop/img/products/p37.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="single-product.html">samsung A25 5G</a>
-                                            </h5>
-                                            <a class="product-meta" href="single-product.html">گوشی موبایل سامسونگ</a>
-                                            <span class="product-price">7,055,000 تومان</span>
-                                            <span class="line-through" style="text-decoration-line: line-through;"
-                                                  class="product-price">8,500,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                            </div>
-                                        </div>
-                                        <div class="discount">
-                                            <span>6%</span>
-                                        </div>
-                                        <a class="product-thumb" href="single-product-not-available.html">
-                                            <img src="/assets/shop/img/products/p234.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="single-product-not-available.html">samsung A04e</a>
-                                            </h5>
-                                            <a class="product-meta" href="single-product-not-available.html">گوشی موبایل
-                                                سامسونگ </a>
-                                            <span class="product-price">5,640,000 تومان</span>
-                                            <span class="line-through" style="text-decoration-line: line-through;"
-                                                  class="product-price">6,000,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>64%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="single-product.html">
-                                            <img src="/assets/shop/img/products/p245.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="single-product.html">samsung tab A9 Lite</a>
-                                            </h5>
-                                            <a class="product-meta" href="single-product.html">تبلت سامسونگ </a>
-                                            <span class="product-price">1,800,000 تومان</span>
-                                            <span class="line-through" style="text-decoration-line: line-through;"
-                                                  class="product-price">5,000,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>25%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="single-product.html">
-                                            <img src="/assets/shop/img/products/p36.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="single-product.html">samsung A35 5G</a>
-                                            </h5>
-                                            <a class="product-meta" href="single-product.html">گوشی موبایل سامسونگ</a>
-                                            <span class="product-price">9,750,000 تومان</span>
-                                            <span class="line-through" style="text-decoration-line: line-through;"
-                                                  class="product-price">13,000,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Product-Slider -->
-
-                    </div>
-                </div>
-            </section>
-            <!-- End Product-Slider -->
-            <div class="container main-container">
-                <!-- Start Product-Slider -->
-                <div class="row">
-                    <div class="col-xl-10 col-lg-12">
-                        <section class="slider-section dt-sl mb-5">
-                            <div class="row mb-3">
-                                <div class="col-12">
-                                    <div class="section-title text-sm-title title-wide no-after-title-wide">
-                                        <h2>پر فروش ترینها</h2>
-                                        <a href="#">مشاهده همه</a>
-                                    </div>
-                                </div>
-
-                                <!-- Start Product-Slider -->
-                                <div class="col-12 px-res-0">
-                                    <div class="product-carousel carousel-md owl-carousel owl-theme">
-                                        <div class="item">
-                                            <div class="product-card">
-                                                <div class="product-head">
-                                                    <div class="rating-stars">
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                    </div>
-                                                    <div class="discount">
-                                                        <span>20%</span>
-                                                    </div>
-                                                </div>
-                                                <a class="product-thumb" href="#">
-                                                    <img src="/assets/shop/img/products/p3.jpg"
-                                                         alt="Product Thumbnail">
-                                                </a>
-                                                <div class="product-card-body">
-                                                    <h5 class="product-title">
-                                                        <a href="#">کت مردانه</a>
-                                                    </h5>
-                                                    <a class="product-meta" href="#">لباس مردانه</a>
-                                                    <span class="product-price">200,000 تومان</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="product-card">
-                                                <div class="product-head">
-                                                    <div class="rating-stars">
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                    </div>
-                                                </div>
-                                                <a class="product-thumb" href="#">
-                                                    <img src="/assets/shop/img/products/p1.jpg"
-                                                         alt="Product Thumbnail">
-                                                </a>
-                                                <div class="product-card-body">
-                                                    <h5 class="product-title">
-                                                        <a href="#">کت مردانه</a>
-                                                    </h5>
-                                                    <a class="product-meta" href="#">لباس مردانه</a>
-                                                    <span class="product-price">200,000 تومان</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="product-card">
-                                                <div class="product-head">
-                                                    <div class="rating-stars">
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star"></i>
-                                                    </div>
-                                                </div>
-                                                <a class="product-thumb" href="#">
-                                                    <img src="/assets/shop/img/products/p2.jpg"
-                                                         alt="Product Thumbnail">
-                                                </a>
-                                                <div class="product-card-body">
-                                                    <h5 class="product-title">
-                                                        <a href="#">کت مردانه</a>
-                                                    </h5>
-                                                    <a class="product-meta" href="#">لباس مردانه</a>
-                                                    <span class="product-price">200,000 تومان</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="product-card">
-                                                <div class="product-head">
-                                                    <div class="rating-stars">
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star"></i>
-                                                    </div>
-                                                </div>
-                                                <a class="product-thumb" href="#">
-                                                    <img src="/assets/shop/img/products/p3.jpg"
-                                                         alt="Product Thumbnail">
-                                                </a>
-                                                <div class="product-card-body">
-                                                    <h5 class="product-title">
-                                                        <a href="#">کت مردانه</a>
-                                                    </h5>
-                                                    <a class="product-meta" href="#">لباس مردانه</a>
-                                                    <span class="product-price">200,000 تومان</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="product-card">
-                                                <div class="product-head">
-                                                    <div class="rating-stars">
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                    </div>
-                                                </div>
-                                                <a class="product-thumb" href="#">
-                                                    <img src="/assets/shop/img/products/p3.jpg"
-                                                         alt="Product Thumbnail">
-                                                </a>
-                                                <div class="product-card-body">
-                                                    <h5 class="product-title">
-                                                        <a href="#">کت مردانه</a>
-                                                    </h5>
-                                                    <a class="product-meta" href="#">لباس مردانه</a>
-                                                    <span class="product-price">200,000 تومان</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="product-card">
-                                                <div class="product-head">
-                                                    <div class="rating-stars">
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star"></i>
-                                                    </div>
-                                                    <div class="discount">
-                                                        <span>20%</span>
-                                                    </div>
-                                                </div>
-                                                <a class="product-thumb" href="#">
-                                                    <img src="/assets/shop/img/products/p1.jpg"
-                                                         alt="Product Thumbnail">
-                                                </a>
-                                                <div class="product-card-body">
-                                                    <h5 class="product-title">
-                                                        <a href="#">کت مردانه</a>
-                                                    </h5>
-                                                    <a class="product-meta" href="#">لباس مردانه</a>
-                                                    <span class="product-price">200,000 تومان</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="product-card">
-                                                <div class="product-head">
-                                                    <div class="rating-stars">
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star active"></i>
-                                                        <i class="mdi mdi-star"></i>
-                                                    </div>
-                                                </div>
-                                                <a class="product-thumb" href="#">
-                                                    <img src="/assets/shop/img/products/p2.jpg"
-                                                         alt="Product Thumbnail">
-                                                </a>
-                                                <div class="product-card-body">
-                                                    <h5 class="product-title">
-                                                        <a href="#">کت مردانه</a>
-                                                    </h5>
-                                                    <a class="product-meta" href="#">لباس مردانه</a>
-                                                    <span class="product-price">200,000 تومان</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End Product-Slider -->
-
-                            </div>
-                        </section>
-                    </div>
-                    <div class="col-xl-2 col-lg-3 hidden-lg pr-0">
-                        <div class="widget-suggestion dt-sn border pt-3 mt-3">
-                            <div class="widget-suggestion-title">
-                                <img src="/assets/shop/img/theme/suggestion-title.png" alt="">
-                            </div>
-                            <div id="progressBar">
-                                <div class="slide-progress"></div>
-                            </div>
-                            <div id="suggestion-slider" class="owl-carousel owl-theme">
-                                <div class="item">
-                                    <div class="product-card mb-3 shadow-unset">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>20%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3 shadow-unset">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3 shadow-unset">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3 shadow-unset">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Product-Slider -->
-                <!-- Start Banner -->
-                <div class="row mt-3 mb-5">
-                    <div class="col-sm-6 col-12 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/medium-banner-1.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-12 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/medium-banner-2.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Banner -->
-            </div>
-            <!-- Start Product-Slider -->
-            <section class="slider-section mb-5 amazing-section" style="background: #304ffe">
-                <div class="container main-container">
-                    <div class="row mb-3">
-                        <!-- Start Product-Slider -->
-                        <div class="col-12">
-                            <div class="product-carousel carousel-lg owl-carousel owl-theme">
-                                <div class="item">
-                                    <div class="amazing-product text-center pt-5">
-                                        <a href="#">
-                                            <img src="/assets/shop/img/theme/amazing-1.png" alt="">
-                                        </a>
-                                        <a href="#" class="view-all-amazing-btn">
-                                            مشاهده همه
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>20%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Product-Slider -->
-
-                    </div>
-                </div>
-            </section>
-            <!-- End Product-Slider -->
-            <div class="container main-container">
-                <!-- Start Banner -->
-                <div class="row mt-3 mb-5">
-                    <div class="col-md-3 col-sm-6 col-6 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/small-banner-1.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-6 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/small-banner-2.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-6 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/small-banner-3.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-6 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/small-banner-4.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Banner -->
-                <!-- Start Category-Section -->
-                <div class="row mt-3 mb-5">
-                    <div class="col-12">
-                        <div class="category-section dt-sn dt-sl border">
-                            <div class="category-section-title dt-sl">
-                                <h3>بیش از ۱،۵۰۰،۰۰۰ کالا در دسته‌بندی‌های مختلف</h3>
-                            </div>
-                            <div class="category-section-slider dt-sl">
-                                <div class="category-slider owl-carousel">
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat5.png" alt="">
-                                            <h4 class="promotion-category-name">کالای دیجیتال</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat4.png" alt="">
-                                            <h4 class="promotion-category-name">آرایشی، بهداشتی و سلامت</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat6.png" alt="">
-                                            <h4 class="promotion-category-name">خودرو،ابزار و اداری</h4>
-                                            <h6 class="promotion-category-quantity">۵۶۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat3.png" alt="">
-                                            <h4 class="promotion-category-name">مد و پوشاک</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat9.png" alt="">
-                                            <h4 class="promotion-category-name">خانه و آشپزخانه</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat8.png" alt="">
-                                            <h4 class="promotion-category-name">لوازم تحریر و هنر</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat2.png" alt="">
-                                            <h4 class="promotion-category-name">کودک و نوزاد</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat1.png" alt="">
-                                            <h4 class="promotion-category-name">ورزش و سفر</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="#" class="promotion-category">
-                                            <img src="/assets/shop/img/category/cat7.png"
-                                                 alt="">
-                                            <h4 class="promotion-category-name">خوردنی و آشامیدنی</h4>
-                                            <h6 class="promotion-category-quantity">۱۵0۰۰۰ کالا</h6>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Category-Section -->
-                <!-- Start Product-Slider -->
-                <section class="slider-section dt-sl mb-5">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <div class="section-title text-sm-title title-wide no-after-title-wide">
-                                <h2>پر فروش ترینها</h2>
-                                <a href="#">مشاهده همه</a>
-                            </div>
-                        </div>
-
-                        <!-- Start Product-Slider -->
-                        <div class="col-12">
-                            <div class="product-carousel carousel-lg owl-carousel owl-theme">
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>20%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>20%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Product-Slider -->
-
-                    </div>
-                </section>
-                <!-- End Product-Slider -->
-                <!-- Start Banner -->
-                <div class="row mt-3 mb-5">
-                    <div class="col-12">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/large-banner.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Banner -->
-                <!-- Start Product-Slider -->
-                <section class="slider-section dt-sl mb-5">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <div class="section-title text-sm-title title-wide no-after-title-wide">
-                                <h2>پر فروش ترینها</h2>
-                                <a href="#">مشاهده همه</a>
-                            </div>
-                        </div>
-
-                        <!-- Start Product-Slider -->
-                        <div class="col-12">
-                            <div class="product-carousel carousel-lg owl-carousel owl-theme">
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>20%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p3.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                            <div class="discount">
-                                                <span>20%</span>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p1.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="product-card mb-3">
-                                        <div class="product-head">
-                                            <div class="rating-stars">
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star active"></i>
-                                                <i class="mdi mdi-star"></i>
-                                            </div>
-                                        </div>
-                                        <a class="product-thumb" href="#">
-                                            <img src="/assets/shop/img/products/p2.jpg" alt="Product Thumbnail">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <h5 class="product-title">
-                                                <a href="#">کت مردانه</a>
-                                            </h5>
-                                            <a class="product-meta" href="#">لباس مردانه</a>
-                                            <span class="product-price">200,000 تومان</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Product-Slider -->
-
-                    </div>
-                </section>
-                <!-- End Product-Slider -->
-                <!-- Start Feature-Product -->
-                <section class="dt-sl dt-sn mb-5">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="section-title text-sm-title title-wide no-after-title-wide">
-                                <h2>پیشنهاد ما</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-lg-4 col-md-6 col-sm-12 col-12 pt-4">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p1.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p2.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p3.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 col-sm-12 col-12 pt-4">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p1.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p2.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p3.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 col-sm-12 col-12 pt-4">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p1.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p2.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="card-horizontal-product border-bottom rounded-0">
-                                        <div class="card-horizontal-product-thumb">
-                                            <a href="#">
-                                                <img src="/assets/shop/img/products/p3.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="card-horizontal-product-content">
-                                            <div class="card-horizontal-product-title">
-                                                <a href="#">
-                                                    <h3>کت مردانه مجلسی</h3>
-                                                </a>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star active"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="card-horizontal-product-price">
-                                                <span>200,000 تومان</span>
-                                            </div>
-                                            <div class="card-horizontal-product-buttons">
-                                                <a href="#" class="btn btn-outline-info">جزئیات محصول</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <!-- End Feature-Product -->
-                <!-- Start Brand-Slider -->
-                <section class="slider-section dt-sl mb-5">
-                    <div class="row">
-                        <!-- Start Product-Slider -->
-                        <div class="col-12">
-                            <div class="brand-slider carousel-lg owl-carousel owl-theme">
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b1.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b2.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b3.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b4.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b5.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b6.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b7.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b8.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b9.png" class="img-fluid" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="/assets/shop/img/brand/b10.png" class="img-fluid" alt="">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Product-Slider -->
-
-                    </div>
-                </section>
-                <!-- End Brand-Slider -->
             </div>
         </main>
         <!--------------------------------- Main Content -->
