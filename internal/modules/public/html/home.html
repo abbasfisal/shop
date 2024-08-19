@@ -276,47 +276,37 @@
                             </ul>
                         </div>
                         <div class="user-item account">
-                            <!-- <a href="#" class="btn-auth"><i class="fal fa-user-circle"></i>
+                            {{if not .AUTH}}
+                                <a href="/login" class="btn-auth"><i class="fal fa-user-circle"></i>
                                     ورود و عضویت
-                                </a> -->
-                            <a href="#">محمد رضایی <i class="fad fa-chevron-down text-sm mr-1"></i>
-                            </a>
-                            <ul class="dropdown--wrapper">
-                                <li class="header-profile-dropdown-account-container">
-                                    <a href="#" class="d-block">
+                                </a>
+                            {{else }}
+                                <a href="#"> {{if .AUTH.FirstName}}{{.AUTH.FirstName}}{{else}}{{.AUTH.Mobile}}{{end}}
+                                    <i class="fad fa-chevron-down text-sm mr-1"></i>
+                                </a>
+                                <ul class="dropdown--wrapper">
+                                    <li class="header-profile-dropdown-account-container">
+                                        <a href="/profile" class="d-block">
                             <span class="header-profile-dropdown-user">
                                 <span class="header-profile-dropdown-user-img">
                                 <img src="/assets/shop/img/avatar/avatar.png">
                                 </span>
                                 <span class="header-profile-dropdown-user-info">
-                                <p class="header-profile-dropdown-user-name">محمد رضایی </p>
+                                <p class="header-profile-dropdown-user-name">  {{if .AUTH.FirstName}}{{.AUTH.FirstName}}{{else}}{{.AUTH.Mobile}}{{end}} </p>
                                 <span class="header-profile-dropdown-user-profile-link">مشاهده حساب کاربری</span>
                                 </span>
                             </span>
-                                        <span class="header-profile-dropdown-account">
-                                <span class="header-profile-dropdown-account-item">
-                                <span class="header-profile-dropdown-account-item-title">اعتبار</span>
-                                <span class="header-profile-dropdown-account-item-amount">
-                                    <span class="header-profile-dropdown-account-item-amount-number">7,500,000</span> تومان </span>
-                                </span>
-                            </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="dropdown--btn-primary">وارد شوید</a>
-                                </li>
-                                <li>
-                                    <span>کاربر جدید هستید؟</span>
-                                    <a href="#" class="border-bottom-dt">ثبت نام</a>
-                                </li>
-                                <hr>
-                                <li>
-                                    <a href="#"> پروفایل </a>
-                                </li>
-                                <li>
-                                    <a href="#"> پیگیری سفارش </a>
-                                </li>
-                            </ul>
+                                        </a>
+                                    </li>
+                                    <hr>
+                                    <li>
+                                        <a href="/profile/edit"> پروفایل </a>
+                                    </li>
+                                    <li>
+                                        <a href="#"> پیگیری سفارش </a>
+                                    </li>
+                                </ul>
+                            {{end}}
                         </div>
                     </div>
                 </div>

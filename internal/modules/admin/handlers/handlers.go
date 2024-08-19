@@ -16,6 +16,7 @@ import (
 	"shop/internal/modules/admin/services/auth"
 	"shop/internal/modules/admin/services/brand"
 	"shop/internal/modules/admin/services/category"
+	"shop/internal/modules/admin/services/customer"
 	"shop/internal/modules/admin/services/product"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
@@ -36,6 +37,7 @@ type AdminHandler struct {
 	attributeSrv attribute.AttributeServiceInterface
 	attrValueSrv attributeValue.AttributeValueServiceInterface
 	brandSrv     brand.BrandServiceInterface
+	customerSrv  customer.CustomerServiceInterface
 
 	i18nBundle *i18n.Bundle
 	//order service
@@ -50,6 +52,8 @@ func NewAdminHandler(
 	attributeSrv attribute.AttributeServiceInterface,
 	attrValueSrv attributeValue.AttributeValueServiceInterface,
 	brandSrv brand.BrandServiceInterface,
+	customerSrv customer.CustomerServiceInterface,
+
 	i18nBundle *i18n.Bundle,
 ) AdminHandler {
 	return AdminHandler{
@@ -59,6 +63,7 @@ func NewAdminHandler(
 		attributeSrv: attributeSrv,
 		attrValueSrv: attrValueSrv,
 		brandSrv:     brandSrv,
+		customerSrv:  customerSrv,
 
 		i18nBundle: i18nBundle,
 	}
@@ -1711,4 +1716,21 @@ func (a AdminHandler) UpdateQuantity(c *gin.Context) {
 	sessions.Set(c, "message", custom_error.SuccessfullyUpdated)
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
+}
+
+func (a AdminHandler) IndexCustomer(c *gin.Context) {
+	customers, err := a.customerSrv.Index(c)
+	if err.Code == 404 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+	}
+	if err.Code == 500 {
+		sessions.Set(c, "message", custom_error.InternalServerError)
+	}
+
+	fmt.Println("----- customers data : ", customers)
+	html.Render(c, http.StatusFound, "admin_index_customer", gin.H{
+		"TITLE":     "مدیریت مشتریان",
+		"CUSTOMERS": customers,
+	})
+
 }
