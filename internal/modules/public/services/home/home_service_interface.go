@@ -24,4 +24,5 @@ type HomeServiceInterface interface {
 	VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) custom_error.CustomError
 	ProcessCustomerAuthentication(c *gin.Context, mobile string) (CustomerResp.CustomerSession, custom_error.CustomError)
 	LogOut(c *gin.Context) bool
+	UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) custom_error.CustomError
 }

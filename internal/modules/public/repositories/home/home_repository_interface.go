@@ -19,4 +19,5 @@ type HomeRepositoryInterface interface {
 	VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) (entities.OTP, error)
 	ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error)
 	LogOut(c *gin.Context) error
+	UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) error
 }

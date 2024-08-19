@@ -115,3 +115,11 @@ func (h HomeService) LogOut(c *gin.Context) bool {
 	sessions.ClearAll(c)
 	return true
 }
+
+func (h HomeService) UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) custom_error.CustomError {
+	if err := h.repo.UpdateProfile(c, req); err != nil {
+		fmt.Println("--- update profile failed : --- ", err)
+		return custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 500)
+	}
+	return custom_error.CustomError{}
+}

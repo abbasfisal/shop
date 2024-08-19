@@ -378,8 +378,13 @@ func (p PublicHandler) UpdateProfile(c *gin.Context) {
 		c.Redirect(http.StatusFound, c.Request.Referer())
 		return
 	}
-	c.JSON(200, gin.H{
-		"e": req,
-	})
 
+	uErr := p.homeSrv.UpdateProfile(c, req)
+	if uErr.Code > 0 {
+		sessions.Set(c, "message", custom_error.UpdateWasFailed)
+	}
+	sessions.Set(c, "message", custom_error.SuccessfullyUpdated)
+	c.Redirect(http.StatusFound, "/profile/edit")
+	c.Abort()
+	return
 }

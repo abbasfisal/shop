@@ -14,6 +14,7 @@ import (
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -184,4 +185,26 @@ func (h HomeRepository) LogOut(c *gin.Context) error {
 	session_id := sessions.GET(c, "session_id")
 
 	return h.db.Where("session_id = ?", session_id).Delete(&entities.Session{}).Error
+}
+
+func (h HomeRepository) UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) error {
+
+	var sess entities.Session
+	session_id := sessions.GET(c, "session_id")
+	if sessErr := h.db.Where("session_id = ? ", session_id).First(&sess).Error; sessErr != nil {
+		return sessErr
+	}
+
+	var customer entities.Customer
+	if cErr := h.db.First(&customer, sess.CustomerID).Error; cErr != nil {
+		return cErr
+	}
+
+	if uErr := h.db.Model(&customer).
+		Update("first_name", strings.TrimSpace(req.FirstName)).
+		Update("last_name", strings.TrimSpace(req.LastName)).Error; uErr != nil {
+		return uErr
+	}
+
+	return nil
 }

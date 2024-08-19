@@ -33,6 +33,7 @@ const (
 	SomethingWrongHappened  string = "خطایی غیرمنتظره رخ داده است"
 	SuccessfullyCreated     string = "باموفقیت ایجاد گردید"
 	SuccessfullyUpdated     string = "با موفقیت بروزرسانی گردید"
+	UpdateWasFailed         string = "خطا در بروزرسانی"
 	StoreImageOnDiskFailed  string = "خطا در ذخیره عکس بر روی هارددیسک"
 	IDIsNotCorrect          string = "شناسه صحیح نمی باشد"
 
