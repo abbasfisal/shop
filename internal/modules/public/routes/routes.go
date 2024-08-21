@@ -22,11 +22,6 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 	r.GET("/:category_slug", publicHdl.ShowProductsByCategory)
 
-	//movie this route into publicAuthGrp
-	r.GET("/profile", publicHdl.ShowProfile)
-	r.GET("/profile/edit", publicHdl.EditProfile)
-	r.POST("/profile/edit", publicHdl.UpdateProfile)
-
 	publicAuthGrp := r.RouterGroup
 	customerRoute := r.RouterGroup
 	customerRoute.Use(CustomerMiddlewares.CheckCustomerSessionID())
@@ -41,7 +36,9 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	publicAuthGrp.Use(CustomerMiddlewares.CustomerMustLogin())
 	{
 		publicAuthGrp.GET("/logout", publicHdl.LogOut)
-
+		publicAuthGrp.GET("/profile", publicHdl.ShowProfile)
+		publicAuthGrp.GET("/profile/edit", publicHdl.EditProfile)
+		publicAuthGrp.POST("/profile/edit", publicHdl.UpdateProfile)
 	}
 
 	guestGrp := r.Group("/")
