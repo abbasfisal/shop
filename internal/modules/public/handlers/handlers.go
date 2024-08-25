@@ -96,7 +96,7 @@ func (p PublicHandler) ShowProduct(c *gin.Context) {
 
 func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 
-	products, err := p.homeSrv.ShowProductsByCategorySlug(context.TODO(), c.Param("category_slug"))
+	products, err := p.homeSrv.ShowProductsByCategorySlug(c, c.Param("category_slug"))
 	if err.Code == 404 {
 		c.JSON(200, gin.H{
 			"msg": "not found",
