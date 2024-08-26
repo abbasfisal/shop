@@ -32,4 +32,5 @@ const (
 
 	// otp
 	OTPIsNotValid = "کد نامعتبر است"
+	OTPISExpired  = "کد otp منقضی شده است"
 )

@@ -206,7 +206,7 @@ func (p PublicHandler) PostLogin(c *gin.Context) {
 	newOTP, otpErr := p.homeSrv.SendOtp(c, req.Mobile)
 	if otpErr.Code > 0 {
 		if otpErr.Code == custom_error.OTPTooSoonCode {
-			sessions.Set(c, "message", "باید از آخرین درخواست ۴ دقیقه بگذرد")
+			sessions.Set(c, "message", custom_error.OTPRequestTooSoon)
 			fmt.Println("------ redirect to verify : to soon request : ")
 			c.Redirect(http.StatusFound, "/verify")
 			return
@@ -245,7 +245,7 @@ func (p PublicHandler) PostVerifyOtp(c *gin.Context) {
 	//check otp is expired?
 	otpTTL := time.Duration(viper.GetInt("app.otp_expiration_time")) * time.Minute //in minute
 	if time.Since(otpCreatedAt) > otpTTL {
-		sessions.Set(c, "message", "کد otp منقضی شده است")
+		sessions.Set(c, "message", custom_messages.OTPISExpired)
 		c.Redirect(http.StatusFound, "/login")
 		return
 	}
@@ -310,7 +310,7 @@ func (p PublicHandler) ResendOtp(c *gin.Context) {
 	newOTP, otpErr := p.homeSrv.SendOtp(c, mobile)
 	if otpErr.Code > 0 {
 		if otpErr.Code == custom_error.OTPTooSoonCode {
-			sessions.Set(c, "message", "باید از آخرین درخواست ۴ دقیقه بگذرد")
+			sessions.Set(c, "message", custom_error.OTPRequestTooSoon)
 			fmt.Println("------ redirect to verify : to soon request : ")
 			c.Redirect(http.StatusFound, "/verify")
 			return
