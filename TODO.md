@@ -114,3 +114,7 @@ ___
 - [x] edit customer profile (name,last name)
 - [x] customer profile manager
 - [x] show all customer in admin panel
+- 
+- [] implement cache system for menu and rows(most orders,most viewed , newest , by categories , etc)
+- [] order root menu 
+- [] store final product in mongodb(flat)
