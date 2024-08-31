@@ -114,7 +114,7 @@ ___
 - [x] edit customer profile (name,last name)
 - [x] customer profile manager
 - [x] show all customer in admin panel
-- 
+- [x] implement redis as a cache driver
 - [ ] implement cache system for menu and rows(most orders,most viewed , newest , by categories , etc)
 - [ ] order root menu 
 - [ ] store final product in mongodb(flat)
