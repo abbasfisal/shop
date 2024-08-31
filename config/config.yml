@@ -21,3 +21,15 @@ upload:
 
 kavenegar:
   api_key: ""
+
+redis:
+  hostname: 127.0.0.1
+  port: 6379
+  password: "secret"
+  dialTimeOut: 5
+  readTimeOut: 5
+  writeTimeOut: 5
+  poolSize: 10
+  poolTimeOut: 15
+  idleTimeOut: 5
+  idleCheckFrequency: 500
