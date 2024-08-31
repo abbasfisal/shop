@@ -3,6 +3,7 @@ storage
 ./uploads
 uploads/*
 
+.env
 
 #shop assets
 /assets/shop/css/main.css
