@@ -167,6 +167,14 @@ func (p PublicHandler) ShowVerifyOtp(c *gin.Context) {
 }
 
 func (p PublicHandler) HomePage(c *gin.Context) {
+
+	//row-header
+	//row-newest
+	//row-random
+	//row-banners
+	//row-by-category
+	//
+
 	html.CustomerRender(c, 200, "home", gin.H{
 		"TITLE": "صفحه اصلی فروشگاه",
 	})
