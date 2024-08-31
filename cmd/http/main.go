@@ -16,6 +16,7 @@ import (
 	"shop/internal/database/mysql"
 	AdminRoutes "shop/internal/modules/admin/routes"
 	PublicRoutes "shop/internal/modules/public/routes"
+	"shop/internal/pkg/cache"
 	"shop/internal/pkg/logging"
 	"sync"
 )
@@ -29,6 +30,8 @@ var (
 
 func main() {
 	once.Do(initialize)
+
+	cache.InitRedisClient()
 
 	commands.Execute()
 
