@@ -33,3 +33,6 @@ redis:
   poolTimeOut: 15
   idleTimeOut: 5
   idleCheckFrequency: 500
+
+mongodb:
+  name: shop_mongo
