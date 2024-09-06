@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"shop/cmd/commands"
+	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
 	AdminRoutes "shop/internal/modules/admin/routes"
 	PublicRoutes "shop/internal/modules/public/routes"
@@ -32,6 +33,10 @@ func main() {
 	once.Do(initialize)
 
 	cache.InitRedisClient()
+
+	if mErr := mongodb.Connect(); mErr != nil {
+		log.Fatalln("mongo db error : ", mErr)
+	}
 
 	commands.Execute()
 
