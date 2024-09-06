@@ -1,4 +1,4 @@
-package mongo
+package mongodb
 
 import (
 	"context"
@@ -10,6 +10,12 @@ import (
 )
 
 var client *mongo.Client
+
+// collection names
+
+const (
+	ProductsCollection = "products"
+)
 
 func Connect() error {
 
