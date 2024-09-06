@@ -120,5 +120,12 @@ ___
 - [ ] store final product in mongodb(flat)
 - 
 
-روز 4 یا 5 هست که نمیتونم کد بزنم چون نمیتونم پکیج ها رو دانلود کنم خطای 403 میده 😩
--  هنوز حل نشده
+__
+- add some real menu
+- load all menu in redis
+- add some real product
+- store product with all attributes in mongodb
+- load data rows(new , most ordered , ) in home page
+- ability to bookmark product by user
+- log all request in elastic
+- order 
