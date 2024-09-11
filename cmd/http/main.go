@@ -30,6 +30,9 @@ var (
 )
 
 func main() {
+
+	defer mysql.Close()
+
 	once.Do(initialize)
 
 	cache.InitRedisClient()

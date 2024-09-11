@@ -30,3 +30,11 @@ func Connect() {
 func Get() *gorm.DB {
 	return db
 }
+
+func Close() {
+	connection, _ := db.DB()
+	err := connection.Close()
+	if err != nil {
+		return
+	}
+}
