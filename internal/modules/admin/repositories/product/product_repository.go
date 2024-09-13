@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
@@ -12,11 +13,15 @@ import (
 )
 
 type ProductRepository struct {
-	db *gorm.DB
+	db          *gorm.DB
+	mongoClient *mongo.Client
 }
 
-func NewProductRepository(db *gorm.DB) ProductRepository {
-	return ProductRepository{db: db}
+func NewProductRepository(db *gorm.DB, mongoClient *mongo.Client) ProductRepository {
+	return ProductRepository{
+		db:          db,
+		mongoClient: mongoClient,
+	}
 }
 
 func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, error) {

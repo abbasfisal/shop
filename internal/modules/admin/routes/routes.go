@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
 	"shop/internal/middlewares"
 	AdminHandler "shop/internal/modules/admin/handlers"
@@ -30,7 +31,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	categoryRepo := categoryRepository.NewCategoryRepository(mysql.Get())
 	categorySrv := category.NewCategoryService(categoryRepo)
 
-	productRepo := productRepository.NewProductRepository(mysql.Get())
+	productRepo := productRepository.NewProductRepository(mysql.Get(), mongodb.Get())
 	productSrv := product.NewProductService(productRepo)
 
 	attributeRep := attributeRepository.NewAttributeRepository(mysql.Get())
