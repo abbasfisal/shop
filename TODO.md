@@ -129,3 +129,8 @@ __
 - ability to bookmark product by user
 - log all request in elastic
 - order 
+
+add make file :
+
+`docker-compose -f docker-compose.dev.yml --env-file .env.development up
+`

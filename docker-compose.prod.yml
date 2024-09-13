@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.3
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    container_name: shop-database-prod
+    volumes:
+      - dbdata_prod:/var/lib/mysql
+    restart: always
+    command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+    env_file:
+      - .env.production
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DB}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+
+  mongodb:
+    image: mongo:8.0.0-rc6-jammy
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    env_file:
+      - .env.production
+    volumes:
+      - mongodb_data_prod:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+
+
+  redis:
+    image: redis:7.2.4
+    container_name: redis
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: redis-server --loglevel warning --protected-mode no --save "" --appendonly no
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis_data_prod:/data
+
+
+
+volumes:
+  dbdata_prod:
+  mongodb_data_prod:
+  redis_data_prod:
