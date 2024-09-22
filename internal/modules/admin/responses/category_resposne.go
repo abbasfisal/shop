@@ -5,6 +5,7 @@ import "shop/internal/entities"
 type Category struct {
 	ID       uint
 	ParentID *uint
+	Priority *uint
 	Title    string
 	Slug     string
 	Image    string
@@ -18,6 +19,7 @@ func ToCategory(category entities.Category) Category {
 	return Category{
 		ID:       category.ID,
 		ParentID: category.ParentID,
+		Priority: category.Priority,
 		Title:    category.Title,
 		Slug:     category.Slug,
 		Image:    category.Image,
