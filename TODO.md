@@ -124,7 +124,7 @@ __
 - add some real menu
 - load all menu in redis
 - add some real product
-- add enable/disable , priority to category
+- [x] add enable/disable , priority to category
 - store product with all attributes in mongodb
 - load data rows(new , most ordered , ) in home page
 - ability to bookmark product by user
