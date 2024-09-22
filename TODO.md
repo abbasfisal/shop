@@ -116,7 +116,7 @@ ___
 - [x] show all customer in admin panel
 - [x] implement redis as a cache driver
 - [ ] implement cache system for menu and rows(most orders,most viewed , newest , by categories , etc)
-- [ ] order root menu 
+- [x] add enable/disable , priority to category
 - [ ] store final product in mongodb(flat)
 - 
 
@@ -124,7 +124,6 @@ __
 - add some real menu
 - load all menu in redis
 - add some real product
-- [x] add enable/disable , priority to category
 - store product with all attributes in mongodb
 - load data rows(new , most ordered , ) in home page
 - ability to bookmark product by user
