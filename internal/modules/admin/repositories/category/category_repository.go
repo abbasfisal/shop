@@ -73,6 +73,12 @@ func (cr CategoryRepository) Update(c *gin.Context, categoryID int, req requests
 			return &req.CategoryID
 
 		}()).
+		Update("priority", func() *uint {
+			if *req.Priority == 0 {
+				return nil
+			}
+			return req.Priority
+		}()).
 		Update("status", func() bool {
 			if req.Status == "" {
 				return false

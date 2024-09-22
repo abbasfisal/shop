@@ -57,6 +57,14 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td>priority</td>
+                                <td>
+                                    <input class="form-control" type="number" name="priority" placeholder="enter priority"
+                                           value="{{if.OLDS.priority}}{{.OLD.priority}}{{end}}{{if .CATEGORY.Priority}}{{.CATEGORY.Priority}}{{end}}">
+                                </td>
+                                <td>{{ .ERRORS.title}}</td>
+                            </tr>
+                            <tr>
                                 <td>title</td>
                                 <td>
                                     <input class="form-control" type="text" name="title" placeholder="enter title"

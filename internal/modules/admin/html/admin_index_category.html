@@ -1,85 +1,87 @@
 {{define "modules/admin/html/admin_index_category"}}
-    {{template "head" .}}
-    <!-- navbar -->
-    {{template "navbar" .}}
-    <!-- Main Sidebar Container -->
-    {{template "sidebar" .}}
+{{template "head" .}}
+<!-- navbar -->
+{{template "navbar" .}}
+<!-- Main Sidebar Container -->
+{{template "sidebar" .}}
 
 
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
-        </div>
-        <!-- /.content-header -->
-
-        <!-- Main content -->
-        <div class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="text-info">{{if .MESSAGE}} {{.MESSAGE}} {{end}} </div>
-                    <div class="col-lg-12">
-                        <a href="/admins/categories/create" class="btn btn-info float-right"><i class="fa fa-plus"></i>
-                            دسته بندی جدید</a>
-                        <br>
-                        <br>
-                        {{if .CATEGORIES.Data}}
-                            <table class="table table-hover">
-                                <tr>
-                                    <td>ID</td>
-                                    <td>عنوان</td>
-                                    <td>اسلاگ</td>
-                                    <td>تصویر</td>
-                                    <td>وضعیت</td>
-                                    <td>عملیات</td>
-                                </tr>
-                                {{range .CATEGORIES.Data}}
-                                    <tr>
-                                        <td>{{.ID}}</td>
-                                        <td>{{.Title}}</td>
-                                        <td>{{.Slug}}</td>
-                                        <td>{{.Image}}</td>
-                                        <td>
-                                            {{if eq .Status true}}
-                                                <span class="badge badge-success">فعال</span>
-                                            {{else}}
-                                                <span class="badge badge-danger">غیرفعال</span>
-                                            {{end}}
-                                        </td>
-                                        <td>
-                                            <a href="/admins/categories/{{.ID}}/edit">
-                                                <i class="nav-icon text-danger fa fa-edit"></i>
-                                            </a>
-                                            |
-                                            <a href="/admins/categories/{{.ID}}">
-                                                <i class="nav-icon text-info fa fa-eye"></i>
-                                            </a>
-                                            |
-                                            <a class="text-success"
-                                               href="/admins/categories/{{.ID}}/products">Products</a>
-                                        </td>
-                                    </tr>
-                                {{end}}
-                            </table>
-                        {{end}}
-                    </div>
-                    <!-- /.col-md-6 -->
-                </div>
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
-        </div>
-        <!-- /.content -->
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
     </div>
-    <!-- /.content-wrapper -->
+    <!-- /.content-header -->
 
-    <!-- Main Footer -->
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="text-info">{{if .MESSAGE}} {{.MESSAGE}} {{end}} </div>
+                <div class="col-lg-12">
+                    <a href="/admins/categories/create" class="btn btn-info float-right"><i class="fa fa-plus"></i>
+                        دسته بندی جدید</a>
+                    <br>
+                    <br>
+                    {{if .CATEGORIES.Data}}
+                    <table class="table table-hover">
+                        <tr>
+                            <td>ID</td>
+                            <td>عنوان</td>
+                            <td>اولویت</td>
+                            <td>اسلاگ</td>
+                            <td>تصویر</td>
+                            <td>وضعیت</td>
+                            <td>عملیات</td>
+                        </tr>
+                        {{range .CATEGORIES.Data}}
+                        <tr>
+                            <td>{{.ID}}</td>
+                            <td>{{.Title}}</td>
+                            <td>{{ if eq .Priority nil}}-{{else}}{{.Priority}}{{end}}</td>
+                            <td>{{.Slug}}</td>
+                            <td>{{.Image}}</td>
+                            <td>
+                                {{if eq .Status true}}
+                                    <span class="badge badge-success">فعال</span>
+                                {{else}}
+                                    <span class="badge badge-danger">غیرفعال</span>
+                                {{end}}
+                            </td>
+                            <td>
+                                <a href="/admins/categories/{{.ID}}/edit">
+                                    <i class="nav-icon text-danger fa fa-edit"></i>
+                                </a>
+                                |
+                                <a href="/admins/categories/{{.ID}}">
+                                    <i class="nav-icon text-info fa fa-eye"></i>
+                                </a>
+                                |
+                                <a class="text-success"
+                                   href="/admins/categories/{{.ID}}/products">Products</a>
+                            </td>
+                        </tr>
+                    {{end}}
+                    </table>
+                    {{end}}
+                </div>
+                <!-- /.col-md-6 -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<!-- Main Footer -->
     {{template "footer" .}}
 
 {{end}}

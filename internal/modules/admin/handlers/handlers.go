@@ -314,7 +314,6 @@ func (a AdminHandler) UpdateCategory(c *gin.Context) {
 
 	catID, catIDErr := strconv.Atoi(c.Param("id"))
 	if catIDErr != nil {
-		fmt.Println("----- string to id err : ", catIDErr)
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
 
 		old.Init()

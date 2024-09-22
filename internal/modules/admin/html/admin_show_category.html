@@ -44,7 +44,7 @@
                                 <tr>
                                     <td>{{.CATEGORY.ID}}</td>
                                     <td>{{.CATEGORY.Title}}</td>
-                                    <td>{{.CATEGORY.Priority}}</td>
+                                    <td>{{if eq .CATEGORY.Priority nil }}-{{else}}{{.CATEGORY.Priority}}{{end}}</td>
                                     <td>{{.CATEGORY.Slug}}</td>
                                     <td>
                                         <img src="/uploads/media/categories/{{.CATEGORY.Image}}" width="250" alt="">
