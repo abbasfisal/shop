@@ -2,7 +2,7 @@
 storage
 ./uploads
 uploads/*
-
+tmp
 .env
 
 #shop assets
