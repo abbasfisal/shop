@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
+	"shop/internal/database/mongodb"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
 	"strconv"
@@ -46,6 +47,37 @@ func (p ProductRepository) FindByID(ctx context.Context, ID int) (entities.Produ
 func (p ProductRepository) Store(ctx context.Context, product entities.Product) (entities.Product, error) {
 
 	err := p.db.WithContext(ctx).Create(&product).Error
+
+	if err == nil {
+		productsCollection := mongodb.GetCollection(mongodb.ProductsCollection)
+
+		_, err := productsCollection.InsertOne(ctx, &entities.MongoProduct{
+			ID:            product.ID,
+			CategoryID:    product.CategoryID,
+			BrandID:       product.BrandID,
+			Title:         product.Title,
+			Slug:          product.Slug,
+			Sku:           product.Sku,
+			Status:        product.Status,
+			OriginalPrice: product.OriginalPrice,
+			SalePrice:     product.SalePrice,
+			Description:   product.Description,
+			Images: func() []string {
+				var imgs []string
+				for _, item := range product.ProductImages {
+					imgs = append(imgs, item.Path)
+				}
+				return imgs
+			}(),
+			CreatedAt: product.CreatedAt,
+			UpdatedAt: product.UpdatedAt,
+		})
+
+		if err != nil {
+			fmt.Println("\n --------- product mongodb : failed ---------- | err: ", err)
+		}
+		fmt.Println("\n------- product mongodb : created successful")
+	}
 	//for _, Ip := range product.ProductImage {
 	//	fmt.Println("insed ", Ip, "| product id : ", product.ID)
 	//	p.db.Create(entities.ProductImages{
