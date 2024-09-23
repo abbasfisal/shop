@@ -167,7 +167,11 @@ func (p PublicHandler) ShowVerifyOtp(c *gin.Context) {
 }
 
 func (p PublicHandler) HomePage(c *gin.Context) {
-
+	menu, err := p.homeSrv.GetMenu(c)
+	if err != nil {
+		html.Error500(c)
+		return
+	}
 	//row-header
 	//row-newest
 	//row-random
@@ -177,6 +181,7 @@ func (p PublicHandler) HomePage(c *gin.Context) {
 
 	html.CustomerRender(c, 200, "home", gin.H{
 		"TITLE": "صفحه اصلی فروشگاه",
+		"MENU":  menu,
 	})
 }
 
