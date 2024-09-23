@@ -2,6 +2,7 @@ package home
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
@@ -9,6 +10,7 @@ import (
 	"shop/internal/modules/public/repositories/home"
 	"shop/internal/modules/public/requests"
 	CustomerRes "shop/internal/modules/public/responses"
+	"shop/internal/pkg/cache"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/sessions"
@@ -18,9 +20,9 @@ type HomeService struct {
 	repo home.HomeRepositoryInterface
 }
 
-func NewHomeService() HomeService {
+func NewHomeService(repo home.HomeRepositoryInterface) HomeService {
 	return HomeService{
-		repo: home.NewHomeRepository(),
+		repo: repo,
 	}
 }
 
@@ -122,4 +124,51 @@ func (h HomeService) UpdateProfile(c *gin.Context, req requests.CustomerProfileR
 		return custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 500)
 	}
 	return custom_error.CustomError{}
+}
+
+func (h HomeService) GetMenu(c context.Context) ([]CustomerRes.CategoryResponse, error) {
+
+	//get menu from cache
+	menu := cache.Get(c, "menu")
+
+	var categoryResponses []CustomerRes.CategoryResponse
+
+	if menu == "" {
+		fmt.Println("--- menu was not exist in cache ------")
+
+		//get menu from database
+		menu, err := h.repo.GetMenu(c)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, category := range menu {
+			categoryResponse := CustomerRes.ToMenuResponse(category)
+			categoryResponses = append(categoryResponses, categoryResponse)
+		}
+
+		//marsh repository response
+		categoryJsonResponse, err := json.Marshal(categoryResponses)
+		if err != nil {
+			fmt.Println("--- category marshal error :", categoryJsonResponse)
+		} else {
+			fmt.Println("--- category marshal success :", categoryJsonResponse)
+		}
+
+		//store marshaled data into cache
+		cacheSetErr := cache.Set(c, "menu", string(categoryJsonResponse), -1)
+		if err != nil {
+			fmt.Println("---- cache set menu key error: ", cacheSetErr)
+		}
+
+	} else {
+
+		fmt.Println("--- menu was exist in cache ------")
+		//menu was existed in cache
+		unmarshalErr := json.Unmarshal([]byte(menu), &categoryResponses)
+		if unmarshalErr != nil {
+			fmt.Println("---- unmarshal category response err :", unmarshalErr)
+		}
+	}
+	return categoryResponses, nil
 }

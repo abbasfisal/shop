@@ -17,6 +17,9 @@ type HomeServiceInterface interface {
 	ShowProductDetail(ctx context.Context, productSlug, sku string) (responses.Product, custom_error.CustomError)
 	ShowProductsByCategorySlug(ctx context.Context, value any) (responses.Products, custom_error.CustomError)
 
+	// GetMenu fetch categories to show in menu
+	GetMenu(c context.Context) ([]CustomerResp.CategoryResponse, error)
+
 	// otp
 
 	SendOtp(ctx context.Context, Mobile string) (entities.OTP, custom_error.CustomError)
