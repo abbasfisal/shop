@@ -6,12 +6,16 @@ import (
 	"shop/internal/middlewares"
 	PublicHandler "shop/internal/modules/public/handlers"
 	CustomerMiddlewares "shop/internal/modules/public/middlewares"
+	homeRepository "shop/internal/modules/public/repositories/home"
 	"shop/internal/modules/public/services/home"
 )
 
 func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
-	homeSrv := home.NewHomeService()
+	//repo
+	homeRep := homeRepository.NewHomeRepository()
+
+	homeSrv := home.NewHomeService(homeRep)
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
 
 	r.GET("/", publicHdl.HomePage)
