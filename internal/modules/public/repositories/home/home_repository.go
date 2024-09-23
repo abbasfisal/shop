@@ -208,3 +208,20 @@ func (h HomeRepository) UpdateProfile(c *gin.Context, req requests.CustomerProfi
 
 	return nil
 }
+
+func (h HomeRepository) GetMenu(ctx context.Context) ([]entities.Category, error) {
+	var menu []entities.Category
+	err := h.db.Preload("SubCategories", func(db *gorm.DB) *gorm.DB {
+		return db.Order("priority is null ,priority ASC")
+	}).Preload("SubCategories.SubCategories", func(db *gorm.DB) *gorm.DB {
+		// مرتب‌سازی زیرمجموعه‌های سطح دوم
+		return db.Order("priority is null ,priority ASC")
+	}).Where("status = ?", true).
+		Where("parent_id IS NULL").              // دریافت دسته‌های اصلی (والدین)
+		Order("priority is null ,priority ASC"). // مرتب‌سازی دسته‌های اصلی
+		Find(&menu).Error
+	if err != nil {
+		return nil, err
+	}
+	return menu, nil
+}

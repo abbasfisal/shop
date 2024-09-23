@@ -20,4 +20,5 @@ type HomeRepositoryInterface interface {
 	ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error)
 	LogOut(c *gin.Context) error
 	UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) error
+	GetMenu(ctx context.Context) ([]entities.Category, error)
 }
