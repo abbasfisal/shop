@@ -1,0 +1,84 @@
+{{define "admin_show_product_feature"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+    <!-- CDN links -->
+
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+
+                        <div class="form-control">
+                            {{if .MESSAGE}}<label class="text-info">{{.MESSAGE}}</label>{{end}}
+                            {{if .PRODUCT}}
+                                <table class="table-bordered w-100 table-responsive-lg table-hover table-bordered text-center">
+                                    <tr>
+                                        <td>سایر عملیات</td>
+                                        <td>
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-feature">
+                                                افزودن صفات
+                                            </a>
+                                            |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/show-gallery"> <b> ویرایش و مشاهده
+                                                    تصاویر</b> </a> |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-attributes">مشاهده و ویرایش
+                                                ویژگی</a> |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-inventory">
+                                                <b>مشاهده و ویرایش موجودی</b>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br>
+
+                                <form action="/admins/products/{{.PRODUCT.ID}}/add-feature" method="post">
+                                    <table class=" w-100 table-responsive-lg table-hover  text-center">
+                                        {{$productID:=.PRODUCT.ID}}
+                                        {{range .PRODUCT.Features.Data}}
+                                            <tr>
+                                                <td>{{.Title}}</td>
+                                                <td>
+                                                    <textarea disabled cols="30" rows="5">{{.Value}}</textarea>
+                                                </td>
+                                                <td>
+                                                    <a href="/admins/products/{{$productID}}/edit-feature/{{.ID}}">ویرایش صفت</a>
+                                                    |
+                                                    <a href="/admins/products/{{$productID}}/delete-feature/{{.ID}}" onclick="confirm('are you sure?')">حذف صفت</a>
+
+                                                </td>
+
+                                            </tr>
+                                        {{end}}
+                                    </table>
+                                </form>
+                            {{end}}
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+{{end}}

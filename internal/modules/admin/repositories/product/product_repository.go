@@ -34,7 +34,7 @@ func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, erro
 func (p ProductRepository) FindBy(ctx context.Context, columnName string, value any) (entities.Product, error) {
 	var product entities.Product
 	condition := fmt.Sprintf("%s=?", columnName)
-	err := p.db.Preload("Category").Preload("Brand").Preload("ProductAttributes").Preload("ProductInventories").Preload("ProductImages").First(&product, condition, value).Error
+	err := p.db.Preload("Category").Preload("Brand").Preload("ProductAttributes").Preload("ProductInventories").Preload("ProductImages").Preload("Features").First(&product, condition, value).Error
 	return product, err
 }
 
@@ -433,6 +433,13 @@ func (p ProductRepository) InsertFeature(c *gin.Context, productID int, req requ
 		Title:     req.Title,
 		Value:     req.Value,
 	}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p ProductRepository) DeleteFeature(c *gin.Context, productID int, featureID int) error {
+	if err := p.db.WithContext(c).Where("product_id=? ", productID).Where("id = ?", featureID).Unscoped().Delete(&entities.Feature{}).Error; err != nil {
 		return err
 	}
 	return nil

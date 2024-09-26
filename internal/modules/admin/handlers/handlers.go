@@ -1733,7 +1733,7 @@ func (a AdminHandler) IndexCustomer(c *gin.Context) {
 	})
 
 }
-func (a AdminHandler) ShowProductFeature(c *gin.Context) {
+func (a AdminHandler) CreateProductFeature(c *gin.Context) {
 	pID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.Redirect(http.StatusFound, "/admins/products/")
@@ -1800,4 +1800,49 @@ func (a AdminHandler) StoreProductFeature(c *gin.Context) {
 	sessions.Set(c, "message", custom_error.SuccessfullyCreated)
 	c.Redirect(http.StatusFound, url)
 	return
+}
+
+func (a AdminHandler) ShowProductFeature(c *gin.Context) {
+	pID, err := strconv.Atoi(c.Param("id"))
+	//url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products/")
+		return
+	}
+
+	productData, pErr := a.productSrv.Show(c, "id", pID)
+	if pErr.Code > 0 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	html.Render(c, http.StatusOK, "admin_show_product_feature", gin.H{
+		"TITLE":   "",
+		"PRODUCT": productData,
+	})
+	return
+}
+
+func (a AdminHandler) DeleteProductFeature(c *gin.Context) {
+	pID, pErr := strconv.Atoi(c.Param("id"))
+	fID, fErr := strconv.Atoi(c.Param("featureID"))
+	url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
+	if pErr != nil || fErr != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	deleteErr := a.productSrv.RemoveFeature(c, pID, fID)
+	if deleteErr.Code > 0 {
+		fmt.Println("--- delete feature err  : ", deleteErr)
+		sessions.Set(c, "message", custom_error.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, url)
+	}
+
+	sessions.Set(c, "message", custom_messages.DeleteSuccessfully)
+	c.Redirect(http.StatusFound, url)
+
 }

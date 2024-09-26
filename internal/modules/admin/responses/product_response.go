@@ -21,6 +21,7 @@ type Product struct {
 	ProductAttributes          ProductAttributes
 	ProductInventories         ProductInventories
 	ProductInventoryAttributes ProductInventoryAttributes
+	Features                   Features
 }
 
 type Products struct {
@@ -54,5 +55,6 @@ func ToProduct(p entities.Product) Product {
 		ProductAttributes:          ToProductAttributes(p.ProductAttributes),
 		ProductInventories:         ToProductInventories(p.ProductInventories),
 		ProductInventoryAttributes: ToProductInventoryAttributes(p.ProductInventoryAttributes),
+		Features:                   ToFeatures(p.Features),
 	}
 }

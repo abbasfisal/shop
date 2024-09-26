@@ -27,4 +27,5 @@ type ProductServiceInterface interface {
 	AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) custom_error.CustomError
 	UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) custom_error.CustomError
 	AddFeature(c *gin.Context, productID int, req requests.CreateProductFeatureRequest) custom_error.CustomError
+	RemoveFeature(c *gin.Context, productID int, featureID int) custom_error.CustomError
 }
