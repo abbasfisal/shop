@@ -425,3 +425,15 @@ func (p ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID i
 	}
 	return nil
 }
+
+func (p ProductRepository) InsertFeature(c *gin.Context, productID int, req requests.CreateProductFeatureRequest) error {
+
+	if err := p.db.Create(&entities.Feature{
+		ProductID: uint(productID),
+		Title:     req.Title,
+		Value:     req.Value,
+	}).Error; err != nil {
+		return err
+	}
+	return nil
+}

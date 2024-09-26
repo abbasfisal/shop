@@ -60,7 +60,7 @@
                                 <td>priority</td>
                                 <td>
                                     <input class="form-control" type="number" name="priority" placeholder="enter priority"
-                                           value="{{if.OLDS.priority}}{{.OLD.priority}}{{end}}{{if .CATEGORY.Priority}}{{.CATEGORY.Priority}}{{end}}">
+                                           value="{{if.OLDS.priority}}{{.OLDS.priority}}{{end}}{{if .CATEGORY.Priority}}{{.CATEGORY.Priority}}{{end}}">
                                 </td>
                                 <td>{{ .ERRORS.title}}</td>
                             </tr>
@@ -75,7 +75,7 @@
                             <tr>
                                 <td>slug</td>
                                 <td><input class="form-control" type="text" name="slug" placeholder="enter slug"
-                                           value="{{if.OLDS.slug}}{{.OLD.slug}}{{end}}{{if .CATEGORY.Slug}}{{.CATEGORY.Slug}}{{end}}">
+                                           value="{{if.OLDS.slug}}{{.OLDS.slug}}{{end}}{{if .CATEGORY.Slug}}{{.CATEGORY.Slug}}{{end}}">
                                 </td>
                                 <td>{{ .ERRORS.slug}}</td>
                             </tr>

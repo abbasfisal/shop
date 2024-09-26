@@ -1733,3 +1733,71 @@ func (a AdminHandler) IndexCustomer(c *gin.Context) {
 	})
 
 }
+func (a AdminHandler) ShowProductFeature(c *gin.Context) {
+	pID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.Redirect(http.StatusFound, "/admins/products/")
+		return
+	}
+
+	product, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+
+	if pErr.Code > 0 {
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	html.Render(c, http.StatusFound, "admin_add_product_feature",
+		gin.H{
+			"TITLE":   "add product feature",
+			"PRODUCT": product,
+		},
+	)
+	return
+}
+
+func (a AdminHandler) StoreProductFeature(c *gin.Context) {
+	pID, err := strconv.Atoi(c.Param("id"))
+	url := fmt.Sprintf("/admins/products/%d/add-feature", pID)
+	if err != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/products/")
+		return
+	}
+
+	_, pErr := a.productSrv.Show(c, "id", pID)
+	if pErr.Code > 0 {
+		sessions.Set(c, "message", custom_error.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/products")
+		return
+	}
+
+	var req requests.CreateProductFeatureRequest
+	_ = c.Request.ParseForm()
+	if bErr := c.ShouldBind(&req); bErr != nil {
+		fmt.Println("---  product feature bind Err : ", bErr)
+		errors.Init()
+		errors.SetFromErrors(bErr)
+
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	addErr := a.productSrv.AddFeature(c, pID, req)
+	if addErr.Code > 0 {
+		fmt.Println("-- add feature error :", addErr)
+		sessions.Set(c, "errors", custom_error.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	sessions.Set(c, "message", custom_error.SuccessfullyCreated)
+	c.Redirect(http.StatusFound, url)
+	return
+}

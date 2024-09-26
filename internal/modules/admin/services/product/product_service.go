@@ -189,3 +189,11 @@ func (p ProductService) UpdateInventoryQuantity(c *gin.Context, inventoryID int,
 	return custom_error.CustomError{}
 
 }
+
+func (p ProductService) AddFeature(c *gin.Context, productID int, req requests.CreateProductFeatureRequest) custom_error.CustomError {
+	err := p.repo.InsertFeature(c, productID, req)
+	if err != nil {
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+}
