@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
@@ -204,4 +205,23 @@ func (p ProductService) RemoveFeature(c *gin.Context, productID int, featureID i
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
+}
+
+func (p ProductService) FetchFeature(c *gin.Context, productID int, featureID int) (responses.Feature, custom_error.CustomError) {
+	feat, err := p.repo.GetFeatureBy(c, productID, featureID)
+
+	if err != nil {
+		return responses.Feature{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+
+	return responses.ToFeature(feat), custom_error.CustomError{}
+}
+
+func (p ProductService) UpdateFeature(c *gin.Context, productID int, featureID int, req requests.UpdateProductFeatureRequest) custom_error.CustomError {
+	if err := p.repo.EditFeature(c, productID, featureID, req); err != nil {
+		fmt.Println("--- update feature err :", err)
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+
 }

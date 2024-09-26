@@ -106,6 +106,8 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		authGrp.POST("/admins/products/:id/add-feature", adminHlr.StoreProductFeature)
 		authGrp.GET("/admins/products/:id/show-feature", adminHlr.ShowProductFeature)
 		authGrp.GET("/admins/products/:id/delete-feature/:featureID", adminHlr.DeleteProductFeature)
+		authGrp.GET("/admins/products/:id/edit-feature/:featureID", adminHlr.EditProductFeature)
+		authGrp.POST("/admins/products/:id/update-feature/:featureID", adminHlr.UpdateProductFeature)
 
 		authGrp.GET("/admins/products/:id/show-gallery", adminHlr.ShowProductGallery)
 		authGrp.GET("/admins/products/images/:id/delete", adminHlr.DeleteProductImage)

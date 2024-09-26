@@ -444,3 +444,19 @@ func (p ProductRepository) DeleteFeature(c *gin.Context, productID int, featureI
 	}
 	return nil
 }
+
+func (p ProductRepository) GetFeatureBy(c *gin.Context, productID int, featureID int) (entities.Feature, error) {
+	var feature entities.Feature
+	if err := p.db.WithContext(c).Where("id=?", featureID).Where("product_id=?", productID).First(&feature).Error; err != nil {
+		return feature, err
+	}
+	return feature, nil
+}
+
+func (p ProductRepository) EditFeature(c *gin.Context, productID int, featureID int, req requests.UpdateProductFeatureRequest) error {
+	if err := p.db.Where("id=?", featureID).Where("product_id=?", productID).Model(&entities.Feature{}).Update("title", req.Title).
+		Update("value", req.Value).Error; err != nil {
+		return err
+	}
+	return nil
+}

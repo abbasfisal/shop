@@ -26,4 +26,6 @@ type ProductRepositoryInterface interface {
 	UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) error
 	InsertFeature(c *gin.Context, productID int, req requests.CreateProductFeatureRequest) error
 	DeleteFeature(c *gin.Context, productID int, featureID int) error
+	GetFeatureBy(c *gin.Context, productID int, featureID int) (entities.Feature, error)
+	EditFeature(c *gin.Context, productID int, featureID int, req requests.UpdateProductFeatureRequest) error
 }

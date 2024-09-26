@@ -28,4 +28,6 @@ type ProductServiceInterface interface {
 	UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) custom_error.CustomError
 	AddFeature(c *gin.Context, productID int, req requests.CreateProductFeatureRequest) custom_error.CustomError
 	RemoveFeature(c *gin.Context, productID int, featureID int) custom_error.CustomError
+	FetchFeature(c *gin.Context, productID int, featureID int) (responses.Feature, custom_error.CustomError)
+	UpdateFeature(c *gin.Context, productID int, featureID int, req requests.UpdateProductFeatureRequest) custom_error.CustomError
 }

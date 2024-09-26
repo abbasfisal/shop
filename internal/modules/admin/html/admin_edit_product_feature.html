@@ -1,0 +1,109 @@
+{{define "admin_edit_product_feature"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+    <!-- CDN links -->
+
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+
+                        <div class="form-control">
+                            {{if .FEATURE}}
+                                <table class="table-bordered w-100 table-responsive-lg table-hover table-bordered text-center">
+                                    <tr>
+                                        <td>سایر عملیات</td>
+                                        <td>
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/show-feature">
+                                                <b>ویرایش و مشاهده
+                                                    صفات</b> </a>|
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/show-gallery"> <b> ویرایش و مشاهده
+                                                    تصاویر</b> </a> |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-attributes">مشاهده و ویرایش
+                                                ویژگی</a> |
+                                            <a href="/admins/products/{{.PRODUCT.ID}}/add-inventory">
+                                                <b>مشاهده و ویرایش موجودی</b>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br>
+                                <form action="/admins/products/{{.FEATURE.ProductID}}/update-feature/{{.FEATURE.ID}}" method="post">
+                                    <table class=" w-100 table-responsive-lg table-hover  text-center">
+
+                                        <tr>
+                                            <td>عنوان</td>
+                                            <td>
+                                                <input type="text"
+                                                       class="form-text form-control"
+                                                       placeholder="عنوان"
+                                                       name="title"
+                                                        {{if .OLDS.title}}
+                                                            value="{{range .OLDS.title}}{{.}}{{end}}"
+                                                        {{else if .FEATURE.Title}}
+                                                            value="{{.FEATURE.Title}}"
+                                                        {{end}}
+                                                >
+                                            </td>
+                                            <td>
+                                                {{if .ERRORS.title}}
+                                                    <lable class="text-danger">{{.ERRORS.title}}</lable>{{end}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>صفات</td>
+                                            <td>
+                                                <textarea class="form-control"
+                                                          placeholder="افزودن صفات"
+                                                          name="value" cols="30"
+                                                          rows="10">{{if .OLDS.value}}{{range .OLDS.value}}{{.}}{{end}}{{else if .FEATURE.Value }}{{.FEATURE.Value}}{{end}}</textarea>
+                                            </td>
+                                            <td>
+                                                {{if .ERRORS.value}}
+                                                    <label class="text-danger">{{.ERRORS.value}}</label>
+                                                {{end}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                <br>
+                                                <button class="btn-success form-control"> بروزرسانی</button>
+                                                <br>
+                                                {{if .MESSAGE}}<label class="form-text">{{.MESSAGE}}</label>{{end}}
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                </form>
+                            {{end}}
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+{{end}}

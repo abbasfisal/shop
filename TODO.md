@@ -118,7 +118,7 @@ ___
 - [ ] implement cache system for menu and rows(most orders,most viewed , newest , by categories , etc)
 - [x] add enable/disable , priority to category
 - [ ] store final product in mongodb(flat)
-- 
+- [x] crud product feature
 
 __
 - add some real menu

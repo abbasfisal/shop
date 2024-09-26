@@ -1846,3 +1846,68 @@ func (a AdminHandler) DeleteProductFeature(c *gin.Context) {
 	c.Redirect(http.StatusFound, url)
 
 }
+
+func (a AdminHandler) EditProductFeature(c *gin.Context) {
+	pID, pErr := strconv.Atoi(c.Param("id"))
+	fID, fErr := strconv.Atoi(c.Param("featureID"))
+	url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
+	if pErr != nil || fErr != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	feat, err := a.productSrv.FetchFeature(c, pID, fID)
+	if err.Code > 0 {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	html.Render(c, http.StatusFound, "admin_edit_product_feature", gin.H{
+		"TITLE":   "ویرایش صفت",
+		"FEATURE": feat,
+	})
+
+}
+
+func (a AdminHandler) UpdateProductFeature(c *gin.Context) {
+	pID, pErr := strconv.Atoi(c.Param("id"))
+	fID, fErr := strconv.Atoi(c.Param("featureID"))
+	url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
+	if pErr != nil || fErr != nil {
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	var req requests.UpdateProductFeatureRequest
+	_ = c.Request.ParseForm()
+	if bErr := c.ShouldBind(&req); bErr != nil {
+		fmt.Println("---  product feature bind Err : ", bErr)
+		errors.Init()
+		errors.SetFromErrors(bErr)
+
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	updateErr := a.productSrv.UpdateFeature(c, pID, fID, req)
+	if updateErr.Code > 0 {
+		fmt.Println("-- update feature error :", updateErr)
+		sessions.Set(c, "errors", custom_error.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
+	sessions.Set(c, "message", custom_error.SuccessfullyCreated)
+	c.Redirect(http.StatusFound, url)
+	return
+
+}
