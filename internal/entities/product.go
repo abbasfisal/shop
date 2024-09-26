@@ -23,4 +23,5 @@ type Product struct {
 	ProductAttributes          []ProductAttribute          `gorm:"foreignKye:ProductID"`
 	ProductInventories         []ProductInventory          `gorm:"foreignKey:ProductID"`
 	ProductInventoryAttributes []ProductInventoryAttribute `gorm:"foreignKey:ProductID"`
+	Features                   []Feature                   `gorm:"foreignKey:ProductID"`
 }
