@@ -25,22 +25,22 @@ func Seed() {
 	//brand
 	var brand = []entities.Brand{
 		{
-			Title:   "zara",
-			Slug:    "zara",
+			Title: "zara",
+			Slug:  "zara",
 		},
 		//perfume brands
 		{
-			Title:   "Bailando",
-			Slug:    "bailando",
+			Title: "Bailando",
+			Slug:  "bailando",
 		},
 		{
-			Title:   "Ballerina",
-			Slug:    "ballerina",
-			Image:   "",
+			Title: "Ballerina",
+			Slug:  "ballerina",
+			Image: "",
 		},
 		{
-			Title:   "woody sence",
-			Slug:    "woody-sence",
+			Title: "woody sence",
+			Slug:  "woody-sence",
 		},
 	}
 
@@ -534,38 +534,6 @@ func Seed() {
 			Products: nil,
 		},
 	}
-	//old category
-	//var category = entities.Category{
-	//	Model:    gorm.Model{},
-	//	Title:    "لباس و پوشاک",
-	//	Slug:     "clothes",
-	//	ParentID: nil,
-	//	Image:    "",
-	//	Status:   true,
-	//	SubCategories: []entities.Category{
-	//		{
-	//			Model:    gorm.Model{},
-	//			Title:    "لباس مردانه",
-	//			Slug:     "men-clothes",
-	//			ParentID: nil,
-	//			Image:    "",
-	//			Status:   true,
-	//			SubCategories: []entities.Category{
-	//				{
-	//					Model:         gorm.Model{},
-	//					Title:         "تی شرت",
-	//					Slug:          "men-t-shirt",
-	//					ParentID:      nil,
-	//					Image:         "men-t-shirt.jpg",
-	//					Status:        true,
-	//					SubCategories: nil,
-	//				},
-	//			},
-	//			Products: nil,
-	//		},
-	//	},
-	//	Products: nil,
-	//}
 
 	//attribute -- attribute-values
 	var attributesAndValues = []entities.Attribute{
@@ -631,121 +599,205 @@ func Seed() {
 			},
 		},
 	}
-
-	//my product
-	//attribute-value
-	//
-	////product
-	//var product = entities.Product{
-	//	Model:         gorm.Model{},
-	//	BrandID:       1,
-	//	CategoryID:    3,
-	//	Title:         "تیشرت مردانه مدل هایما",
-	//	Slug:          "hima-men-t-shirt",
-	//	Sku:           "sku-32932",
-	//	Status:        true,
-	//	OriginalPrice: 20000,
-	//	SalePrice:     250000,
-	//	Description:   "توضیحات تیشرت هایما",
-	//}
-	//
-	////product-attribute
-	//var productAttribute = []entities.ProductAttribute{
-	//	{
-	//		Model:               gorm.Model{},
-	//		ProductID:           1,
-	//		AttributeID:         1, //size
-	//		AttributeTitle:      "سایز",
-	//		AttributeValueID:    1, //small
-	//		AttributeValueTitle: "s",
-	//	},
-	//	{
-	//		Model:               gorm.Model{},
-	//		ProductID:           1,
-	//		AttributeID:         1, //size
-	//		AttributeTitle:      "سایز",
-	//		AttributeValueID:    2, //medium
-	//		AttributeValueTitle: "m",
-	//	},
-	//	{
-	//		Model:               gorm.Model{},
-	//		ProductID:           1,
-	//		AttributeID:         2, //color
-	//		AttributeTitle:      "رنگ",
-	//		AttributeValueID:    6, //ابی
-	//		AttributeValueTitle: "ابی",
-	//	},
-	//	{
-	//		Model:               gorm.Model{},
-	//		ProductID:           1,
-	//		AttributeID:         2, //color
-	//		AttributeTitle:      "رنگ",
-	//		AttributeValueID:    7, //قرمز
-	//		AttributeValueTitle: "قرمز",
-	//	},
-	//}
-	//
-	////product-inventory
-	//var productInventory = []entities.ProductInventory{
-	//	{
-	//		Model:     gorm.Model{},
-	//		ProductID: 1,
-	//		Quantity:  20,
-	//	},
-	//	{
-	//		Model:     gorm.Model{},
-	//		ProductID: 1,
-	//		Quantity:  10,
-	//	},
-	//}
-	//
-	////product-inventory-attribute
-	//var productInventoryAttribute = []entities.ProductInventoryAttribute{
-	//	//1 : size : small
-	//	//2 : size : medium
-	//	//3 : color: blue
-	//	//4 : color: red
-	//
-	//	//small-blue = qty =20
-	//	{
-	//		Model:              gorm.Model{},
-	//		ProductID:          1,
-	//		ProductInventoryID: 1, //qty=20
-	//		ProductAttributeID: 1, //small
-	//	},
-	//	{
-	//		Model:              gorm.Model{},
-	//		ProductID:          1,
-	//		ProductInventoryID: 1, //qty=20
-	//		ProductAttributeID: 3, //blue
-	//	},
-	//
-	//	//medium-red = qty =10
-	//	{
-	//		Model:              gorm.Model{},
-	//		ProductID:          1,
-	//		ProductInventoryID: 1, //qty=10
-	//		ProductAttributeID: 2, //medium
-	//	},
-	//	{
-	//		Model:              gorm.Model{},
-	//		ProductID:          1,
-	//		ProductInventoryID: 1, //qty=10
-	//		ProductAttributeID: 4, //red
-	//	},
-	//}
-	//
-
-	//end my product
+	var products = []entities.Product{
+		//women perfume
+		{
+			CategoryID:    49, //عطر و ادکلن زنانه
+			BrandID:       3,  //Ballerina
+			Title:         "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر",
+			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl",
+			Sku:           "sku1000",
+			Status:        true,
+			OriginalPrice: 822_000,
+			SalePrice:     349_000,
+			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/1.webp",
+				},
+				{
+					Path: "2024/09/27/2.webp",
+				},
+				{
+					Path: "2024/09/27/3.webp",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					Quantity: 150,
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "نوع عطر",
+					Value: "ادو پرفیوم",
+				},
+				{
+					Title: "حجم",
+					Value: "90 میلی لیتر",
+				},
+				{
+					Title: "مناسب برای",
+					Value: "خانم ها",
+				},
+				{
+					Title: "نت های آغازین",
+					Value: "بادام، قهوه، ترنج، ليمو",
+				},
+				{
+					Title: "نت های میانی",
+					Value: "گل سرخ، ياس سامباك، شكوفه پرتقال، زنبق و رز بلغاري",
+				},
+				{
+					Title: "نت های پایانی",
+					Value: "لوبياي تونكا\n غلاف كاكائو\nوانيل\nپرالين\nچوب صندل\nمشك\nعنبر\nنعناع هندي و سدر\nچوب كشمير\nدارچين\n\n",
+				},
+				{
+					Title: "نوع رایحه",
+					Value: "گرم و تلخ",
+				},
+				{
+					Title: "فصل",
+					Value: "پاییز و زمستان",
+				},
+			},
+		},
+		{
+			CategoryID:    49, //عطر و ادکلن زنانه
+			BrandID:       3,  //Ballerina
+			Title:         "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson حجم 100 میلی لیتر",
+			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-پویزن-poisson",
+			Sku:           "sku1001",
+			Status:        true,
+			OriginalPrice: 780_000,
+			SalePrice:     349_000,
+			Description:   "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson عطری است زنانه با رایحه ای شیرین و گرم که مکمل شخصیت زنانه است و به شما احساس منحصر به فرد و جذاب می دهد. با بسته‌بندی و طراحی لوکس شیشه، این عطر بهترین کیفیت را در اختیار شما قرار می‌دهد.",
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/11.webp",
+				},
+				{
+					Path: "2024/09/27/22.webp",
+				},
+				{
+					Path: "2024/09/27/33.webp",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					Quantity: 200,
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "نوع محصول (غلظت)",
+					Value: "ادو پرفیوم",
+				},
+				{
+					Title: "حجم",
+					Value: "100 میلی لیتر",
+				},
+				{
+					Title: "مناسب برای",
+					Value: "خانم ها",
+				},
+				{
+					Title: "نت های آغازین",
+					Value: "ترنج و ماندارین",
+				},
+				{
+					Title: "نت های میانی",
+					Value: "گل رز",
+				},
+				{
+					Title: "نت های پایانی",
+					Value: "عنبر\n\n, \nنعنا هندی\n\n, \nوانيل",
+				},
+				{
+					Title: "نوع رایحه",
+					Value: "گرم و شیرین",
+				},
+				{
+					Title: "فصل",
+					Value: "پاییز و زمستان",
+				},
+				{
+					Title: "گروه بویایی",
+					Value: "چوبی چایپر",
+				},
+			},
+		},
+		{
+			CategoryID:    49, //عطر و ادکلن زنانه
+			BrandID:       3,  //Ballerina
+			Title:         "ادو پرفیوم زنانه بایلندو مدل اکلت Eclatto حجم 100 میلی لیتر",
+			Slug:          "ادو-پرفیوم-زنانه-بایلندو-مدل-اکلت-eclatto",
+			Sku:           "sku1002",
+			Status:        true,
+			OriginalPrice: 815_000,
+			SalePrice:     477_600,
+			Description:   "ادو پرفیوم زنانه بایلندو مدل d’ Eclatto قصیده ای فریبنده برای ظرافت زنانگی است،‌ جاییکه ترکیب مست کننده میوه ها، لمس مخملی گل پائونیا، و با حضور باشکوه سرو گرد هم می آیند.تا نقش و نگار طلسم کننده ای از جذابیت و اعتماد به نفس را بیافریند.",
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/111.webp",
+				},
+				{
+					Path: "2024/09/27/222.webp",
+				},
+				{
+					Path: "2024/09/27/333.webp",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					Quantity: 200,
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "نوع محصول (غلظت)",
+					Value: "ادو پرفیوم",
+				},
+				{
+					Title: "حجم",
+					Value: "100 میلی لیتر",
+				},
+				{
+					Title: "مناسب برای",
+					Value: "خانم ها",
+				},
+				{
+					Title: "نت های آغازین",
+					Value: "درخت سرو\n\n, \nگل پائونیا",
+				},
+				{
+					Title: "نت های میانی",
+					Value: "پونه\n\n, \nمشک\n\n, \nويستريا",
+				},
+				{
+					Title: "نت های پایانی",
+					Value: "اسمانتوس\n\n, \nسدر\n\n, \nعنبر",
+				},
+				{
+					Title: "نوع رایحه",
+					Value: "ملایم و شیرین",
+				},
+				{
+					Title: "فصل",
+					Value: "بهار",
+				},
+			},
+		},
+	}
 
 	db.Create(&user)
 	db.Create(&category)
 	db.Create(&brand)
 	db.Create(&attributesAndValues)
-	//db.Create(&product)
+	db.Create(&products)
 	//db.Create(&productAttribute)
 	//db.Create(&productInventory)
 	//db.Create(&productInventoryAttribute)
 
-	fmt.Println("[Seed] tables successfully")
+	fmt.Println("\\\\\\\\\\\\\\  ~~~~[Seed] tables successfully~~~~ \\\\\\\\\\\\\\")
 }
