@@ -76,17 +76,33 @@
                                     </tr>
                                 </table>
                                 <hr>
-
+                                <table class="table table-hover ">
+                                    <thead>
+                                    <tr>
+                                        <th>عنوان</th>
+                                        <th>مقدار</th>
+                                    </tr>
+                                    </thead>
+                                    {{range .PRODUCT.Features.Data}}
+                                        <tr>
+                                            <td>
+                                                <label class="text-info">{{.Title}}</label>
+                                            </td>
+                                            <td>
+                                                <textarea disabled name="" id="" cols="15"
+                                                          rows="5">{{.Value}}</textarea>
+                                            </td>
+                                        </tr>
+                                    {{end}}
+                                </table>
+                                <hr>
                                 <div class="d-flex ">
                                     {{range .PRODUCT.ProductInventories.Data}}
                                         <div class="form-control m-2 p-4">
                                             <b>موجودی:</b> {{.Quantity}}<br>
                                             <b>ویژگی ها:</b><br>
-
                                             <br>
-
                                         </div>
-
                                     {{end}}
                                 </div>
                             {{end}}
