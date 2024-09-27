@@ -23,32 +23,404 @@ func Seed() {
 	}
 
 	//brand
-	var brand = []entities.Brand{
-		{
-			Title: "zara",
-			Slug:  "zara",
-		},
-		//perfume brands
-		{
-			Title: "Bailando",
-			Slug:  "bailando",
-		},
-		{
-			Title: "Ballerina",
-			Slug:  "ballerina",
-			Image: "",
-		},
-		{
-			Title: "woody sence",
-			Slug:  "woody-sence",
-		},
-	}
+	var brand = fakeBrands()
 
 	//category
+	category := fakeCategories()
+
+	//attribute -- attribute-values
+	var attributesAndValues = fakeAttributeAndValues()
+
+	//products include :
+	//3 perfume
+	//1 men trouser
+	var products = fakeProducts()
+
+	db.Create(&user)
+	db.Create(&category)
+	db.Create(&brand)
+	db.Create(&attributesAndValues)
+	db.Create(&products)
+	//db.Create(&productAttribute)
+	//db.Create(&productInventory)
+	//db.Create(&productInventoryAttribute)
+
+	fmt.Println("\\\\\\\\\\\\\\  ~~~~[Seed] tables successfully~~~~ \\\\\\\\\\\\\\")
+}
+
+func fakeProducts() []entities.Product {
+	return []entities.Product{
+		//women perfume
+		{
+			CategoryID:    49, //عطر و ادکلن زنانه
+			BrandID:       3,  //Ballerina
+			Title:         "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر",
+			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl",
+			Sku:           "sku1000",
+			Status:        true,
+			OriginalPrice: 822_000,
+			SalePrice:     349_000,
+			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/1.webp",
+				},
+				{
+					Path: "2024/09/27/2.webp",
+				},
+				{
+					Path: "2024/09/27/3.webp",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					Quantity: 150,
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "نوع عطر",
+					Value: "ادو پرفیوم",
+				},
+				{
+					Title: "حجم",
+					Value: "90 میلی لیتر",
+				},
+				{
+					Title: "مناسب برای",
+					Value: "خانم ها",
+				},
+				{
+					Title: "نت های آغازین",
+					Value: "بادام، قهوه، ترنج، ليمو",
+				},
+				{
+					Title: "نت های میانی",
+					Value: "گل سرخ، ياس سامباك، شكوفه پرتقال، زنبق و رز بلغاري",
+				},
+				{
+					Title: "نت های پایانی",
+					Value: "لوبياي تونكا\n غلاف كاكائو\nوانيل\nپرالين\nچوب صندل\nمشك\nعنبر\nنعناع هندي و سدر\nچوب كشمير\nدارچين\n\n",
+				},
+				{
+					Title: "نوع رایحه",
+					Value: "گرم و تلخ",
+				},
+				{
+					Title: "فصل",
+					Value: "پاییز و زمستان",
+				},
+			},
+		},
+		{
+			CategoryID:    49, //عطر و ادکلن زنانه
+			BrandID:       3,  //Ballerina
+			Title:         "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson حجم 100 میلی لیتر",
+			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-پویزن-poisson",
+			Sku:           "sku1001",
+			Status:        true,
+			OriginalPrice: 780_000,
+			SalePrice:     349_000,
+			Description:   "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson عطری است زنانه با رایحه ای شیرین و گرم که مکمل شخصیت زنانه است و به شما احساس منحصر به فرد و جذاب می دهد. با بسته‌بندی و طراحی لوکس شیشه، این عطر بهترین کیفیت را در اختیار شما قرار می‌دهد.",
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/11.webp",
+				},
+				{
+					Path: "2024/09/27/22.webp",
+				},
+				{
+					Path: "2024/09/27/33.webp",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					Quantity: 200,
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "نوع محصول (غلظت)",
+					Value: "ادو پرفیوم",
+				},
+				{
+					Title: "حجم",
+					Value: "100 میلی لیتر",
+				},
+				{
+					Title: "مناسب برای",
+					Value: "خانم ها",
+				},
+				{
+					Title: "نت های آغازین",
+					Value: "ترنج و ماندارین",
+				},
+				{
+					Title: "نت های میانی",
+					Value: "گل رز",
+				},
+				{
+					Title: "نت های پایانی",
+					Value: "عنبر\n\n, \nنعنا هندی\n\n, \nوانيل",
+				},
+				{
+					Title: "نوع رایحه",
+					Value: "گرم و شیرین",
+				},
+				{
+					Title: "فصل",
+					Value: "پاییز و زمستان",
+				},
+				{
+					Title: "گروه بویایی",
+					Value: "چوبی چایپر",
+				},
+			},
+		},
+		{
+			CategoryID:    49, //عطر و ادکلن زنانه
+			BrandID:       3,  //Ballerina
+			Title:         "ادو پرفیوم زنانه بایلندو مدل اکلت Eclatto حجم 100 میلی لیتر",
+			Slug:          "ادو-پرفیوم-زنانه-بایلندو-مدل-اکلت-eclatto",
+			Sku:           "sku1002",
+			Status:        true,
+			OriginalPrice: 815_000,
+			SalePrice:     477_600,
+			Description:   "ادو پرفیوم زنانه بایلندو مدل d’ Eclatto قصیده ای فریبنده برای ظرافت زنانگی است،‌ جاییکه ترکیب مست کننده میوه ها، لمس مخملی گل پائونیا، و با حضور باشکوه سرو گرد هم می آیند.تا نقش و نگار طلسم کننده ای از جذابیت و اعتماد به نفس را بیافریند.",
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/111.webp",
+				},
+				{
+					Path: "2024/09/27/222.webp",
+				},
+				{
+					Path: "2024/09/27/333.webp",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					Quantity: 200,
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "نوع محصول (غلظت)",
+					Value: "ادو پرفیوم",
+				},
+				{
+					Title: "حجم",
+					Value: "100 میلی لیتر",
+				},
+				{
+					Title: "مناسب برای",
+					Value: "خانم ها",
+				},
+				{
+					Title: "نت های آغازین",
+					Value: "درخت سرو\n\n, \nگل پائونیا",
+				},
+				{
+					Title: "نت های میانی",
+					Value: "پونه\n\n, \nمشک\n\n, \nويستريا",
+				},
+				{
+					Title: "نت های پایانی",
+					Value: "اسمانتوس\n\n, \nسدر\n\n, \nعنبر",
+				},
+				{
+					Title: "نوع رایحه",
+					Value: "ملایم و شیرین",
+				},
+				{
+					Title: "فصل",
+					Value: "بهار",
+				},
+			},
+		},
+
+		//men-pents-trousers
+		{
+			CategoryID:    22,
+			BrandID:       5,
+			Title:         "شلوار مردانه مدل بنگال کمربند دار",
+			Slug:          "شلوار-مردانه-مدل-بنگال-کمربند-دار",
+			Sku:           "sku2000",
+			Status:        true,
+			OriginalPrice: 280_000,
+			SalePrice:     238_000,
+			Description:   "شلوار از پارچه ی به اصطلاح بنگال تولید شده است،پارچه ی کتان بنگال پارچه ای با ظرافت بالا همراه با کشسانی نسبی مناسب می باشد که زیبایی دو چندانی در پوشیدن شلوار به شما می دهد پس اگر دنبال شلوار ضخیم میگردید ما پارچه ی بنگال را توصیه نمیکنیم.قد شلوار صد سانتی متر است،پاچه ی شلوار پاکتی است و در قسمت پاچه و کمربند مارک فلزی کار شده است،قسمت پشت کمر کش کار شده است و در جلوی کار طراحی کمربندی زیبا که شمارا از بستن کمربند بی نیاز میکند و راحتی دو چندانی را به ارمغان خواهد آورد.شلوار دارای دو جیب در بغل و یک جیب کوچک در پشت است،یک ساسون در پای چپ و یک ساسون در روی پای راست به ظاهر کلاسیکی شلوار می افزاید.رنگ شلوار مشکی است و مهمترین ویژگی آن استایل جذب و قابلیت پوشیدن با کفش کالج و تیپ رسمی و همینطور قابلیت پوشیدن با کفش اسپرت و تیپ اسپرت را دارد.",
+
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/4444.webp",
+				},
+				{
+					Path: "2024/09/27/5555.webp",
+				},
+				{
+					Path: "2024/09/27/6666.webp",
+				},
+			},
+			ProductAttributes: []entities.ProductAttribute{
+
+				{
+					//medium
+					ProductID:           4,
+					AttributeID:         1,
+					AttributeTitle:      "سایز",
+					AttributeValueID:    2,
+					AttributeValueTitle: "m",
+				},
+				{
+					//large
+					ProductID:           4,
+					AttributeID:         1,
+					AttributeTitle:      "سایز",
+					AttributeValueID:    3,
+					AttributeValueTitle: "l",
+				},
+				{
+					//x-large
+					ProductID:           4,
+					AttributeID:         1,
+					AttributeTitle:      "سایز",
+					AttributeValueID:    4,
+					AttributeValueTitle: "xl",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					ProductID: 4,
+					Quantity:  25,
+				},
+				{
+					ProductID: 4,
+					Quantity:  50,
+				},
+				{
+					ProductID: 4,
+					Quantity:  75,
+				},
+			},
+			ProductInventoryAttributes: []entities.ProductInventoryAttribute{
+				{
+					ProductID:          4,
+					ProductInventoryID: 4,
+					ProductAttributeID: 1, //medium
+				},
+				{
+					ProductID:          4,
+					ProductInventoryID: 5,
+					ProductAttributeID: 2, //large
+				},
+				{
+					ProductID:          4,
+					ProductInventoryID: 6,
+					ProductAttributeID: 3, //x-large
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "جنس",
+					Value: "بنگال",
+				},
+				{
+					Title: "طرح",
+					Value: "ساده",
+				},
+				{
+					Title: "استایل شلوار",
+					Value: "جذب",
+				},
+				{
+					Title: "نوع فاق",
+					Value: "متوسط",
+				},
+				{
+					Title: "نحوه بسته شدن",
+					Value: "یکسره",
+				},
+				{
+					Title: "مورد استفاده",
+					Value: "روزمره\n\nاداری و رسمی\n\nمهمانی\n\n",
+				},
+			},
+		},
+	}
+}
+
+func fakeAttributeAndValues() []entities.Attribute {
+	return []entities.Attribute{
+		{
+			Model: gorm.Model{},
+			Title: "سایز",
+
+			AttributeValues: []entities.AttributeValue{
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "s",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "m",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "l",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "xl",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "سایز",
+					Value:          "xxl",
+				},
+			},
+		},
+		{
+			Model: gorm.Model{},
+			Title: "رنگ",
+			AttributeValues: []entities.AttributeValue{
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "رنگ",
+					Value:          "آبی",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "رنگ",
+					Value:          "قرمز",
+				},
+				{
+					Model:          gorm.Model{},
+					AttributeID:    0,
+					AttributeTitle: "رنگ",
+					Value:          "بنفش",
+				},
+			},
+		},
+	}
+}
+
+func fakeCategories() []entities.Category {
 	id1 := uint(1)
 	id2 := uint(2)
 
-	category := []entities.Category{
+	return []entities.Category{
 		//apparel
 		{
 			Priority: &id1,
@@ -534,270 +906,32 @@ func Seed() {
 			Products: nil,
 		},
 	}
+}
 
-	//attribute -- attribute-values
-	var attributesAndValues = []entities.Attribute{
+func fakeBrands() []entities.Brand {
+	return []entities.Brand{
 		{
-			Model: gorm.Model{},
-			Title: "سایز",
-
-			AttributeValues: []entities.AttributeValue{
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "سایز",
-					Value:          "s",
-				},
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "سایز",
-					Value:          "m",
-				},
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "سایز",
-					Value:          "l",
-				},
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "سایز",
-					Value:          "xl",
-				},
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "سایز",
-					Value:          "xxl",
-				},
-			},
+			Title: "zara",
+			Slug:  "zara",
+		},
+		//perfume brands
+		{
+			Title: "Bailando",
+			Slug:  "bailando",
 		},
 		{
-			Model: gorm.Model{},
-			Title: "رنگ",
-			AttributeValues: []entities.AttributeValue{
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "رنگ",
-					Value:          "آبی",
-				},
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "رنگ",
-					Value:          "قرمز",
-				},
-				{
-					Model:          gorm.Model{},
-					AttributeID:    0,
-					AttributeTitle: "رنگ",
-					Value:          "بنفش",
-				},
-			},
+			Title: "Ballerina",
+			Slug:  "ballerina",
+			Image: "",
+		},
+		{
+			Title: "woody sence",
+			Slug:  "woody-sence",
+		},
+
+		{
+			Title: "داخلی",
+			Slug:  "iran",
 		},
 	}
-	var products = []entities.Product{
-		//women perfume
-		{
-			CategoryID:    49, //عطر و ادکلن زنانه
-			BrandID:       3,  //Ballerina
-			Title:         "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر",
-			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl",
-			Sku:           "sku1000",
-			Status:        true,
-			OriginalPrice: 822_000,
-			SalePrice:     349_000,
-			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
-			ProductImages: []entities.ProductImages{
-				{
-					Path: "2024/09/27/1.webp",
-				},
-				{
-					Path: "2024/09/27/2.webp",
-				},
-				{
-					Path: "2024/09/27/3.webp",
-				},
-			},
-			ProductInventories: []entities.ProductInventory{
-				{
-					Quantity: 150,
-				},
-			},
-			Features: []entities.Feature{
-				{
-					Title: "نوع عطر",
-					Value: "ادو پرفیوم",
-				},
-				{
-					Title: "حجم",
-					Value: "90 میلی لیتر",
-				},
-				{
-					Title: "مناسب برای",
-					Value: "خانم ها",
-				},
-				{
-					Title: "نت های آغازین",
-					Value: "بادام، قهوه، ترنج، ليمو",
-				},
-				{
-					Title: "نت های میانی",
-					Value: "گل سرخ، ياس سامباك، شكوفه پرتقال، زنبق و رز بلغاري",
-				},
-				{
-					Title: "نت های پایانی",
-					Value: "لوبياي تونكا\n غلاف كاكائو\nوانيل\nپرالين\nچوب صندل\nمشك\nعنبر\nنعناع هندي و سدر\nچوب كشمير\nدارچين\n\n",
-				},
-				{
-					Title: "نوع رایحه",
-					Value: "گرم و تلخ",
-				},
-				{
-					Title: "فصل",
-					Value: "پاییز و زمستان",
-				},
-			},
-		},
-		{
-			CategoryID:    49, //عطر و ادکلن زنانه
-			BrandID:       3,  //Ballerina
-			Title:         "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson حجم 100 میلی لیتر",
-			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-پویزن-poisson",
-			Sku:           "sku1001",
-			Status:        true,
-			OriginalPrice: 780_000,
-			SalePrice:     349_000,
-			Description:   "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson عطری است زنانه با رایحه ای شیرین و گرم که مکمل شخصیت زنانه است و به شما احساس منحصر به فرد و جذاب می دهد. با بسته‌بندی و طراحی لوکس شیشه، این عطر بهترین کیفیت را در اختیار شما قرار می‌دهد.",
-			ProductImages: []entities.ProductImages{
-				{
-					Path: "2024/09/27/11.webp",
-				},
-				{
-					Path: "2024/09/27/22.webp",
-				},
-				{
-					Path: "2024/09/27/33.webp",
-				},
-			},
-			ProductInventories: []entities.ProductInventory{
-				{
-					Quantity: 200,
-				},
-			},
-			Features: []entities.Feature{
-				{
-					Title: "نوع محصول (غلظت)",
-					Value: "ادو پرفیوم",
-				},
-				{
-					Title: "حجم",
-					Value: "100 میلی لیتر",
-				},
-				{
-					Title: "مناسب برای",
-					Value: "خانم ها",
-				},
-				{
-					Title: "نت های آغازین",
-					Value: "ترنج و ماندارین",
-				},
-				{
-					Title: "نت های میانی",
-					Value: "گل رز",
-				},
-				{
-					Title: "نت های پایانی",
-					Value: "عنبر\n\n, \nنعنا هندی\n\n, \nوانيل",
-				},
-				{
-					Title: "نوع رایحه",
-					Value: "گرم و شیرین",
-				},
-				{
-					Title: "فصل",
-					Value: "پاییز و زمستان",
-				},
-				{
-					Title: "گروه بویایی",
-					Value: "چوبی چایپر",
-				},
-			},
-		},
-		{
-			CategoryID:    49, //عطر و ادکلن زنانه
-			BrandID:       3,  //Ballerina
-			Title:         "ادو پرفیوم زنانه بایلندو مدل اکلت Eclatto حجم 100 میلی لیتر",
-			Slug:          "ادو-پرفیوم-زنانه-بایلندو-مدل-اکلت-eclatto",
-			Sku:           "sku1002",
-			Status:        true,
-			OriginalPrice: 815_000,
-			SalePrice:     477_600,
-			Description:   "ادو پرفیوم زنانه بایلندو مدل d’ Eclatto قصیده ای فریبنده برای ظرافت زنانگی است،‌ جاییکه ترکیب مست کننده میوه ها، لمس مخملی گل پائونیا، و با حضور باشکوه سرو گرد هم می آیند.تا نقش و نگار طلسم کننده ای از جذابیت و اعتماد به نفس را بیافریند.",
-			ProductImages: []entities.ProductImages{
-				{
-					Path: "2024/09/27/111.webp",
-				},
-				{
-					Path: "2024/09/27/222.webp",
-				},
-				{
-					Path: "2024/09/27/333.webp",
-				},
-			},
-			ProductInventories: []entities.ProductInventory{
-				{
-					Quantity: 200,
-				},
-			},
-			Features: []entities.Feature{
-				{
-					Title: "نوع محصول (غلظت)",
-					Value: "ادو پرفیوم",
-				},
-				{
-					Title: "حجم",
-					Value: "100 میلی لیتر",
-				},
-				{
-					Title: "مناسب برای",
-					Value: "خانم ها",
-				},
-				{
-					Title: "نت های آغازین",
-					Value: "درخت سرو\n\n, \nگل پائونیا",
-				},
-				{
-					Title: "نت های میانی",
-					Value: "پونه\n\n, \nمشک\n\n, \nويستريا",
-				},
-				{
-					Title: "نت های پایانی",
-					Value: "اسمانتوس\n\n, \nسدر\n\n, \nعنبر",
-				},
-				{
-					Title: "نوع رایحه",
-					Value: "ملایم و شیرین",
-				},
-				{
-					Title: "فصل",
-					Value: "بهار",
-				},
-			},
-		},
-	}
-
-	db.Create(&user)
-	db.Create(&category)
-	db.Create(&brand)
-	db.Create(&attributesAndValues)
-	db.Create(&products)
-	//db.Create(&productAttribute)
-	//db.Create(&productInventory)
-	//db.Create(&productInventoryAttribute)
-
-	fmt.Println("\\\\\\\\\\\\\\  ~~~~[Seed] tables successfully~~~~ \\\\\\\\\\\\\\")
 }
