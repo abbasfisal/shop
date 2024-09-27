@@ -1108,17 +1108,19 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 
 func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 	productID, pErr := strconv.Atoi(c.Param("id"))
+	urlAdminProudcts := "/admins/products"
 	if pErr != nil {
 		errors.Init()
 		errors.SetFromErrors(pErr)
-		sessions.Set(c, "message", "id محصول اشتباه است")
+		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
 
-		c.Redirect(http.StatusFound, "/admins/products")
+		c.Redirect(http.StatusFound, urlAdminProudcts)
 		return
 	}
 
 	//binding
 	var req requests.CreateProductInventoryRequest
+	url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
 	_ = c.Request.ParseForm()
 	err := c.ShouldBind(&req)
 	if err != nil {
@@ -1130,7 +1132,6 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
 
-		url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
 		c.Redirect(http.StatusFound, url)
 		return
 	}
@@ -1139,22 +1140,19 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 	iErr := a.productSrv.CreateInventory(c, productID, req)
 	if iErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
-		c.Redirect(http.StatusFound, "/admins/products")
+		c.Redirect(http.StatusFound, urlAdminProudcts)
 		return
 	}
 	if iErr.Code == 500 {
 		sessions.Set(c, "message", custom_error.InternalServerError)
-		c.Redirect(http.StatusFound, "/admins/products")
+		c.Redirect(http.StatusFound, urlAdminProudcts)
 		return
 	}
 
-	fmt.Println("inventory created")
 	sessions.Set(c, "message", custom_messages.ProductInventoryCreatedSuccessfully)
 
-	url := fmt.Sprintf("/admins/products/%d/add-inventory", productID)
 	c.Redirect(http.StatusFound, url)
 	return
-
 }
 
 func (a AdminHandler) ShowProductGallery(c *gin.Context) {

@@ -230,12 +230,15 @@ func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, 
 		var productAttributes []entities.ProductAttribute
 
 		//fetch product-attributes
-		if err := p.db.WithContext(c).Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
-			return err
-		}
-		//check len retrieved product-attribute
-		if len(productAttributes) != len(req.ProductAttributes) {
-			return gorm.ErrRecordNotFound
+		//len(req.ProductAttributes)<=0  یعنی برای محصول ویژگی -مقدار نمیخواهیم بذاریم و صرفا میخواهیم موجودی بذاریم
+		if len(req.ProductAttributes) > 0 {
+			if err := tx.WithContext(c).Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
+				return err
+			}
+			//check len retrieved product-attribute
+			if len(productAttributes) != len(req.ProductAttributes) {
+				return gorm.ErrRecordNotFound
+			}
 		}
 
 		inventory = entities.ProductInventory{
@@ -243,20 +246,32 @@ func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, 
 			Quantity:  uint(req.Quantity),
 		}
 
+		//todo: باید چک کنی که چندتا موجودی بدون اتریبیوت ذخیره شده تا بتونی روی ایجاد چندین موجودی بدون ویژگی کنترل داشته باشی
+		//var count int64
+		//if err := tx.Where("product_id = ?", productID).Count(&count).Error; err != nil {
+		//	return err
+		//}
+		//if count > 1 {
+		//	return &custom_error.DuplicateProductInventory{ProductID: uint(productID)}
+		//}
+
 		//store inventory
-		if iErr := tx.Create(&inventory).Error; iErr != nil {
+		if iErr := tx.WithContext(c).Create(&inventory).Error; iErr != nil {
 			return iErr
 		}
 
 		//store product-attribute in product-inventory-attribute table
-		for _, attr := range productAttributes {
-			inventoryAttr := entities.ProductInventoryAttribute{
-				ProductID:          uint(productID),
-				ProductInventoryID: inventory.ID,
-				ProductAttributeID: attr.ID,
-			}
-			if err := tx.Create(&inventoryAttr).Error; err != nil {
-				return err
+		//len(req.ProductAttributes)<=0  یعنی برای محصول ویژگی -مقدار نمیخواهیم بذاریم و صرفا میخواهیم موجودی بذاریم
+		if len(req.ProductAttributes) > 0 {
+			for _, attr := range productAttributes {
+				inventoryAttr := entities.ProductInventoryAttribute{
+					ProductID:          uint(productID),
+					ProductInventoryID: inventory.ID,
+					ProductAttributeID: attr.ID,
+				}
+				if err := tx.Create(&inventoryAttr).Error; err != nil {
+					return err
+				}
 			}
 		}
 		return nil

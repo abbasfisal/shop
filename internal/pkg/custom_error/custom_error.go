@@ -2,6 +2,7 @@ package custom_error
 
 import (
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -57,4 +58,15 @@ func HandleError(err error, notFoundMsg string) CustomError {
 		return New(err.Error(), notFoundMsg, 404)
 	}
 	return New(err.Error(), InternalServerError, 500)
+}
+
+// DuplicateProductInventory این خطا
+// زمان ایجاد موجودی ایجاد میشه در صورتی که کاربر هیچگونه اتریبیوت-ویژگی رو پاس نداده باشه
+// و صرفا بخواد که فقط موجودی برای محصول اضافه کنه
+type DuplicateProductInventory struct {
+	ProductID uint
+}
+
+func (d *DuplicateProductInventory) Error() string {
+	return fmt.Sprintf("duplicate product inventory found with ID: %d", d.ProductID)
 }
