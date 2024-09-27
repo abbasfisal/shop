@@ -23,12 +23,25 @@ func Seed() {
 	}
 
 	//brand
-	var brand = entities.Brand{
-		Model:   gorm.Model{},
-		Title:   "zara",
-		Slug:    "zara",
-		Image:   "",
-		Product: nil,
+	var brand = []entities.Brand{
+		{
+			Title:   "zara",
+			Slug:    "zara",
+		},
+		//perfume brands
+		{
+			Title:   "Bailando",
+			Slug:    "bailando",
+		},
+		{
+			Title:   "Ballerina",
+			Slug:    "ballerina",
+			Image:   "",
+		},
+		{
+			Title:   "woody sence",
+			Slug:    "woody-sence",
+		},
 	}
 
 	//category
