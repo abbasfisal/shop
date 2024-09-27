@@ -43,7 +43,7 @@ func Error500(c *gin.Context) {
 
 /**
 *-----------------------------
-|		customer render 🛍
+|		customer render 🛍 مشتری
 *-----------------------------
 */
 
@@ -63,6 +63,9 @@ func customerWithGlobalData(c *gin.Context, data gin.H) gin.H {
 	data["ERRORS"] = converters.StringToMap(sessions.Flash(c, "errors"))
 	data["OLDS"] = converters.StringToUrlValues(sessions.Flash(c, "olds"))
 	data["MESSAGE"] = sessions.Flash(c, "message")
+
+	menu, _ := c.Get("menu") //We load the menu using the LoadMenu() middleware and ignore the ok variable because if there is any error in LoadMenu(), a 500 error will be returned
+	data["MENU"] = menu
 
 	customer := helpers.CustomerAuth(c)
 
