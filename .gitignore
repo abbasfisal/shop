@@ -1,7 +1,9 @@
 .idea/
 storage
-./uploads
-uploads/*
+
+#./uploads
+#uploads/*
+
 tmp/*
 .env
 
