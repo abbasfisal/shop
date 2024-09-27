@@ -1203,32 +1203,16 @@ func (a AdminHandler) DeleteProductImage(c *gin.Context) {
 	//remove image from disk
 	imageDelErr := os.Remove(image.FullPath)
 
-	if imageDelErr == nil {
-		//remove image form db
-		rImageErr := a.productSrv.RemoveImage(c, imageID)
-
-		if rImageErr.Code > 0 {
-			//image record  removed from db
-			fmt.Println("---- RemoveImage --- err : ", rImageErr)
-			if rImageErr.Code == 404 {
-				sessions.Set(c, "message", custom_error.RecordNotFound)
-				c.Redirect(http.StatusFound, c.Request.Referer())
-				return
-			}
-			if rImageErr.Code == 500 {
-				sessions.Set(c, "message", custom_error.InternalServerError)
-				c.Redirect(http.StatusFound, c.Request.Referer())
-				return
-			}
-		} else {
-			// image record deleted successfully
-			sessions.Set(c, "message", custom_messages.ImageDeletedSuccessfully)
-			c.Redirect(http.StatusFound, c.Request.Referer())
-		}
+	if imageDelErr != nil {
+		fmt.Println("-- remove image from disk err:", imageDelErr)
 	}
 
-	fmt.Println("---- image not removed form disk : err: ------ ", imageDelErr)
-	sessions.Set(c, "message", custom_messages.ImageNotRemovedFromDisk)
+	//remove image form db
+	rImageErr := a.productSrv.RemoveImage(c, imageID)
+	if rImageErr.Code > 0 {
+		fmt.Println("---- RemoveImage --- err : ", rImageErr)
+	}
+
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
 }
