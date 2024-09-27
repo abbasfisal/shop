@@ -1,15 +1,3 @@
-change add new products
-<br/>
-we need 3 page for this approach:
-<br/>
-1- add a product (images , videos, prices , title , slug ,sku , status )
-<br/>
-2- add a page for add attributes (product_attribute_values)
-<br/>
-3- add a page for add inventory for chosen attribute values
-
-<br/>
-
 explain WITH RECURSIVE CategoryHierarchy AS (
 SELECT id, title, parent_id
 FROM categories
@@ -29,25 +17,8 @@ LIMIT 1;
 
 
 <br/>
-
-<ul>
-<li>add a page for product inventory  </li>
-<li>use transaction for add attr-values for a product</li>
-<li>implement upload media for a product</li>
-
-
-</ul>
-
-- add brand [title , slug ,image(just one image)]
-- add brand_id to products table (nullable) [add its relation in product entity]
-- check product images
 - ability to upload videos of product (use product videos to upload
   videos [must use tusd pkg , fmtp to reduce video size])
-- remove whitespace when u wanna insert any record to db [insert,update]
-- implement show and edit product attributes
-- implement show and edit product inventory
-- impl edit inventory and edit product_attribute
-- show attribute-value in add-attributes page
 - use record lock when editing or delete product records
 
 # todos
@@ -121,8 +92,8 @@ ___
 - [x] crud product feature
 
 __
-- add some real menu
-- load all menu in redis
+- [x] add some real menu
+- [x] load all menu in redis
 - add some real product
 - store product with all attributes in mongodb
 - load data rows(new , most ordered , ) in home page
