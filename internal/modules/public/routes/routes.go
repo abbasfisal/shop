@@ -12,10 +12,15 @@ import (
 
 func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
-	//repo
+	//home repository
 	homeRep := homeRepository.NewHomeRepository()
 
+	//home service
 	homeSrv := home.NewHomeService(homeRep)
+
+	//load menu by LoadMenu middleware
+	r.Use(CustomerMiddlewares.LoadMenu(&homeSrv))
+
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
 
 	r.GET("/", publicHdl.HomePage)
@@ -24,7 +29,7 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	//find by sku (detail of  a product )
 	r.GET("/:category_slug/:product_slug/:sku", publicHdl.ShowProduct)
 
-	r.GET("/:category_slug", publicHdl.ShowProductsByCategory)
+	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)
 
 	publicAuthGrp := r.RouterGroup
 	customerRoute := r.RouterGroup
