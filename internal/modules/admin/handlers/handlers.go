@@ -1074,10 +1074,10 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 	fmt.Println("show product inventory : product id : ", productID)
 	product, err := a.productSrv.FetchByProductID(c, productID)
 
-	if err.Code == 404 || len(product.ProductAttributes.Data) <= 0 {
+	if err.Code == 404 {
 		url := fmt.Sprintf("/admins/products/%d/add-attributes", productID)
+		sessions.Set(c, "message", custom_error.RecordNotFound)
 
-		sessions.Set(c, "message", "ابتدا ویژگی برای محصول مورد نظر اضافه کنید")
 		c.Redirect(http.StatusFound, url)
 		return
 	}
