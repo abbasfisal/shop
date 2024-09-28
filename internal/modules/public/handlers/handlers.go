@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"context"
+	errors2 "errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
+	"gorm.io/gorm"
 	"net/http"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/services/home"
@@ -96,23 +98,25 @@ func (p PublicHandler) ShowProduct(c *gin.Context) {
 
 func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 
-	products, err := p.homeSrv.ShowProductsByCategorySlug(c, c.Param("category_slug"))
-	if err.Code == 404 {
-		c.JSON(200, gin.H{
-			"msg": "not found",
-		})
-		return
-	}
-	if err.Code == 500 {
-		c.JSON(200, gin.H{
-			"msg": "internal server err",
-		})
-		return
+	productPagination, err := p.homeSrv.ListProductByCategorySlug(c, c.Param("category_slug"))
+	if err != nil {
+		//هر خطایی به جز خطای مرتبط با پیدانکردن رکورد اگر وجود داشت اون خطا رو نشون میدیم
+		//در غیر این صورت پیغام رکورد یافت نشد به کاربر نشون داده میشه :)
+		if !errors2.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(200, gin.H{
+				"msg": custom_error.SomethingWrongHappened,
+			})
+			return
+		}
 	}
 
-	html.Render(c, http.StatusFound, "products_by_category_slug", gin.H{
-		"PRODUCTS": products,
-	})
+	html.CustomerRender(c, http.StatusFound, "search",
+		gin.H{
+			"TITLE":          "search",
+			"PAGINATION":     productPagination,
+			"PrimaryMessage": custom_error.RecordNotFound,
+		},
+	)
 	return
 
 }
@@ -167,11 +171,11 @@ func (p PublicHandler) ShowVerifyOtp(c *gin.Context) {
 }
 
 func (p PublicHandler) HomePage(c *gin.Context) {
-	menu, err := p.homeSrv.GetMenu(c)
-	if err != nil {
-		html.Error500(c)
-		return
-	}
+	//menu, err := p.homeSrv.GetMenu(c)
+	//if err != nil {
+	//	html.Error500(c)
+	//	return
+	//}
 	//row-header
 	//row-newest
 	//row-random
@@ -181,7 +185,6 @@ func (p PublicHandler) HomePage(c *gin.Context) {
 
 	html.CustomerRender(c, 200, "home", gin.H{
 		"TITLE": "صفحه اصلی فروشگاه",
-		"MENU":  menu,
 	})
 }
 

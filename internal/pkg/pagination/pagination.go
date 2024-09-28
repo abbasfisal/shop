@@ -47,9 +47,15 @@ func (p *Pagination) GetSort() string {
 
 // --------
 
-func Paginate(c *gin.Context, entity interface{}, pagination *Pagination, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+func Paginate(c *gin.Context, condition string, entity interface{}, pagination *Pagination, db *gorm.DB) (func(db *gorm.DB) *gorm.DB, bool) {
+
 	var totalRows int64
-	db.Model(entity).Count(&totalRows)
+	db.Model(entity).Where(condition).Count(&totalRows)
+
+	//تعداد رکورد هایی که پیدا کرده رو چک میکنیم
+	if totalRows <= 0 {
+		return nil, false
+	}
 
 	pagination.TotalRows = totalRows
 	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.Limit)))
@@ -75,7 +81,7 @@ func Paginate(c *gin.Context, entity interface{}, pagination *Pagination, db *go
 
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Offset(pagination.GetOffset()).Limit(pagination.GetLimit()).Order(pagination.GetSort())
-	}
+	}, true
 }
 
 // Remove 'page' from query and generate PrevLink/NextLink

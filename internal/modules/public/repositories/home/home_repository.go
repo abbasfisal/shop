@@ -253,7 +253,12 @@ func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.P
 	}
 
 	var products []entities.Product
-	paginateQuery := pagination.Paginate(c, &products, &pg, h.db)
+	condition := fmt.Sprintf("category_id=%d", category.ID)
+
+	paginateQuery, exist := pagination.Paginate(c, condition, &products, &pg, h.db)
+	if !exist {
+		return pg, gorm.ErrRecordNotFound
+	}
 
 	if pErr := paginateQuery(h.db).Preload("ProductImages").Where("category_id=?", category.ID).Find(&products).Error; pErr != nil {
 		return pg, pErr
