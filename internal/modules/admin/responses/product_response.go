@@ -1,6 +1,9 @@
 package responses
 
-import "shop/internal/entities"
+import (
+	"math"
+	"shop/internal/entities"
+)
 
 type Product struct {
 	ID            uint
@@ -13,6 +16,7 @@ type Product struct {
 	OriginalPrice uint
 	SalePrice     uint
 	Description   string
+	Discount      uint
 
 	//relation
 	Category                   Category
@@ -47,6 +51,14 @@ func ToProduct(p entities.Product) Product {
 		OriginalPrice: p.OriginalPrice,
 		SalePrice:     p.SalePrice,
 		Description:   p.Description,
+		Discount: func() uint {
+
+			originalPrice := float64(p.OriginalPrice)
+			salePrice := float64(p.SalePrice)
+			dis := ((originalPrice - salePrice) / originalPrice) * 100
+
+			return uint(math.Round(dis))
+		}(),
 
 		//relation
 		Category:                   ToCategory(p.Category),
