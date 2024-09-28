@@ -13,6 +13,7 @@ import (
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
+	"shop/internal/pkg/pagination"
 	"shop/internal/pkg/sessions"
 )
 
@@ -53,22 +54,16 @@ func (h HomeService) ShowProductDetail(ctx context.Context, productSlug, sku str
 	return responses.ToProduct(product), custom_error.CustomError{}
 }
 
-func (h HomeService) ShowProductsByCategorySlug(ctx context.Context, value any) (responses.Products, custom_error.CustomError) {
+func (h HomeService) ListProductByCategorySlug(c *gin.Context, slug string) (pagination.Pagination, error) {
 
-	//get
-	category, cErr := h.ShowCategory(ctx, "slug", value)
-	if cErr.Code == 404 {
-		return responses.Products{}, custom_error.New(cErr.Error(), custom_error.RecordNotFound, 404)
-	}
-	if cErr.Code == 500 {
-		return responses.Products{}, custom_error.New(cErr.Error(), custom_error.InternalServerError, 500)
-	}
-
-	products, err := h.repo.GetProductsBy(ctx, "category_id", category.ID)
+	productList, err := h.repo.ListProductBy(c, slug)
 	if err != nil {
-		return responses.Products{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return pagination.Pagination{}, err
 	}
-	return responses.ToProducts(products), custom_error.CustomError{}
+
+	productList.Rows = responses.ToProducts(productList.Rows.([]entities.Product))
+	return productList, nil
+
 }
 
 func (h HomeService) ShowCategory(ctx context.Context, columnName string, value any) (responses.Category, custom_error.CustomError) {
