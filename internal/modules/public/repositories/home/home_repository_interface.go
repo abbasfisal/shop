@@ -6,6 +6,7 @@ import (
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
 	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/pagination"
 )
 
 type HomeRepositoryInterface interface {
@@ -21,4 +22,5 @@ type HomeRepositoryInterface interface {
 	LogOut(c *gin.Context) error
 	UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) error
 	GetMenu(ctx context.Context) ([]entities.Category, error)
+	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
 }

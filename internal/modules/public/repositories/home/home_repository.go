@@ -11,6 +11,7 @@ import (
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
 	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/pagination"
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
 	"strconv"
@@ -224,4 +225,40 @@ func (h HomeRepository) GetMenu(ctx context.Context) ([]entities.Category, error
 		return nil, err
 	}
 	return menu, nil
+}
+
+func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error) {
+
+	// Convert query parameters from string to int
+	limitStr := c.Query("limit")
+	pageStr := c.Query("page")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 { // Default to 10 if invalid
+		limit = 10
+	}
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 { // Default to 1 if invalid
+		page = 1
+	}
+	var pg = pagination.Pagination{
+		Limit: limit,
+		Page:  page,
+	}
+
+	var category entities.Category
+	if err := h.db.WithContext(c).Where("slug = ?", slug).First(&category).Error; err != nil {
+		return pg, err
+	}
+
+	var products []entities.Product
+	paginateQuery := pagination.Paginate(c, &products, &pg, h.db)
+
+	if pErr := paginateQuery(h.db).Preload("ProductImages").Where("category_id=?", category.ID).Find(&products).Error; pErr != nil {
+		return pg, pErr
+	}
+
+	pg.Rows = products
+	return pg, nil
 }
