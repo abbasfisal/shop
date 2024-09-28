@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
+	"strconv"
 )
 
 func Seed() {
@@ -49,7 +50,72 @@ func Seed() {
 }
 
 func fakeProducts() []entities.Product {
-	return []entities.Product{
+	var p []entities.Product
+	for i := 1; i <= 200; i++ {
+		p = append(p, entities.Product{
+			CategoryID:    49, //عطر و ادکلن زنانه
+			BrandID:       3,  //Ballerina
+			Title:         "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر" + strconv.Itoa(i*2),
+			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl" + strconv.Itoa(i*2),
+			Sku:           "sku1000" + strconv.Itoa(i*2),
+			Status:        true,
+			OriginalPrice: 822_000,
+			SalePrice:     349_000,
+			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
+			ProductImages: []entities.ProductImages{
+				{
+					Path: "2024/09/27/1.webp",
+				},
+				{
+					Path: "2024/09/27/2.webp",
+				},
+				{
+					Path: "2024/09/27/3.webp",
+				},
+			},
+			ProductInventories: []entities.ProductInventory{
+				{
+					Quantity: 150,
+				},
+			},
+			Features: []entities.Feature{
+				{
+					Title: "نوع عطر",
+					Value: "ادو پرفیوم",
+				},
+				{
+					Title: "حجم",
+					Value: "90 میلی لیتر",
+				},
+				{
+					Title: "مناسب برای",
+					Value: "خانم ها",
+				},
+				{
+					Title: "نت های آغازین",
+					Value: "بادام، قهوه، ترنج، ليمو",
+				},
+				{
+					Title: "نت های میانی",
+					Value: "گل سرخ، ياس سامباك، شكوفه پرتقال، زنبق و رز بلغاري",
+				},
+				{
+					Title: "نت های پایانی",
+					Value: "لوبياي تونكا\n غلاف كاكائو\nوانيل\nپرالين\nچوب صندل\nمشك\nعنبر\nنعناع هندي و سدر\nچوب كشمير\nدارچين\n\n",
+				},
+				{
+					Title: "نوع رایحه",
+					Value: "گرم و تلخ",
+				},
+				{
+					Title: "فصل",
+					Value: "پاییز و زمستان",
+				},
+			},
+		})
+	}
+
+	p2 := []entities.Product{
 		//women perfume
 		{
 			CategoryID:    49, //عطر و ادکلن زنانه
@@ -348,6 +414,9 @@ func fakeProducts() []entities.Product {
 			},
 		},
 	}
+
+	p = append(p, p2...)
+	return p
 }
 
 func fakeAttributeAndValues() []entities.Attribute {
