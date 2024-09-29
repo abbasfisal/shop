@@ -90,6 +90,8 @@ ___
 - [x] add enable/disable , priority to category
 - [ ] store final product in mongodb(flat)
 - [x] crud product feature
+- [x] show single product in home page with multi qty
+- [x] show product by category in home page
 
 __
 - [x] add some real menu
