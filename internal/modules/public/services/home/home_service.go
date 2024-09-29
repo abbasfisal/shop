@@ -167,3 +167,16 @@ func (h HomeService) GetMenu(c context.Context) ([]CustomerRes.CategoryResponse,
 	}
 	return categoryResponses, nil
 }
+
+func (h HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, custom_error.CustomError) {
+
+	product, err := h.repo.GetProduct(c, productSku, productSlug)
+	if err != nil {
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+
+	p := responses.ToProduct(product["product"].(entities.Product))
+	product["product"] = p
+
+	return product, custom_error.CustomError{}
+}

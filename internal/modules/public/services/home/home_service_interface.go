@@ -29,4 +29,5 @@ type HomeServiceInterface interface {
 	ProcessCustomerAuthentication(c *gin.Context, mobile string) (CustomerResp.CustomerSession, custom_error.CustomError)
 	LogOut(c *gin.Context) bool
 	UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) custom_error.CustomError
+	GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, custom_error.CustomError)
 }

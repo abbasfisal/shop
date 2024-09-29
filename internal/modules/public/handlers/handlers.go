@@ -189,9 +189,24 @@ func (p PublicHandler) HomePage(c *gin.Context) {
 }
 
 func (p PublicHandler) SingleProduct(c *gin.Context) {
-	html.Render(c, 200, "customer_single_product", gin.H{
-		"TITLE": "عنوان فروشگاه",
-	})
+
+	product, err := p.homeSrv.GetSingleProduct(c, c.Param("product_sku"), c.Param("product_slug"))
+	primaryMessage := ""
+	if err.Code > 0 {
+		if err.Code == 404 {
+			primaryMessage = err.DisplayMessage
+		} else {
+			html.Error500(c)
+			return
+		}
+	}
+
+	html.CustomerRender(c, http.StatusFound, "single_product",
+		gin.H{
+			"PRODUCT":        product,
+			"PrimaryMessage": primaryMessage,
+		})
+	return
 }
 
 func (p PublicHandler) PostLogin(c *gin.Context) {

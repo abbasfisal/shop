@@ -24,7 +24,7 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
 
 	r.GET("/", publicHdl.HomePage)
-	r.GET("/products/single", publicHdl.SingleProduct)
+	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct)
 
 	//find by sku (detail of  a product )
 	r.GET("/:category_slug/:product_slug/:sku", publicHdl.ShowProduct)

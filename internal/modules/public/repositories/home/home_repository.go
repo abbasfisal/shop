@@ -47,10 +47,76 @@ func (h HomeRepository) GetCategories(ctx context.Context, limit int) ([]entitie
 
 	return categories, err
 }
-func (h HomeRepository) GetProduct(ctx context.Context, productSlug, sku string) (entities.Product, error) {
+func (h HomeRepository) GetProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, error) {
+
+	type InventoryWithAttributes struct {
+		InventoryID                 uint
+		Quantity                    uint
+		AttributeID                 uint
+		AttributeTitle              string
+		AttributeValueID            uint
+		AttributeValueTitle         string
+		ProductInventoryAttributeID uint
+	}
+
 	var product entities.Product
-	err := h.db.Where("slug=? and sku=? and status=true", productSlug, sku).First(&product).Error
-	return product, err
+	aerr := h.db.WithContext(c).
+		Preload("Category").
+		Preload("Brand").
+		Preload("ProductImages").
+		Preload("Features").
+		Where("sku=? and slug=? and status=true", productSku, productSlug).
+		First(&product).Error
+
+	if aerr != nil {
+		return map[string]interface{}{}, aerr
+	}
+
+	var inventories []InventoryWithAttributes
+
+	result := make(map[string]interface{})
+
+	serr := h.db.
+		WithContext(c).
+		Table("product_inventories").
+		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, product_inventory_attributes.id AS product_inventory_attribute_id").
+		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id AND product_inventory_attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id AND product_attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
+		Where("product_inventories.product_id = ? and product_inventories.deleted_at IS NULL", product.ID).
+		Scan(&inventories).
+		Error
+
+	if serr != nil {
+		return map[string]interface{}{}, serr
+	}
+
+	inventoryMap := make(map[uint]map[string]interface{})
+	for _, inventory := range inventories {
+		if _, exists := inventoryMap[inventory.InventoryID]; !exists {
+			inventoryMap[inventory.InventoryID] = map[string]interface{}{
+				"quantity":     inventory.Quantity,
+				"inventory_id": inventory.InventoryID,
+				"attributes":   []map[string]interface{}{},
+			}
+		}
+
+		attributes := inventoryMap[inventory.InventoryID]["attributes"].([]map[string]interface{})
+		attributes = append(attributes, map[string]interface{}{
+			"attribute_id":                   inventory.AttributeID,
+			"attribute_title":                inventory.AttributeTitle,
+			"attribute_value_id":             inventory.AttributeValueID,
+			"attribute_value_title":          inventory.AttributeValueTitle,
+			"product_inventory_attribute_id": inventory.ProductInventoryAttributeID,
+		})
+		inventoryMap[inventory.InventoryID]["attributes"] = attributes
+	}
+
+	result["product"] = product
+	result["inventories"] = inventoryMap
+
+	return result, nil
 }
 
 func (h HomeRepository) GetProductsBy(ctx context.Context, columnName string, value any) ([]entities.Product, error) {
