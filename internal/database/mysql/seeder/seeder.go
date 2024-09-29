@@ -332,7 +332,7 @@ func fakeProducts() []entities.Product {
 
 				{
 					//medium
-					ProductID:           4,
+					//ProductID:           4,
 					AttributeID:         1,
 					AttributeTitle:      "سایز",
 					AttributeValueID:    2,
@@ -340,7 +340,7 @@ func fakeProducts() []entities.Product {
 				},
 				{
 					//large
-					ProductID:           4,
+					//ProductID:           4,
 					AttributeID:         1,
 					AttributeTitle:      "سایز",
 					AttributeValueID:    3,
@@ -348,7 +348,7 @@ func fakeProducts() []entities.Product {
 				},
 				{
 					//x-large
-					ProductID:           4,
+					//ProductID:           4,
 					AttributeID:         1,
 					AttributeTitle:      "سایز",
 					AttributeValueID:    4,
@@ -357,32 +357,32 @@ func fakeProducts() []entities.Product {
 			},
 			ProductInventories: []entities.ProductInventory{
 				{
-					ProductID: 4,
-					Quantity:  25,
+					//ProductID: 4,
+					Quantity: 25,
 				},
 				{
-					ProductID: 4,
-					Quantity:  50,
+					//ProductID: 4,
+					Quantity: 50,
 				},
 				{
-					ProductID: 4,
-					Quantity:  75,
+					//ProductID: 4,
+					Quantity: 75,
 				},
 			},
 			ProductInventoryAttributes: []entities.ProductInventoryAttribute{
 				{
-					ProductID:          4,
-					ProductInventoryID: 4,
+					ProductID:          204,
+					ProductInventoryID: 204,
 					ProductAttributeID: 1, //medium
 				},
 				{
-					ProductID:          4,
-					ProductInventoryID: 5,
+					ProductID:          204,
+					ProductInventoryID: 205,
 					ProductAttributeID: 2, //large
 				},
 				{
-					ProductID:          4,
-					ProductInventoryID: 6,
+					ProductID:          204,
+					ProductInventoryID: 206,
 					ProductAttributeID: 3, //x-large
 				},
 			},
