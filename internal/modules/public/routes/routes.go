@@ -24,12 +24,8 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
 
 	r.GET("/", publicHdl.HomePage)
-	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct)
-
-	//find by sku (detail of  a product )
-	r.GET("/:category_slug/:product_slug/:sku", publicHdl.ShowProduct)
-
-	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)
+	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct) //show single product
+	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)     //show products by category
 
 	publicAuthGrp := r.RouterGroup
 	customerRoute := r.RouterGroup

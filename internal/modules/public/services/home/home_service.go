@@ -45,15 +45,6 @@ func (h HomeService) GetCategories(ctx context.Context, limit int) (responses.Ca
 	return responses.ToCategories(categories), custom_error.CustomError{}
 }
 
-func (h HomeService) ShowProductDetail(ctx context.Context, productSlug, sku string) (responses.Product, custom_error.CustomError) {
-
-	product, err := h.repo.GetProduct(ctx, productSlug, sku)
-	if err != nil {
-		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
-	}
-	return responses.ToProduct(product), custom_error.CustomError{}
-}
-
 func (h HomeService) ListProductByCategorySlug(c *gin.Context, slug string) (pagination.Pagination, error) {
 
 	productList, err := h.repo.ListProductBy(c, slug)

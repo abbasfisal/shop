@@ -74,28 +74,6 @@ func (p PublicHandler) Index(c *gin.Context) {
 	return
 }
 
-func (p PublicHandler) ShowProduct(c *gin.Context) {
-
-	_ = c.Param("category_slug")
-	productSlug := c.Param("product_slug")
-	sku := c.Param("sku")
-
-	product, err := p.homeSrv.ShowProductDetail(c, productSlug, sku)
-	if err.Code == 404 {
-		c.Redirect(http.StatusFound, "/")
-		return
-	}
-	if err.Code == 500 {
-		html.Error500(c)
-		return
-	}
-
-	html.Render(c, http.StatusFound, "product_detail", gin.H{
-		"PRODUCT": product,
-	})
-	return
-}
-
 func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 
 	productPagination, err := p.homeSrv.ListProductByCategorySlug(c, c.Param("category_slug"))
