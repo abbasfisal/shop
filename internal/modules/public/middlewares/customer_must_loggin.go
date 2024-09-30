@@ -15,7 +15,7 @@ func CustomerMustLogin() gin.HandlerFunc {
 		customer := helpers.CustomerAuth(c)
 
 		if customer.ID <= 0 {
-			c.Redirect(http.StatusFound, "/hihiih")
+			c.Redirect(http.StatusFound, "/login")
 			c.Abort()
 			return
 		}
