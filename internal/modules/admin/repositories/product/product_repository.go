@@ -4,8 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
+	"math"
 	"shop/internal/database/mongodb"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
@@ -49,43 +53,8 @@ func (p ProductRepository) Store(ctx context.Context, product entities.Product) 
 	err := p.db.WithContext(ctx).Create(&product).Error
 
 	if err == nil {
-		productsCollection := mongodb.GetCollection(mongodb.ProductsCollection)
-
-		_, err := productsCollection.InsertOne(ctx, &entities.MongoProduct{
-			ID:            product.ID,
-			CategoryID:    product.CategoryID,
-			BrandID:       product.BrandID,
-			Title:         product.Title,
-			Slug:          product.Slug,
-			Sku:           product.Sku,
-			Status:        product.Status,
-			OriginalPrice: product.OriginalPrice,
-			SalePrice:     product.SalePrice,
-			Description:   product.Description,
-			Images: func() []string {
-				var imgs []string
-				for _, item := range product.ProductImages {
-					imgs = append(imgs, item.Path)
-				}
-				return imgs
-			}(),
-			CreatedAt: product.CreatedAt,
-			UpdatedAt: product.UpdatedAt,
-		})
-
-		if err != nil {
-			fmt.Println("\n --------- product mongodb : failed ---------- | err: ", err)
-		}
-		fmt.Println("\n------- product mongodb : created successful")
+		SyncMongo(ctx, p.db, product.ID)
 	}
-	//for _, Ip := range product.ProductImage {
-	//	fmt.Println("insed ", Ip, "| product id : ", product.ID)
-	//	p.db.Create(entities.ProductImages{
-	//		ProductID: product.ID,
-	//		Path:      Ip.Path,
-	//	})
-	//}
-
 	return product, err
 }
 
@@ -149,6 +118,7 @@ func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int,
 			AttributeValueTitle: parts[7],
 		})
 	}
+	SyncMongo(ctx, p.db, uint(productID))
 	return nil
 }
 
@@ -282,6 +252,8 @@ func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, 
 		return entities.ProductInventory{}, txErr
 	}
 
+	SyncMongo(c, p.db, uint(productID))
+
 	return inventory, nil
 }
 
@@ -292,7 +264,18 @@ func (p ProductRepository) GetImage(c *gin.Context, imageID int) (entities.Produ
 }
 
 func (p ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
-	return p.db.WithContext(c).Unscoped().Delete(&entities.ProductImages{}, imageID).Error
+
+	var productImage entities.ProductImages
+	if imgErr := p.db.WithContext(c).Where("id=?", imageID).First(&productImage).Error; imgErr != nil {
+		return imgErr
+	}
+	if delImgErr := p.db.WithContext(c).Unscoped().Delete(&productImage).Error; delImgErr != nil {
+		return delImgErr
+	}
+
+	SyncMongo(c, p.db, uint(productImage.ProductID))
+
+	return nil
 }
 
 func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStoredPath []string) error {
@@ -305,7 +288,12 @@ func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStore
 		)
 	}
 
-	return p.db.WithContext(c).Create(&images).Error
+	if storeImgErr := p.db.WithContext(c).Create(&images).Error; storeImgErr != nil {
+		return storeImgErr
+	}
+
+	SyncMongo(c, p.db, uint(productID))
+	return nil
 }
 
 func (p ProductRepository) Update(c *gin.Context, productID int, req requests.UpdateProductRequest) (entities.Product, error) {
@@ -333,11 +321,11 @@ func (p ProductRepository) Update(c *gin.Context, productID int, req requests.Up
 		Update("description", req.Description).Error
 
 	if updateErr != nil {
-		fmt.Println("---- repo product update  err : 201 ", updateErr)
-
 		return entities.Product{}, pErr
 	}
-	fmt.Println("---- repo product udpate succ ")
+
+	SyncMongo(c, p.db, uint(productID))
+
 	return product, nil
 }
 
@@ -354,10 +342,14 @@ func (p ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInven
 		return piaErr
 	}
 
+	SyncMongo(c, p.db, uint(productInventoryAttribute.ProductID))
+
 	return nil
 }
 
 func (p ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) error {
+
+	var productID uint
 
 	txErr := p.db.WithContext(c).Transaction(func(tx *gorm.DB) error {
 
@@ -367,6 +359,8 @@ func (p ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) erro
 		if iErr := p.db.WithContext(c).First(&inventory, inventoryID).Error; iErr != nil {
 			return iErr
 		}
+
+		productID = inventory.ProductID
 
 		//delete all product-attribute inventory
 		var productInventoryAttributes []entities.ProductInventoryAttribute
@@ -380,9 +374,12 @@ func (p ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) erro
 		}
 		return nil
 	})
+
 	if txErr != nil {
 		return txErr
 	}
+
+	SyncMongo(c, p.db, productID)
 
 	return nil
 }
@@ -426,6 +423,9 @@ func (p ProductRepository) AppendAttributesToInventory(c *gin.Context, inventory
 	if txErr != nil {
 		return txErr
 	}
+
+	SyncMongo(c, p.db, uint(productInventory.ProductID))
+
 	return nil
 }
 
@@ -438,6 +438,9 @@ func (p ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID i
 	if updateErr := p.db.WithContext(c).Model(&inventory).Update("quantity", quantity).Error; updateErr != nil {
 		return updateErr
 	}
+
+	SyncMongo(c, p.db, uint(inventory.ProductID))
+
 	return nil
 }
 
@@ -450,6 +453,9 @@ func (p ProductRepository) InsertFeature(c *gin.Context, productID int, req requ
 	}).Error; err != nil {
 		return err
 	}
+
+	SyncMongo(c, p.db, uint(productID))
+
 	return nil
 }
 
@@ -457,6 +463,9 @@ func (p ProductRepository) DeleteFeature(c *gin.Context, productID int, featureI
 	if err := p.db.WithContext(c).Where("product_id=? ", productID).Where("id = ?", featureID).Unscoped().Delete(&entities.Feature{}).Error; err != nil {
 		return err
 	}
+
+	SyncMongo(c, p.db, uint(productID))
+
 	return nil
 }
 
@@ -473,5 +482,160 @@ func (p ProductRepository) EditFeature(c *gin.Context, productID int, featureID 
 		Update("value", req.Value).Error; err != nil {
 		return err
 	}
+
+	SyncMongo(c, p.db, uint(productID))
+
 	return nil
+}
+
+// SyncMongo وظیفه ذخیره محصول و روابطش و نیز ذخیره موجودی انبار رو در استراکت دلخواه در مونگو دیبی به عهده داره
+func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
+	// تعریف ساختار مورد نیاز برای انبارها و ویژگی‌ها
+	type InventoryWithAttributes struct {
+		InventoryID                 uint
+		Quantity                    uint
+		AttributeID                 uint
+		AttributeTitle              string
+		AttributeValueID            uint
+		AttributeValueTitle         string
+		ProductInventoryAttributeID uint
+	}
+
+	// بارگذاری اطلاعات محصول
+	var product entities.Product
+	productErr := db.WithContext(c).
+		Preload("Category").
+		Preload("Brand").
+		Preload("ProductImages").
+		Preload("Features").
+		Where("id=?", productID).
+		First(&product).
+		Error
+
+	if productErr != nil {
+		fmt.Println("--- mongo product error:", productErr)
+		return productErr
+	}
+
+	// بارگذاری موجودی‌ها
+	var inventories []InventoryWithAttributes
+	serr := db.
+		WithContext(c).
+		Table("product_inventories").
+		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, product_inventory_attributes.id AS product_inventory_attribute_id").
+		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id AND product_inventory_attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id AND product_attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
+		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
+		Where("product_inventories.product_id = ? and product_inventories.deleted_at IS NULL", product.ID).
+		Scan(&inventories).
+		Error
+
+	if serr != nil {
+		fmt.Println("--- mongo scan error:", serr)
+		return serr
+	}
+
+	// آماده‌سازی برای ذخیره در MongoDB
+	inventoryMap := make(map[string]entities.Inventory)
+	for _, inventory := range inventories {
+		key := fmt.Sprintf("%d", inventory.InventoryID)
+		if _, exists := inventoryMap[key]; !exists {
+			inventoryMap[key] = entities.Inventory{
+				InventoryID: int64(inventory.InventoryID),
+				Quantity:    int64(inventory.Quantity),
+				Attributes:  []entities.InventoryAttributes{},
+			}
+		}
+
+		inv := inventoryMap[key]
+		inv.Attributes = append(inv.Attributes, entities.InventoryAttributes{
+			AttributeID:                 int64(inventory.AttributeID),
+			AttributeTitle:              inventory.AttributeTitle,
+			AttributeValueID:            int64(inventory.AttributeValueID),
+			AttributeValueTitle:         inventory.AttributeValueTitle,
+			ProductInventoryAttributeID: int64(inventory.ProductInventoryAttributeID),
+		})
+		inventoryMap[key] = inv
+	}
+
+	// تبدیل محصول به ساختار MongoProduct
+	mongoProduct := entities.MongoProduct{
+		Product: entities.P{
+			ID: int64(product.ID),
+			Category: entities.C{
+				ID:       int64(product.Category.ID),
+				ParentID: int64(*product.Category.ParentID),
+				Title:    product.Category.Title,
+				Slug:     product.Category.Slug,
+			},
+			CategoryID: int64(product.CategoryID),
+			Brand: entities.B{
+				ID:    int64(product.Brand.ID),
+				Title: product.Brand.Title,
+				Slug:  product.Brand.Slug,
+			},
+			BrandID:       int64(product.BrandID),
+			Title:         product.Title,
+			Slug:          product.Slug,
+			Sku:           product.Sku,
+			Status:        product.Status,
+			OriginalPrice: int64(product.OriginalPrice),
+			SalePrice:     int64(product.SalePrice),
+			Discount: func() int64 {
+				originalPrice := float64(product.OriginalPrice)
+				salePrice := float64(product.SalePrice)
+				dis := ((originalPrice - salePrice) / originalPrice) * 100
+
+				return int64(math.Round(dis))
+			}(),
+			Description: product.Description,
+			Images:      entities.Img{Data: transformImages(product.ProductImages)},
+			Features:    entities.F{Data: transformFeatures(product.Features)},
+			CreatedAt:   product.CreatedAt,
+			UpdatedAt:   product.UpdatedAt,
+		},
+		Inventories: inventoryMap,
+	}
+
+	// چک کردن وجود محصول در MongoDB
+	productsCollection := mongodb.GetCollection(mongodb.ProductsCollection)
+	filter := bson.M{"product.id": mongoProduct.Product.ID}
+	update := bson.M{"$set": mongoProduct}
+
+	// تلاش برای آپدیت محصول در صورت وجود، در غیر این صورت ایجاد محصول جدید
+	opts := options.Update().SetUpsert(true)
+	_, err := productsCollection.UpdateOne(c, filter, update, opts)
+	if err != nil {
+		fmt.Println("--- product insert/update err ", err)
+		return err
+	}
+
+	fmt.Println("~~~~~~~~~~~~ mongo product collection created/updated successfully:) ~~~~~~~~~~")
+	return nil
+}
+
+func transformImages(images []entities.ProductImages) []entities.ImgData {
+	var imgData []entities.ImgData
+	for _, img := range images {
+		imgData = append(imgData, entities.ImgData{
+			ID:           int64(img.ID),
+			OriginalPath: img.Path,
+			FullPath:     viper.GetString("Upload.Products") + img.Path,
+		})
+	}
+	return imgData
+}
+
+func transformFeatures(features []entities.Feature) []entities.FData {
+	var fData []entities.FData
+	for _, feature := range features {
+		fData = append(fData, entities.FData{
+			ID:        int64(feature.ID),
+			ProductID: int64(feature.ProductID),
+			Title:     feature.Title,
+			Value:     feature.Value,
+		})
+	}
+	return fData
 }
