@@ -94,8 +94,10 @@ ___
 - [x] show product by category in home page
 
 __
+- [ ] separate SyncMongo() from product_repository
 - [x] add some real menu
 - [x] load all menu in redis
+- 
 - add some real product
 - store product with all attributes in mongodb
 - load data rows(new , most ordered , ) in home page
