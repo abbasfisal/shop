@@ -8,6 +8,7 @@ import (
 	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/repositories/home"
+	"shop/internal/modules/public/repositories/home_mongo"
 	"shop/internal/modules/public/requests"
 	CustomerRes "shop/internal/modules/public/responses"
 	"shop/internal/pkg/cache"
@@ -18,12 +19,14 @@ import (
 )
 
 type HomeService struct {
-	repo home.HomeRepositoryInterface
+	repo      home.HomeRepositoryInterface
+	mongoRepo home_mongo.MongoHomeRepositoryInterface
 }
 
-func NewHomeService(repo home.HomeRepositoryInterface) HomeService {
+func NewHomeService(repo home.HomeRepositoryInterface, mongoRepo home_mongo.MongoHomeRepositoryInterface) HomeService {
 	return HomeService{
-		repo: repo,
+		repo:      repo,
+		mongoRepo: mongoRepo,
 	}
 }
 
@@ -160,6 +163,14 @@ func (h HomeService) GetMenu(c context.Context) ([]CustomerRes.CategoryResponse,
 }
 
 func (h HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, custom_error.CustomError) {
+
+	mongoProduct, err := h.mongoRepo.GetProduct(c, productSku, productSlug)
+	if err == nil {
+		fmt.Println("--- mongo success --- ")
+		return mongoProduct, custom_error.CustomError{}
+	} else {
+		fmt.Println("--- mongo product get err: ", err)
+	}
 
 	product, err := h.repo.GetProduct(c, productSku, productSlug)
 	if err != nil {
