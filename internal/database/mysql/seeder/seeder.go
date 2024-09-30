@@ -1,11 +1,13 @@
 package seeder
 
 import (
+	"context"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
+	productRepo "shop/internal/modules/admin/repositories/product"
 	"strconv"
 )
 
@@ -45,6 +47,8 @@ func Seed() {
 	//db.Create(&productAttribute)
 	//db.Create(&productInventory)
 	//db.Create(&productInventoryAttribute)
+
+	insertProductInMongo(db)
 
 	fmt.Println("\\\\\\\\\\\\\\  ~~~~[Seed] tables successfully~~~~ \\\\\\\\\\\\\\")
 }
@@ -1002,5 +1006,25 @@ func fakeBrands() []entities.Brand {
 			Title: "داخلی",
 			Slug:  "iran",
 		},
+	}
+}
+
+// ------------+
+func insertProductInMongo(db *gorm.DB) {
+	var products []entities.Product
+	if err := db.Find(&products).Error; err != nil {
+		fmt.Println("~~~ [failed] get all products")
+	} else {
+
+		for _, pItem := range products {
+			err := productRepo.SyncMongo(context.Background(), db, pItem.ID)
+			if err != nil {
+				fmt.Printf("~~~~ [syncMongo] failed for product id %d ~~~~ error: %s\n", pItem.ID, err.Error())
+				return
+			} else {
+				fmt.Printf("~~~~ [syncMongo] success for product id %d ~~~~\n", pItem.ID)
+			}
+		}
+
 	}
 }
