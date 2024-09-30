@@ -7,6 +7,7 @@ import (
 	PublicHandler "shop/internal/modules/public/handlers"
 	CustomerMiddlewares "shop/internal/modules/public/middlewares"
 	homeRepository "shop/internal/modules/public/repositories/home"
+	"shop/internal/modules/public/repositories/home_mongo"
 	"shop/internal/modules/public/services/home"
 )
 
@@ -15,8 +16,10 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	//home repository
 	homeRep := homeRepository.NewHomeRepository()
 
+	MongoHomeRepo := home_mongo.NewMongoRepository()
+
 	//home service
-	homeSrv := home.NewHomeService(homeRep)
+	homeSrv := home.NewHomeService(homeRep, MongoHomeRepo)
 
 	//load menu by LoadMenu middleware
 	r.Use(CustomerMiddlewares.LoadMenu(&homeSrv))
