@@ -68,14 +68,14 @@ type FData struct {
 }
 
 type Inventory struct {
-	InventoryID int64                 `bson:"inventory_id"`
-	Quantity    int64                 `bson:"quantity"`
-	Attributes  []InventoryAttributes `bson:"attributes"`
+	InventoryID int64                 `json:"inventory_id" bson:"inventory_id"`
+	Quantity    int64                 `json:"quantity" bson:"quantity"`
+	Attributes  []InventoryAttributes `json:"attributes" bson:"attributes"`
 }
 type InventoryAttributes struct {
-	AttributeID                 int64  `bson:"attribute_id"`
-	AttributeTitle              string `bson:"attribute_title"`
-	AttributeValueID            int64  `bson:"attribute_value_id"`
-	AttributeValueTitle         string `bson:"attribute_value_title"`
-	ProductInventoryAttributeID int64  `bson:"product_inventory_attribute_id"`
+	AttributeID                 int64  `json:"attribute_id" bson:"attribute_id"`
+	AttributeTitle              string `json:"attribute_title" bson:"attribute_title"`
+	AttributeValueID            int64  `json:"attribute_value_id" bson:"attribute_value_id"`
+	AttributeValueTitle         string `json:"attribute_value_title" bson:"attribute_value_title"`
+	ProductInventoryAttributeID int64  `json:"product_inventory_attribute_id" bson:"product_inventory_attribute_id"`
 }
