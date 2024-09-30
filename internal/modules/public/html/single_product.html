@@ -455,41 +455,38 @@
                                                 <div class="product-variant dt-sl">
                                                     <div>
                                                         {{if eq (len .PRODUCT.inventories) 1}}
-                                                            {{range .PRODUCT.inventories}}
-                                                                {{if lt .quantity 5}}
-
+                                                            {{range $key,$item:=.PRODUCT.inventories}}
+                                                                {{if lt $item.Quantity 5}}
                                                                     <b>موجودی</b>:
-
-                                                                    {{.quantity}}
+                                                                    {{$item.Quantity}}
                                                                     عدد
-                                                                {{end}}
+                                                                   {{end}}
                                                             {{end}}
                                                         {{else}}
                                                             <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
                                                                 <h2>انتخاب :</h2>
                                                             </div>
                                                             <select name="" id="" class="custom-select">
-                                                                {{range .PRODUCT.inventories}}
-                                                                    {{$qty:=.quantity}}
-                                                                    {{$inventory_id:=.inventory_id}}
-                                                                    {{if eq (len .attributes) 1}}
-                                                                        {{range .attributes}}
+                                                                {{range $item:=.PRODUCT.inventories}}
+                                                                    {{$qty:=$item.Quantity}}
+                                                                    {{$inventory_id:=$item.InventoryID}}
+                                                                    {{if eq (len $item.Attributes) 1}}
+                                                                        {{range $item.Attributes}}
                                                                             <option value="{{$inventory_id}}" class="">
-                                                                                {{.attribute_title}}
-                                                                                {{.attribute_value_title}}
-                                                                                {{if lt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
+                                                                                {{.AttributeTitle}}
+                                                                                {{.AttributeValueTitle}}
+                                                                                {{if gt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
                                                                             </option>
                                                                         {{end}}
 
                                                                     {{else}}
                                                                         {{$composite:=""}}
-                                                                        {{range .attributes}}
-                                                                            {{$composite = printf "%s%s:%s  " $composite .attribute_title .attribute_value_title}} <!-- افزودن هر ویژگی به رشته قبلی -->
+                                                                        {{range .Attributes}}
+                                                                            {{$composite = printf "%s%s:%s  " $composite .AttributeTitle .AttributeValueTitle}} <!-- افزودن هر ویژگی به رشته قبلی -->
                                                                         {{end}}
-                                                                        <option value="{{.inventory_id}}">{{$composite}}
-
-                                                                            {{if lt $qty 5 }}
-                                                                                |موجودی:{{.quantity}}
+                                                                        <option value="{{.InventoryID}}">{{$composite}}
+                                                                            {{if gt $qty 5 }}
+                                                                                |موجودی:{{.Quantity}}
                                                                                 عدد
                                                                             {{end}}
                                                                         </option>
