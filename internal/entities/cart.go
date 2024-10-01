@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Cart struct {
 	gorm.Model
-	UserID      uint
+	CustomerID  uint
 	ProductID   uint
 	InventoryID uint
 
@@ -20,12 +20,6 @@ type Cart struct {
 	SalePrice     uint
 
 	//----
-
-	Product Product
+	//Customer Customer `gorm:"references:ID"`
+	//Product  Product  `gorm:"references:ID"`
 }
-
-//user1
-//product1
-//inventory1
-//count2
-//
