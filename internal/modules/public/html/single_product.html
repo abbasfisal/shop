@@ -23,6 +23,7 @@
 
     <body>
     <form action="/add-to-cart" method="post">
+        <input type="hidden" name="product_id" value="{{.PRODUCT._id}}">
         <div class="wrapper">
 
             <!-------------------------------- Header Section -->
@@ -466,7 +467,7 @@
                                                             <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
                                                                 <h2>انتخاب :</h2>
                                                             </div>
-                                                            <select name="" id="" class="custom-select">
+                                                            <select name="inventory_id" id="" class="custom-select">
                                                                 {{range $item:=.PRODUCT.inventories}}
                                                                     {{$qty:=$item.Quantity}}
                                                                     {{$inventory_id:=$item.InventoryID}}
