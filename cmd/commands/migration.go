@@ -27,6 +27,7 @@ func migrate() {
 	db.Exec("SET foreign_key_checks = 0")
 
 	if err := db.Migrator().DropTable(
+		&entities.Cart{},
 		&entities.User{},
 		&entities.Customer{},
 		&entities.OTP{},
@@ -42,7 +43,6 @@ func migrate() {
 		&entities.AttributeValue{},
 		&entities.Attribute{},
 		&entities.Address{},
-		&entities.Cart{},
 		&entities.Order{},
 	); err != nil {
 		log.Fatal("[Drop tables] failed : ", err)
@@ -66,17 +66,16 @@ func migrate() {
 		&entities.ProductInventory{},
 		&entities.Address{},
 		&entities.Cart{},
-
 		&entities.Order{},
 	)
 	db.Exec("SET foreign_key_checks = 1")
 
 	if err != nil {
-		log.Fatal("[Migrate] table migration failed ", err)
+		log.Fatal("~~~~ [Migrate] Tables Migration Failed : ", err)
 		return
 	}
 
-	fmt.Println("[Create] tables successfully")
+	fmt.Println("~~~~ [Migrate] Tables Migration Success")
 
 	os.Exit(1)
 }
