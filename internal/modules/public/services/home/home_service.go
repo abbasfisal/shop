@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/repositories/home"
@@ -14,6 +15,7 @@ import (
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
+	"shop/internal/pkg/helpers"
 	"shop/internal/pkg/pagination"
 	"shop/internal/pkg/sessions"
 )
@@ -181,4 +183,23 @@ func (h HomeService) GetSingleProduct(c *gin.Context, productSku string, product
 	product["product"] = p
 
 	return product, custom_error.CustomError{}
+}
+
+func (h HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest) {
+	mongoProduct, err := h.mongoRepo.GetProductByObjectID(c, productObjectID, req)
+
+	if err != nil {
+		fmt.Println("error not found doc ")
+		return
+	}
+
+	//store in cart
+	user, ok := helpers.GetAuthUser(c)
+	if !ok || user.ID <= 0 {
+		return
+	}
+
+	h.repo.InsertCart(c, user, mongoProduct, req)
+
+	fmt.Println("succ find :title", mongoProduct.ID)
 }

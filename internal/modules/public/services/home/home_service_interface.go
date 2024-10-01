@@ -3,6 +3,7 @@ package home
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/requests"
@@ -30,4 +31,8 @@ type HomeServiceInterface interface {
 	LogOut(c *gin.Context) bool
 	UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) custom_error.CustomError
 	GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, custom_error.CustomError)
+
+	//------cart
+
+	AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest)
 }
