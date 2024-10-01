@@ -63,14 +63,15 @@ func CheckCustomerSessionID() gin.HandlerFunc {
 			"http_method": method,
 		})
 
-		fmt.Println("Middleware : check_customer_session")
+		fmt.Println("[Middleware] :check_customer_session")
 
-		customer := helpers.CustomerAuth(c)
-
-		if customer.ID > 0 {
-			c.Redirect(http.StatusFound, "/")
-			c.Abort()
-			return
+		customer, ok := helpers.GetAuthUser(c)
+		if ok {
+			if customer.ID > 0 {
+				c.Redirect(http.StatusFound, "/")
+				c.Abort()
+				return
+			}
 		}
 
 		c.Next()
