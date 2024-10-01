@@ -14,5 +14,5 @@ type Session struct {
 	ExpiredAt  time.Time
 
 	//relation
-	Customer Customer `gorm:"foreignKey:CustomerID"`
+	Customer Customer `gorm:"references:ID"`
 }
