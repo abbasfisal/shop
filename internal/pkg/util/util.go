@@ -3,6 +3,7 @@ package util
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"log"
@@ -121,4 +122,14 @@ func ValidateIRMobile(mobile string) bool {
 func Random4Digit() int64 {
 	n, _ := rand.Int(rand.Reader, big.NewInt(9000))
 	return n.Int64() + 1000
+}
+
+func PrettyJson(v any) {
+	jsonData, err := json.MarshalIndent(v, "", "  ") // تبدیل به JSON زیبا
+	if err != nil {
+		fmt.Println("Error converting to JSON:", err)
+	} else {
+		// چاپ اطلاعات به‌صورت JSON زیبا
+		fmt.Printf("~~~~~~~~~~~~~~~~~~~~ [pretty json ] : data:\n%s\n ~~~~~~~~~~~~~~~~~~~~", string(jsonData))
+	}
 }
