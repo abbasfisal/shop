@@ -338,11 +338,15 @@ func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.P
 func (h HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest) {
 	var cart entities.Cart
 
-	err := h.db.Where("user_id = ? AND product_id = ? AND inventory_id = ?", user.ID, product.Product.ID, req.InventoryID).First(&cart).Error
+	err := h.db.
+		Where("customer_id = ? AND product_id = ? AND inventory_id = ?", user.ID, product.Product.ID, req.InventoryID).
+		First(&cart).
+		Error
+
 	if err != nil {
 		//not found ,so we will create it
 		cart = entities.Cart{
-			UserID:        user.ID,
+			CustomerID:    user.ID,
 			ProductID:     uint(product.Product.ID),
 			InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 			Count:         1,
