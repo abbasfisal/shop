@@ -279,7 +279,7 @@
                             <!-- <a href="#" class="btn-auth"><i class="fal fa-user-circle"></i>
                                     ورود و عضویت
                                 </a> -->
-                            <a href="#">abbas momeni <i class="fad fa-chevron-down text-sm mr-1"></i>
+                            <a href="#">{{if .AUTH.FirstName}}{{.AUTH.FirstName}} {{.AUTH.LastName}} {{else}}{{.AUTH.Mobile}}{{end}} <i class="fad fa-chevron-down text-sm mr-1"></i>
                             </a>
                             <ul class="dropdown--wrapper">
                                 <li class="header-profile-dropdown-account-container">
@@ -289,7 +289,7 @@
                                 <img src="/assets/shop/img/avatar/avatar.png">
                                 </span>
                                 <span class="header-profile-dropdown-user-info">
-                                <p class="header-profile-dropdown-user-name">abbas momeni </p>
+                                <p class="header-profile-dropdown-user-name">{{if .AUTH.FirstName}}{{.AUTH.FirstName}} {{.AUTH.LastName}} {{else}}{{.AUTH.Mobile}}{{end}}</p>
                                 <span class="header-profile-dropdown-user-profile-link">مشاهده حساب کاربری</span>
                                 </span>
                             </span>
