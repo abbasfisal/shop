@@ -41,3 +41,15 @@ func CustomerAuth(c *gin.Context) customerResponse.Customer {
 
 	return customerResponse.ToCustomer(customer)
 }
+
+// GetAuthUser get auth key from context
+func GetAuthUser(c *gin.Context) (customerResponse.Customer, bool) {
+
+	auth, exist := c.Get("auth")
+	if !exist {
+		return customerResponse.Customer{}, false
+	}
+	cus, ok := auth.(customerResponse.Customer)
+
+	return cus, ok
+}
