@@ -1,8 +1,12 @@
 package entities
 
-import "time"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
 
 type MongoProduct struct {
+	ID          primitive.ObjectID   `bson:"_id,omitempty"`
 	Product     P                    `bson:"product"`
 	Inventories map[string]Inventory `bson:"inventories"`
 }
