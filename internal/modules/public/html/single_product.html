@@ -457,17 +457,19 @@
                                                     <div>
                                                         {{if eq (len .PRODUCT.inventories) 1}}
                                                             {{range $key,$item:=.PRODUCT.inventories}}
+                                                                <input type="hidden" name="inventory_id"
+                                                                       value="{{$item.InventoryID}}">
                                                                 {{if lt $item.Quantity 5}}
                                                                     <b>موجودی</b>:
                                                                     {{$item.Quantity}}
                                                                     عدد
-                                                                   {{end}}
+                                                                {{end}}
                                                             {{end}}
                                                         {{else}}
                                                             <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
                                                                 <h2>انتخاب :</h2>
                                                             </div>
-                                                            <select name="inventory_id" id="" class="custom-select">
+                                                            <select name="inventory_id" class="custom-select">
                                                                 {{range $item:=.PRODUCT.inventories}}
                                                                     {{$qty:=$item.Quantity}}
                                                                     {{$inventory_id:=$item.InventoryID}}
