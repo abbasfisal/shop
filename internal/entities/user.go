@@ -11,6 +11,6 @@ type User struct {
 	Type        string `gorm:"type:enum('admin','client');not null;default:'client'"`
 
 	//Address Address //fk (1:1)
-	Cart  Cart //fk
+	//Cart  Cart //fk
 	Order Order
 }
