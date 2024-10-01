@@ -67,9 +67,9 @@ func customerWithGlobalData(c *gin.Context, data gin.H) gin.H {
 	menu, _ := c.Get("menu") //We load the menu using the LoadMenu() middleware and ignore the ok variable because if there is any error in LoadMenu(), a 500 error will be returned
 	data["MENU"] = menu
 
-	customer := helpers.CustomerAuth(c)
-
-	if customer.ID > 0 {
+	//check `auth` key from context
+	customer, ok := helpers.GetAuthUser(c)
+	if ok && customer.ID > 0 {
 		data["AUTH"] = customer
 	}
 
