@@ -10,6 +10,7 @@ import (
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
+	"shop/internal/modules/public/responses"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/pagination"
 	"shop/internal/pkg/sessions"
@@ -332,4 +333,33 @@ func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.P
 
 	pg.Rows = products
 	return pg, nil
+}
+
+func (h HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest) {
+	var cart entities.Cart
+
+	err := h.db.Where("user_id = ? AND product_id = ? AND inventory_id = ?", user.ID, product.Product.ID, req.InventoryID).First(&cart).Error
+	if err != nil {
+		//not found ,so we will create it
+		cart = entities.Cart{
+			UserID:        user.ID,
+			ProductID:     uint(product.Product.ID),
+			InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
+			Count:         1,
+			Status:        0,
+			ProductTitle:  product.Product.Title,
+			ProductImage:  product.Product.Images.Data[0].OriginalPath,
+			ProductSlug:   product.Product.Slug,
+			OriginalPrice: uint(product.Product.OriginalPrice),
+			SalePrice:     uint(product.Product.SalePrice),
+		}
+		h.db.Create(&cart)
+		fmt.Println("~~~~~~~ [create] new cart created ,cart id is : ", cart.ID, " | Count:", cart.Count)
+	} else {
+		cart.Count++
+		h.db.Save(&cart)
+		fmt.Println("~~~~~~~ [updated]  cart count  ,Cart Count is : ", cart.Count)
+
+	}
+
 }

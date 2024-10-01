@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
+	"shop/internal/modules/public/responses"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/pagination"
 )
@@ -23,4 +24,5 @@ type HomeRepositoryInterface interface {
 	UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) error
 	GetMenu(ctx context.Context) ([]entities.Category, error)
 	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
+	InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest)
 }
