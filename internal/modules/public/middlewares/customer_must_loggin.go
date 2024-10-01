@@ -11,10 +11,10 @@ import (
 func CustomerMustLogin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		fmt.Println("Middleware fired : customerMustBelogin")
-		customer := helpers.CustomerAuth(c)
+		fmt.Println("[Middleware] : CustomerMustLogin")
 
-		if customer.ID <= 0 {
+		customer, ok := helpers.GetAuthUser(c)
+		if !ok || customer.ID <= 0 {
 			c.Redirect(http.StatusFound, "/login")
 			c.Abort()
 			return
