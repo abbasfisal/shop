@@ -21,8 +21,10 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	//home service
 	homeSrv := home.NewHomeService(homeRep, MongoHomeRepo)
 
-	//load menu by LoadMenu middleware
-	r.Use(CustomerMiddlewares.LoadMenu(&homeSrv))
+	//--- [Global Middleware]
+	r.Use(CustomerMiddlewares.LoadMenu(&homeSrv)) //load menu by LoadMenu middleware
+	r.Use(CustomerMiddlewares.CheckUserAuth())    //set `auth` key in context if user was existed in database
+	//----
 
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
 
@@ -47,6 +49,7 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		publicAuthGrp.GET("/profile", publicHdl.ShowProfile)
 		publicAuthGrp.GET("/profile/edit", publicHdl.EditProfile)
 		publicAuthGrp.POST("/profile/edit", publicHdl.UpdateProfile)
+		publicAuthGrp.POST("/add-to-cart", publicHdl.AddToCart)
 	}
 
 	guestGrp := r.Group("/")
