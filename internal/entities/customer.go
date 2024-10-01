@@ -13,5 +13,6 @@ type Customer struct {
 
 	//--------- Relation
 	Address Address   `gorm:"foreignKey:CustomerID"`
+	Carts   []Cart    `gorm:"foreignKey:CustomerID"`
 	Session []Session `gorm:"foreignKey:CustomerID"`
 }
