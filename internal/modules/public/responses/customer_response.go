@@ -21,6 +21,7 @@ type Cart struct {
 	InventoryID   uint
 	Count         uint8
 	Status        uint8
+	ProductSku    string
 	ProductTitle  string
 	ProductSlug   string
 	ProductImage  string
@@ -41,6 +42,7 @@ func toCart(cartItem entities.Cart) Cart {
 		InventoryID:   cartItem.InventoryID,
 		Count:         cartItem.Count,
 		Status:        cartItem.Status,
+		ProductSku:    cartItem.ProductSku,
 		ProductTitle:  cartItem.ProductTitle,
 		ProductSlug:   cartItem.ProductSlug,
 		ProductImage:  viper.GetString("Upload.Products") + cartItem.ProductImage,
