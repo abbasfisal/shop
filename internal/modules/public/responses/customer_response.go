@@ -28,6 +28,7 @@ type Cart struct {
 	SalePrice     uint
 }
 type Carts struct {
+	TotalItemCount uint
 	TotalSalePrice uint
 	Data           []Cart
 }
@@ -50,7 +51,9 @@ func toCart(cartItem entities.Cart) Cart {
 
 func toCarts(cartData []entities.Cart) Carts {
 	var carts Carts
+	counter := 1
 	for _, item := range cartData {
+		carts.TotalItemCount += uint(counter)
 		carts.TotalSalePrice += item.SalePrice * uint(item.Count)
 		carts.Data = append(carts.Data, toCart(item))
 	}

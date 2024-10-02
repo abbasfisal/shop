@@ -147,7 +147,7 @@
                                     <path d="M3 10H21M3 10L5 20H19L21 10M3 10L9 4M21 10L15 4" stroke="#000000"
                                           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
-                                <span class="bag-items-number">2</span>
+                                <span class="bag-items-number">{{.AUTH.Carts.TotalItemCount }}</span>
                             </a>
                             {{if gt ( .AUTH.Carts.TotalSalePrice) 0}}
                                 <ul>
@@ -192,7 +192,8 @@
                             <span class="d-block text-center mb-3"> مبلغ کل: <span class="total"> {{$totalSalePrice}} تومان</span>
                             </span>
                                         <span class="d-block text-center px-2">
-                            <a href="/checkout/cart" class="btn-cart"> مشاهده سبد خرید <i class="mi mi-ShoppingCart"></i>
+                            <a href="/checkout/cart" class="btn-cart"> مشاهده سبد خرید <i
+                                        class="mi mi-ShoppingCart"></i>
                             </a>
                             </span>
                                     </li>
