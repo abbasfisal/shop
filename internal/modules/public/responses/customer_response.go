@@ -12,7 +12,7 @@ type Customer struct {
 	LastName  string
 	IsActive  bool
 	//address
-	Carts []Cart
+	Carts Carts
 }
 type Cart struct {
 	ID            uint
@@ -26,6 +26,10 @@ type Cart struct {
 	ProductImage  string
 	OriginalPrice uint
 	SalePrice     uint
+}
+type Carts struct {
+	TotalSalePrice uint
+	Data           []Cart
 }
 
 func toCart(cartItem entities.Cart) Cart {
@@ -44,10 +48,11 @@ func toCart(cartItem entities.Cart) Cart {
 	}
 }
 
-func toCarts(cartData []entities.Cart) []Cart {
-	var carts []Cart
+func toCarts(cartData []entities.Cart) Carts {
+	var carts Carts
 	for _, item := range cartData {
-		carts = append(carts, toCart(item))
+		carts.TotalSalePrice += item.SalePrice * uint(item.Count)
+		carts.Data = append(carts.Data, toCart(item))
 	}
 	return carts
 }
