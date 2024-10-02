@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
 	"net/http"
 	"shop/internal/modules/public/requests"
@@ -395,5 +396,43 @@ func (p PublicHandler) UpdateProfile(c *gin.Context) {
 	sessions.Set(c, "message", custom_error.SuccessfullyUpdated)
 	c.Redirect(http.StatusFound, "/profile/edit")
 	c.Abort()
+	return
+}
+
+func (p PublicHandler) AddToCart(c *gin.Context) {
+	var req requests.AddToCartRequest
+
+	_ = c.Request.ParseForm()
+	bindErr := c.ShouldBind(&req)
+	if bindErr != nil {
+		c.JSON(200, gin.H{
+			"err": bindErr.Error(),
+		})
+		return
+	}
+	//validation objectID
+	productObjectID, err := primitive.ObjectIDFromHex(req.ProductID)
+	if err != nil {
+		fmt.Println("[error]-[AddToCart]:", err)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	p.homeSrv.AddToCart(c, productObjectID, req)
+
+	c.JSON(200, gin.H{
+		"ok": productObjectID.String(),
+	})
+	//check uuid is exist in mongo? yes => catch product
+	//	p.homeSrv.AddToCart(c, req)
+
+	return
+
+}
+
+func (p PublicHandler) Cart(c *gin.Context) {
+	html.CustomerRender(c, 200, "cart", gin.H{
+		"TITLE": "cart",
+	})
 	return
 }
