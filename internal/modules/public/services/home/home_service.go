@@ -203,3 +203,12 @@ func (h HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectI
 
 	fmt.Println("succ find :title", mongoProduct.ID)
 }
+
+func (h HomeService) CartItemIncrement(c *gin.Context, cartID int) bool {
+	err := h.repo.IncreaseCartItemCount(c, cartID)
+	if err != nil {
+		fmt.Println("[failed]-[CartItemIncrement]-[error]:", err)
+		return false
+	}
+	return true
+}

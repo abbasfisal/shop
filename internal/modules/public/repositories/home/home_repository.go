@@ -12,6 +12,7 @@ import (
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/responses"
 	"shop/internal/pkg/custom_error"
+	"shop/internal/pkg/helpers"
 	"shop/internal/pkg/pagination"
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
@@ -366,5 +367,19 @@ func (h HomeRepository) InsertCart(c *gin.Context, user responses.Customer, prod
 		fmt.Println("~~~~~~~ [updated]  cart count  ,Cart Count is : ", cart.Count)
 
 	}
+
+}
+
+func (h HomeRepository) IncreaseCartItemCount(c *gin.Context, cartID int) error {
+	customer, exist := helpers.GetAuthUser(c)
+	if !exist {
+		return errors.New(custom_error.SomethingWrongHappened)
+	}
+
+	return h.db.
+		Model(&entities.Cart{}).
+		Where("id=?", uint(cartID)).
+		Where("customer_id=?", customer.ID).
+		Update("count", gorm.Expr("count + ?", 1)).Error
 
 }

@@ -35,4 +35,5 @@ type HomeServiceInterface interface {
 	//------cart
 
 	AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest)
+	CartItemIncrement(c *gin.Context, cartID int) bool
 }

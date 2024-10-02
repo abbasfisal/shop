@@ -19,6 +19,7 @@ import (
 	"shop/internal/pkg/old"
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
+	"strconv"
 	"time"
 )
 
@@ -434,5 +435,19 @@ func (p PublicHandler) Cart(c *gin.Context) {
 	html.CustomerRender(c, 200, "cart", gin.H{
 		"TITLE": "cart",
 	})
+	return
+}
+
+func (p PublicHandler) CartItemIncrement(c *gin.Context) {
+	id := c.Param("cartID")
+	cartID, ConvertErr := strconv.Atoi(id)
+	if ConvertErr != nil {
+		c.Redirect(http.StatusFound, "/checkout/cart")
+		return
+	}
+
+	p.homeSrv.CartItemIncrement(c, cartID)
+
+	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
 }
