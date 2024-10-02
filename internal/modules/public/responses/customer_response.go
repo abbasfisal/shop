@@ -1,6 +1,7 @@
 package responses
 
 import (
+	"github.com/spf13/viper"
 	"shop/internal/entities"
 )
 
@@ -37,7 +38,7 @@ func toCart(cartItem entities.Cart) Cart {
 		Status:        cartItem.Status,
 		ProductTitle:  cartItem.ProductTitle,
 		ProductSlug:   cartItem.ProductSlug,
-		ProductImage:  cartItem.ProductImage,
+		ProductImage:  viper.GetString("Upload.Products") + cartItem.ProductImage,
 		OriginalPrice: cartItem.OriginalPrice,
 		SalePrice:     cartItem.SalePrice,
 	}
