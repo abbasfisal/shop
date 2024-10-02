@@ -351,6 +351,7 @@ func (h HomeRepository) InsertCart(c *gin.Context, user responses.Customer, prod
 			InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 			Count:         1,
 			Status:        0,
+			ProductSku:    product.Product.Sku,
 			ProductTitle:  product.Product.Title,
 			ProductImage:  product.Product.Images.Data[0].OriginalPath,
 			ProductSlug:   product.Product.Slug,
