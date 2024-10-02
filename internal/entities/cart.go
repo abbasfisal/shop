@@ -12,6 +12,7 @@ type Cart struct {
 	Status uint8
 
 	//--
+	ProductSku   string
 	ProductTitle string
 	ProductImage string
 	ProductSlug  string
