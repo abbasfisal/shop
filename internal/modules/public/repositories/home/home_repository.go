@@ -383,3 +383,18 @@ func (h HomeRepository) IncreaseCartItemCount(c *gin.Context, cartID int) error 
 		Update("count", gorm.Expr("count + ?", 1)).Error
 
 }
+
+func (h HomeRepository) DecreaseCartItemCount(c *gin.Context, cartID int) error {
+	customer, exist := helpers.GetAuthUser(c)
+	if !exist {
+		return errors.New(custom_error.SomethingWrongHappened)
+	}
+
+	return h.db.
+		Model(&entities.Cart{}).
+		Where("id=?", uint(cartID)).
+		Where("customer_id=?", customer.ID).
+		Where("count>?", 1).
+		Update("count", gorm.Expr("count - ?", 1)).Error
+
+}

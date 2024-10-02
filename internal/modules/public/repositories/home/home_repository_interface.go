@@ -26,4 +26,5 @@ type HomeRepositoryInterface interface {
 	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
 	InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest)
 	IncreaseCartItemCount(c *gin.Context, cartID int) error
+	DecreaseCartItemCount(c *gin.Context, cartID int) error
 }

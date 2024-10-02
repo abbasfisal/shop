@@ -357,43 +357,50 @@
                                                                     <div class="item-detail">
                                                                         <ul>
                                                                             <li>
-                                                                        <span class="color"
-                                                                              style="background-color: #9E9E9E;"></span>
-                                                                                <span>خاکستری</span>
-                                                                            </li>
-                                                                            <li>
-                                                                                <i class="far fa-shield-check text-muted"></i>
-                                                                                <span>گارانتی ۱۸ ماهه</span>
-                                                                            </li>
-                                                                            <li>
-                                                                                <i class="far fa-store-alt text-muted"></i>
-                                                                                <span>نام فروشنده</span>
-                                                                            </li>
-                                                                            <li>
-                                                                                <i
-                                                                                        class="far fa-clipboard-check text-primary"></i>
+                                                                                <i class="far fa-clipboard-check text-primary"></i>
                                                                                 <span>موجود در انبار</span>
                                                                             </li>
                                                                         </ul>
                                                                         <div class="item-quantity--item-price">
                                                                             <div class="item-quantity">
-                                                                                <div class="num-block">
-                                                                                    <div class="num-in">
-                                                                                        <span class="plus"></span>
-                                                                                        <input type="text"
-                                                                                               class="in-num"
-                                                                                               value="1" readonly>
-                                                                                        <span class="minus dis"></span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <button class="item-remove-btn mr-3">
-                                                                                    <i class="far fa-trash-alt"></i>
-                                                                                    حذف
-                                                                                </button>
+                                                                                <form action="/cart/{{$item.ID}}/increment"
+                                                                                      method="get">
+                                                                                    <input type="hidden"
+                                                                                           value="{{$item.ID}}"/>
+                                                                                    <button class="item-remove-btn ml-3"
+                                                                                            type="submit">
+                                                                                        <i style="color: green"
+                                                                                           class="far fa-plus-hexagon "></i>
+                                                                                    </button>
+                                                                                </form>
+                                                                                <span>
+                                                                                            {{$item.Count}}
+                                                                                        </span>
+                                                                                {{if gt $item.Count 1}}
+                                                                                    <form action="/cart/{{$item.ID}}/decrement"
+                                                                                          method="get">
+                                                                                        <input type="hidden"
+                                                                                               value="{{$item.ID}}"/>
+                                                                                        <button class="item-remove-btn mr-3 "
+                                                                                                type="submit">
+                                                                                            <i class="far  fa-minus-hexagon "></i>
+                                                                                        </button>
+                                                                                    </form>
+                                                                                {{end}}
+                                                                                <form action="">
+                                                                                    <input type="hidden"
+                                                                                           value="{{$item.ID}}"/>
+                                                                                    <button style="color: darkred"
+                                                                                            class="item-remove-btn mr-3">
+                                                                                        <i style="color: darkred"
+                                                                                           class="far fa-trash-alt"></i>
+                                                                                        حذف
+                                                                                    </button>
+                                                                                </form>
                                                                             </div>
                                                                             <div class="item-price">
-                                                                                ۱۰,000,۰۰۰<span
-                                                                                        class="text-sm mr-1">تومان</span>
+                                                                                {{$item.SalePrice}}
+                                                                                <span class="text-sm mr-1">تومان</span>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -405,97 +412,104 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-xl-3 col-lg-4 col-12 sticky-sidebar">
-                                        <div class="widget-post1 dt-sn dt-sn--box border mb-2">
-                                            <ul class="checkout-summary-summary">
-                                                <li>
-                                                    <span>مبلغ کل (3 کالا)</span><span>۱0,000,۰۰۰ تومان</span>
-                                                </li>
-                                                <li class="checkout-summary-discount">
-                                                    <span>سود شما از خرید</span><span><span>(۱٪)</span>3۰۰,۰۰۰
-                                                        تومان</span>
-                                                </li>
-                                                <li>
-                                                    <span>هزینه ارسال<span class="help-sn" data-toggle="tooltip"
-                                                                           data-html="true" data-placement="bottom"
-                                                                           title="<div class='help-container is-right'><div class='help-arrow'></div><p class='help-text'>هزینه ارسال مرسولات می‌تواند وابسته به شهر و آدرس گیرنده متفاوت باشد. در صورتی که هر یک از مرسولات حداقل ارزشی برابر با 120هزار تومان داشته باشد، آن مرسوله بصورت رایگان ارسال می‌شود.<br>'حداقل ارزش هر مرسوله برای ارسال رایگان، می تواند متغیر باشد.'</p></div>">
-   
+                                    {{if gt .AUTH.Carts.TotalItemCount 0}}
+                                        <div class="col-xl-3 col-lg-4 col-12 sticky-sidebar">
+                                            <div class="widget-post1 dt-sn dt-sn--box border mb-2">
+                                                <ul class="checkout-summary-summary">
+                                                    <li>
+                                                        <span>
+                                                            مبلغ کل ({{.AUTH.Carts.TotalItemCount}} کالا)
+                                                        </span>
+                                                        <span>
+                                                            {{.AUTH.Carts.TotalOriginalPrice}}
+                                                            تومان
+                                                        </span>
+                                                    </li>
+                                                    <li class="checkout-summary-discount">
+                                                        <span>سود شما از خرید</span>
+                                                        <span>
+                                                            <span>(۱٪)</span>
+                                                            {{.AUTH.Carts.TotalProfitPrice}}
+                                                        تومان
+                                                        </span>
+                                                    </li>
+                                                    <li>
+                                                    <span>هزینه ارسال
+                                                        <span class="help-sn" data-toggle="tooltip"
+                                                              data-html="true" data-placement="bottom"
+                                                              title="<div class='help-container is-right'><div class='help-arrow'></div><p class='help-text'>هزینه ارسال مرسولات می‌تواند وابسته به شهر و آدرس گیرنده متفاوت باشد. در صورتی که هر یک از مرسولات حداقل ارزشی برابر با 120هزار تومان داشته باشد، آن مرسوله بصورت رایگان ارسال می‌شود.<br>'حداقل ارزش هر مرسوله برای ارسال رایگان، می تواند متغیر باشد.'</p></div>">
+
                                                         </span>
                                                     </span>
-                                                    <span>وابسته به آدرس</span>
-                                                </li>
-                                                <li class="checkout-club-container">
-                                                    <span>دیجیکلاب<span class="help-sn" data-toggle="tooltip"
-                                                                        data-html="true" data-placement="bottom"
-                                                                        title="<div class='help-container is-right'><div class='help-arrow'></div><p class='help-text'>با امتیازهای خود در باشگاه مشتریان دیجی پرس (دیجی کلاب) از بین جوایز متنوع انتخاب کنید.</p></div>">
-                                                          
-                                                        </span>
-                                                    </span>
-                                                    <span><span>120+</span><span> امتیاز</span></span>
-                                                </li>
-                                            </ul>
-                                            <div class="checkout-summary-devider">
-                                                <div></div>
-                                            </div>
-                                            <div class="checkout-summary-content">
-                                                <div class="checkout-summary-price-title">مبلغ قابل پرداخت:</div>
-                                                <div class="checkout-summary-price-value">
-                                                    <span class="checkout-summary-price-value-amount">۱2,000,۰۰۰</span>
-                                                    تومان
+                                                        <span>وابسته به آدرس</span>
+                                                    </li>
+
+                                                </ul>
+                                                <div class="checkout-summary-devider">
+                                                    <div></div>
                                                 </div>
-                                                <a href="#" class="mb-2 d-block">
-                                                    <button class="btn-primary-cm btn-with-icon w-100 text-center pr-0">
-                                                        <i>
-                                                            <svg width="25px" height="25px" viewBox="0 0 24 24"
-                                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <g id="Iconly/Curved/Arrow - Left">
-                                                                    <g id="Arrow - Left">
-                                                                        <path id="Stroke 1"
-                                                                              d="M4.24988 12.2742L19.2499 12.2742"
-                                                                              stroke="#fff" stroke-width="1.5"
-                                                                              stroke-linecap="round"
-                                                                              stroke-linejoin="round"/>
-                                                                        <path id="Stroke 3"
-                                                                              d="M10.3002 18.2988C10.3002 18.2988 4.25017 15.0378 4.25017 12.2758C4.25017 9.51176 10.3002 6.24976 10.3002 6.24976"
-                                                                              stroke="#fff" stroke-width="1.5"
-                                                                              stroke-linecap="round"
-                                                                              stroke-linejoin="round"/>
+                                                <div class="checkout-summary-content">
+                                                    <div class="checkout-summary-price-title">مبلغ قابل پرداخت:</div>
+                                                    <div class="checkout-summary-price-value">
+                                                        <span class="checkout-summary-price-value-amount">
+                                                            {{.AUTH.Carts.TotalSalePrice}}
+                                                        </span>
+                                                        تومان
+                                                    </div>
+                                                    <a href="#" class="mb-2 d-block">
+                                                        <button class="btn-primary-cm btn-with-icon w-100 text-center pr-0">
+                                                            <i>
+                                                                <svg width="25px" height="25px" viewBox="0 0 24 24"
+                                                                     fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <g id="Iconly/Curved/Arrow - Left">
+                                                                        <g id="Arrow - Left">
+                                                                            <path id="Stroke 1"
+                                                                                  d="M4.24988 12.2742L19.2499 12.2742"
+                                                                                  stroke="#fff" stroke-width="1.5"
+                                                                                  stroke-linecap="round"
+                                                                                  stroke-linejoin="round"/>
+                                                                            <path id="Stroke 3"
+                                                                                  d="M10.3002 18.2988C10.3002 18.2988 4.25017 15.0378 4.25017 12.2758C4.25017 9.51176 10.3002 6.24976 10.3002 6.24976"
+                                                                                  stroke="#fff" stroke-width="1.5"
+                                                                                  stroke-linecap="round"
+                                                                                  stroke-linejoin="round"/>
+                                                                        </g>
                                                                     </g>
-                                                                </g>
-                                                            </svg>
-                                                        </i>
-                                                        ادامه ثبت سفارش
-                                                    </button>
-                                                </a>
-                                                <div>
+                                                                </svg>
+                                                            </i>
+                                                            ادامه ثبت سفارش
+                                                        </button>
+                                                    </a>
+                                                    <div>
                                                     <span>
                                                         کالاهای موجود در سبد شما ثبت و رزرو نشده‌اند، برای ثبت سفارش
                                                         مراحل بعدی را تکمیل کنید.
                                                     </span><span class="help-sn" data-toggle="tooltip" data-html="true"
                                                                  data-placement="bottom"
                                                                  title="<div class='help-container is-right'><div class='help-arrow'></div><p class='help-text'>محصولات موجود در سبد خرید شما تنها در صورت ثبت و پرداخت سفارش برای شما رزرو می‌شوند. در صورت عدم ثبت سفارش، دیجی پرس هیچگونه مسئولیتی در قبال تغییر قیمت یا موجودی این کالاها ندارد.</p></div>">
-                                    
+
                                                     </span>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="widget-post2 dt-sn dt-sn--box checkout-feature-aside pt-4">
+                                                <ul>
+                                                    <li class="checkout-feature-aside-item">
+                                                        <img src="/assets/shop/img/svg/return-policy.svg" alt="">
+                                                        هفت روز ضمانت تعویض
+                                                    </li>
+                                                    <li class="checkout-feature-aside-item">
+                                                        <img src="/assets/shop/img/svg/payment-terms.svg" alt="">
+                                                        پرداخت در محل با کارت بانکی
+                                                    </li>
+                                                    <li class="checkout-feature-aside-item">
+                                                        <img src="/assets/shop/img/svg/delivery.svg" alt="">
+                                                        تحویل اکسپرس
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div class="widget-post2 dt-sn dt-sn--box checkout-feature-aside pt-4">
-                                            <ul>
-                                                <li class="checkout-feature-aside-item">
-                                                    <img src="/assets/shop/img/svg/return-policy.svg" alt="">
-                                                    هفت روز ضمانت تعویض
-                                                </li>
-                                                <li class="checkout-feature-aside-item">
-                                                    <img src="/assets/shop/img/svg/payment-terms.svg" alt="">
-                                                    پرداخت در محل با کارت بانکی
-                                                </li>
-                                                <li class="checkout-feature-aside-item">
-                                                    <img src="/assets/shop/img/svg/delivery.svg" alt="">
-                                                    تحویل اکسپرس
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    {{end}}
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="nav-profile" role="tabpanel"
@@ -570,7 +584,7 @@
                                                                     <div class="item-quantity">
                                                                         <div class="num-block">
                                                                             <div class="num-in">
-                                                                                <span class="plus"></span>
+                                                                                <button class="plus">s</button>
                                                                                 <input type="text" class="in-num"
                                                                                        value="1" readonly>
                                                                                 <span class="minus dis"></span>

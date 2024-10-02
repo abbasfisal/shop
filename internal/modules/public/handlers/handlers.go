@@ -451,3 +451,17 @@ func (p PublicHandler) CartItemIncrement(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
 }
+
+func (p PublicHandler) CartItemDecrement(c *gin.Context) {
+	id := c.Param("cartID")
+	cartID, ConvertErr := strconv.Atoi(id)
+	if ConvertErr != nil {
+		c.Redirect(http.StatusFound, "/checkout/cart")
+		return
+	}
+
+	p.homeSrv.CartItemDecrement(c, cartID)
+
+	c.Redirect(http.StatusFound, "/checkout/cart")
+	return
+}

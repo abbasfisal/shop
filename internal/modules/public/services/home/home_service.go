@@ -212,3 +212,12 @@ func (h HomeService) CartItemIncrement(c *gin.Context, cartID int) bool {
 	}
 	return true
 }
+
+func (h HomeService) CartItemDecrement(c *gin.Context, cartID int) bool {
+	err := h.repo.DecreaseCartItemCount(c, cartID)
+	if err != nil {
+		fmt.Println("[failed]-[CartItemDecrement]-[error]:", err)
+		return false
+	}
+	return true
+}
