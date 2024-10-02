@@ -398,3 +398,17 @@ func (h HomeRepository) DecreaseCartItemCount(c *gin.Context, cartID int) error 
 		Update("count", gorm.Expr("count - ?", 1)).Error
 
 }
+func (h HomeRepository) DeleteCartItem(c *gin.Context, cartID int) error {
+	customer, exist := helpers.GetAuthUser(c)
+	if !exist {
+		return errors.New(custom_error.SomethingWrongHappened)
+	}
+
+	return h.db.
+		Model(&entities.Cart{}).Unscoped().
+		Where("id=?", uint(cartID)).
+		Where("customer_id=?", customer.ID).
+		Delete(&entities.Cart{}).
+		Error
+
+}

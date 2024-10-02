@@ -221,3 +221,13 @@ func (h HomeService) CartItemDecrement(c *gin.Context, cartID int) bool {
 	}
 	return true
 }
+
+func (h HomeService) RemoveCartItem(c *gin.Context, cartID int) bool {
+	err := h.repo.DeleteCartItem(c, cartID)
+	if err != nil {
+		fmt.Println("[failed]-[RemoveCartItem]-[error]:", err)
+		return false
+	}
+
+	return true
+}

@@ -387,10 +387,12 @@
                                                                                         </button>
                                                                                     </form>
                                                                                 {{end}}
-                                                                                <form action="">
+                                                                                <form action="/cart/{{$item.ID}}/remove"
+                                                                                      method="get">
                                                                                     <input type="hidden"
                                                                                            value="{{$item.ID}}"/>
-                                                                                    <button style="color: darkred"
+                                                                                    <button type="submit"
+                                                                                            style="color: darkred"
                                                                                             class="item-remove-btn mr-3">
                                                                                         <i style="color: darkred"
                                                                                            class="far fa-trash-alt"></i>
