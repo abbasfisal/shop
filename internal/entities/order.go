@@ -4,10 +4,16 @@ import "gorm.io/gorm"
 
 type Order struct {
 	gorm.Model
-	UserID         uint
-	TrackingNumber string `gorm:"type:varchar(10)"`
-	ProductID      uint
-	Count          uint `gorm:"type:SmallInt"`
-	Status         uint `gorm:"type:smallInt"`
-	//add bank url , etc
+	CustomerID         uint
+	OrderNumber        string `gorm:"type:varchar(10),unique"`
+	PaymentStatus      uint   `gorm:"type:smallInt"`
+	TotalOriginalPrice uint
+	TotalSalePrice     uint
+	Discount           uint
+	OrderStatus        uint8 `gorm:"type:smallInt"`
+
+	//-- relation
+
+	OrderItems []OrderItem `gorm:"foreignKey:OrderID"`
+	Payments   []Payment   `gorm:"foreignKey:OrderID"`
 }
