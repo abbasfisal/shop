@@ -27,7 +27,12 @@ func migrate() {
 	db.Exec("SET foreign_key_checks = 0")
 
 	if err := db.Migrator().DropTable(
+		&entities.OrderItem{},
+		&entities.Payment{},
+		&entities.Order{},
+		&entities.CartItem{},
 		&entities.Cart{},
+		&entities.Address{},
 		&entities.User{},
 		&entities.Customer{},
 		&entities.OTP{},
@@ -42,8 +47,6 @@ func migrate() {
 		&entities.ProductImages{},
 		&entities.AttributeValue{},
 		&entities.Attribute{},
-		&entities.Address{},
-		&entities.Order{},
 	); err != nil {
 		log.Fatal("[Drop tables] failed : ", err)
 	}
@@ -52,21 +55,24 @@ func migrate() {
 	err := db.AutoMigrate(
 		&entities.User{},
 		&entities.Customer{},
-		&entities.OTP{},
-		&entities.Session{},
+		&entities.Address{},
 		&entities.Brand{},
 		&entities.Category{},
-		&entities.Feature{},
-		&entities.ProductInventoryAttribute{},
 		&entities.Attribute{},
 		&entities.AttributeValue{},
 		&entities.Product{},
-		&entities.ProductAttribute{},
 		&entities.ProductImages{},
+		&entities.Feature{},
+		&entities.ProductAttribute{},
 		&entities.ProductInventory{},
-		&entities.Address{},
+		&entities.ProductInventoryAttribute{},
 		&entities.Cart{},
+		&entities.CartItem{},
 		&entities.Order{},
+		&entities.OrderItem{},
+		&entities.Payment{},
+		&entities.OTP{},
+		&entities.Session{},
 	)
 	db.Exec("SET foreign_key_checks = 1")
 
