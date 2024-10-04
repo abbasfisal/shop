@@ -21,7 +21,7 @@ func (ar AuthenticateRepository) FindCustomerBySessionID(c *gin.Context, session
 
 	err := ar.db.
 		WithContext(c).
-		Preload("Customer.Carts").
+		Preload("Customer.Carts.CartItems").
 		Where("session_id = ?", sessionID).
 		First(&sess).
 		Error
