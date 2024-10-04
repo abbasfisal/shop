@@ -111,7 +111,16 @@ func Mapper(field string) string {
 		return "موبایل"
 	case "password":
 		return "کلمه عبور"
+	case "receiveraddress":
+		return "آدرس تحویل گیرنده"
+	case "receivermobile":
+		return "موبایل"
+	case "receivername":
+		return "نام تحویل گیرنده"
+	case "receiverpostalcode":
+		return "کد پستی"
+
 	default:
-		return "فیلد"
+		return ""
 	}
 }
