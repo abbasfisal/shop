@@ -5,12 +5,12 @@ import "gorm.io/gorm"
 type Order struct {
 	gorm.Model
 	CustomerID         uint
-	OrderNumber        string `gorm:"type:varchar(10),unique"`
-	PaymentStatus      uint   `gorm:"type:smallInt"`
+	OrderNumber        string `gorm:"type:varchar(10);unique"`
+	PaymentStatus      uint
 	TotalOriginalPrice uint
 	TotalSalePrice     uint
 	Discount           uint
-	OrderStatus        uint8 `gorm:"type:smallInt"`
+	OrderStatus        uint
 
 	//-- relation
 
