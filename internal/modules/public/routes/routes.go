@@ -50,11 +50,14 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		publicAuthGrp.GET("/profile/edit", publicHdl.EditProfile)
 		publicAuthGrp.POST("/profile/edit", publicHdl.UpdateProfile)
 
-		publicAuthGrp.POST("/add-to-cart", publicHdl.AddToCart)                   //insert
-		publicAuthGrp.GET("/checkout/cart", publicHdl.Cart)                       //get-all
-		publicAuthGrp.GET("/cart/:cartID/increment", publicHdl.CartItemIncrement) //+
-		publicAuthGrp.GET("/cart/:cartID/decrement", publicHdl.CartItemDecrement) //-
-		publicAuthGrp.GET("/cart/:cartID/remove", publicHdl.RemoveCartItem)       //delete
+		publicAuthGrp.POST("/add-to-cart", publicHdl.AddToCart)            //insert
+		publicAuthGrp.GET("/checkout/cart", publicHdl.Cart)                //get-all
+		publicAuthGrp.POST("/cart/increment", publicHdl.CartItemIncrement) //+
+		publicAuthGrp.POST("/cart/decrement", publicHdl.CartItemDecrement) //-
+		publicAuthGrp.POST("/cart/remove", publicHdl.RemoveCartItem)       //delete
+
+		publicAuthGrp.GET("/checkout/shipping", publicHdl.Shipping)    //shipping
+		publicAuthGrp.POST("/addresses/store", publicHdl.StoreAddress) //store address
 
 	}
 
