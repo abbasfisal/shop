@@ -116,7 +116,7 @@ func AllowImageExtensions() []string {
 func ValidateIRMobile(mobile string) bool {
 	// الگوی بررسی شماره موبایل ایران
 	re := regexp.MustCompile(`^09\d{9}$`)
-	return re.MatchString(mobile)
+	return len(mobile) == 11 && re.MatchString(mobile)
 }
 
 func Random4Digit() int64 {
