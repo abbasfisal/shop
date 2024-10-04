@@ -364,10 +364,11 @@
                                                                         </ul>
                                                                         <div class="item-quantity--item-price">
                                                                             <div class="item-quantity">
-                                                                                <form action="/cart/{{$item.ID}}/increment"
-                                                                                      method="get">
-                                                                                    <input type="hidden"
-                                                                                           value="{{$item.ID}}"/>
+                                                                                <form action="/cart/increment"
+                                                                                      method="post">
+                                                                                    <input type="hidden" name="product_id" value="{{$item.ProductID}}"/>
+                                                                                    <input type="hidden" name="inventory_id" value="{{$item.InventoryID}}"/>
+                                                                                    <input type="hidden" name="cart_id" value="{{$item.CartID}}"/>
                                                                                     <button class="item-remove-btn ml-3"
                                                                                             type="submit">
                                                                                         <i style="color: green"
@@ -375,7 +376,7 @@
                                                                                     </button>
                                                                                 </form>
                                                                                 <span>
-                                                                                            {{$carItem.TotalItemCount}}
+                                                                                            {{$item.Quantity}}
                                                                                         </span>
                                                                                 {{if gt $carItem.TotalItemCount 1}}
                                                                                     <form action="/cart/{{$item.ID}}/decrement"
