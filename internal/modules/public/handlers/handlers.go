@@ -15,6 +15,7 @@ import (
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/errors"
+	"shop/internal/pkg/helpers"
 	"shop/internal/pkg/html"
 	"shop/internal/pkg/old"
 	"shop/internal/pkg/sessions"
@@ -480,5 +481,58 @@ func (p PublicHandler) RemoveCartItem(c *gin.Context) {
 	p.homeSrv.RemoveCartItem(c, req)
 
 	c.Redirect(http.StatusFound, "/checkout/cart")
+	return
+}
+
+func (p PublicHandler) Shipping(c *gin.Context) {
+
+	customer, ok := helpers.GetAuthUser(c)
+	if ok {
+		if customer.Cart.CartItem.TotalItemCount <= 0 {
+			c.Redirect(http.StatusFound, "/checkout/cart")
+			return
+		}
+	}
+
+	html.CustomerRender(c, http.StatusFound, "shipping",
+		gin.H{
+			"TITLE": "اطلاعات ارسال",
+		})
+	return
+}
+
+func (p PublicHandler) StoreAddress(c *gin.Context) {
+	var req requests.StoreAddressRequest
+	_ = c.Request.ParseForm()
+	err := c.ShouldBind(&req)
+	if err != nil {
+
+		errors.Init()
+		errors.SetErrors(c, p.i18nBundle, err)
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	//todo:add validation for postal_code
+	if !util.ValidateIRMobile(req.ReceiverMobile) {
+		errors.Init()
+
+		errors.Add("receivermobile", custom_error.IRMobileIsInvalid)
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	p.homeSrv.StoreAddress(c, req)
+
+	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
 }
