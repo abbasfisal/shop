@@ -37,7 +37,7 @@ const (
 	UpdateWasFailed         string = "خطا در بروزرسانی"
 	StoreImageOnDiskFailed  string = "خطا در ذخیره عکس بر روی هارددیسک"
 	IDIsNotCorrect          string = "شناسه صحیح نمی باشد"
-
+	IRMobileIsInvalid              = "شماره موبایل معتبر نیست"
 	//OTP
 
 	OTPRequestTooSoon = "باید ۴ دقیقه صبر کنید برای دریافت کد جدید"
