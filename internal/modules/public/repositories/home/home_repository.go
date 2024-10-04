@@ -468,3 +468,36 @@ func (h HomeRepository) DeleteCartItem(c *gin.Context, req requests.IncreaseCart
 		Error
 
 }
+
+func (h HomeRepository) CreateOrUpdateAddress(c *gin.Context, req requests.StoreAddressRequest) error {
+	customer, ok := helpers.GetAuthUser(c)
+	if !ok {
+		return nil
+	}
+
+	if customer.Address.ID <= 0 {
+		if err := h.db.Create(&entities.Address{
+			CustomerID:         customer.ID,
+			ReceiverName:       req.ReceiverName,
+			ReceiverMobile:     req.ReceiverMobile,
+			ReceiverAddress:    req.ReceiverAddress,
+			ReceiverPostalCode: req.ReceiverPostalCode,
+		}).Error; err != nil {
+			util.PrettyJson(err)
+			return errors.New("خطا در ذخیره آدرس")
+		}
+	}
+
+	if err := h.db.Model(&entities.Address{}).Where("customer_id=?", customer.ID).Updates(&entities.Address{
+		CustomerID:         customer.ID,
+		ReceiverName:       req.ReceiverName,
+		ReceiverMobile:     req.ReceiverMobile,
+		ReceiverAddress:    req.ReceiverAddress,
+		ReceiverPostalCode: req.ReceiverPostalCode,
+	}).Error; err != nil {
+		util.PrettyJson(err)
+		return errors.New("خطا در بروزرسانی آدرس")
+	}
+
+	return nil
+}

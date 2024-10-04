@@ -28,4 +28,5 @@ type HomeRepositoryInterface interface {
 	IncreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error
 	DecreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error
 	DeleteCartItem(c *gin.Context, req requests.IncreaseCartItemQty) error
+	CreateOrUpdateAddress(c *gin.Context, req requests.StoreAddressRequest) error
 }
