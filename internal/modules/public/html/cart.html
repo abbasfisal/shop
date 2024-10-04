@@ -333,12 +333,13 @@
                                                 </svg>
 
                                                 <span class="checkout-header-title">ارسال عادی</span>
-                                                <span class="checkout-header-extra-info">({{.AUTH.Carts.TotalItemCount}} کالا)</span>
+                                                <span class="checkout-header-extra-info">({{.AUTH.Cart.CartItem.TotalItemCount}} کالا)</span>
                                             </div>
                                             <div class="checkout-section-content-dd-k">
                                                 <div class="cart-items-dd-k">
-                                                    {{if gt (len .AUTH.Carts.Data) 0}}
-                                                        {{range $item:=.AUTH.Carts.Data}}
+                                                    {{if gt (len .AUTH.Cart.CartItem.Data) 0}}
+                                                        {{$carItem:=.AUTH.Cart.CartItem}}
+                                                        {{range $item:= $carItem.Data}}
                                                             <div class="cart-item py-4 px-3">
                                                                 <div class="item-thumbnail">
                                                                     <a href="#">
@@ -374,9 +375,9 @@
                                                                                     </button>
                                                                                 </form>
                                                                                 <span>
-                                                                                            {{$item.Count}}
+                                                                                            {{$carItem.TotalItemCount}}
                                                                                         </span>
-                                                                                {{if gt $item.Count 1}}
+                                                                                {{if gt $carItem.TotalItemCount 1}}
                                                                                     <form action="/cart/{{$item.ID}}/decrement"
                                                                                           method="get">
                                                                                         <input type="hidden"
@@ -414,16 +415,16 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {{if gt .AUTH.Carts.TotalItemCount 0}}
+                                    {{if gt .AUTH.Cart.CartItem.TotalItemCount 0}}
                                         <div class="col-xl-3 col-lg-4 col-12 sticky-sidebar">
                                             <div class="widget-post1 dt-sn dt-sn--box border mb-2">
                                                 <ul class="checkout-summary-summary">
                                                     <li>
                                                         <span>
-                                                            مبلغ کل ({{.AUTH.Carts.TotalItemCount}} کالا)
+                                                            مبلغ کل ({{.AUTH.Cart.CartItem.TotalItemCount}} کالا)
                                                         </span>
                                                         <span>
-                                                            {{.AUTH.Carts.TotalOriginalPrice}}
+                                                            {{.AUTH.Cart.CartItem.TotalOriginalPrice}}
                                                             تومان
                                                         </span>
                                                     </li>
@@ -431,7 +432,7 @@
                                                         <span>سود شما از خرید</span>
                                                         <span>
                                                             <span>(۱٪)</span>
-                                                            {{.AUTH.Carts.TotalProfitPrice}}
+                                                            {{.AUTH.Cart.CartItem.TotalProfitPrice}}
                                                         تومان
                                                         </span>
                                                     </li>
@@ -454,7 +455,7 @@
                                                     <div class="checkout-summary-price-title">مبلغ قابل پرداخت:</div>
                                                     <div class="checkout-summary-price-value">
                                                         <span class="checkout-summary-price-value-amount">
-                                                            {{.AUTH.Carts.TotalSalePrice}}
+                                                            {{.AUTH.Cart.CartItem.TotalSalePrice}}
                                                         </span>
                                                         تومان
                                                     </div>
