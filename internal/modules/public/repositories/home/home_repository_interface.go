@@ -25,7 +25,7 @@ type HomeRepositoryInterface interface {
 	GetMenu(ctx context.Context) ([]entities.Category, error)
 	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
 	InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest)
-	IncreaseCartItemCount(c *gin.Context, cartID int) error
-	DecreaseCartItemCount(c *gin.Context, cartID int) error
-	DeleteCartItem(c *gin.Context, cartID int) error
+	IncreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error
+	DecreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error
+	DeleteCartItem(c *gin.Context, req requests.IncreaseCartItemQty) error
 }

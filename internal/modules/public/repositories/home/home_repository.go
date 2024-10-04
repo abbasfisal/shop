@@ -337,78 +337,134 @@ func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.P
 }
 
 func (h HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest) {
+	maxQuantity := uint8(2)
+	//todo: set max quantity in config
+	//todo:check inventories stock_reserved before insert
+	//todo:check product count in the cart
+	//todo: after change cart to order, we will delete cart and cartItems
 	var cart entities.Cart
 
+	//todo:check cart status
 	err := h.db.
-		Where("customer_id = ? AND product_id = ? AND inventory_id = ?", user.ID, product.Product.ID, req.InventoryID).
+		Preload("CartItems").
+		Where("customer_id = ? AND status = ? ", user.ID, 0).
 		First(&cart).
 		Error
 
 	if err != nil {
 		//not found ,so we will create it
-		cart = entities.Cart{
-			CustomerID:    user.ID,
-			ProductID:     uint(product.Product.ID),
-			InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
-			Count:         1,
-			Status:        0,
-			ProductSku:    product.Product.Sku,
-			ProductTitle:  product.Product.Title,
-			ProductImage:  product.Product.Images.Data[0].OriginalPath,
-			ProductSlug:   product.Product.Slug,
-			OriginalPrice: uint(product.Product.OriginalPrice),
-			SalePrice:     uint(product.Product.SalePrice),
+		cart := entities.Cart{
+			CustomerID: user.ID,
+			Status:     0,
+			CartItems: []entities.CartItem{
+				{
+					CustomerID:    user.ID,
+					ProductID:     uint(product.Product.ID),
+					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
+					Quantity:      1,
+					OriginalPrice: uint(product.Product.OriginalPrice),
+					SalePrice:     uint(product.Product.SalePrice),
+					ProductSku:    product.Product.Sku,
+					ProductTitle:  product.Product.Title,
+					ProductImage:  product.Product.Images.Data[0].OriginalPath,
+					ProductSlug:   product.Product.Slug,
+				},
+			},
 		}
+
 		h.db.Create(&cart)
-		fmt.Println("~~~~~~~ [create] new cart created ,cart id is : ", cart.ID, " | Count:", cart.Count)
+		fmt.Println("~~~~~~~ [create] new cart created ,cart id is : ", cart.ID)
 	} else {
-		cart.Count++
+
+		itemExist := false
+		for i, cartItem := range cart.CartItems {
+
+			if cartItem.ProductID == uint(product.Product.ID) && cartItem.InventoryID == req.InventoryID {
+				if cart.CartItems[i].Quantity < maxQuantity {
+					cart.CartItems[i].Quantity += 1
+				} else {
+					return
+				}
+
+				itemExist = true
+				break
+			}
+		}
+
+		if !itemExist {
+			//cartItem was not exist
+			CartItems := []entities.CartItem{
+				{
+					CustomerID:    user.ID,
+					ProductID:     uint(product.Product.ID),
+					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
+					Quantity:      1,
+					OriginalPrice: uint(product.Product.OriginalPrice),
+					SalePrice:     uint(product.Product.SalePrice),
+					ProductSku:    product.Product.Sku,
+					ProductTitle:  product.Product.Title,
+					ProductImage:  product.Product.Images.Data[0].OriginalPath,
+					ProductSlug:   product.Product.Slug,
+				},
+			}
+			h.db.Model(&cart).Association("CartItems").Append(&CartItems)
+
+		}
+
 		h.db.Save(&cart)
-		fmt.Println("~~~~~~~ [updated]  cart count  ,Cart Count is : ", cart.Count)
 
 	}
 
 }
 
-func (h HomeRepository) IncreaseCartItemCount(c *gin.Context, cartID int) error {
+func (h HomeRepository) IncreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error {
+	customer, exist := helpers.GetAuthUser(c)
+	if !exist {
+		return errors.New(custom_error.SomethingWrongHappened)
+	}
+
+	//return nil
+	return h.db.
+		Model(&entities.CartItem{}).
+		Where("cart_id=?", req.CartID).
+		Where("customer_id=?", customer.ID).
+		Where("product_id=?", req.ProductID).
+		Where("inventory_id=?", req.InventoryID).
+		Where("quantity<?", 3).                                //max qty to order
+		Update("quantity", gorm.Expr("quantity + ?", 1)).Error //todo:qty <3
+
+}
+
+func (h HomeRepository) DecreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error {
 	customer, exist := helpers.GetAuthUser(c)
 	if !exist {
 		return errors.New(custom_error.SomethingWrongHappened)
 	}
 
 	return h.db.
-		Model(&entities.Cart{}).
-		Where("id=?", uint(cartID)).
+		Model(&entities.CartItem{}).
+		Where("cart_id=?", req.CartID).
 		Where("customer_id=?", customer.ID).
-		Update("count", gorm.Expr("count + ?", 1)).Error
+		Where("product_id=?", req.ProductID).
+		Where("inventory_id=?", req.InventoryID).
+		Where("quantity>?", 1).
+		Update("quantity", gorm.Expr("quantity - ?", 1)).
+		Error
 
 }
-
-func (h HomeRepository) DecreaseCartItemCount(c *gin.Context, cartID int) error {
+func (h HomeRepository) DeleteCartItem(c *gin.Context, req requests.IncreaseCartItemQty) error {
 	customer, exist := helpers.GetAuthUser(c)
 	if !exist {
 		return errors.New(custom_error.SomethingWrongHappened)
 	}
 
 	return h.db.
-		Model(&entities.Cart{}).
-		Where("id=?", uint(cartID)).
+		Model(&entities.CartItem{}).Unscoped().
+		Where("cart_id=?", req.CartID).
 		Where("customer_id=?", customer.ID).
-		Where("count>?", 1).
-		Update("count", gorm.Expr("count - ?", 1)).Error
-
-}
-func (h HomeRepository) DeleteCartItem(c *gin.Context, cartID int) error {
-	customer, exist := helpers.GetAuthUser(c)
-	if !exist {
-		return errors.New(custom_error.SomethingWrongHappened)
-	}
-
-	return h.db.
-		Model(&entities.Cart{}).Unscoped().
-		Where("id=?", uint(cartID)).
-		Where("customer_id=?", customer.ID).
-		Delete(&entities.Cart{}).
+		Where("product_id=?", req.ProductID).
+		Where("inventory_id=?", req.InventoryID).
+		Delete(&entities.CartItem{}).
 		Error
 
 }

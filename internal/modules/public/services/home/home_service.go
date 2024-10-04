@@ -204,8 +204,8 @@ func (h HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectI
 	fmt.Println("succ find :title", mongoProduct.ID)
 }
 
-func (h HomeService) CartItemIncrement(c *gin.Context, cartID int) bool {
-	err := h.repo.IncreaseCartItemCount(c, cartID)
+func (h HomeService) CartItemIncrement(c *gin.Context, req requests.IncreaseCartItemQty) bool {
+	err := h.repo.IncreaseCartItemCount(c, req)
 	if err != nil {
 		fmt.Println("[failed]-[CartItemIncrement]-[error]:", err)
 		return false
@@ -213,8 +213,8 @@ func (h HomeService) CartItemIncrement(c *gin.Context, cartID int) bool {
 	return true
 }
 
-func (h HomeService) CartItemDecrement(c *gin.Context, cartID int) bool {
-	err := h.repo.DecreaseCartItemCount(c, cartID)
+func (h HomeService) CartItemDecrement(c *gin.Context, req requests.IncreaseCartItemQty) bool {
+	err := h.repo.DecreaseCartItemCount(c, req)
 	if err != nil {
 		fmt.Println("[failed]-[CartItemDecrement]-[error]:", err)
 		return false
@@ -222,8 +222,8 @@ func (h HomeService) CartItemDecrement(c *gin.Context, cartID int) bool {
 	return true
 }
 
-func (h HomeService) RemoveCartItem(c *gin.Context, cartID int) bool {
-	err := h.repo.DeleteCartItem(c, cartID)
+func (h HomeService) RemoveCartItem(c *gin.Context, req requests.IncreaseCartItemQty) bool {
+	err := h.repo.DeleteCartItem(c, req)
 	if err != nil {
 		fmt.Println("[failed]-[RemoveCartItem]-[error]:", err)
 		return false
