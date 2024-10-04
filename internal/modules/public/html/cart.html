@@ -300,7 +300,8 @@
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                 <a class="nav-item nav-link d-inline-flex w-auto active" id="nav-home-tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-home" role="tab" aria-controls="nav-home"
-                                   aria-selected="true">سبد خرید<span class="count-cart">{{.AUTH.Cart.CartItem.TotalItemCount}}</span></a>
+                                   aria-selected="true">سبد خرید<span
+                                            class="count-cart">{{.AUTH.Cart.CartItem.TotalItemCount}}</span></a>
                             </div>
                         </nav>
                     </div>
@@ -366,9 +367,14 @@
                                                                             <div class="item-quantity">
                                                                                 <form action="/cart/increment"
                                                                                       method="post">
-                                                                                    <input type="hidden" name="product_id" value="{{$item.ProductID}}"/>
-                                                                                    <input type="hidden" name="inventory_id" value="{{$item.InventoryID}}"/>
-                                                                                    <input type="hidden" name="cart_id" value="{{$item.CartID}}"/>
+                                                                                    <input type="hidden"
+                                                                                           name="product_id"
+                                                                                           value="{{$item.ProductID}}"/>
+                                                                                    <input type="hidden"
+                                                                                           name="inventory_id"
+                                                                                           value="{{$item.InventoryID}}"/>
+                                                                                    <input type="hidden" name="cart_id"
+                                                                                           value="{{$item.CartID}}"/>
                                                                                     <button class="item-remove-btn ml-3"
                                                                                             type="submit">
                                                                                         <i style="color: green"
@@ -381,9 +387,15 @@
                                                                                 {{if gt $item.Quantity 1}}
                                                                                     <form action="/cart/decrement"
                                                                                           method="post">
-                                                                                        <input type="hidden" name="product_id" value="{{$item.ProductID}}"/>
-                                                                                        <input type="hidden" name="inventory_id" value="{{$item.InventoryID}}"/>
-                                                                                        <input type="hidden" name="cart_id" value="{{$item.CartID}}"/>
+                                                                                        <input type="hidden"
+                                                                                               name="product_id"
+                                                                                               value="{{$item.ProductID}}"/>
+                                                                                        <input type="hidden"
+                                                                                               name="inventory_id"
+                                                                                               value="{{$item.InventoryID}}"/>
+                                                                                        <input type="hidden"
+                                                                                               name="cart_id"
+                                                                                               value="{{$item.CartID}}"/>
                                                                                         <button class="item-remove-btn mr-3 "
                                                                                                 type="submit">
                                                                                             <i class="far  fa-minus-hexagon "></i>
@@ -392,9 +404,14 @@
                                                                                 {{end}}
                                                                                 <form action="/cart/remove"
                                                                                       method="post">
-                                                                                    <input type="hidden" name="product_id" value="{{$item.ProductID}}"/>
-                                                                                    <input type="hidden" name="inventory_id" value="{{$item.InventoryID}}"/>
-                                                                                    <input type="hidden" name="cart_id" value="{{$item.CartID}}"/>
+                                                                                    <input type="hidden"
+                                                                                           name="product_id"
+                                                                                           value="{{$item.ProductID}}"/>
+                                                                                    <input type="hidden"
+                                                                                           name="inventory_id"
+                                                                                           value="{{$item.InventoryID}}"/>
+                                                                                    <input type="hidden" name="cart_id"
+                                                                                           value="{{$item.CartID}}"/>
                                                                                     <button type="submit"
                                                                                             style="color: darkred"
                                                                                             class="item-remove-btn mr-3">
@@ -413,6 +430,12 @@
                                                                 </div>
                                                             </div>
                                                         {{end}}
+                                                    {{else}}
+                                                        <div class="cart-item py-4 px-3">
+                                                            <p>
+                                                                سبد خرید شما خالی است!
+                                                            </p>
+                                                        </div>
                                                     {{end}}
                                                 </div>
                                             </div>
@@ -463,28 +486,31 @@
                                                         تومان
                                                     </div>
                                                     <a href="#" class="mb-2 d-block">
-                                                        <button class="btn-primary-cm btn-with-icon w-100 text-center pr-0">
-                                                            <i>
-                                                                <svg width="25px" height="25px" viewBox="0 0 24 24"
-                                                                     fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                    <g id="Iconly/Curved/Arrow - Left">
-                                                                        <g id="Arrow - Left">
-                                                                            <path id="Stroke 1"
-                                                                                  d="M4.24988 12.2742L19.2499 12.2742"
-                                                                                  stroke="#fff" stroke-width="1.5"
-                                                                                  stroke-linecap="round"
-                                                                                  stroke-linejoin="round"/>
-                                                                            <path id="Stroke 3"
-                                                                                  d="M10.3002 18.2988C10.3002 18.2988 4.25017 15.0378 4.25017 12.2758C4.25017 9.51176 10.3002 6.24976 10.3002 6.24976"
-                                                                                  stroke="#fff" stroke-width="1.5"
-                                                                                  stroke-linecap="round"
-                                                                                  stroke-linejoin="round"/>
+                                                        <form action="/checkout/shipping" method="get">
+                                                            <button type="submit"
+                                                                    class="btn-primary-cm btn-with-icon w-100 text-center pr-0">
+                                                                <i>
+                                                                    <svg width="25px" height="25px" viewBox="0 0 24 24"
+                                                                         fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <g id="Iconly/Curved/Arrow - Left">
+                                                                            <g id="Arrow - Left">
+                                                                                <path id="Stroke 1"
+                                                                                      d="M4.24988 12.2742L19.2499 12.2742"
+                                                                                      stroke="#fff" stroke-width="1.5"
+                                                                                      stroke-linecap="round"
+                                                                                      stroke-linejoin="round"/>
+                                                                                <path id="Stroke 3"
+                                                                                      d="M10.3002 18.2988C10.3002 18.2988 4.25017 15.0378 4.25017 12.2758C4.25017 9.51176 10.3002 6.24976 10.3002 6.24976"
+                                                                                      stroke="#fff" stroke-width="1.5"
+                                                                                      stroke-linecap="round"
+                                                                                      stroke-linejoin="round"/>
+                                                                            </g>
                                                                         </g>
-                                                                    </g>
-                                                                </svg>
-                                                            </i>
-                                                            ادامه ثبت سفارش
-                                                        </button>
+                                                                    </svg>
+                                                                </i>
+                                                                تایید و تکمیل سفارش
+                                                            </button>
+                                                        </form>
                                                     </a>
                                                     <div>
                                                     <span>
