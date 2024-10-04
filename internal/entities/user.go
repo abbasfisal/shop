@@ -12,5 +12,5 @@ type User struct {
 
 	//Address Address //fk (1:1)
 	//Cart  Cart //fk
-	Order Order
+	//Order Order
 }
