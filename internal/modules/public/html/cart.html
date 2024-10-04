@@ -300,7 +300,7 @@
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                 <a class="nav-item nav-link d-inline-flex w-auto active" id="nav-home-tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-home" role="tab" aria-controls="nav-home"
-                                   aria-selected="true">سبد خرید<span class="count-cart">1</span></a>
+                                   aria-selected="true">سبد خرید<span class="count-cart">{{.AUTH.Cart.CartItem.TotalItemCount}}</span></a>
                             </div>
                         </nav>
                     </div>
@@ -378,21 +378,23 @@
                                                                                 <span>
                                                                                             {{$item.Quantity}}
                                                                                         </span>
-                                                                                {{if gt $carItem.TotalItemCount 1}}
-                                                                                    <form action="/cart/{{$item.ID}}/decrement"
-                                                                                          method="get">
-                                                                                        <input type="hidden"
-                                                                                               value="{{$item.ID}}"/>
+                                                                                {{if gt $item.Quantity 1}}
+                                                                                    <form action="/cart/decrement"
+                                                                                          method="post">
+                                                                                        <input type="hidden" name="product_id" value="{{$item.ProductID}}"/>
+                                                                                        <input type="hidden" name="inventory_id" value="{{$item.InventoryID}}"/>
+                                                                                        <input type="hidden" name="cart_id" value="{{$item.CartID}}"/>
                                                                                         <button class="item-remove-btn mr-3 "
                                                                                                 type="submit">
                                                                                             <i class="far  fa-minus-hexagon "></i>
                                                                                         </button>
                                                                                     </form>
                                                                                 {{end}}
-                                                                                <form action="/cart/{{$item.ID}}/remove"
-                                                                                      method="get">
-                                                                                    <input type="hidden"
-                                                                                           value="{{$item.ID}}"/>
+                                                                                <form action="/cart/remove"
+                                                                                      method="post">
+                                                                                    <input type="hidden" name="product_id" value="{{$item.ProductID}}"/>
+                                                                                    <input type="hidden" name="inventory_id" value="{{$item.InventoryID}}"/>
+                                                                                    <input type="hidden" name="cart_id" value="{{$item.CartID}}"/>
                                                                                     <button type="submit"
                                                                                             style="color: darkred"
                                                                                             class="item-remove-btn mr-3">
