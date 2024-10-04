@@ -8,7 +8,7 @@ type OrderItem struct {
 	OrderID            uint
 	ProductID          uint
 	InventoryID        uint
-	Quantity           uint8 `gorm:"type:SmallInt"`
+	Quantity           uint
 	OriginalPrice      uint
 	SalePrice          uint
 	TotalOriginalPrice uint

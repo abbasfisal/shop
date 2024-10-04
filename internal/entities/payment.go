@@ -5,10 +5,11 @@ import "gorm.io/gorm"
 type Payment struct {
 	gorm.Model
 	CustomerID    uint
-	OrderId       uint
-	PaymentStatus uint8 `gorm:"type:smallInt"`
+	OrderID       uint
+	PaymentStatus uint
+
 	Amount        uint
-	PaymentMethod uint8
+	PaymentMethod uint
 	TransactionID string
 	BankResponse  string
 
