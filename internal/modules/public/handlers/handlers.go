@@ -19,7 +19,6 @@ import (
 	"shop/internal/pkg/old"
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/util"
-	"strconv"
 	"time"
 )
 
@@ -439,42 +438,46 @@ func (p PublicHandler) Cart(c *gin.Context) {
 }
 
 func (p PublicHandler) CartItemIncrement(c *gin.Context) {
-	id := c.Param("cartID")
-	cartID, ConvertErr := strconv.Atoi(id)
-	if ConvertErr != nil {
+	_ = c.Request.ParseForm()
+	var req requests.IncreaseCartItemQty
+	err := c.ShouldBind(&req)
+	if err != nil {
+		fmt.Println("-- bind error :", err.Error())
 		c.Redirect(http.StatusFound, "/checkout/cart")
-		return
 	}
+	util.PrettyJson(req)
 
-	p.homeSrv.CartItemIncrement(c, cartID)
-
+	res := p.homeSrv.CartItemIncrement(c, req)
+	fmt.Println("---------- res:", res)
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
 }
 
 func (p PublicHandler) CartItemDecrement(c *gin.Context) {
-	id := c.Param("cartID")
-	cartID, ConvertErr := strconv.Atoi(id)
-	if ConvertErr != nil {
+	_ = c.Request.ParseForm()
+	var req requests.IncreaseCartItemQty
+	err := c.ShouldBind(&req)
+	if err != nil {
+		fmt.Println("-- bind error :", err.Error())
 		c.Redirect(http.StatusFound, "/checkout/cart")
-		return
 	}
 
-	p.homeSrv.CartItemDecrement(c, cartID)
+	p.homeSrv.CartItemDecrement(c, req)
 
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
 }
 
 func (p PublicHandler) RemoveCartItem(c *gin.Context) {
-	id := c.Param("cartID")
-	cartID, ConvertErr := strconv.Atoi(id)
-	if ConvertErr != nil {
+	_ = c.Request.ParseForm()
+	var req requests.IncreaseCartItemQty
+	err := c.ShouldBind(&req)
+	if err != nil {
+		fmt.Println("-- bind error :", err.Error())
 		c.Redirect(http.StatusFound, "/checkout/cart")
-		return
 	}
 
-	p.homeSrv.RemoveCartItem(c, cartID)
+	p.homeSrv.RemoveCartItem(c, req)
 
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
