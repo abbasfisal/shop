@@ -11,8 +11,27 @@ type Customer struct {
 	FirstName string
 	LastName  string
 	IsActive  bool
-	//address
-	Cart Cart
+	Address   Address
+	Cart      Cart
+}
+type Address struct {
+	ID                 uint
+	CustomerID         uint
+	ReceiverName       string
+	ReceiverMobile     string
+	ReceiverAddress    string
+	ReceiverPostalCode string
+}
+
+func toAddress(address entities.Address) Address {
+	return Address{
+		ID:                 address.ID,
+		CustomerID:         address.CustomerID,
+		ReceiverName:       address.ReceiverName,
+		ReceiverMobile:     address.ReceiverMobile,
+		ReceiverAddress:    address.ReceiverAddress,
+		ReceiverPostalCode: address.ReceiverPostalCode,
+	}
 }
 
 func ToCustomer(cus entities.Customer) Customer {
@@ -23,8 +42,9 @@ func ToCustomer(cus entities.Customer) Customer {
 		FirstName: cus.FirstName,
 		LastName:  cus.LastName,
 		IsActive:  cus.Active,
+		Address:   toAddress(cus.Address),
+		Cart:      toCart(cus.Carts), // در اینجا اولین سبد خرید مشتری در نظر گرفته می‌شود
 
-		Cart: toCart(cus.Carts), // در اینجا اولین سبد خرید مشتری در نظر گرفته می‌شود
 	}
 }
 
