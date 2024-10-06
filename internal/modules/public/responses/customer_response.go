@@ -105,12 +105,11 @@ func toCartItems(cartItemEntities []entities.CartItem) CartItem {
 	// محاسبه مقادیر و تبدیل آیتم‌ها
 	for _, item := range cartItemEntities {
 		items = append(items, toCartItem(item))
-		totalItemCount += counter //----------------
+		totalItemCount += counter
 		totalSalePrice += uint(item.SalePrice) * uint(item.Quantity)
 		totalOriginalPrice += uint(item.OriginalPrice) * uint(item.Quantity)
 		totalProfitPrice += (uint(item.OriginalPrice) - uint(item.SalePrice)) * uint(item.Quantity)
 
-		counter++
 	}
 
 	return CartItem{
