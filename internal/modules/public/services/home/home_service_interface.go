@@ -38,4 +38,5 @@ type HomeServiceInterface interface {
 	CartItemIncrement(c *gin.Context, req requests.IncreaseCartItemQty) bool
 	CartItemDecrement(c *gin.Context, req requests.IncreaseCartItemQty) bool
 	RemoveCartItem(c *gin.Context, req requests.IncreaseCartItemQty) bool
+	StoreAddress(c *gin.Context, req requests.StoreAddressRequest)
 }

@@ -231,3 +231,7 @@ func (h HomeService) RemoveCartItem(c *gin.Context, req requests.IncreaseCartIte
 
 	return true
 }
+
+func (h HomeService) StoreAddress(c *gin.Context, req requests.StoreAddressRequest) {
+	h.repo.CreateOrUpdateAddress(c, req)
+}
