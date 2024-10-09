@@ -33,4 +33,8 @@ const (
 	// otp
 	OTPIsNotValid = "کد نامعتبر است"
 	OTPISExpired  = "کد otp منقضی شده است"
+
+	//
+
+	FillAddress = "لطفا فیلد های آدرس را تکمیل نمایید."
 )
