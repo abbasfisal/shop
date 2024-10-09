@@ -8,5 +8,5 @@ type Cart struct {
 	Status     uint8
 
 	//---- relation
-	CartItems []CartItem `gorm:"foreignKey:CartID"`
+	CartItems []CartItem `gorm:"foreignKey:CartID;constraint:OnDelete:CASCADE"`
 }
