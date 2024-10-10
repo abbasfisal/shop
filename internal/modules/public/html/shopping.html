@@ -97,6 +97,15 @@
                                                           action="/addresses/store"
                                                           style="max-width: 100%;">
                                                         <div class="row">
+                                                            {{if .MESSAGE}}
+                                                                <div class="text-center p-2 ">
+                                                                    <b class="text-danger fa-1x">
+                                                                        ** {{.MESSAGE}}
+                                                                    </b>
+                                                                </div>
+                                                                <br>
+                                                            {{end}}
+
                                                             <div class="col-md-6 col-sm-12 mb-2">
                                                                 <div class="form-row-title">
                                                                     <h4>
@@ -181,9 +190,7 @@
                                                                 <button type="submit"
                                                                         class="btn btn-sm btn-primary btn-submit-form"
                                                                         style="background: #f7858d;font-weight: 600;box-shadow: none;border: none;margin-top: 10px;color: #fff;">
-                                                                    ثبت
-                                                                    و
-                                                                    ارسال به این آدرس
+                                                                    ثبت آدرس
                                                                 </button>
                                                                 <button type="button"
                                                                         class="btn-link-border float-left mt-3">
@@ -335,27 +342,32 @@
                                     </span>
                                     تومان
                                 </div>
-                                <a href="#" class="mb-2 d-block">
-                                    <button class="btn-primary-cm btn-with-icon w-100 text-center pr-0 pl-0">
+
+                                <form action="/checkout/payment" method="post">
+                                    <button type="submit"
+                                            class="btn-primary-cm btn-with-icon w-100 text-center pr-0 pl-0">
                                         <i>
                                             <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
                                                  xmlns="http://www.w3.org/2000/svg">
                                                 <g id="Iconly/Curved/Arrow - Left">
                                                     <g id="Arrow - Left">
                                                         <path id="Stroke 1" d="M4.24988 12.2742L19.2499 12.2742"
-                                                              stroke="#fff" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke="#fff" stroke-width="1.5"
+                                                              stroke-linecap="round"
                                                               stroke-linejoin="round"></path>
                                                         <path id="Stroke 3"
                                                               d="M10.3002 18.2988C10.3002 18.2988 4.25017 15.0378 4.25017 12.2758C4.25017 9.51176 10.3002 6.24976 10.3002 6.24976"
-                                                              stroke="#fff" stroke-width="1.5" stroke-linecap="round"
+                                                              stroke="#fff" stroke-width="1.5"
+                                                              stroke-linecap="round"
                                                               stroke-linejoin="round"></path>
                                                     </g>
                                                 </g>
                                             </svg>
                                         </i>
-                                        تایید و ادامه ثبت سفارش
+                                        پرداخت
                                     </button>
-                                </a>
+                                </form>
+
                                 <div>
                                     <span>
                                         کالاهای موجود در سبد شما ثبت و رزرو نشده‌اند، برای ثبت سفارش
