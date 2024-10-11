@@ -19,6 +19,7 @@ import (
 	PublicRoutes "shop/internal/modules/public/routes"
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/logging"
+	"shop/internal/pkg/sms"
 	"sync"
 )
 
@@ -58,6 +59,13 @@ func initialize() {
 	initializeLogger()
 	loadConfig()
 	initializeDatabase()
+	InitializeSmsService()
+}
+
+func InitializeSmsService() {
+	//todo:get from env
+	kaveNegar := sms.NewKaveNegar("apiKey")
+	sms.GetSMSManager().SetService(kaveNegar)
 }
 
 func loadTranslation() {
