@@ -39,6 +39,10 @@ func Send(receptors []string, message string) {
 	GetSMSManager().Send(receptors, message)
 }
 
+func SendOTP(receptor string, token string) {
+	GetSMSManager().SendOTP(receptor, token)
+}
+
 /**
  *---------------------------
  *			KAVENEGAR
