@@ -59,6 +59,11 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		publicAuthGrp.GET("/checkout/shipping", publicHdl.Shipping)    //shipping
 		publicAuthGrp.POST("/addresses/store", publicHdl.StoreAddress) //store address
 
+		publicAuthGrp.POST("/checkout/payment", publicHdl.Payment) //payment
+
+		//put outside
+		publicAuthGrp.GET("/checkout/payment/verify", publicHdl.VerifyPayment) //payment callback url
+
 	}
 
 	guestGrp := r.Group("/")
