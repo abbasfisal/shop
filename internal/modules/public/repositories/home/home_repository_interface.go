@@ -3,6 +3,7 @@ package home
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/responses"
@@ -29,4 +30,10 @@ type HomeRepositoryInterface interface {
 	DecreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error
 	DeleteCartItem(c *gin.Context, req requests.IncreaseCartItemQty) error
 	CreateOrUpdateAddress(c *gin.Context, req requests.StoreAddressRequest) error
+
+	// GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
+	GenerateOrderFromCart(c *gin.Context) (orderEntity entities.Order, inventoryTx *gorm.DB, error error)
+
+	Release(order entities.Order, tx *gorm.DB)
+	OrderPaidSuccessfully(c *gin.Context, params requests.VerifyPaymentQueryString)
 }
