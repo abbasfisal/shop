@@ -1,6 +1,6 @@
 env_file: ".env.development"
 app:
-  name: shop
+  name: vivify
   port: 8082
   host: 127.0.0.1
   debug: true
