@@ -104,6 +104,7 @@ __
 - ability to bookmark product by user
 - log all request in elastic
 - order 
+- get tax-code
 
 add make file :
 
