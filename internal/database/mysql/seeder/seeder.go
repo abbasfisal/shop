@@ -1013,7 +1013,7 @@ func fakeBrands() []entities.Brand {
 func insertProductInMongo(db *gorm.DB) {
 	var products []entities.Product
 	if err := db.Find(&products).Error; err != nil {
-		fmt.Println("~~~ [failed] get all products")
+		fmt.Println("~~~ [failed] get all products ~~~")
 	} else {
 
 		for _, pItem := range products {
