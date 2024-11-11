@@ -49,6 +49,7 @@ func main() {
 	setupRoutes(r)
 
 	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
+	log.Printf("[start server ]: %s", "http://"+addr)
 	if err := r.Run(addr); err != nil {
 		logging.GlobalLog.FatalF("[Server start failed]: %v", err)
 	}
