@@ -1,0 +1,937 @@
+{{define "404"}}
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="/assets/shop/img/seller-logo.png" type="image/icon">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>{{.APP_NAME}}</title>
+        <!-- Font Icon -->
+        <link rel="stylesheet" href="/assets/shop/css/vendor/font-awesome.min.css">
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="/assets/shop/css/vendor/bootstrap.min.css">
+        <!-- Plugins -->
+        <link rel="stylesheet" href="/assets/shop/plugin/go-to-top/style.css">
+        <link rel="stylesheet" href="/assets/shop/plugin/iran-map/iranmap.css">
+        <!-- Main CSS File -->
+        <link rel="stylesheet" href="/assets/shop/css/main.css">
+    </head>
+
+    <body>
+    <div class="wrapper">
+        <!-------------------------------- Header Section -->
+        {{template "header_tmpl" .}}
+        <!-------------------------------- Header Section -->
+
+        <!--------------------- Header Responsive Section -->
+        <div class="header-responsive">
+            <div class="header-top">
+                <div class="side-navigation-wrapper">
+                    <button class="btn-toggle-side-navigation">
+                        <i>
+                            <svg width="20px" height="20px" viewBox="0 -1 12 12" id="meteor-icon-kit__regular-bars-s"
+                                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                      d="M0.85714 2C0.38376 2 0 1.55228 0 1C0 0.44772 0.38376 0 0.85714 0H11.1429C11.6162 0 12 0.44772 12 1C12 1.55228 11.6162 2 11.1429 2H0.85714zM0.85714 6C0.38376 6 0 5.5523 0 5C0 4.4477 0.38376 4 0.85714 4H11.1429C11.6162 4 12 4.4477 12 5C12 5.5523 11.6162 6 11.1429 6H0.85714zM0.85714 10C0.38376 10 0 9.5523 0 9C0 8.4477 0.38376 8 0.85714 8H11.1429C11.6162 8 12 8.4477 12 9C12 9.5523 11.6162 10 11.1429 10H0.85714z"
+                                      fill="#758CA3"/>
+                            </svg>
+                        </i>
+                    </button>
+                    <div class="side-navigation">
+                        <div class="site-logo">
+                            <a href="#">
+                                <img src="/assets/shop/img/svg/logo.svg" alt="logo">
+                            </a>
+                        </div>
+                        <div class="divider"></div>
+                        <ul class="not-list-children">
+                            <li>
+                                <a href="#">
+                                    <i>
+                                        <svg width="25px" height="25px" version="1.1" id="Layer_1"
+                                             xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 512 512" xml:space="preserve">
+                                <rect x="21.59" y="175.807" style="fill:#EDEDED;" width="468.819" height="234.41"/>
+                                            <rect x="453.398" y="175.807" style="fill:#D8D8DA;" width="37.012"
+                                                  height="234.41"/>
+                                            <rect x="83.277" y="163.47" style="fill:#D1E5F5;" width="345.446"
+                                                  height="185.06"/>
+                                            <polygon style="fill:#B4D8F1;"
+                                                     points="120.289,163.47 305.349,348.53 428.723,348.53 428.723,163.47 "/>
+                                            <circle style="fill:#E07188;" cx="256" cy="354.699" r="92.53"/>
+                                            <path style="fill:#DC4161;" d="M256,262.169c-4.186,0-8.298,0.305-12.337,0.844c45.266,6.035,80.193,44.77,80.193,91.686
+                                    s-34.927,85.652-80.193,91.686c4.039,0.538,8.151,0.844,12.337,0.844c51.103,0,92.53-41.428,92.53-92.53
+                                    S307.103,262.169,256,262.169z"/>
+                                            <polygon style="fill:#80CB93;" points="502.747,138.795 490.41,151.133 21.59,151.133 9.253,138.795 83.277,64.771 428.723,64.771 
+                                    "/>
+                                            <polygon style="fill:#6DC180;" points="428.723,64.771 404.048,64.771 478.072,138.795 465.735,151.133 490.41,151.133 
+                                    502.747,138.795 "/>
+                                            <path style="fill:#95D5A7;" d="M9.253,175.807c0,34.068,27.618,61.687,61.687,61.687s61.687-27.618,61.687-61.687
+                                    c0,34.068,27.618,61.687,61.687,61.687S256,209.876,256,175.807c0,34.068,27.618,61.687,61.687,61.687s61.687-27.618,61.687-61.687
+                                    c0,34.068,27.618,61.687,61.687,61.687s61.687-27.618,61.687-61.687v-37.012H9.253V175.807z"/>
+                                            <g>
+                                                <path style="fill:#80CB93;" d="M478.072,138.795v37.012c0,29.843-21.193,54.735-49.349,60.451
+                                        c3.986,0.809,8.112,1.236,12.337,1.236c34.068,0,61.687-27.618,61.687-61.687v-37.012H478.072z"/>
+                                                <path style="fill:#80CB93;" d="M305.349,236.258c3.986,0.809,8.112,1.236,12.337,1.236c34.068,0,61.687-27.618,61.687-61.687
+                                        h-13.37c-6.058,0-11.162,4.409-12.174,10.382C349.575,211.283,330.167,231.219,305.349,236.258z"/>
+                                                <path style="fill:#80CB93;" d="M181.976,236.258c3.986,0.809,8.112,1.236,12.337,1.236c34.068,0,61.687-27.618,61.687-61.687
+                                        h-13.37c-6.058,0-11.162,4.409-12.174,10.382C226.202,211.283,206.794,231.219,181.976,236.258z"/>
+                                                <path style="fill:#80CB93;" d="M58.602,236.258c3.986,0.809,8.112,1.236,12.337,1.236c34.068,0,61.687-27.618,61.687-61.687
+                                        h-13.371c-6.058,0-11.162,4.409-12.174,10.382C102.828,211.283,83.42,231.219,58.602,236.258z"/>
+                                            </g>
+                                            <path style="fill:#F8F8F9;" d="M280.675,319.979c-13.628,0-24.675,11.047-24.675,24.675c0,6.814,0,6.814,0,0
+                                    c0-13.628-11.047-24.675-24.675-24.675c-13.628,0-24.675,11.047-24.675,24.675c0,6.814,2.761,12.983,7.227,17.447L256,404.223
+                                    l42.122-42.122l0,0c4.465-4.465,7.227-10.634,7.227-17.447C305.349,331.026,294.303,319.979,280.675,319.979z"/>
+                                            <path style="fill:#2E2D31;" d="M132.627,210.812c12.216,21.445,35.291,35.935,61.687,35.935s49.47-14.49,61.687-35.935
+                                    c12.216,21.445,35.291,35.935,61.687,35.935s49.47-14.49,61.687-35.935c12.216,21.445,35.29,35.935,61.687,35.935
+                                    c39.117,0,70.94-31.823,70.94-70.94v-37.012c0-2.548-1.03-4.855-2.696-6.528c-0.005-0.005-0.009-0.01-0.014-0.016l-74.024-74.024
+                                    c-1.736-1.735-4.09-2.709-6.544-2.709H170.46c-5.111,0-9.253,4.142-9.253,9.253s4.142,9.253,9.253,9.253h254.431l55.518,55.518
+                                    H31.591l55.518-55.518h46.34c5.111,0,9.253-4.142,9.253-9.253s-4.142-9.253-9.253-9.253H83.277c-2.454,0-4.807,0.975-6.544,2.709
+                                    L2.709,132.251c-0.002,0.002-0.002,0.004-0.004,0.005C1.034,133.932,0,136.243,0,138.795v37.012
+                                    c0,14.796,4.559,28.544,12.337,39.925v194.485c0,5.111,4.142,9.253,9.253,9.253h155.954c18.685,22.591,46.916,37.012,78.456,37.012
+                                    s59.771-14.421,78.456-37.012H490.41c5.111,0,9.253-4.142,9.253-9.253V260.524c0-5.111-4.142-9.253-9.253-9.253
+                                    c-5.111,0-9.253,4.142-9.253,9.253v140.44H346.614c6.679-13.029,10.626-27.671,11.091-43.181h71.018
+                                    c5.111,0,9.253-4.142,9.253-9.253v-70.734c0-5.111-4.142-9.253-9.253-9.253s-9.253,4.142-9.253,9.253v61.481h-62.854
+                                    c-7.454-48.831-49.734-86.361-100.616-86.361s-93.162,37.53-100.616,86.361H92.53v-95.893
+                                    C109.609,237.916,123.893,226.142,132.627,210.812z M493.494,148.048v27.759c0,28.913-23.521,52.434-52.434,52.434
+                                    c-28.913,0-52.434-23.521-52.434-52.434c0-5.111-4.142-9.253-9.253-9.253s-9.253,4.142-9.253,9.253
+                                    c0,28.913-23.521,52.434-52.434,52.434c-28.913,0-52.434-23.521-52.434-52.434c0-5.111-4.142-9.253-9.253-9.253
+                                    c-5.111,0-9.253,4.142-9.253,9.253c0,28.913-23.521,52.434-52.434,52.434s-52.434-23.521-52.434-52.434
+                                    c0-5.111-4.142-9.253-9.253-9.253c-5.111,0-9.253,4.142-9.253,9.253c0,28.913-23.521,52.434-52.434,52.434
+                                    s-52.434-23.521-52.434-52.434v-27.759H493.494z M256,271.422c45.92,0,83.277,37.357,83.277,83.277S301.92,437.976,256,437.976
+                                    s-83.277-37.358-83.277-83.277S210.08,271.422,256,271.422z M83.277,357.783h71.017c0.465,15.509,4.411,30.151,11.09,43.181H30.843
+                                    V234.288c11.415,7.851,25.225,12.459,40.096,12.459c1.034,0,2.06-0.03,3.084-0.074V348.53
+                                    C74.024,353.642,78.166,357.783,83.277,357.783z"/>
+                            </svg>
+                                    </i> سوپرمارکت </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i>
+                                        <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.1"
+                                                  d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                  fill="#323232"/>
+                                            <path d="M16 8L8 16" stroke="#323232" stroke-width="2"
+                                                  stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M9 9.01001L9 9.00001" stroke="#323232" stroke-width="2"
+                                                  stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M15 15.01L15 15" stroke="#323232" stroke-width="2"
+                                                  stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                  stroke="#323232" stroke-width="2"/>
+                                        </svg>
+                                    </i> پیشنهادها و تخفیف ها </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i>
+                                        <svg width="23px" height="23px" viewBox="0 0 24 24" fill="none"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.1"
+                                                  d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                  fill="#323232"></path>
+                                            <path d="M9 12H15" stroke="#323232" stroke-width="2" stroke-linecap="round"
+                                                  stroke-linejoin="round"></path>
+                                            <path d="M12 9L12 15" stroke="#323232" stroke-width="2"
+                                                  stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                  stroke="#323232" stroke-width="2"></path>
+                                        </svg>
+                                    </i> فروشنده شوید </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i>
+                                        <svg width="23px" height="23px" viewBox="0 0 24 24" fill="none"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8.95043 20.6471C6.17301 19.9956 4.00437 17.827 3.35288 15.0496C2.88237 13.0437 2.88237 10.9563 3.35288 8.95043C4.00437 6.17301 6.17301 4.00437 8.95044 3.35288C10.9563 2.88237 13.0437 2.88237 15.0496 3.35288C17.827 4.00437 19.9956 6.17301 20.6471 8.95043C21.1176 10.9563 21.1176 13.0437 20.6471 15.0496C19.9956 17.827 17.827 19.9956 15.0496 20.6471C13.0437 21.1176 10.9563 21.1176 8.95043 20.6471Z"
+                                                  fill="#363853" fill-opacity="0.15" stroke="#363853"
+                                                  stroke-width="1.5"/>
+                                            <circle cx="12" cy="15.5" r="1" fill="#363853"/>
+                                            <path d="M10 10V9.5C10 8.39543 10.8954 7.5 12 7.5V7.5V7.5C13.1046 7.5 14 8.39543 14 9.5V9.62132C14 10.1839 13.7765 10.7235 13.3787 11.1213L12 12.5"
+                                                  stroke="#363853" stroke-width="1.5" stroke-linecap="round"
+                                                  stroke-linejoin="round"/>
+                                        </svg>
+                                    </i> سوالی دارید؟ </a>
+                            </li>
+                        </ul>
+                        <div class="divider"></div>
+                        <ul class="category-list">
+                            <li class="has-children">
+                                <a href="#">کالای دیجیتال</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">مد و پوشاک</a>
+                                <ul>
+                                    <li>لباس زنانه</li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">زیبایی و سلامت</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">خانه و آشپزخانه</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">کتاب،لوازم تحریر و هنر</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">اسباب بازی،کودک و نوزاد</a>
+                            </li>
+                            <li>
+                                <a href="#">ورزش و سفر</a>
+                            </li>
+                            <li>
+                                <a href="#">خوردنی و آشامیدنی</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="overlay-side-navigation"></div>
+                </div>
+                <div class="site-logo">
+                    <a href="#">
+                        <img src="/assets/shop/img/svg/logo.svg" alt="logo">
+                    </a>
+                </div>
+                <div class="header-tools">
+                    <a href="#">
+                        <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.15" d="M3 10H21L19 20H5L3 10Z" fill="#000000"/>
+                            <path d="M3 10H21M3 10L5 20H19L21 10M3 10L9 4M21 10L15 4" stroke="#000000"
+                                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="bag-items-number">2</span>
+                    </a>
+                </div>
+            </div>
+            <div class="header-bottom">
+                <div class="search-box">
+                    <form action="#">
+                        <input type="text" placeholder="نام محصول یا برند را جستجو کنید...">
+                        <i>
+                            <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.1"
+                                      d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+                                      fill="#323232"/>
+                                <path d="M15 15L21 21" stroke="#323232" stroke-width="2" stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                                <path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+                                      stroke="#323232" stroke-width="2"/>
+                            </svg>
+                        </i>
+                    </form>
+                    <div class="search-result">
+                        <ul class="search-result-list">
+                            <li>
+                                <a href="#">موبایل</a>
+                            </li>
+                            <li>
+                                <a href="#">سامسونگ</a>
+                            </li>
+                            <li>
+                                <a href="#">مودم</a>
+                            </li>
+                            <li>
+                                <a href="#">اپل</a>
+                            </li>
+                            <li>
+                                <a href="#">تلویزیون</a>
+                            </li>
+                        </ul>
+                        <ul class="search-result-most-view">
+                            <li>
+                                <a href="#">موبایل</a>
+                            </li>
+                            <li>
+                                <a href="#">سامسونگ</a>
+                            </li>
+                            <li>
+                                <a href="#">مودم</a>
+                            </li>
+                            <li>
+                                <a href="#">اپل</a>
+                            </li>
+                            <li>
+                                <a href="#">تلویزیون</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="header-tools">
+                    <a href="#">
+                        <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <circle opacity="0.5" cx="12" cy="9" r="3" stroke="#1C274C" stroke-width="1.5"/>
+                            <circle cx="12" cy="12" r="10" stroke="#1C274C" stroke-width="1.5"/>
+                            <path opacity="0.5"
+                                  d="M17.9691 20C17.81 17.1085 16.9247 15 11.9999 15C7.07521 15 6.18991 17.1085 6.03076 20"
+                                  stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!--------------------- Header Responsive Section -->
+
+        <!---------------------------- Page Loader Section-->
+        <div class="page-loader">
+            <div class="page-loader-content">
+                <div class="logo-area">
+                    <img src="/assets/shop/img/svg/logo.svg" alt="">
+                </div>
+                <span class="loader"></span>
+            </div>
+        </div>
+        <!---------------------------- Page Loader Section-->
+
+        <!--------------------------------- Main Content -->
+        <main class="main-content dt-sl mb-3">
+            <div class="container main-container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="dt-sl pt-3 pb-5">
+                            <div class="error-page text-center">
+                                <h1>صفحه‌ای که دنبال آن بودید پیدا نشد!</h1>
+                                <a href="/" class="btn-primary-cm">ادامه خرید</a>
+                                <img src="/assets/shop/img/theme/404.png" class="img-fluid" width="60%" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!--------------------------------- Main Content -->
+
+        <!-------------------------- Mobile Footer Section-->
+        <div class="mobile-footer d-lg-none d-table justify-content-center shadow-box bg-white position-fixed p-2 w-100"
+             style="bottom:0;z-index: 100;table-layout: fixed;">
+            <ul class="d-table-row">
+                <li class="d-table-cell pointer">
+                    <div class="mf-link nav-link text-center">
+                <span class="d-block mf-link-icon" style="cursor: pointer;">
+                    <svg height="25pxx" width="25px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 512 512" xml:space="preserve">
+                        <path style="fill:#CEE8FA;" d="M395.47,296.3H116.531c-36.816,0-57.855-42.009-35.803-71.491L225.983,30.621
+                            c14.993-20.043,45.041-20.043,60.034,0l145.254,194.188C453.325,254.291,432.286,296.3,395.47,296.3z"/>
+                        <path style="fill:#2D527C;" d="M443.755,215.471L298.501,21.284C288.382,7.759,272.893,0,256.001,0s-32.383,7.759-42.5,21.284
+                            L68.245,215.471c-13.759,18.393-15.916,42.579-5.631,63.119c10.286,20.54,30.946,33.298,53.916,33.298h66.552
+                            C185.227,422.598,275.94,512,387.153,512c8.608,0,15.589-6.979,15.589-15.589V381.652c0-8.61-6.981-15.589-15.589-15.589
+                            c-14.01,0-27.556-5.074-38.144-14.29c-6.494-5.651-16.339-4.971-21.993,1.525c-5.653,6.494-4.97,16.34,1.525,21.993
+                            c12.293,10.699,27.185,17.765,43.025,20.577v84.258c-86.772-7.791-155.289-79.949-157.307-168.237H395.47
+                            c22.97,0,43.63-12.759,53.917-33.298C459.671,258.052,457.514,233.866,443.755,215.471z M421.509,264.629
+                            c-5.043,10.069-14.777,16.081-26.04,16.081H116.53c-11.261,0-20.995-6.011-26.038-16.081c-5.043-10.07-4.027-21.466,2.72-30.484
+                            L238.466,39.957c4.173-5.581,10.565-8.781,17.534-8.781c6.97,0,13.36,3.2,17.534,8.781l145.254,194.188
+                            C425.534,243.165,426.551,254.56,421.509,264.629z"/>
+                    </svg>
+                </span>
+                    </div>
+                </li>
+                <li class="d-table-cell">
+                    <a href="" class="mf-link nav-link text-center">
+                        <div class="mf-link-icon position-relative d-table mx-auto">
+                            <svg width="25px" height="25px" version="1" xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 48 48" enable-background="new 0 0 48 48">
+                                <g fill="#616161">
+                                    <rect x="34.6" y="28.1" transform="matrix(.707 -.707 .707 .707 -15.154 36.586)"
+                                          width="4" height="17"></rect>
+                                    <circle cx="20" cy="20" r="16"></circle>
+                                </g>
+                                <rect x="36.2" y="32.1" transform="matrix(.707 -.707 .707 .707 -15.839 38.239)"
+                                      fill="#37474F" width="4" height="12.3"></rect>
+                                <circle fill="#64B5F6" cx="20" cy="20" r="13"></circle>
+                                <path fill="#BBDEFB"
+                                      d="M26.9,14.2c-1.7-2-4.2-3.2-6.9-3.2s-5.2,1.2-6.9,3.2c-0.4,0.4-0.3,1.1,0.1,1.4c0.4,0.4,1.1,0.3,1.4-0.1 C16,13.9,17.9,13,20,13s4,0.9,5.4,2.5c0.2,0.2,0.5,0.4,0.8,0.4c0.2,0,0.5-0.1,0.6-0.2C27.2,15.3,27.2,14.6,26.9,14.2z"></path>
+                            </svg>
+                        </div>
+                    </a>
+                </li>
+                <li class="d-table-cell">
+                    <a href="" class="mf-link nav-link text-center">
+                    <span class="d-block mf-link-icon">
+                        <svg class="svg-icon"
+                             style="position: relative;width: 35px; height: 35px;vertical-align: middle;fill: currentColor;overflow: hidden;"
+                             viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M336.2 571.3h337.9v319.3H336.2z" fill="#2867CE"></path>
+                            <path d="M296.3 405.6l185-185c9-9 20.9-13.5 32.7-13.5 11.9 0 23.7 4.5 32.7 13.5l185.7 185.7 194.1 194.1c1.9 1.9 5.1 1.3 6.2-1.1 7.9-17.9 12.1-37.4 12.1-57.5 0-38.1-14.8-73.8-41.7-100.7L614.7 152.6c-55.6-55.5-145.9-55.5-201.5 0L124.9 441C98 467.9 83.2 503.6 83.2 541.7c0 20.1 4.2 39.7 12.1 57.5 1.1 2.4 4.3 3 6.2 1.1l194.8-194.7z"
+                                  fill="#2867CE"></path>
+                            <path d="M201.6 566.2c-5.4 5.4-8.4 12.7-8.4 20.3v230.7c0 54.3 44 98.3 98.3 98.3h103.3c10.4 0 18.9-8.4 18.9-18.9V640.7c0-11.4 14.1-16.5 24.2-16.5h152.3c11.6 0 24.2 6.3 24.2 16.5v255.9c0 10.4 8.4 18.9 18.9 18.9h103.3c54.3 0 98.3-44.1 98.3-98.3V586.5c0-7.6-3-14.9-8.4-20.3L526 265.9c-6.7-6.7-17.4-6.7-24.1 0L201.6 566.2z"
+                                  fill="#BDD2EF"></path>
+                        </svg>
+                    </span>
+                    </a>
+                </li>
+                <li class="d-table-cell">
+                    <a href="" class="mf-link nav-link text-center">
+                        <div class="position-relative mf-link-icon d-table mx-auto">
+                    <span class="d-block mf-link-icon">
+                        <svg version="1" xmlns="http://www.w3.org/2000/svg" width="25px" height="25px"
+                             viewBox="0 0 48 48" enable-background="new 0 0 48 48">
+                            <path fill="#2E7D32"
+                                  d="M25.4,5.6c-0.8-0.8-2-0.8-2.8,0l-12,12c-0.8,0.8-0.8,2,0,2.8C11,20.8,11.5,21,12,21s1-0.2,1.4-0.6l12-12 C26.2,7.6,26.2,6.4,25.4,5.6z"></path>
+                            <path fill="#1B5E20"
+                                  d="M37.4,17.6l-12-12c-0.8-0.8-2-0.8-2.8,0c-0.8,0.8-0.8,2,0,2.8l12,12C35,20.8,35.5,21,36,21s1-0.2,1.4-0.6 C38.2,19.6,38.2,18.4,37.4,17.6z"></path>
+                            <path fill="#388E3C"
+                                  d="M37.4,41H10.6c-1,0-1.8-0.7-2-1.6L5,21h38l-3.7,18.4C39.1,40.3,38.3,41,37.4,41z"></path>
+                            <path fill="#4CAF50"
+                                  d="M43,23H5c-1.1,0-2-0.9-2-2v-2c0-1.1,0.9-2,2-2h38c1.1,0,2,0.9,2,2v2C45,22.1,44.1,23,43,23z"></path>
+                            <polygon fill="#DCEDC8"
+                                     points="30.8,24.8 22.9,32.7 19.2,28.9 17,31.1 22.9,37 33,26.9"></polygon>
+                        </svg>
+                    </span>
+                        </div>
+                    </a>
+                </li>
+                <li class="d-table-cell">
+                    <a class="mf-link nav-link text-center" data-bs-toggle="offcanvas" href="#cartCanvas" role="button"
+                       aria-controls="cart canvas">
+                        <div class="position-relative mf-link-icon d-table mx-auto">
+                    <span class="d-block mf-link-icon">
+                        <svg width="25px" height="25px" version="1" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 48 48" enable-background="new 0 0 48 48">
+                            <path fill="#607D8B"
+                                  d="M39.6,27.2c0.1-0.7,0.2-1.4,0.2-2.2s-0.1-1.5-0.2-2.2l4.5-3.2c0.4-0.3,0.6-0.9,0.3-1.4L40,10.8 c-0.3-0.5-0.8-0.7-1.3-0.4l-5,2.3c-1.2-0.9-2.4-1.6-3.8-2.2l-0.5-5.5c-0.1-0.5-0.5-0.9-1-0.9h-8.6c-0.5,0-1,0.4-1,0.9l-0.5,5.5 c-1.4,0.6-2.7,1.3-3.8,2.2l-5-2.3c-0.5-0.2-1.1,0-1.3,0.4l-4.3,7.4c-0.3,0.5-0.1,1.1,0.3,1.4l4.5,3.2c-0.1,0.7-0.2,1.4-0.2,2.2 s0.1,1.5,0.2,2.2L4,30.4c-0.4,0.3-0.6,0.9-0.3,1.4L8,39.2c0.3,0.5,0.8,0.7,1.3,0.4l5-2.3c1.2,0.9,2.4,1.6,3.8,2.2l0.5,5.5 c0.1,0.5,0.5,0.9,1,0.9h8.6c0.5,0,1-0.4,1-0.9l0.5-5.5c1.4-0.6,2.7-1.3,3.8-2.2l5,2.3c0.5,0.2,1.1,0,1.3-0.4l4.3-7.4 c0.3-0.5,0.1-1.1-0.3-1.4L39.6,27.2z M24,35c-5.5,0-10-4.5-10-10c0-5.5,4.5-10,10-10c5.5,0,10,4.5,10,10C34,30.5,29.5,35,24,35z"></path>
+                            <path fill="#455A64"
+                                  d="M24,13c-6.6,0-12,5.4-12,12c0,6.6,5.4,12,12,12s12-5.4,12-12C36,18.4,30.6,13,24,13z M24,30 c-2.8,0-5-2.2-5-5c0-2.8,2.2-5,5-5s5,2.2,5,5C29,27.8,26.8,30,24,30z"></path>
+                        </svg>
+                    </span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-------------------------- Mobile Footer Section-->
+
+        <!-------------------------------- Footer Section -->
+        <footer class="main-footer dt-sl">
+            <div class="back-to-top">
+                <!--<a href="#">
+                    <span class="icon">
+                    <i class="mdi mdi-chevron-up"></i>
+                    </span>
+                    <span>بازگشت به بالا</span>
+                </a>-->
+            </div>
+            <div class="container main-container">
+                <div class="footer-services">
+                    <div class="row">
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/delivery.svg">
+                            </a>
+                            <p>تحویل اکسپرس</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/contact-us.svg">
+                            </a>
+                            <p>پشتیبانی 24 ساعته</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/payment-terms.svg">
+                            </a>
+                            <p>پرداخت درمحل</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/return-policy.svg">
+                            </a>
+                            <p>۷ روز ضمانت بازگشت</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/origin-guarantee.svg">
+                            </a>
+                            <p>ضمانت اصل بودن کالا</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-widgets">
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">راهنمای خرید از دیجی پرس</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">نحوه ثبت سفارش</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">رویه ارسال سفارش</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">شیوه‌های پرداخت</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">خدمات مشتریان</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">پاسخ به پرسش‌های متداول</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">رویه‌های بازگرداندن کالا</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">شرایط استفاده</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">حریم خصوصی</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">با دیجی پرس</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">فروش در دیجی پرس</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">همکاری با سازمان‌ها</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">فرصت‌های شغلی</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">تماس با دیجی پرس</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">درباره دیجی پرس</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="newsletter">
+                                <p>از تخفیف‌ها و جدیدترین‌های فروشگاه باخبر شوید:</p>
+                                <form action="" class="mt-3">
+                                    <input type="email" class="form-control"
+                                           placeholder="آدرس ایمیل خود را وارد کنید...">
+                                    <input type="submit" class="btn btn-primary" value="ارسال">
+                                </form>
+                            </div>
+                            <div class="socials">
+                                <p>ما را در شبکه های اجتماعی دنبال کنید.</p>
+                                <div class="footer-social">
+                                    <ul class="text-center mt-2">
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-instagram"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-telegram"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-facebook"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-twitter"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info">
+                    <div class="row">
+                        <div class="col-12 text-right">
+                            <span>هفت روز هفته ، 24 ساعت شبانه‌روز پاسخگوی شما هستیم.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="description">
+                <div class="container main-container">
+                    <div class="row">
+                        <div class="site-description col-12 col-lg-7">
+                            <h1 class="site-title">فروشگاه اینترنتی دیجی پرس، بررسی، انتخاب و خرید آنلاین</h1>
+                            <p> دیجی پرس به عنوان یکی از قدیمی‌ترین فروشگاه های اینترنتی با بیش از یک دهه تجربه، با
+                                پایبندی به سه اصل کلیدی، پرداخت در محل، 7 روز ضمانت بازگشت کالا و تضمین اصل‌بودن کالا،
+                                موفق شده تا همگام با فروشگاه‌های معتبر جهان، به بزرگ‌ترین فروشگاه اینترنتی ایران تبدیل
+                                شود. به محض ورود به دیجی پرس با یک سایت پر از کالا رو به رو می‌شوید! هر آنچه که نیاز
+                                دارید و به ذهن شما خطور می‌کند در اینجا پیدا خواهید کرد. </p>
+                        </div>
+                        <div class="symbol col-12 col-lg-5">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/enamad/symbol-01.png" alt="">
+                            </a>
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/enamad/symbol-02.png" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <div class="container main-container">
+                    <p> استفاده از مطالب فروشگاه اینترنتی دیجی پرس فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع است.
+                        کلیه حقوق این سایت متعلق به شرکت نوآوران فن آوازه (فروشگاه آنلاین دیجی پرس) می‌باشد. </p>
+                </div>
+            </div>
+        </footer>
+        <!-------------------------------- Footer Section -->
+
+        <!----------------------------- Go To Top Section -->
+        <div class="progress-wrap d-lg-block d-none" style="position: fixed;">
+            <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+            </svg>
+            <svg style="position: absolute;left: 8px;top: 9px;" height="30px" width="30px" version="1.1" id="Layer_1"
+                 xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 512 512" xml:space="preserve">
+            <path style="fill:#CEE8FA;" d="M395.47,296.3H116.531c-36.816,0-57.855-42.009-35.803-71.491L225.983,30.621
+                c14.993-20.043,45.041-20.043,60.034,0l145.254,194.188C453.325,254.291,432.286,296.3,395.47,296.3z"/>
+                <path style="fill:#2D527C;" d="M443.755,215.471L298.501,21.284C288.382,7.759,272.893,0,256.001,0s-32.383,7.759-42.5,21.284
+                L68.245,215.471c-13.759,18.393-15.916,42.579-5.631,63.119c10.286,20.54,30.946,33.298,53.916,33.298h66.552
+                C185.227,422.598,275.94,512,387.153,512c8.608,0,15.589-6.979,15.589-15.589V381.652c0-8.61-6.981-15.589-15.589-15.589
+                c-14.01,0-27.556-5.074-38.144-14.29c-6.494-5.651-16.339-4.971-21.993,1.525c-5.653,6.494-4.97,16.34,1.525,21.993
+                c12.293,10.699,27.185,17.765,43.025,20.577v84.258c-86.772-7.791-155.289-79.949-157.307-168.237H395.47
+                c22.97,0,43.63-12.759,53.917-33.298C459.671,258.052,457.514,233.866,443.755,215.471z M421.509,264.629
+                c-5.043,10.069-14.777,16.081-26.04,16.081H116.53c-11.261,0-20.995-6.011-26.038-16.081c-5.043-10.07-4.027-21.466,2.72-30.484
+                L238.466,39.957c4.173-5.581,10.565-8.781,17.534-8.781c6.97,0,13.36,3.2,17.534,8.781l145.254,194.188
+                C425.534,243.165,426.551,254.56,421.509,264.629z"/>
+            </svg>
+        </div>
+        <!----------------------------- Go To Top Section -->
+
+    </div>
+
+    <!-- Core JS Files -->
+    <script src="/assets/shop/js/vendor/jquery.min.js"></script>
+    <script src="/assets/shop/js/vendor/popper.min.js"></script>
+    <script src="/assets/shop/js/vendor/bootstrap.bundle.min.js"></script>
+    <!-- Plugins -->
+    <script src="/assets/shop/plugin/go-to-top/script.js"></script>
+    <script src="/assets/shop/plugin/iran-map/iranmap.js"></script>
+    <!-- Main JS File -->
+    <script src="/assets/shop/js/js-404/js-404.js"></script>
+    </body>
+    </html>
+{{end}}
