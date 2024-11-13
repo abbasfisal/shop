@@ -235,3 +235,16 @@ func (h HomeService) RemoveCartItem(c *gin.Context, req requests.IncreaseCartIte
 func (h HomeService) StoreAddress(c *gin.Context, req requests.StoreAddressRequest) {
 	h.repo.CreateOrUpdateAddress(c, req)
 }
+
+func (h HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
+	orderList, err := h.repo.GetPaginatedOrders(c)
+
+	util.PrettyJson(orderList)
+	if err != nil {
+		return pagination.Pagination{}, err
+	}
+
+	orderList.Rows = responses.ToOrders(orderList.Rows.([]entities.Order))
+	return orderList, nil
+
+}
