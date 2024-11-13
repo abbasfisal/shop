@@ -1,17 +1,21 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Payment struct {
 	gorm.Model
-	CustomerID    uint
-	OrderID       uint
-	PaymentStatus uint
-
-	Amount        uint
-	PaymentMethod uint
-	TransactionID string
-	BankResponse  string
+	CustomerID  uint
+	OrderID     uint
+	Authority   string `gorm:"unique"`
+	Description string
+	PaymentURL  string
+	StatusCode  int
+	Amount      uint
+	RefID       string
+	Status      int //payment status -> 0-pending,1-paid ,2-failed
 
 	//-- relation
+
 }
