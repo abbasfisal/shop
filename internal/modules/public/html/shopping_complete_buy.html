@@ -1,0 +1,204 @@
+{{define "shopping_complete_buy"}}
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="/assets/shop/img/seller-logo.png" type="image/icon">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>DigiKala | Shopping Complete Buy Page</title>
+        <!-- Font Icon -->
+        <link rel="stylesheet" href="/assets/shop/css/vendor/font-awesome.min.css">
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="/assets/shop/css/vendor/bootstrap.min.css">
+        <!-- Main CSS File -->
+        <link rel="stylesheet" href="/assets/shop/css/main.css">
+    </head>
+
+    <body class="pt-0">
+    <div class="wrapper shopping-page">
+        <!------------------------ Header Shopping Section-->
+        <header class="header-shopping dt-sl">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center pt-2 mt-3">
+                        <div class="header-shopping-logo dt-sl">
+                            <a href="#">
+                                <img src="/assets/shop/img/svg/logo.svg" alt="">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center">
+                        <ul class="checkout-steps">
+                            <li>
+                                <a href="#" class="active">
+                                    <span>اطلاعات ارسال</span>
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="#" class="active">
+                                    <span>پرداخت</span>
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="#" class="active">
+                                    <span>اتمام خرید و ارسال</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!------------------------ Header Shopping Section-->
+
+        <!---------------------------- Page Loader Section-->
+        <div class="page-loader">
+            <div class="page-loader-content">
+                <div class="logo-area">
+                    <img src="/assets/shop/img/svg/logo.svg" alt="">
+                </div>
+                <span class="loader"></span>
+            </div>
+        </div>
+        <!---------------------------- Page Loader Section-->
+
+        <!--------------------------- Main Content Section-->
+        <main class="main-content dt-sl mt-5 mb-3">
+            <div class="container main-container">
+                <div class="row">
+                    <div class="cart-page-content col-12 px-0">
+                        <div class="checkout-alert dt-sn dt-sn--box mb-4">
+                            <div class="circle-box-icon successful">
+                                <i>
+                                    <svg width="60px" height="60px" viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4.91988 12.257C4.2856 12.257 3.65131 12.5199 3.19988 13.0342C2.79417 13.4913 2.59417 14.0799 2.63417 14.6913C2.67417 15.3027 2.94846 15.857 3.4056 16.2627L7.51417 19.8684C7.93131 20.2342 8.46846 20.4399 9.02274 20.4399C9.0856 20.4399 9.14846 20.4399 9.21131 20.4342C9.82846 20.3827 10.4056 20.0799 10.7942 19.5999L20.857 7.27986C21.657 6.30272 21.5085 4.85701 20.5313 4.05701C20.057 3.67415 19.4627 3.49129 18.857 3.55415C18.2513 3.61701 17.7027 3.90844 17.3142 4.38272L8.74846 14.8627L6.42274 12.8227C5.99417 12.4456 5.45131 12.257 4.91988 12.257Z"
+                                              fill="url(#paint0_linear)"></path>
+                                        <path d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z"
+                                              fill="url(#paint1_linear)"></path>
+                                        <path opacity="0.75"
+                                              d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z"
+                                              fill="url(#paint2_radial)"></path>
+                                        <path opacity="0.5"
+                                              d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z"
+                                              fill="url(#paint3_radial)"></path>
+                                        <defs>
+                                            <linearGradient id="paint0_linear" x1="15.825" y1="-13.9667" x2="9.82533"
+                                                            y2="23.9171" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#00CC00"></stop>
+                                                <stop offset="0.1878" stop-color="#06C102"></stop>
+                                                <stop offset="0.5185" stop-color="#17A306"></stop>
+                                                <stop offset="0.9507" stop-color="#33740C"></stop>
+                                                <stop offset="1" stop-color="#366E0D"></stop>
+                                            </linearGradient>
+                                            <linearGradient id="paint1_linear" x1="15.2501" y1="0.625426" x2="7.43443"
+                                                            y2="23.6215" gradientUnits="userSpaceOnUse">
+                                                <stop offset="0.2544" stop-color="#90D856"></stop>
+                                                <stop offset="0.736" stop-color="#00CC00"></stop>
+                                                <stop offset="0.7716" stop-color="#0BCD07"></stop>
+                                                <stop offset="0.8342" stop-color="#29CF18"></stop>
+                                                <stop offset="0.9166" stop-color="#59D335"></stop>
+                                                <stop offset="1" stop-color="#90D856"></stop>
+                                            </linearGradient>
+                                            <radialGradient id="paint2_radial" cx="0" cy="0" r="1"
+                                                            gradientUnits="userSpaceOnUse"
+                                                            gradientTransform="translate(15.452 8.95803) rotate(116.129) scale(8.35776 4.28316)">
+                                                <stop stop-color="#FBE07A" stop-opacity="0.75"></stop>
+                                                <stop offset="0.0803394" stop-color="#FBE387"
+                                                      stop-opacity="0.6897"></stop>
+                                                <stop offset="0.5173" stop-color="#FDF2C7" stop-opacity="0.362"></stop>
+                                                <stop offset="0.8357" stop-color="#FFFBF0" stop-opacity="0.1233"></stop>
+                                                <stop offset="1" stop-color="white" stop-opacity="0"></stop>
+                                            </radialGradient>
+                                            <radialGradient id="paint3_radial" cx="0" cy="0" r="1"
+                                                            gradientUnits="userSpaceOnUse"
+                                                            gradientTransform="translate(11.6442 17.0245) rotate(155.316) scale(9.80163 4.14906)">
+                                                <stop stop-color="#440063" stop-opacity="0.25"></stop>
+                                                <stop offset="1" stop-color="#420061" stop-opacity="0"></stop>
+                                            </radialGradient>
+                                        </defs>
+                                    </svg>
+                                </i>
+                            </div>
+                            <div class="checkout-alert-title">
+                                <h4> سفارش <span
+                                            class="checkout-alert-highlighted checkout-alert-highlighted-success">{{.ORDER_NUMBER}}</span>
+                                    با موفقیت در سیستم ثبت شد.
+                                </h4>
+                            </div>
+                            <div class="checkout-alert-content">
+                                <p class="checkout-alert-content-success">
+                                    سفارش نهایتا تا یک روز آماده ارسال خواهد شد.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!--------------------------- Main Content Section-->
+
+        <!--------------------------- Mini Footer Section-->
+        <footer class="mini-footer mt-5">
+            <div class="container main-container">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12 text-left mb-2">
+                        <i>
+                            <svg width="23px" height="23px" viewBox="0 0 24 24" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5"
+                                      d="M10.0376 5.31617L10.6866 6.4791C11.2723 7.52858 11.0372 8.90532 10.1147 9.8278C10.1147 9.8278 10.1147 9.8278 10.1147 9.8278C10.1146 9.82792 8.99588 10.9468 11.0245 12.9755C13.0525 15.0035 14.1714 13.8861 14.1722 13.8853C14.1722 13.8853 14.1722 13.8853 14.1722 13.8853C15.0947 12.9628 16.4714 12.7277 17.5209 13.3134L18.6838 13.9624C20.2686 14.8468 20.4557 17.0692 19.0628 18.4622C18.2258 19.2992 17.2004 19.9505 16.0669 19.9934C14.1588 20.0658 10.9183 19.5829 7.6677 16.3323C4.41713 13.0817 3.93421 9.84122 4.00655 7.93309C4.04952 6.7996 4.7008 5.77423 5.53781 4.93723C6.93076 3.54428 9.15317 3.73144 10.0376 5.31617Z"
+                                      fill="#1C274C"></path>
+                                <path d="M13.2595 1.87983C13.3257 1.47094 13.7122 1.19357 14.1211 1.25976C14.1464 1.26461 14.2279 1.27983 14.2705 1.28933C14.3559 1.30834 14.4749 1.33759 14.6233 1.38082C14.9201 1.46726 15.3347 1.60967 15.8323 1.8378C16.8286 2.29456 18.1544 3.09356 19.5302 4.46936C20.906 5.84516 21.705 7.17097 22.1617 8.16725C22.3899 8.66487 22.5323 9.07947 22.6187 9.37625C22.6619 9.52466 22.6912 9.64369 22.7102 9.72901C22.7197 9.77168 22.7267 9.80594 22.7315 9.83125L22.7373 9.86245C22.8034 10.2713 22.5286 10.6739 22.1197 10.7401C21.712 10.8061 21.3279 10.53 21.2601 10.1231C21.258 10.1121 21.2522 10.0828 21.2461 10.0551C21.2337 9.9997 21.2124 9.91188 21.1786 9.79572C21.1109 9.56339 20.9934 9.21806 20.7982 8.79238C20.4084 7.94207 19.7074 6.76789 18.4695 5.53002C17.2317 4.29216 16.0575 3.59117 15.2072 3.20134C14.7815 3.00618 14.4362 2.88865 14.2038 2.82097C14.0877 2.78714 13.9417 2.75363 13.8863 2.7413C13.4793 2.67347 13.1935 2.28755 13.2595 1.87983Z"
+                                      fill="#1C274C"></path>
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                      d="M13.4857 5.3293C13.5995 4.93102 14.0146 4.7004 14.4129 4.81419L14.2069 5.53534C14.4129 4.81419 14.4129 4.81419 14.4129 4.81419L14.4144 4.81461L14.4159 4.81505L14.4192 4.81602L14.427 4.81834L14.4468 4.8245C14.4618 4.82932 14.4807 4.8356 14.5031 4.84357C14.548 4.85951 14.6074 4.88217 14.6802 4.91337C14.8259 4.97581 15.0249 5.07223 15.2695 5.21694C15.7589 5.50662 16.4271 5.9878 17.2121 6.77277C17.9971 7.55775 18.4782 8.22593 18.7679 8.7154C18.9126 8.95991 19.009 9.15897 19.0715 9.30466C19.1027 9.37746 19.1254 9.43682 19.1413 9.48173C19.1493 9.50418 19.1555 9.52301 19.1604 9.53809L19.1665 9.55788L19.1688 9.56563L19.1698 9.56896L19.1702 9.5705C19.1702 9.5705 19.1707 9.57194 18.4495 9.77798L19.1707 9.57194C19.2845 9.97021 19.0538 10.3853 18.6556 10.4991C18.2607 10.6119 17.8492 10.3862 17.7313 9.99413L17.7276 9.98335C17.7223 9.96832 17.7113 9.93874 17.6928 9.89554C17.6558 9.8092 17.5887 9.66797 17.4771 9.47938C17.2541 9.10264 16.8514 8.53339 16.1514 7.83343C15.4515 7.13348 14.8822 6.73078 14.5055 6.50781C14.3169 6.39619 14.1757 6.32909 14.0893 6.29209C14.0461 6.27358 14.0165 6.26254 14.0015 6.25721L13.9907 6.25352C13.5987 6.13564 13.3729 5.72419 13.4857 5.3293Z"
+                                      fill="#1C274C"></path>
+                            </svg>
+                        </i>
+                        شماره تماس : <a href="#">
+                            12345678
+                            - ۰۲۱
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-sm-12 text-right">
+                        <i>
+                            <svg width="22px" height="22px" viewBox="0 0 24 24" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <g id="style=bulk">
+                                    <g id="email">
+                                        <path id="vector (Stroke)" fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M2.86466 4.1379C3.92465 3.15363 5.38503 2.75 7 2.75H17C18.615 2.75 20.0754 3.15363 21.1353 4.1379C22.2054 5.13152 22.75 6.60705 22.75 8.5V15.5C22.75 17.393 22.2054 18.8685 21.1353 19.8621C20.0754 20.8464 18.615 21.25 17 21.25H7C5.38503 21.25 3.92465 20.8464 2.86466 19.8621C1.79462 18.8685 1.25 17.393 1.25 15.5V8.5C1.25 6.60705 1.79462 5.13152 2.86466 4.1379Z"
+                                              fill="#BFBFBF"></path>
+                                        <path id="vector (Stroke)_2" fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M19.3633 7.31026C19.6166 7.63802 19.5562 8.10904 19.2285 8.3623L13.6814 12.6486C12.691 13.4138 11.3089 13.4138 10.3185 12.6486L4.77144 8.3623C4.44367 8.10904 4.38328 7.63802 4.63655 7.31026C4.88982 6.98249 5.36083 6.9221 5.6886 7.17537L11.2356 11.4616C11.6858 11.8095 12.3141 11.8095 12.7642 11.4616L18.3113 7.17537C18.6391 6.9221 19.1101 6.98249 19.3633 7.31026Z"
+                                              fill="#000000"></path>
+                                    </g>
+                                </g>
+                            </svg>
+                        </i>
+                        آدرس ایمیل : <a href="#">info@gmail.com</a>
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <div class="copy-right-mini-footer text-secondary">
+                            Copyright © 2024 {{.APP_NAME}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!--------------------------- Mini Footer Section-->
+    </div>
+
+    <!-- Core JS Files -->
+    <script src="/assets/shop/js/vendor/jquery.min.js"></script>
+    <script src="/assets/shop/js/vendor/popper.min.js"></script>
+    <script src="/assets/shop/js/vendor/bootstrap.bundle.min.js"></script>
+    <!-- Main JS File -->
+    <script src="/assets/shop/js/js-shopping/js-shopping-complete-buy.js"></script>
+    </body>
+    </html>
+{{end}}
