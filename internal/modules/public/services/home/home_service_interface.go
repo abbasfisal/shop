@@ -10,6 +10,7 @@ import (
 	CustomerResp "shop/internal/modules/public/responses"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/pagination"
+	"shop/internal/pkg/payment/zarinpal"
 )
 
 type HomeServiceInterface interface {
@@ -39,4 +40,10 @@ type HomeServiceInterface interface {
 	CartItemDecrement(c *gin.Context, req requests.IncreaseCartItemQty) bool
 	RemoveCartItem(c *gin.Context, req requests.IncreaseCartItemQty) bool
 	StoreAddress(c *gin.Context, req requests.StoreAddressRequest)
+
+	// ProcessOrderPayment convert cart to order and remove cart
+	ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (entities.Order, entities.Payment, custom_error.CustomError)
+
+	VerifyPayment(c *gin.Context, payment entities.Order, refID string, verified bool)
+	GetPaymentBy(c *gin.Context, authority string) (entities.Order, entities.Customer, error)
 }
