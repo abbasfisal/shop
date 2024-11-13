@@ -37,4 +37,8 @@ const (
 	//
 
 	FillAddress = "لطفا فیلد های آدرس را تکمیل نمایید."
+
+	//------- payment
+
+	OrderSuccessfulPaid = "با تشکر از خرید شما! کدپیگیری %s"
 )
