@@ -31,6 +31,7 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	r.GET("/", publicHdl.HomePage)
 	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct) //show single product
 	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)     //show products by category
+	r.GET("/checkout/payment/verify", publicHdl.VerifyPayment)            //payment callback url
 
 	publicAuthGrp := r.RouterGroup
 	customerRoute := r.RouterGroup
@@ -60,9 +61,6 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		publicAuthGrp.POST("/addresses/store", publicHdl.StoreAddress) //store address
 
 		publicAuthGrp.POST("/checkout/payment", publicHdl.Payment) //payment
-
-		//put outside
-		publicAuthGrp.GET("/checkout/payment/verify", publicHdl.VerifyPayment) //payment callback url
 
 	}
 
