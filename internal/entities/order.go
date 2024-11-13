@@ -14,6 +14,6 @@ type Order struct {
 
 	//-- relation
 
-	OrderItems []OrderItem `gorm:"foreignKey:OrderID"`
-	Payments   []Payment   `gorm:"foreignKey:OrderID"`
+	OrderItems []OrderItem `gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE;"`
+	Payment    Payment     `gorm:"foreignKey:OrderID"`
 }
