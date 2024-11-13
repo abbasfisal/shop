@@ -32,8 +32,11 @@ type HomeRepositoryInterface interface {
 	CreateOrUpdateAddress(c *gin.Context, req requests.StoreAddressRequest) error
 
 	// GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
-	GenerateOrderFromCart(c *gin.Context) (orderEntity entities.Order, inventoryTx *gorm.DB, error error)
+	GenerateOrderFromCart(c *gin.Context) (entities.Order, error)
 
 	Release(order entities.Order, tx *gorm.DB)
-	OrderPaidSuccessfully(c *gin.Context, params requests.VerifyPaymentQueryString)
+	OrderPaidSuccessfully(c *gin.Context, order entities.Order, refID string, verified bool) (entities.Order, bool, custom_error.CustomError)
+
+	CreatePayment(c *gin.Context, payment entities.Payment) error
+	GetPayment(c *gin.Context, authority string) (entities.Order, entities.Customer, error)
 }
