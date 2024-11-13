@@ -162,31 +162,337 @@
                         </ul>
                         <div class="divider"></div>
                         <ul class="category-list">
-                            {{range .MENU}}
-                                <li class="has-children">
-                                    <a href="#">{{.Title}}</a>
-                                    <ul>
-                                        {{range .SubCategories}}
-                                            {{if .SubCategories}}
-                                                <li class="has-children">
-                                                    <a href="#">{{.Title}}</a>
-                                                    <ul>
-                                                        {{range .SubCategories}}
-                                                            <li>
-                                                                <a href="#">{{.Title}}</a>
-                                                            </li>
-                                                        {{end}}
-                                                    </ul>
-                                                </li>
-                                            {{else}}
-                                                <li>
-                                                    <a href="#">{{.Title}}</a>
-                                                </li>
-                                            {{end}}
-                                        {{end}}
-                                    </ul>
-                                </li>
-                            {{end}}
+                            <li class="has-children">
+                                <a href="#">کالای دیجیتال</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">مد و پوشاک</a>
+                                <ul>
+                                    <li>لباس زنانه</li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">زیبایی و سلامت</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">خانه و آشپزخانه</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="#">کتاب،لوازم تحریر و هنر</a>
+                                <ul>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی گوشی</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">کیف و کاور گوشی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پاور بانک (شارژر همراه)</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">پایه نگهدارنده گوشی</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">گوشی موبایل</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">سامسونگ</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">هوآوی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">اپل</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">شیائومی</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">آنر</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">نوکیا</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">هدفون، هدست، هندزفری</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">اسپیکر بلوتوث و با سیم</a>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">دوربین عکاسی دیجیتال</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ ورزشی و فیلم برداری</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">دوربین‌ چاپ سریع</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-children">
+                                        <a href="#">لوازم جانبی دوربین</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">لنز</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کیف</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کارت حافظه</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">کاغذ چاپ عکس</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">اسباب بازی،کودک و نوزاد</a>
+                            </li>
+                            <li>
+                                <a href="#">ورزش و سفر</a>
+                            </li>
+                            <li>
+                                <a href="#">خوردنی و آشامیدنی</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="overlay-side-navigation"></div>
@@ -196,7 +502,6 @@
                         <img src="/assets/shop/img/svg/logo.svg" alt="logo">
                     </a>
                 </div>
-                {{/*cart icon in mobile view*/}}
                 <div class="header-tools">
                     <a href="#">
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
@@ -209,7 +514,6 @@
                     </a>
                 </div>
             </div>
-            {{/*search input and profile icon in mobile view */}}
             <div class="header-bottom">
                 <div class="search-box">
                     <form action="#">
@@ -265,7 +569,6 @@
                     </div>
                 </div>
                 <div class="header-tools">
-                    {{/*profile icon in mobile view*/}}
                     <a href="#">
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
