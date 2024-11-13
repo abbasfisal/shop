@@ -42,6 +42,14 @@ const (
 
 	OTPRequestTooSoon = "باید ۴ دقیقه صبر کنید برای دریافت کد جدید"
 	OTPTooManyRequest = "شما در حال حاضر به سقف درخواست‌ها برای این شماره در یک ساعت گذشته رسیده‌اید"
+
+	//payment
+	OrderAlreadyMarkedAsPaid      = "سفارش از قبل ثبت شده است"
+	OrderChangeStatusToPaid       = "تغییر وضعیت سفارش به پرداخت شد با مشکل روبرو گردید"
+	UpdateOrderFaileds            = "بروزرسانی سفارش با خطا مواجه شد"
+	ProductInventoryNotFounds     = "رکورد موجودی محصول یافت نشد"
+	UpdatePaymentFaileds          = "ویرایش رکورد پرداخت با خطا روبرو شد"
+	UpdateProductInventoryFaileds = "ویرایش رکورد موجودی محصول با خطا روبرو شد"
 )
 const (
 	OTPTooSoonCode            = 4152
@@ -51,6 +59,16 @@ const (
 	//sesion
 
 	CreateSessionFailedCode = 8001
+
+	//payment,order errors code
+
+	PaymentNotFound              = 9000
+	OrderMarkedAsPaid            = 9001
+	OrderSavePaidStatusFailed    = 9002
+	UpdateOrderFailed            = 9003
+	ProductInventoryNotFound     = 9004
+	UpdatePaymentFailed          = 9005
+	UpdateProductInventoryFailed = 9006
 )
 
 func HandleError(err error, notFoundMsg string) CustomError {
