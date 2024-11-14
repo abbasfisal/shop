@@ -13,6 +13,7 @@ import (
 	brandRepository "shop/internal/modules/admin/repositories/brand"
 	categoryRepository "shop/internal/modules/admin/repositories/category"
 	customerRepository "shop/internal/modules/admin/repositories/customer"
+	orderRepository "shop/internal/modules/admin/repositories/order"
 	productRepository "shop/internal/modules/admin/repositories/product"
 	"shop/internal/modules/admin/services/attribute"
 	attributeValue "shop/internal/modules/admin/services/attribute_value"
@@ -20,6 +21,7 @@ import (
 	"shop/internal/modules/admin/services/brand"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/customer"
+	order "shop/internal/modules/admin/services/order"
 	"shop/internal/modules/admin/services/product"
 )
 
@@ -46,7 +48,10 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 	customerRepo := customerRepository.NewCustomerRepository(mysql.Get())
 	customerSrv := customer.NewCustomerService(customerRepo)
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, i18nBundle)
+	orderRepo := orderRepository.NewOrderRepository(mysql.Get(), mongodb.Get())
+	orderSrv := order.NewOrderService(orderRepo)
+
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, i18nBundle)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
@@ -134,6 +139,10 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 		//customer
 		authGrp.GET("/admins/customers", adminHlr.IndexCustomer)
+
+		//order
+		authGrp.GET("/admins/orders", adminHlr.IndexOrders)
+		authGrp.GET("/admins/orders/:id/details", adminHlr.ShowOrder)
 
 	}
 
