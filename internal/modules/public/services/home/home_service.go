@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/repositories/home"
@@ -17,7 +18,9 @@ import (
 	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/helpers"
 	"shop/internal/pkg/pagination"
+	"shop/internal/pkg/payment/zarinpal"
 	"shop/internal/pkg/sessions"
+	"shop/internal/pkg/util"
 )
 
 type HomeService struct {
@@ -233,7 +236,57 @@ func (h HomeService) RemoveCartItem(c *gin.Context, req requests.IncreaseCartIte
 }
 
 func (h HomeService) StoreAddress(c *gin.Context, req requests.StoreAddressRequest) {
-	h.repo.CreateOrUpdateAddress(c, req)
+	err := h.repo.CreateOrUpdateAddress(c, req)
+	if err != nil {
+		fmt.Println("[home_service]-[StoreAddress]-err:", err)
+	}
+}
+
+// ProcessOrderPayment convert cart to order and remove cart
+func (h HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (entities.Order, entities.Payment, custom_error.CustomError) {
+
+	order, err := h.repo.GenerateOrderFromCart(c)
+	if err != nil {
+		return order, entities.Payment{}, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 1000)
+	}
+
+	customer, _ := helpers.GetAuthUser(c)
+	description := "order id :" + order.OrderNumber
+
+	//paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), "http://vivify.ir/checkout/payment/verify", description, "", customer.Mobile)
+	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), "https://6d40-5-211-205-213.ngrok-free.app/checkout/payment/verify", description, "", customer.Mobile)
+	if zarinErr != nil || statusCode != 100 {
+		log.Println("[home_service]-[ProcessOrderPayment]-[New ZarinPal Payment Request Error]:", zarinErr)
+		return order, entities.Payment{}, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10001)
+	}
+	log.Println("[ZarinPal New Request Success]:", "paymentURL:", paymentURL, "|authority:", authority, "|statusCode:", statusCode)
+
+	//create new payment
+	payment := entities.Payment{
+		CustomerID:  customer.ID,
+		OrderID:     order.ID,
+		Authority:   authority,
+		Description: description,
+		PaymentURL:  paymentURL,
+		StatusCode:  statusCode,
+		Amount:      order.TotalSalePrice,
+		RefID:       "",
+		Status:      0, //pending
+	}
+	paymentErr := h.repo.CreatePayment(c, payment)
+	if paymentErr != nil {
+		return order, entities.Payment{}, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10002)
+	}
+
+	return order, payment, custom_error.CustomError{}
+}
+
+func (h HomeService) VerifyPayment(c *gin.Context, order entities.Order, refID string, verified bool) {
+	h.repo.OrderPaidSuccessfully(c, order, refID, verified)
+}
+
+func (h HomeService) GetPaymentBy(c *gin.Context, authority string) (entities.Order, entities.Customer, error) {
+	return h.repo.GetPayment(c, authority)
 }
 
 func (h HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
@@ -247,4 +300,8 @@ func (h HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
 	orderList.Rows = responses.ToOrders(orderList.Rows.([]entities.Order))
 	return orderList, nil
 
+}
+
+func (h HomeService) GetOrderBy(c *gin.Context, orderNumber string) (interface{}, interface{}) {
+	return h.repo.GetOrder(c, orderNumber)
 }

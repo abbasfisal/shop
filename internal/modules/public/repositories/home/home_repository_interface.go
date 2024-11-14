@@ -40,4 +40,5 @@ type HomeRepositoryInterface interface {
 	CreatePayment(c *gin.Context, payment entities.Payment) error
 	GetPayment(c *gin.Context, authority string) (entities.Order, entities.Customer, error)
 	GetPaginatedOrders(c *gin.Context) (pagination.Pagination, error)
+	GetOrder(c *gin.Context, orderNumber string) (entities.Order, error)
 }

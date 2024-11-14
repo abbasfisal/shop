@@ -48,4 +48,5 @@ type HomeServiceInterface interface {
 	GetPaymentBy(c *gin.Context, authority string) (entities.Order, entities.Customer, error)
 
 	ListOrders(c *gin.Context) (pagination.Pagination, error)
+	GetOrderBy(c *gin.Context, orderNumber string) (interface{}, interface{})
 }

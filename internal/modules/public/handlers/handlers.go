@@ -9,7 +9,9 @@ import (
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
+	"os"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/services/home"
 	"shop/internal/pkg/custom_error"
@@ -18,7 +20,9 @@ import (
 	"shop/internal/pkg/helpers"
 	"shop/internal/pkg/html"
 	"shop/internal/pkg/old"
+	"shop/internal/pkg/payment/zarinpal"
 	"shop/internal/pkg/sessions"
+	"shop/internal/pkg/sms"
 	"shop/internal/pkg/util"
 	"time"
 )
@@ -534,5 +538,147 @@ func (p PublicHandler) StoreAddress(c *gin.Context) {
 	p.homeSrv.StoreAddress(c, req)
 
 	c.Redirect(http.StatusFound, c.Request.Referer())
+	return
+}
+
+func (p PublicHandler) Payment(c *gin.Context) {
+	customer, ok := helpers.GetAuthUser(c)
+
+	//if address fields was empty ,set message
+	if !ok || customer.Address.ID == 0 ||
+		customer.Address.ReceiverName == "" ||
+		customer.Address.ReceiverMobile == "" ||
+		customer.Address.ReceiverAddress == "" ||
+		customer.Address.ReceiverPostalCode == "" {
+
+		sessions.Set(c, "message", custom_messages.FillAddress)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+		return
+	}
+
+	zarin, err := zarinpal.NewZarinpal(os.Getenv("ZARINPAL_MERCHANTID"), false)
+	if err != nil {
+		log.Println("[zarinpal err]:", err)
+		html.CustomerRender(c, http.StatusInternalServerError, "500", gin.H{})
+		return
+	}
+
+	//todo: after 10 minute if nothing happened cancel order and free reserved_stock
+	_, payment, pErr := p.homeSrv.ProcessOrderPayment(c, zarin)
+	if pErr.Code > 0 || payment.PaymentURL == "" {
+		log.Println("[handler]-[payment]-[error]:", pErr.OriginalMessage, "|display err :", pErr.DisplayMessage)
+		html.CustomerRender(c, http.StatusInternalServerError, "500", gin.H{})
+		return
+	}
+
+	//redirect to bank gateway
+	c.Redirect(http.StatusPermanentRedirect, payment.PaymentURL)
+	return
+}
+
+func (p PublicHandler) VerifyPayment(c *gin.Context) {
+
+	query := c.Request.URL.Query()
+	//status := query.Get("Status")
+	authority := query.Get("Authority")
+	if authority == "" {
+		html.CustomerRender(c, http.StatusPermanentRedirect, "404", gin.H{})
+		return
+	}
+	//if status == "NOK" {
+	//	//payment was canceled by user of failed
+	//}
+
+	//get payment
+	order, customer, pErr := p.homeSrv.GetPaymentBy(c, authority)
+	if pErr != nil || order.Payment.ID <= 0 {
+		html.CustomerRender(c, http.StatusPermanentRedirect, "404", gin.H{})
+		return
+	}
+
+	zarin, err := zarinpal.NewZarinpal(os.Getenv("ZARINPAL_MERCHANTID"), false)
+	if err != nil {
+		log.Println("[zarinpal err]:", err)
+		html.CustomerRender(c, http.StatusInternalServerError, "500", gin.H{})
+		return
+	}
+
+	verified, refID, statusCode, vErr := zarin.PaymentVerification(int(order.Payment.Amount), authority)
+	if vErr != nil || !verified || (statusCode != 100 && statusCode != 101) {
+
+	}
+
+	go func() {
+		log.Println("-------- call VerifyPayment ----------")
+		p.homeSrv.VerifyPayment(c, order, refID, verified)
+	}()
+
+	if statusCode == 100 {
+		go func() {
+			log.Println("------- call sms sender -----------")
+			message := fmt.Sprintf(custom_messages.OrderSuccessfulPaid, order.OrderNumber)
+			sms.Send([]string{customer.Mobile}, message)
+		}()
+	}
+
+	if verified {
+		html.CustomerRender(c, http.StatusOK, "shopping_complete_buy", gin.H{
+			"ORDER_NUMBER": order.OrderNumber,
+		})
+		return
+	}
+
+	if !verified || vErr != nil {
+		//customer canceled payment
+		html.CustomerRender(c, http.StatusOK, "shopping_no_complete_buy", gin.H{
+			"ORDER_NUMBER": order.OrderNumber,
+		})
+		return
+	}
+
+}
+
+func (p PublicHandler) ShowOrderList(c *gin.Context) {
+
+	orderPaginations, err := p.homeSrv.ListOrders(c)
+
+	if err != nil {
+		//هر خطایی به جز خطای مرتبط با پیدانکردن رکورد اگر وجود داشت اون خطا رو نشون میدیم
+		//در غیر این صورت پیغام رکورد یافت نشد به کاربر نشون داده میشه :)
+		if errors2.Is(err, gorm.ErrRecordNotFound) {
+			html.CustomerRender(c, http.StatusNotFound, "profile_orders", gin.H{
+				"TITLE":      "لیست سفارشات",
+				"PAGINATION": nil,
+			})
+			return
+		} else {
+			c.JSON(200, gin.H{
+				"else": 1,
+				"err":  err.Error(),
+				"msg":  custom_error.SomethingWrongHappened,
+			})
+			return
+		}
+	}
+
+	html.CustomerRender(c, http.StatusFound, "profile_orders",
+		gin.H{
+			"TITLE":          "لیست سفارشات",
+			"PAGINATION":     orderPaginations,
+			"PrimaryMessage": "لیست سفارشات",
+		},
+	)
+	return
+}
+
+func (p PublicHandler) ShowOrderDetails(c *gin.Context) {
+	q := c.Param("order_number")
+	order, err := p.homeSrv.GetOrderBy(c, q)
+	log.Println("---- er:", err)
+	c.JSON(200, gin.H{
+		"orderNumber": q,
+		//	"err":         err.(error).Error(),
+		"order": order,
+	})
 	return
 }

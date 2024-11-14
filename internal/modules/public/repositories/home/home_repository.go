@@ -7,6 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"log"
+	"math/rand"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
@@ -500,4 +503,283 @@ func (h HomeRepository) CreateOrUpdateAddress(c *gin.Context, req requests.Store
 	}
 
 	return nil
+}
+
+// GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
+func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, error) {
+	customer, ok := helpers.GetAuthUser(c)
+	if !ok {
+		return entities.Order{}, errors.New(custom_error.SomethingWrongHappened)
+	}
+
+	tx := h.db.WithContext(c).Begin()
+
+	//check qty and reserve it
+	for _, cartItem := range customer.Cart.CartItem.Data {
+		var pInventory entities.ProductInventory
+
+		//lock for update
+		if cItemErr := tx.
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("id = ? AND product_id = ?", cartItem.InventoryID, cartItem.ProductID).
+			First(&pInventory).
+			Error; cItemErr != nil {
+			tx.Rollback()
+			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[find-inventory]-error:", cItemErr.Error())
+			return entities.Order{}, cItemErr
+		}
+
+		realQty := pInventory.Quantity - pInventory.ReservedStock
+		if realQty < uint(cartItem.Quantity) {
+			//out of stock
+			tx.Rollback()
+			return entities.Order{}, errors.New("out of stock")
+		}
+
+		//update and save reserved stock
+		pInventory.ReservedStock += uint(cartItem.Quantity)
+		if updateInventoryReservedStock := tx.Save(&pInventory).Error; updateInventoryReservedStock != nil {
+			tx.Rollback()
+			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[update-reserve-stock]-error:", updateInventoryReservedStock.Error())
+			return entities.Order{}, updateInventoryReservedStock
+		}
+
+	}
+
+	//create order
+	order := entities.Order{
+		CustomerID:         customer.ID,
+		OrderNumber:        strconv.Itoa(rand.Intn(9999999)),
+		PaymentStatus:      0,
+		TotalOriginalPrice: customer.Cart.CartItem.TotalOriginalPrice,
+		TotalSalePrice:     customer.Cart.CartItem.TotalSalePrice,
+		Discount:           0,
+		OrderStatus:        0, //pending
+	}
+	if createOrderError := tx.Create(&order).Error; createOrderError != nil {
+		tx.Rollback()
+		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order]-error:", createOrderError.Error())
+		return order, createOrderError
+	}
+
+	//create order-items
+	var orderItems []entities.OrderItem
+	for _, cartItem := range customer.Cart.CartItem.Data {
+		orderItems = append(orderItems, entities.OrderItem{
+			CustomerID:         customer.ID,
+			OrderID:            order.ID,
+			ProductID:          cartItem.ProductID,
+			InventoryID:        cartItem.InventoryID,
+			Quantity:           uint(cartItem.Quantity),
+			OriginalPrice:      cartItem.OriginalPrice,
+			SalePrice:          cartItem.SalePrice,
+			TotalOriginalPrice: cartItem.OriginalPrice * uint(cartItem.Quantity),
+			TotalSalePrice:     cartItem.SalePrice * uint(cartItem.Quantity),
+		})
+		util.PrettyJson(cartItem)
+	}
+
+	if createOrderItemsErr := tx.Create(&orderItems).Error; createOrderItemsErr != nil {
+		tx.Rollback()
+		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order-items]-error:", createOrderItemsErr.Error())
+		return order, createOrderItemsErr
+	}
+
+	//Delete Cart and its CartItem
+	if true {
+		if deleteCartErr := h.db.WithContext(c).Unscoped().Delete(&entities.Cart{}, customer.Cart.ID).Error; deleteCartErr != nil {
+			tx.Rollback()
+			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[delete-cart-and-cartItem]-error:", deleteCartErr.Error())
+			return order, deleteCartErr
+		}
+	}
+
+	tx.Commit()
+	return order, nil
+}
+
+func (h HomeRepository) Release(order entities.Order, tx *gorm.DB) {
+	tx.Rollback()
+}
+
+func (h HomeRepository) OrderPaidSuccessfully(c *gin.Context, order entities.Order, refID string, verified bool) (entities.Order, bool, custom_error.CustomError) {
+	util.PrettyJson(order)
+	log.Println("---- verify :", verified)
+
+	//	var order entities.Order
+	tx := h.db.WithContext(c).Begin()
+
+	//if err := tx.Preload("OrderItems").Where("id=? AND amount=?", payment.OrderID).First(&order).Error; err != nil {
+	//	tx.Rollback()
+	//	return order, false, custom_error.New(err.Error(), custom_error.RecordNotFound, custom_error.PaymentNotFound)
+	//}
+
+	if order.OrderStatus > 0 {
+		log.Println("----------order status is greater than 0 -------")
+		tx.Rollback()
+		log.Println("order has already been marked as paid, skipping duplicate process")
+		return order, true, custom_error.New("order has already been marked as paid, skipping duplicate process", custom_error.OrderAlreadyMarkedAsPaid, custom_error.OrderMarkedAsPaid)
+	}
+	if verified {
+		log.Println("--- x1")
+		order.OrderStatus = 1 //paid successful
+		if saveOrderErr := tx.Save(&order).Error; saveOrderErr != nil {
+			tx.Rollback()
+			return order, false, custom_error.New(saveOrderErr.Error(), custom_error.OrderChangeStatusToPaid, custom_error.OrderSavePaidStatusFailed)
+		}
+
+		order.Payment.RefID = refID
+		order.Payment.Status = 1 //paid
+		if updatePayment := tx.Save(&order.Payment).Error; updatePayment != nil {
+			tx.Rollback()
+			return order, false, custom_error.New(updatePayment.Error(), custom_error.UpdatePaymentFaileds, custom_error.UpdatePaymentFailed)
+		}
+
+	} else {
+		log.Println("--- x2")
+		order.OrderStatus = 2 //failed
+		if saveOrderErr := tx.Save(&order).Error; saveOrderErr != nil {
+			tx.Rollback()
+			return order, false, custom_error.New(saveOrderErr.Error(), custom_error.UpdateOrderFaileds, custom_error.UpdateOrderFailed)
+		}
+
+		order.Payment.Status = 2 //failed
+		if updatePayment := tx.Save(&order.Payment).Error; updatePayment != nil {
+			tx.Rollback()
+			return order, false, custom_error.New(updatePayment.Error(), custom_error.UpdatePaymentFaileds, custom_error.UpdatePaymentFailed)
+		}
+	}
+
+	//decrees product inventory quantity and product inventory reserved stock
+	for _, orderItem := range order.OrderItems {
+		log.Println("----- x 3")
+		var productInventory entities.ProductInventory
+		if findProductInventoryErr := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("product_id=? AND id=?", orderItem.ProductID, orderItem.InventoryID).
+			First(&productInventory).Error; findProductInventoryErr != nil {
+			log.Println("----- x 4")
+
+			tx.Rollback()
+			return order, false, custom_error.New(findProductInventoryErr.Error(), custom_error.ProductInventoryNotFounds, custom_error.ProductInventoryNotFound)
+		}
+
+		if verified {
+			log.Println("----- x 5")
+
+			productInventory.Quantity -= orderItem.Quantity
+			productInventory.ReservedStock -= orderItem.Quantity
+		} else {
+			log.Println("----- x 6")
+
+			productInventory.ReservedStock -= orderItem.Quantity
+		}
+
+		//todo: update mongodb
+		if updateProductInventoryErr := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Save(&productInventory).Error; updateProductInventoryErr != nil {
+			log.Println("----- x 7")
+
+			tx.Rollback()
+			return order, false, custom_error.New(updateProductInventoryErr.Error(), custom_error.UpdateProductInventoryFaileds, custom_error.UpdateProductInventoryFailed)
+		}
+		log.Println("----- x 8")
+
+	}
+
+	tx.Commit()
+	log.Println("----- x 9")
+
+	return order, true, custom_error.CustomError{}
+
+}
+
+func (h HomeRepository) CreatePayment(c *gin.Context, payment entities.Payment) error {
+	if err := h.db.Create(&payment).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h HomeRepository) GetPayment(c *gin.Context, authority string) (entities.Order, entities.Customer, error) {
+	var payment entities.Payment
+	var order entities.Order
+
+	if err := h.db.WithContext(c).Where("authority = ?", authority).First(&payment).Error; err != nil {
+		return order, entities.Customer{}, err
+	}
+
+	if orderErr := h.db.WithContext(c).Preload("OrderItems").Where("id=?", payment.OrderID).First(&order).Error; orderErr != nil {
+		return order, entities.Customer{}, orderErr
+	}
+
+	var customer entities.Customer
+	if customerErr := h.db.WithContext(c).Where("id=?", payment.CustomerID).First(&customer).Error; customerErr != nil {
+		return order, entities.Customer{}, customerErr
+	}
+
+	order.Payment = payment
+	return order, customer, nil
+}
+
+func (h HomeRepository) GetPaginatedOrders(c *gin.Context) (pagination.Pagination, error) {
+
+	customer, exists := helpers.GetAuthUser(c)
+	if !exists {
+		return pagination.Pagination{}, errors.New("user must be logged In")
+	}
+
+	// Convert query parameters from string to int
+	limitStr := c.Query("limit")
+	pageStr := c.Query("page")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 { // Default to 10 if invalid
+		limit = 10
+	}
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 { // Default to 1 if invalid
+		page = 1
+	}
+	var pg = pagination.Pagination{
+		Limit: limit,
+		Page:  page,
+	}
+
+	//var order entities.Order
+	//if err := h.db.WithContext(c).Where("customer_id = ?", customer.ID).First(&order).Error; err != nil {
+	//	return pg, err
+	//}
+
+	var orders []entities.Order
+	condition := fmt.Sprintf("customer_id=%d", customer.ID)
+
+	paginateQuery, exist := pagination.Paginate(c, condition, &orders, &pg, h.db)
+	util.PrettyJson(customer)
+
+	if !exist {
+		log.Println("--------- here :", exist)
+		return pg, gorm.ErrRecordNotFound
+	}
+
+	if pErr := paginateQuery(h.db).Preload("OrderItems").Where("customer_id=?", customer.ID).Find(&orders).Error; pErr != nil {
+		log.Println("----------- here 2:", pErr)
+		return pg, pErr
+	}
+
+	pg.Rows = orders
+	return pg, nil
+}
+
+func (h HomeRepository) GetOrder(c *gin.Context, orderNumber string) (entities.Order, error) {
+
+	customer, exists := helpers.GetAuthUser(c)
+	if !exists {
+		return entities.Order{}, errors.New("user must be loggedIn")
+	}
+	var order entities.Order
+	if err := h.db.WithContext(c).Preload("OrderItems").Preload("Payment").Where("order_number=? AND customer_id=?", orderNumber, customer.ID).First(&order).Error; err != nil {
+		return order, gorm.ErrRecordNotFound
+	}
+	return order, nil
+
 }
