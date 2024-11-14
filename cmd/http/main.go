@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/joho/godotenv"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
 	"golang.org/x/text/language"
@@ -82,12 +83,18 @@ func initializeLogger() {
 }
 
 func loadConfig() {
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalf("--[main.go]-[-- load env failed --]- Warning: No .env file found or unable to load: %v", err)
+	}
+	viper.AutomaticEnv() //read local environment automatically
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
 	viper.AddConfigPath("./config/")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file: %v", err)
 	}
+
 }
 
 func initializeDatabase() {
