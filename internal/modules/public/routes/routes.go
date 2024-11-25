@@ -64,7 +64,7 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle) {
 
 		//-- orders
 		publicAuthGrp.GET("/orders", publicHdl.ShowOrderList)
-		publicAuthGrp.GET("/orders/detail/:order_number", publicHdl.ShorOrderDetails)
+		publicAuthGrp.GET("/orders/detail/:order_number", publicHdl.ShowOrderDetails)
 
 	}
 
