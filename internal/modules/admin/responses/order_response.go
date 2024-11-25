@@ -2,10 +2,12 @@ package responses
 
 import (
 	"shop/internal/entities"
+	"time"
 )
 
 type Order struct {
 	CustomerID         uint
+	OrderID            uint
 	OrderNumber        string
 	PaymentStatus      uint
 	TotalOriginalPrice uint
@@ -13,6 +15,7 @@ type Order struct {
 	Discount           uint
 	OrderStatus        uint
 	OrderStatusText    string
+	CreatedAt          time.Time
 	OrderItems         OrderItems
 	Payment            Payment
 }
@@ -33,12 +36,14 @@ func ToOrder(o entities.Order) Order {
 
 	orderResponse := Order{
 		CustomerID:         o.CustomerID,
+		OrderID:            o.ID,
 		OrderNumber:        o.OrderNumber,
 		PaymentStatus:      o.PaymentStatus,
 		TotalOriginalPrice: o.TotalOriginalPrice,
 		TotalSalePrice:     o.TotalSalePrice,
 		Discount:           o.Discount,
 		OrderStatus:        o.OrderStatus,
+		CreatedAt:          o.CreatedAt,
 		OrderStatusText:    OrderStatusMap(o.OrderStatus),
 		OrderItems:         ToOrderItems(o.OrderItems),
 	}
