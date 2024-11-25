@@ -17,6 +17,7 @@ import (
 	"shop/internal/modules/admin/services/brand"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/customer"
+	"shop/internal/modules/admin/services/order"
 	"shop/internal/modules/admin/services/product"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
@@ -38,9 +39,10 @@ type AdminHandler struct {
 	attrValueSrv attributeValue.AttributeValueServiceInterface
 	brandSrv     brand.BrandServiceInterface
 	customerSrv  customer.CustomerServiceInterface
+	orderSrv     order.OrderServiceInterface
 
 	i18nBundle *i18n.Bundle
-	//order service
+
 	//user service
 	//cart service
 }
@@ -53,6 +55,7 @@ func NewAdminHandler(
 	attrValueSrv attributeValue.AttributeValueServiceInterface,
 	brandSrv brand.BrandServiceInterface,
 	customerSrv customer.CustomerServiceInterface,
+	orderSrv order.OrderServiceInterface,
 
 	i18nBundle *i18n.Bundle,
 ) AdminHandler {
@@ -64,6 +67,7 @@ func NewAdminHandler(
 		attrValueSrv: attrValueSrv,
 		brandSrv:     brandSrv,
 		customerSrv:  customerSrv,
+		orderSrv:     orderSrv,
 
 		i18nBundle: i18nBundle,
 	}
