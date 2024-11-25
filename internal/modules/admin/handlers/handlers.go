@@ -1899,16 +1899,19 @@ func (a AdminHandler) UpdateProductFeature(c *gin.Context) {
 }
 
 func (a AdminHandler) IndexOrders(c *gin.Context) {
-	paginate, err := a.orderSrv.GetOrderPaginate(c)
+	orderPaginate, err := a.orderSrv.GetOrderPaginate(c)
+
 	if err != nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": err,
 		})
 		return
 	}
-	c.JSON(200, gin.H{
-		"data": paginate,
+	html.Render(c, http.StatusFound, "admin_index_order", gin.H{
+		"TITLE":      "لیست سفارشات",
+		"PAGINATION": orderPaginate,
 	})
+
 	return
 }
 
