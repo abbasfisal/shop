@@ -78,8 +78,8 @@ ___
 - [x] implement login / register for customer
 - [x] send otp
 - [x] resend otp
-- [ ] add customer profile html form
-- [ ] add customer address html form
+- [x] add customer profile html form
+- [x] add customer address html form
 - [ ] add product recom by elastic
 - [x] add logOut
 - [x] edit customer profile (name,last name)
@@ -98,15 +98,20 @@ __
 - [x] add some real menu
 - [x] load all menu in redis
 - 
-- add some real product
-- store product with all attributes in mongodb
+- [x] add some real product
+- [x] store product with all attributes in mongodb
 - load data rows(new , most ordered , ) in home page
 - ability to bookmark product by user
 - log all request in elastic
 - order 
-- get tax-code
-
+- [x] get tax-code
+- [x] buy product by bank gateway
+- [x] show customer paginated orders
+- [x] show detail of an order in customer side
+- [x] show paginated orders in admin panel
+- [ ] show detail of an order in admin side 
 add make file :
 
 `docker-compose -f docker-compose.dev.yml --env-file .env.development up
 `
+
