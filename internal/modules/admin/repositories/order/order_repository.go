@@ -64,10 +64,47 @@ func (oRepo OrderRepository) FindOrderBy(c *gin.Context, orderID int) (entities.
 	var order entities.Order
 	var customer entities.Customer
 
-	if err := oRepo.db.WithContext(c).Preload("OrderItems").Preload("Payment").First(&order, orderID).Error; err != nil {
+	//برای گرفتن دیتای جدول
+	//product_attributes
+	//مجبور هستیم که ابتدا دو ستون
+	//product_id , inventory_id
+	//که در جدول order_items هستند
+	// رو بدست بیاریم و بعد نتایج اونها رو درون preload استفاده کنیم
+
+	var productAndInventory []struct {
+		ProductID   uint
+		InventoryID uint
+	}
+	if err := oRepo.db.WithContext(c).
+		Table("order_items").
+		Select("product_id , inventory_id").
+		Where("order_id = ?", orderID).
+		Scan(&productAndInventory).Error; err != nil {
 		return order, customer, err
 	}
 
+	//حالا نتایج رو به صورت اسلایس در میاریم که مستقیم بشه درون preload استفاده کرد
+	var productIDs, inventoryIDs []uint
+	for _, item := range productAndInventory {
+		productIDs = append(productIDs, item.ProductID)
+		inventoryIDs = append(inventoryIDs, item.InventoryID)
+	}
+
+	if err := oRepo.db.WithContext(c).
+		Preload("OrderItems.Product.ProductInventoryAttributes",
+			"product_inventory_attributes.product_id IN (?) AND product_inventory_attributes.product_inventory_id IN (?)",
+			productIDs, inventoryIDs,
+		).
+		Preload("OrderItems.Product.ProductInventoryAttributes.ProductAttribute",
+			"product_attributes.product_id IN (?)",
+			productIDs,
+		).
+		Preload("Payment").
+		First(&order, orderID).Error; err != nil {
+		return order, customer, err
+	}
+
+	//select customer
 	if err := oRepo.db.WithContext(c).First(&customer, order.CustomerID).Error; err != nil {
 		return order, customer, err
 	}
