@@ -1897,3 +1897,40 @@ func (a AdminHandler) UpdateProductFeature(c *gin.Context) {
 	return
 
 }
+
+func (a AdminHandler) IndexOrders(c *gin.Context) {
+	paginate, err := a.orderSrv.GetOrderPaginate(c)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"err": err,
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"data": paginate,
+	})
+	return
+}
+
+func (a AdminHandler) ShowOrder(c *gin.Context) {
+	orderID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		sessions.Set(c, "message", "ID سفارش صحیح نمی باشد.")
+		c.Redirect(http.StatusFound, "/admins/orders")
+	}
+
+	//result, err := a.orderSrv.GetOrderBy(c, orderID)
+	orderRes, customerRes, err := a.orderSrv.GetOrderBy(c, orderID)
+	if err != nil {
+		sessions.Set(c, "message", err.Error())
+		c.Redirect(http.StatusFound, "/admins/orders")
+		return
+	}
+
+	html.Render(c, http.StatusOK, "show-brand", gin.H{
+		"TITLE":    "جزییات سفارش",
+		"Customer": customerRes,
+		"Data":     orderRes,
+	})
+	return
+}
