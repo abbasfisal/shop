@@ -15,5 +15,5 @@ type OrderItem struct {
 	TotalSalePrice     uint
 
 	//-- relation
-
+	Product Product
 }
