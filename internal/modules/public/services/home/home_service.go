@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
+	"os"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/repositories/home"
@@ -254,7 +255,7 @@ func (h HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpa
 	description := "order id :" + order.OrderNumber
 
 	//paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), "http://vivify.ir/checkout/payment/verify", description, "", customer.Mobile)
-	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), "https://6d40-5-211-205-213.ngrok-free.app/checkout/payment/verify", description, "", customer.Mobile)
+	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), os.Getenv("ZARINPAL_CALLBACKURL"), description, "", customer.Mobile)
 	if zarinErr != nil || statusCode != 100 {
 		log.Println("[home_service]-[ProcessOrderPayment]-[New ZarinPal Payment Request Error]:", zarinErr)
 		return order, entities.Payment{}, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10001)
