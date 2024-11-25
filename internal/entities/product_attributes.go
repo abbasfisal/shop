@@ -14,4 +14,6 @@ type ProductAttribute struct {
 
 	Attribute      Attribute      `gorm:"foreignKey:AttributeID"`
 	AttributeValue AttributeValue `gorm:"foreignKey:AttributeValueID"`
+
+	Product Product
 }
