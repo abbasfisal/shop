@@ -4,8 +4,6 @@ import (
 	"shop/internal/entities"
 )
 
-var a = entities.Order{}
-
 type Order struct {
 	CustomerID         uint
 	OrderNumber        string
@@ -16,7 +14,7 @@ type Order struct {
 	OrderStatus        uint
 	OrderStatusText    string
 	OrderItems         OrderItems
-	//Payment            entities.Payment{}
+	Payment            Payment
 }
 
 type Orders struct {
@@ -32,7 +30,8 @@ func ToOrders(ordersList []entities.Order) Orders {
 	return oResponse
 }
 func ToOrder(o entities.Order) Order {
-	return Order{
+
+	orderResponse := Order{
 		CustomerID:         o.CustomerID,
 		OrderNumber:        o.OrderNumber,
 		PaymentStatus:      o.PaymentStatus,
@@ -43,6 +42,10 @@ func ToOrder(o entities.Order) Order {
 		OrderStatusText:    OrderStatusMap(o.OrderStatus),
 		OrderItems:         ToOrderItems(o.OrderItems),
 	}
+	if o.Payment.ID != 0 {
+		orderResponse.Payment = ToPayment(o.Payment)
+	}
+	return orderResponse
 }
 
 func OrderStatusMap(status uint) string {
