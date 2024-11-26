@@ -1,0 +1,180 @@
+{{define "admin_show_order"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10">
+                        <b>جزییات پرداخت</b>
+                        <table class="table-info table table-hover">
+                            <tr>
+                                <td>ID</td>
+                                <td>{{.Data.Payment.ID}}</td>
+                            </tr>
+                            <tr>
+                                <td>تاریخ پرداخت</td>
+                                <td>{{.Data.Payment.CreatedAt}}</td>
+                            </tr>
+                            <tr>
+                                <td>Authority</td>
+                                <td>{{.Data.Payment.Authority}}</td>
+                            </tr>
+                            <tr>
+                                <td>توضیحات</td>
+                                <td>{{.Data.Payment.Description}}</td>
+                            </tr>
+                            <tr>
+                                <td>آدرس درگاه پرداخت</td>
+                                <td>{{.Data.Payment.PaymentURL}}</td>
+                            </tr>
+                            <tr>
+                                <td>کد وضعیت</td>
+                                <td>{{.Data.Payment.StatusCode}}</td>
+                            </tr>
+                            <tr>
+                                <td>مبلغ</td>
+                                <td>{{.Data.Payment.Amount}} تومان </td>
+                            </tr>
+
+                            <tr>
+                                <td>RefID شناسه پرداخت</td>
+                                <td>{{.Data.Payment.RefID}}</td>
+                            </tr>
+                            <tr>
+                                <td>وضعیت پرداخت</td>
+                                <td>{{.Data.Payment.Status}}</td>
+                            </tr>
+
+                        </table>
+                        <b>جزییات سفارش دهنده</b>
+                        <table class="table table-info table-hover">
+                            <tr>
+                                <td>نام و نام خانوادگی مشتری</td>
+                                <td>{{.Customer.FirstName}} {{.Customer.LastName}}</td>
+                            </tr>
+                            <tr>
+                                <td>شماره موبایل</td>
+                                <td>{{.Customer.Mobile}}</td>
+                            </tr>
+                            <tr>
+                                <td>آدرس</td>
+                                <td>
+                                    <b>نام تحویل گیرنده:</b>
+                                    {{.Customer.Address.ReceiverName}}
+                                    <br>
+                                    <b>موبایل تحویل گیرنده:</b>
+                                    {{.Customer.Address.ReceiverMobile}}
+                                    <br>
+                                    <b>آدرس تحویل گیرنده:</b>
+                                    {{.Customer.Address.ReceiverAddress}}
+                                    <br>
+                                    <b>کد پستی تحویل گیرنده:</b>
+                                    {{.Customer.Address.ReceiverPostalCode}}
+                                    <br>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr>
+                        <b>جزییات سفارش</b>
+                        <table class="table table-info table-hover">
+                            <tr>
+                                <td>ID سفارش</td>
+                                <td>{{.Data.ID}}</td>
+                            </tr>
+                            <tr>
+                                <td>شماره سفارش</td>
+                                <td>{{.Data.OrderNumber}}</td>
+                            </tr>
+                            <tr>
+                                <td>تاریخ ایجاد سفارش</td>
+                                <td>{{.Data.CreatedAt}}</td>
+                            </tr>
+                            <tr>
+                                <td>جمع کل سفارش(بدون در نظرگرفتن تخفیف)</td>
+                                <td>{{.Data.TotalOriginalPrice}}</td>
+                            </tr>
+                            <tr>
+                                <td>جمع کل مبلغ پرداختی سفارش</td>
+                                <td>{{.Data.TotalSalePrice}}</td>
+                            </tr>
+                            <tr>
+                                <td>تخفیف سفارش</td>
+                                <td>{{.Data.Discount}}</td>
+                            </tr>
+                            <tr>
+                                <td>وضعیت سفارش</td>
+                                <td>{{.Data.OrderStatus}}</td>
+                            </tr>
+                        </table>
+                        <hr>
+
+                        <b>آیتم های سفارش</b>
+                        <table class="table table-info table-hover">
+
+                            {{range .Data.OrderItems}}
+                                <tr>
+                                    <td>نام محصول</td>
+                                    <td>{{.Product.Title}}</td>
+                                </tr>
+                                <tr>
+                                    <td>شناسه محصول</td>
+                                    <td>{{.Product.Sku}}</td>
+                                </tr>
+                                <tr>
+                                    <td>قیمت اصلی محصول</td>
+                                    <td>{{.Product.OriginalPrice}} تومان</td>
+                                </tr>
+                                <tr>
+                                    <td>قیمت فروش محصول</td>
+                                    <td>{{.Product.SalePrice}} تومان</td>
+                                </tr>
+                                <tr>
+                                    <td>تعداد سفارش</td>
+                                    <td>{{.Quantity}} عدد</td>
+                                </tr>
+
+                                {{range .Product.ProductInventoryAttributes}}
+                                    <tr>
+                                        <td><b>{{.ProductAttribute.AttributeTitle}}</b></td>
+                                        <td><b>{{.ProductAttribute.AttributeValueTitle}}</b></td>
+                                    </tr>
+                                {{end}}
+                            {{end}}
+
+
+                        </table>
+                    </div>
+                    <!-- /.col-md-6 -->
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}
+
