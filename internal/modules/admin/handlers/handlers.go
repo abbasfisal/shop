@@ -1930,7 +1930,7 @@ func (a AdminHandler) ShowOrder(c *gin.Context) {
 		return
 	}
 
-	html.Render(c, http.StatusOK, "show-brand", gin.H{
+	html.Render(c, http.StatusOK, "admin_show_order", gin.H{
 		"TITLE":    "جزییات سفارش",
 		"Customer": customerRes,
 		"Data":     orderRes,
