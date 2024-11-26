@@ -105,7 +105,7 @@ func (oRepo OrderRepository) FindOrderBy(c *gin.Context, orderID int) (entities.
 	}
 
 	//select customer
-	if err := oRepo.db.WithContext(c).First(&customer, order.CustomerID).Error; err != nil {
+	if err := oRepo.db.WithContext(c).Preload("Address").First(&customer, order.CustomerID).Error; err != nil {
 		return order, customer, err
 	}
 
