@@ -1,20 +1,25 @@
 package responses
 
 import (
+	"encoding/json"
 	"shop/internal/entities"
+	"time"
 )
 
 type AdminOrder struct {
+	ID                 uint
 	CustomerID         uint
 	OrderNumber        string
 	PaymentStatus      uint
 	TotalOriginalPrice uint
 	TotalSalePrice     uint
+	CreatedAt          time.Time
 	Discount           uint
 	OrderStatus        uint
 	OrderStatusText    string
 	OrderItems         AdminOrderItems
 	Payment            Payment
+	Address            Address
 }
 
 type AdminOrders struct {
@@ -31,15 +36,18 @@ func ToAdminOrders(ordersList []entities.Order) AdminOrders {
 
 func ToAdminOrder(o entities.Order) AdminOrder {
 	orderResponse := AdminOrder{
+		ID:                 o.ID,
 		CustomerID:         o.CustomerID,
 		OrderNumber:        o.OrderNumber,
 		PaymentStatus:      o.PaymentStatus,
 		TotalOriginalPrice: o.TotalOriginalPrice,
 		TotalSalePrice:     o.TotalSalePrice,
+		CreatedAt:          o.CreatedAt,
 		Discount:           o.Discount,
 		OrderStatus:        o.OrderStatus,
 		OrderStatusText:    AdminOrderStatusMap(o.OrderStatus),
 		OrderItems:         ToAdminOrderItems(o.OrderItems),
+		Address:            ToAddress(o.Address),
 	}
 
 	// بررسی وجود Payment
@@ -51,13 +59,30 @@ func ToAdminOrder(o entities.Order) AdminOrder {
 }
 
 func AdminOrderStatusMap(status uint) string {
+
 	switch status {
-	case 0:
+	case entities.OrderPending: //0
 		return "در حال پرداخت"
-	case 1:
+	case entities.OrderConfirmed:
 		return "پرداخت شده"
-	case 2:
+	case entities.OrderCancelled:
 		return "لغو شده"
+	case entities.OrderPreparing:
+		return "در حال آماده سازی"
+	case entities.OrderReadyToShip:
+		return "آماده برای ارسال"
+	case entities.OrderShipped:
+		return "ارسال شده"
+	case entities.OrderInTransit:
+		return "در مسیر ارسال"
+	case entities.OrderDelivered:
+		return "تحویل داده شده"
+	case entities.OrderReturned:
+		return "مرجوع شده"
+	case entities.OrderCompleted:
+		return "تکمیل شده"
+	case entities.OrderUnderReview:
+		return "اختلاف یا مشکل"
 	default:
 		return "نامعلوم"
 	}
@@ -66,19 +91,25 @@ func AdminOrderStatusMap(status uint) string {
 //------------- order item
 
 type AdminOrderItem struct {
-	CustomerID         uint `json:"customer_id"`
-	OrderID            uint `json:"order_id"`
-	ProductID          uint `json:"product_id"`
-	InventoryID        uint `json:"inventory_id"`
-	Quantity           uint `json:"quantity"`
-	OriginalPrice      uint `json:"original_price"`
-	SalePrice          uint `json:"sale_price"`
-	TotalOriginalPrice uint `json:"total_original_price"`
-	TotalSalePrice     uint `json:"total_sale_price"`
+	CustomerID         uint
+	OrderID            uint
+	InventoryID        uint
+	Quantity           uint
+	OriginalPrice      uint
+	SalePrice          uint
+	TotalOriginalPrice uint
+	TotalSalePrice     uint
+
+	ProductID            uint
+	ProductTitle         string
+	ProductOriginalPrice uint
+	ProductSalePrice     uint
+	ProductSku           string
+	OrderItemAttributes  OrderItemAttributes
 }
 
 type AdminOrderItems struct {
-	Data []AdminOrderItem `json:"data"`
+	Data []AdminOrderItem
 }
 
 func ToAdminOrderItem(oItem entities.OrderItem) AdminOrderItem {
@@ -92,6 +123,13 @@ func ToAdminOrderItem(oItem entities.OrderItem) AdminOrderItem {
 		SalePrice:          oItem.SalePrice,
 		TotalOriginalPrice: oItem.TotalOriginalPrice,
 		TotalSalePrice:     oItem.TotalSalePrice,
+
+		ProductTitle:         oItem.Product.Title,
+		ProductOriginalPrice: oItem.OriginalPrice,
+		ProductSalePrice:     oItem.SalePrice,
+		ProductSku:           oItem.Product.Sku,
+
+		OrderItemAttributes: ToOrderItemAttributes(oItem.Product.ProductInventoryAttributes),
 	}
 }
 
@@ -101,4 +139,42 @@ func ToAdminOrderItems(oItems []entities.OrderItem) AdminOrderItems {
 		orderItems.Data = append(orderItems.Data, ToAdminOrderItem(oItem))
 	}
 	return orderItems
+}
+
+type OrderItemAttributes struct {
+	Data []OrderItemAttribute
+}
+type OrderItemAttribute struct {
+	Title string
+	Value string
+}
+
+func ToOrderItemAttribute(oItemAttribute entities.ProductAttribute) OrderItemAttribute {
+	return OrderItemAttribute{
+		Title: oItemAttribute.AttributeTitle,
+		Value: oItemAttribute.AttributeValueTitle,
+	}
+}
+func ToOrderItemAttributes(oItemAttributes []entities.ProductInventoryAttribute) OrderItemAttributes {
+	var a OrderItemAttributes
+	for _, i2 := range oItemAttributes {
+		a.Data = append(a.Data, ToOrderItemAttribute(i2.ProductAttribute))
+	}
+	return a
+}
+
+type Address struct {
+	ReceiverName       string
+	ReceiverMobile     string
+	ReceiverAddress    string
+	ReceiverPostalCode string
+}
+
+func ToAddress(address string) Address {
+	var add Address
+	err := json.Unmarshal([]byte(address), &add)
+	if err != nil {
+		return add
+	}
+	return add
 }
