@@ -26,6 +26,7 @@
                 <div class="row">
                     <div class="col-lg-10">
                         <b>جزییات پرداخت</b>
+
                         <table class="table-info table table-hover">
                             <tr>
                                 <td>ID</td>
@@ -53,7 +54,7 @@
                             </tr>
                             <tr>
                                 <td>مبلغ</td>
-                                <td>{{.Data.Payment.Amount}} تومان </td>
+                                <td>{{.Data.Payment.Amount}} تومان</td>
                             </tr>
 
                             <tr>
@@ -80,16 +81,16 @@
                                 <td>آدرس</td>
                                 <td>
                                     <b>نام تحویل گیرنده:</b>
-                                    {{.Customer.Address.ReceiverName}}
+                                    {{.Data.Address.ReceiverName}}
                                     <br>
                                     <b>موبایل تحویل گیرنده:</b>
-                                    {{.Customer.Address.ReceiverMobile}}
+                                    {{.Data.Address.ReceiverMobile}}
                                     <br>
                                     <b>آدرس تحویل گیرنده:</b>
-                                    {{.Customer.Address.ReceiverAddress}}
+                                    {{.Data.Address.ReceiverAddress}}
                                     <br>
                                     <b>کد پستی تحویل گیرنده:</b>
-                                    {{.Customer.Address.ReceiverPostalCode}}
+                                    {{.Data.Address.ReceiverPostalCode}}
                                     <br>
                                 </td>
                             </tr>
@@ -123,7 +124,7 @@
                             </tr>
                             <tr>
                                 <td>وضعیت سفارش</td>
-                                <td>{{.Data.OrderStatus}}</td>
+                                <td>{{.Data.OrderStatusText}}</td>
                             </tr>
                         </table>
                         <hr>
@@ -131,32 +132,32 @@
                         <b>آیتم های سفارش</b>
                         <table class="table table-info table-hover">
 
-                            {{range .Data.OrderItems}}
+                            {{range .Data.OrderItems.Data}}
                                 <tr>
                                     <td>نام محصول</td>
-                                    <td>{{.Product.Title}}</td>
+                                    <td>{{.ProductTitle}}</td>
                                 </tr>
                                 <tr>
                                     <td>شناسه محصول</td>
-                                    <td>{{.Product.Sku}}</td>
+                                    <td>{{.ProductSku}}</td>
                                 </tr>
                                 <tr>
                                     <td>قیمت اصلی محصول</td>
-                                    <td>{{.Product.OriginalPrice}} تومان</td>
+                                    <td>{{.ProductOriginalPrice}} تومان</td>
                                 </tr>
                                 <tr>
                                     <td>قیمت فروش محصول</td>
-                                    <td>{{.Product.SalePrice}} تومان</td>
+                                    <td>{{.ProductSalePrice}} تومان</td>
                                 </tr>
                                 <tr>
                                     <td>تعداد سفارش</td>
                                     <td>{{.Quantity}} عدد</td>
                                 </tr>
 
-                                {{range .Product.ProductInventoryAttributes}}
+                                {{range .OrderItemAttributes.Data}}
                                     <tr>
-                                        <td><b>{{.ProductAttribute.AttributeTitle}}</b></td>
-                                        <td><b>{{.ProductAttribute.AttributeValueTitle}}</b></td>
+                                        <td><b>{{.Title}}</b></td>
+                                        <td><b>{{.Value}}</b></td>
                                     </tr>
                                 {{end}}
                             {{end}}
