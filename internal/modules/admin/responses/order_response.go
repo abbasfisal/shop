@@ -9,7 +9,7 @@ type Order struct {
 	CustomerID         uint
 	OrderID            uint
 	OrderNumber        string
-	PaymentStatus      uint
+	PaymentStatus      int
 	TotalOriginalPrice uint
 	TotalSalePrice     uint
 	Discount           uint
