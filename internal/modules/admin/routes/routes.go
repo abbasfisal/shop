@@ -143,6 +143,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
 		//order
 		authGrp.GET("/admins/orders", adminHlr.IndexOrders)
 		authGrp.GET("/admins/orders/:id/details", adminHlr.ShowOrder)
+		authGrp.POST("/admins/orders/:id/update-status", adminHlr.EditOrder)
 
 	}
 
