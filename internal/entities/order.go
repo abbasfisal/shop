@@ -6,13 +6,14 @@ type Order struct {
 	gorm.Model
 	CustomerID         uint
 	OrderNumber        string `gorm:"type:varchar(10);unique"`
-	PaymentStatus      uint
+	PaymentStatus      int
 	TotalOriginalPrice uint
 	TotalSalePrice     uint
 	Discount           uint
 	OrderStatus        uint
 
 	Address string
+	Note    string
 
 	//-- relation
 
@@ -22,7 +23,7 @@ type Order struct {
 
 // Order Status Constants
 const (
-	OrderPending     uint = iota // در حال بررسی
+	OrderPending     uint = iota // در حال پرداخت
 	OrderConfirmed               // پرداخت شده
 	OrderCancelled               // لغو شده
 	OrderPreparing               // در حال آماده‌سازی
