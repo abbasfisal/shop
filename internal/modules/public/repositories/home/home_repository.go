@@ -2,6 +2,7 @@ package home
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -546,16 +547,21 @@ func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, e
 
 	}
 
+	//convert address struct to json
+	addressJson, _ := json.Marshal(customer.Address)
+
 	//create order
 	order := entities.Order{
 		CustomerID:         customer.ID,
 		OrderNumber:        strconv.Itoa(rand.Intn(9999999)),
-		PaymentStatus:      0,
+		PaymentStatus:      entities.PaymentPending, //pending
 		TotalOriginalPrice: customer.Cart.CartItem.TotalOriginalPrice,
 		TotalSalePrice:     customer.Cart.CartItem.TotalSalePrice,
 		Discount:           0,
-		OrderStatus:        0, //pending
+		OrderStatus:        entities.OrderPending, //pending
+		Address:            string(addressJson),
 	}
+
 	if createOrderError := tx.Create(&order).Error; createOrderError != nil {
 		tx.Rollback()
 		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order]-error:", createOrderError.Error())
