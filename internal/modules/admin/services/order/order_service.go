@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/order"
+	"shop/internal/modules/admin/requests"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/pkg/pagination"
 )
@@ -29,9 +30,21 @@ func (o OrderService) GetOrderPaginate(c *gin.Context) (pagination.Pagination, e
 
 func (o OrderService) GetOrderBy(c *gin.Context, orderID int) (responses.OrderDetail, error) {
 	orderEntity, customerEntity, err := o.repo.FindOrderBy(c, orderID)
+
 	if err != nil {
 		return responses.OrderDetail{}, err
 	}
 
 	return responses.ToOrderDetail(orderEntity, customerEntity), nil
+}
+
+func (o OrderService) ChangeOrderStatus(c *gin.Context, orderID int, req requests.UpdateOrderStatus) error {
+	_, err := o.repo.UpdateOrderStatusAndNote(c, orderID, req)
+	if err != nil {
+		return err
+	}
+	return nil
+
+	//todo: send sms when changing order status
+	//responses.AdminOrderStatusMap(orderEntity.OrderStatus)
 }
