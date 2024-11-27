@@ -12,6 +12,8 @@ type Order struct {
 	Discount           uint
 	OrderStatus        uint
 
+	Address string
+
 	//-- relation
 
 	OrderItems []OrderItem `gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE;"`
@@ -20,15 +22,15 @@ type Order struct {
 
 // Order Status Constants
 const (
-	OrderPending     uint = 1  // در حال بررسی
-	OrderConfirmed   uint = 2  // تایید شده
-	OrderCancelled   uint = 3  // لغو شده
-	OrderPreparing   uint = 4  // در حال آماده‌سازی
-	OrderReadyToShip uint = 5  // آماده برای ارسال
-	OrderShipped     uint = 6  // ارسال شده
-	OrderInTransit   uint = 7  // در مسیر ارسال
-	OrderDelivered   uint = 8  // تحویل داده شده
-	OrderReturned    uint = 9  // مرجوع شده
-	OrderCompleted   uint = 10 // تکمیل شده
-	OrderUnderReview uint = 11 // اختلاف یا مشکل
+	OrderPending     uint = iota // در حال بررسی
+	OrderConfirmed               // پرداخت شده
+	OrderCancelled               // لغو شده
+	OrderPreparing               // در حال آماده‌سازی
+	OrderReadyToShip             // آماده برای ارسال
+	OrderShipped                 // ارسال شده
+	OrderInTransit               // در مسیر ارسال
+	OrderDelivered               // تحویل داده شده
+	OrderReturned                // مرجوع شده
+	OrderCompleted               // تکمیل شده
+	OrderUnderReview             // اختلاف یا مشکل
 )
