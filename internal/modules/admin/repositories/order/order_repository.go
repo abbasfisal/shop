@@ -114,10 +114,10 @@ func (oRepo OrderRepository) FindOrderBy(c *gin.Context, orderID int) (entities.
 	return order, customer, nil
 }
 
-func (oRepo OrderRepository) UpdateOrderStatusAndNote(c *gin.Context, orderID int, req requests.UpdateOrderStatus) error {
+func (oRepo OrderRepository) UpdateOrderStatusAndNote(c *gin.Context, orderID int, req requests.UpdateOrderStatus) (entities.Order, error) {
 	var order entities.Order
 	if err := oRepo.db.WithContext(c).Where("id=?", orderID).First(&order).Error; err != nil {
-		return gorm.ErrRecordNotFound
+		return entities.Order{}, err
 	}
 
 	// عدد منفی یک به این معنی هست که که ادمین نمیخواهد حالت پیشفرض وضعیت سفارش را تغییر دهد
@@ -133,7 +133,7 @@ func (oRepo OrderRepository) UpdateOrderStatusAndNote(c *gin.Context, orderID in
 	}
 
 	if err := oRepo.db.WithContext(c).Save(&order).Error; err != nil {
-		return err
+		return entities.Order{}, nil
 	}
-	return nil
+	return order, nil
 }
