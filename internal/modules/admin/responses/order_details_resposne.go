@@ -7,9 +7,6 @@ type OrderDetail struct {
 	Customer Customer
 }
 
-type Address struct {
-}
-
 func ToOrderDetail(orderEntity entities.Order, customerEntity entities.Customer) OrderDetail {
 	return OrderDetail{
 		Order:    ToAdminOrder(orderEntity),
