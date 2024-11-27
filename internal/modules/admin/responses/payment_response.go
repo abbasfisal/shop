@@ -1,10 +1,15 @@
 package responses
 
-import "shop/internal/entities"
+import (
+	"shop/internal/entities"
+	"time"
+)
 
 type Payment struct {
+	ID                uint
 	CustomerID        uint
 	OrderID           uint
+	CreatedAt         time.Time
 	Authority         string
 	Description       string
 	PaymentURL        string
@@ -17,8 +22,10 @@ type Payment struct {
 
 func ToPayment(paymentEntity entities.Payment) Payment {
 	return Payment{
+		ID:                paymentEntity.ID,
 		CustomerID:        paymentEntity.CustomerID,
 		OrderID:           paymentEntity.OrderID,
+		CreatedAt:         paymentEntity.CreatedAt,
 		Authority:         paymentEntity.Authority,
 		Description:       paymentEntity.Description,
 		PaymentURL:        paymentEntity.PaymentURL,
@@ -31,12 +38,14 @@ func ToPayment(paymentEntity entities.Payment) Payment {
 }
 func PaymentStatusMapper(status int) string {
 	switch status {
-	case 0:
-		return "در حال پرداخت"
-	case 1:
-		return "پرداخت شده"
-	case 2:
-		return "لغو شده"
+	case entities.PaymentPending:
+		return "منتظر پرداخت" //0
+	case entities.PaymentSuccess:
+		return "پرداخت موفق"
+	case entities.PaymentFailed:
+		return "پرداخت ناموفق یا لغو شده"
+	case entities.PaymentRetry:
+		return "در انتظار پرداخت مجدد"
 	default:
 		return "نامعلوم"
 	}
