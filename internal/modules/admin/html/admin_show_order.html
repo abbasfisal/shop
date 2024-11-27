@@ -14,6 +14,7 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                        {{.MESSAGE}}
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -24,7 +25,45 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
+                    <div class="col-lg-12 align-content-center">
+                        <div class="col-lg-8  bg-light p-3  card">
+                            <b>تغییر وضعیت سفارش</b>
+                            <form action="/admins/orders/{{.Data.ID}}/update-status" method="post" class="pt-3">
+                                <select class="form-control" name="status">
+                                    <option value="-1">انتخاب کنید</option>
+                                    <option value="0" {{if eq .Data.OrderStatus 0}}selected{{end}}>در حال پرداخت
+                                    </option>
+                                    <option value="1" {{if eq .Data.OrderStatus 1}}selected{{end}}>پرداخت شده</option>
+                                    <option value="2" {{if eq .Data.OrderStatus 2}}selected{{end}}>لغو شده</option>
+                                    <option value="3" {{if eq .Data.OrderStatus 3}}selected{{end}}>در حال آماده سازی
+                                    </option>
+                                    <option value="4" {{if eq .Data.OrderStatus 4}}selected{{end}}>آماده برای ارسال
+                                    </option>
+                                    <option value="5" {{if eq .Data.OrderStatus 5}}selected{{end}}>ارسال شده</option>
+                                    <option value="6" {{if eq .Data.OrderStatus 6}}selected{{end}}>در مسیر ارسال
+                                    </option>
+                                    <option value="7" {{if eq .Data.OrderStatus 7}}selected{{end}}>تحویل داده شده
+                                    </option>
+                                    <option value="8" {{if eq .Data.OrderStatus 8}}selected{{end}}>مرجوع شده</option>
+                                    <option value="9" {{if eq .Data.OrderStatus 9}}selected{{end}}>تکمیل شده</option>
+                                    <option value="10" {{if eq .Data.OrderStatus 10}}selected{{end}}>اختلاف یا مشکل
+                                    </option>
+                                    <option value="11" {{if eq .Data.OrderStatus 11}}selected{{end}}>نامعلوم</option>
+                                </select>
+
+                                <textarea class="form-control mt-4" name="note" placeholder="یادداشت" cols="30"
+                                          rows="5">{{with .Data.OrderNote}}{{.}}{{end}}</textarea>
+
+                                <input class="btn text-center btn-success" type="submit" value="بروزرسانی">
+
+                            </form>
+                        </div>
+                    </div>
+
+
                     <div class="col-lg-10">
+                        <hr>
+                        <br>
                         <b>جزییات پرداخت</b>
 
                         <table class="table-info table table-hover">
