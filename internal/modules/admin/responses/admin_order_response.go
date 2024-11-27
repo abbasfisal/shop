@@ -10,11 +10,12 @@ type AdminOrder struct {
 	ID                 uint
 	CustomerID         uint
 	OrderNumber        string
-	PaymentStatus      uint
+	PaymentStatus      int
 	TotalOriginalPrice uint
 	TotalSalePrice     uint
 	CreatedAt          time.Time
 	Discount           uint
+	OrderNote          string
 	OrderStatus        uint
 	OrderStatusText    string
 	OrderItems         AdminOrderItems
@@ -45,6 +46,7 @@ func ToAdminOrder(o entities.Order) AdminOrder {
 		CreatedAt:          o.CreatedAt,
 		Discount:           o.Discount,
 		OrderStatus:        o.OrderStatus,
+		OrderNote:          o.Note,
 		OrderStatusText:    AdminOrderStatusMap(o.OrderStatus),
 		OrderItems:         ToAdminOrderItems(o.OrderItems),
 		Address:            ToAddress(o.Address),
