@@ -21,8 +21,8 @@ type Payment struct {
 
 // Payment Status Constants
 const (
-	PaymentPending uint = 1 // منتظر پرداخت
-	PaymentSuccess uint = 2 // پرداخت موفق
-	PaymentFailed  uint = 3 // پرداخت ناموفق
-	PaymentRetry   uint = 4 // در انتظار پرداخت مجدد
+	PaymentPending uint = iota // منتظر پرداخت
+	PaymentSuccess             // پرداخت موفق
+	PaymentFailed              // پرداخت ناموفق
+	PaymentRetry               // در انتظار پرداخت مجدد
 )
