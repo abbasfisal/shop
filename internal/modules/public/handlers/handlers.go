@@ -424,15 +424,8 @@ func (p PublicHandler) AddToCart(c *gin.Context) {
 	}
 
 	p.homeSrv.AddToCart(c, productObjectID, req)
-
-	c.JSON(200, gin.H{
-		"ok": productObjectID.String(),
-	})
-	//check uuid is exist in mongo? yes => catch product
-	//	p.homeSrv.AddToCart(c, req)
-
+	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
-
 }
 
 func (p PublicHandler) Cart(c *gin.Context) {
