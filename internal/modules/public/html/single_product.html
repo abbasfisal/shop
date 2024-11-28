@@ -283,18 +283,22 @@
                                                                 </div>
                                                                 تومان
                                                             </div>
-                                                            <div
-                                                                    class="product-additional-item product-additional-item--no-icon">
-                                                                <span>300,000</span>&nbsp; تومان تخفیف سازمانی کسر
-                                                                گردیده
-                                                                است.
-                                                            </div>
                                                         </div>
                                                         <div class="product-seller-row product-seller-row--add-to-cart">
-                                                            <button type="submit"
-                                                                    class="btn-add-to-cart btn-add-to-cart--full-width">
-                                                                <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
-                                                            </button>
+                                                            {{$productIDVar:=.PRODUCT.product.ID}}
+                                                            {{range $CartItem:=.AUTH.Cart.CartItem.Data}}
+                                                                {{if eq .ProductID $productIDVar}}
+                                                                    <a href="/checkout/cart"
+                                                                       class="btn-add-to-cart bg-success  btn-add-to-cart--full-width">مشاهده
+                                                                        سبد خرید
+                                                                    </a>
+                                                                {{else}}
+                                                                    <button type="submit"
+                                                                            class="btn-add-to-cart btn-add-to-cart--full-width">
+                                                                        <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
+                                                                    </button>
+                                                                {{end}}
+                                                            {{end}}
                                                         </div>
                                                     </nav>
                                                 </div>
