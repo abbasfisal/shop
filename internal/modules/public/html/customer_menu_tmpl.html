@@ -1,0 +1,141 @@
+{{define "customer_menu_tmpl"}}
+    <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12 sticky-sidebar">
+        <div class="profile-sidebar dt-sl">
+            <div class="dt-sl dt-sn border mb-3">
+                <div class="profile-sidebar-header dt-sl">
+                    <div class="d-flex align-items-center">
+                        <div class="profile-avatar">
+                            <img src="/assets/shop/img/svg/avatar-1.svg" alt="">
+                        </div>
+                        <div class="profile-header-content mr-3 mt-2">
+                            <span class="d-block profile-username">{{if .AUTH.FirstName}}{{.AUTH.FirstName}} {{.AUTH.LastName}}{{else }}{{.AUTH.Mobile}}{{end}}</span>
+                            <span class="d-block profile-phone">{{.AUTH.Mobile}}</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-link mt-2 dt-sl">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <a href="/logout">
+                                    <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.5"
+                                              d="M9 4.5H8C5.64298 4.5 4.46447 4.5 3.73223 5.23223C3 5.96447 3 7.14298 3 9.5V14.5C3 16.857 3 18.0355 3.73223 18.7678C4.46447 19.5 5.64298 19.5 8 19.5H9"
+                                              stroke="#1C274C" stroke-width="1.5"/>
+                                        <path d="M9 6.4764C9 4.18259 9 3.03569 9.70725 2.4087C10.4145 1.78171 11.4955 1.97026 13.6576 2.34736L15.9864 2.75354C18.3809 3.17118 19.5781 3.37999 20.2891 4.25826C21 5.13652 21 6.40672 21 8.94711V15.0529C21 17.5933 21 18.8635 20.2891 19.7417C19.5781 20.62 18.3809 20.8288 15.9864 21.2465L13.6576 21.6526C11.4955 22.0297 10.4145 22.2183 9.70725 21.5913C9 20.9643 9 19.8174 9 17.5236V6.4764Z"
+                                              stroke="#1C274C" stroke-width="1.5"/>
+                                        <path opacity="0.5" d="M12 11V13" stroke="#1C274C"
+                                              stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    <span class="d-block mt-1">خروج از حساب</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dt-sl dt-sn border mb-3">
+                <div class="profile-menu-section dt-sl">
+                    <div class="label-profile-menu mt-2 mb-2">
+                        <span>حساب کاربری شما</span>
+                    </div>
+                    <div class="profile-menu">
+                        <ul>
+                            <li>
+                                <a href="/profile" class="{{if eq .ACTIVE "profile"}}active{{end}}">
+                                    <svg style="margin-left: 3px;" width="23px" height="23px"
+                                         viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.4"
+                                              d="M12.1207 12.78C12.0507 12.77 11.9607 12.77 11.8807 12.78C10.1207 12.72 8.7207 11.28 8.7207 9.50998C8.7207 7.69998 10.1807 6.22998 12.0007 6.22998C13.8107 6.22998 15.2807 7.69998 15.2807 9.50998C15.2707 11.28 13.8807 12.72 12.1207 12.78Z"
+                                              stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round"/>
+                                        <path opacity="0.34"
+                                              d="M18.7398 19.3801C16.9598 21.0101 14.5998 22.0001 11.9998 22.0001C9.39977 22.0001 7.03977 21.0101 5.25977 19.3801C5.35977 18.4401 5.95977 17.5201 7.02977 16.8001C9.76977 14.9801 14.2498 14.9801 16.9698 16.8001C18.0398 17.5201 18.6398 18.4401 18.7398 19.3801Z"
+                                              stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round"/>
+                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                              stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round"/>
+                                    </svg>
+                                    پروفایل
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/orders" class="{{if eq .ACTIVE "orders"}}active{{end}}">
+                                    <svg style="margin-left: 3px;" width="25px" height="25px"
+                                         viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.15" d="M3 10H21L19 20H5L3 10Z"
+                                              fill="#000000"></path>
+                                        <path d="M3 10H21M3 10L5 20H19L21 10M3 10L9 4M21 10L15 4"
+                                              stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round"></path>
+                                    </svg>
+                                    همه سفارش ها
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <svg style="margin-left: 3px;" style="margin-left: 3px;"
+                                         fill="#000000" width="23px" height="23px" viewBox="0 0 256 256"
+                                         id="Flat" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M224,56V200a7.99977,7.99977,0,0,1-8,8H40a7.99977,7.99977,0,0,1-8-8V56a7.99977,7.99977,0,0,1,8-8H216A7.99977,7.99977,0,0,1,224,56Z"
+                                              opacity="0.2"/>
+                                        <path d="M184,104v32a8.00039,8.00039,0,0,1-8,8H99.314l10.34327,10.34277a8.00053,8.00053,0,0,1-11.31446,11.31446l-24-24c-.05664-.05664-.10449-.11768-.15869-.17578-.12549-.13282-.251-.26514-.36719-.40625-.0913-.11084-.17138-.22706-.25537-.3418-.07031-.09522-.14453-.188-.21093-.28662-.085-.12647-.15918-.25782-.23584-.38819-.05567-.09423-.11524-.186-.167-.2832-.06933-.12891-.12841-.26172-.18994-.39355-.04931-.10547-.10205-.209-.147-.31641-.05225-.12695-.09522-.25586-.14063-.38477-.042-.11816-.0874-.23437-.124-.355-.03906-.1289-.06787-.25976-.10058-.39013-.03077-.12305-.06543-.24414-.09034-.36914-.02978-.15186-.04834-.30469-.06933-.45752-.01465-.106-.03516-.20948-.0459-.3169a8.02276,8.02276,0,0,1,0-1.584c.01074-.10742.03125-.21094.0459-.3169.021-.15283.03955-.30566.06933-.45752.02491-.125.05957-.24609.09034-.36914.03271-.13037.06152-.26123.10058-.39013.03662-.12061.082-.23682.124-.355.04541-.12891.08838-.25782.14063-.38477.04492-.10742.09766-.21094.147-.31641.06153-.13183.12061-.26464.18994-.39355.05176-.09717.11133-.189.167-.2832.07666-.13037.15087-.26172.23584-.38819.0664-.09863.14062-.1914.21093-.28662.084-.11474.16407-.231.25537-.3418.11622-.14111.2417-.27343.36719-.40625.0542-.0581.10205-.11914.15869-.17578l24-24a8.00053,8.00053,0,0,1,11.31446,11.31446L99.314,128H168V104a8,8,0,0,1,16,0Zm48-48V200a16.01833,16.01833,0,0,1-16,16H40a16.01833,16.01833,0,0,1-16-16V56A16.01833,16.01833,0,0,1,40,40H216A16.01833,16.01833,0,0,1,232,56ZM216.00977,200,216,56H40V200H216.00977Z"/>
+                                    </svg>
+                                    درخواست مرجوعی
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <svg style="margin-left: 3px;" width="23px" height="23px"
+                                         viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.15"
+                                              d="M4.3314 12.0474L12 20L19.6686 12.0474C20.5211 11.1633 21 9.96429 21 8.71405C21 6.11055 18.9648 4 16.4543 4C15.2487 4 14.0925 4.49666 13.24 5.38071L12 6.66667L10.76 5.38071C9.90749 4.49666 8.75128 4 7.54569 4C5.03517 4 3 6.11055 3 8.71405C3 9.96429 3.47892 11.1633 4.3314 12.0474Z"
+                                              fill="#000000"></path>
+                                        <path d="M4.3314 12.0474L12 20L19.6686 12.0474C20.5211 11.1633 21 9.96429 21 8.71405C21 6.11055 18.9648 4 16.4543 4C15.2487 4 14.0925 4.49666 13.24 5.38071L12 6.66667L10.76 5.38071C9.90749 4.49666 8.75128 4 7.54569 4C5.03517 4 3 6.11055 3 8.71405C3 9.96429 3.47892 11.1633 4.3314 12.0474Z"
+                                              stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round"></path>
+                                    </svg>
+                                    لیست علاقمندی ها
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <svg style="margin-left: 3px;" width="23px" height="23px"
+                                         viewBox="-1.99 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <g id="direction" transform="translate(-4 -2)">
+                                            <path id="secondary" fill="#2ca9bc"
+                                                  d="M6,6A1,1,0,0,0,5,7v4a1,1,0,0,0,1,1H16.67a1,1,0,0,0,.83-.45l1.33-2a1,1,0,0,0,0-1.1l-1.33-2A1,1,0,0,0,16.67,6Z"/>
+                                            <path id="primary"
+                                                  d="M7,21h8M13,6V4a1,1,0,0,0-1-1H10A1,1,0,0,0,9,4V6ZM9,12v9h4V12ZM6,6A1,1,0,0,0,5,7v4a1,1,0,0,0,1,1H16.67a1,1,0,0,0,.83-.45l1.33-2a1,1,0,0,0,0-1.1l-1.33-2A1,1,0,0,0,16.67,6Z"
+                                                  fill="none" stroke="#000000" stroke-linecap="round"
+                                                  stroke-linejoin="round" stroke-width="2"/>
+                                        </g>
+                                    </svg>
+                                    آدرس
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/profile/edit" class="{{if eq .ACTIVE "edit_profile"}}active{{end}}">
+                                    <svg style="margin-left: 3px;" width="20px" height="20px"
+                                         viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.15" d="M4 20H8L18 10L14 6L4 16V20Z"
+                                              fill="#000000"/>
+                                        <path d="M12 20H20.5M18 10L21 7L17 3L14 6M18 10L8 20H4V16L14 6M18 10L14 6"
+                                              stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                              stroke-linejoin="round"/>
+                                    </svg>
+                                    اطلاعات شخصی
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
