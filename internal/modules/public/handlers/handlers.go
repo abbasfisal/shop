@@ -363,7 +363,8 @@ func (p PublicHandler) LogOut(c *gin.Context) {
 
 func (p PublicHandler) ShowProfile(c *gin.Context) {
 	html.CustomerRender(c, http.StatusFound, "customer_profile", gin.H{
-		"TITLE": "مدیریت پروفایل",
+		"TITLE":  "مدیریت پروفایل",
+		"ACTIVE": "profile",
 	})
 	return
 }
@@ -371,7 +372,8 @@ func (p PublicHandler) ShowProfile(c *gin.Context) {
 func (p PublicHandler) EditProfile(c *gin.Context) {
 	html.CustomerRender(c, http.StatusFound, "customer_edit_profile",
 		gin.H{
-			"TITLE": "ویرایش پروفایل",
+			"TITLE":  "ویرایش پروفایل",
+			"ACTIVE": "edit_profile",
 		},
 	)
 	return
@@ -642,13 +644,12 @@ func (p PublicHandler) ShowOrderList(c *gin.Context) {
 			html.CustomerRender(c, http.StatusNotFound, "profile_orders", gin.H{
 				"TITLE":      "لیست سفارشات",
 				"PAGINATION": nil,
+				"ACTIVE":     "orders",
 			})
 			return
 		} else {
 			c.JSON(200, gin.H{
-				"else": 1,
-				"err":  err.Error(),
-				"msg":  custom_error.SomethingWrongHappened,
+				"msg": custom_error.SomethingWrongHappened,
 			})
 			return
 		}
@@ -659,6 +660,7 @@ func (p PublicHandler) ShowOrderList(c *gin.Context) {
 			"TITLE":          "لیست سفارشات",
 			"PAGINATION":     orderPaginations,
 			"PrimaryMessage": "لیست سفارشات",
+			"ACTIVE":         "orders",
 		},
 	)
 	return
