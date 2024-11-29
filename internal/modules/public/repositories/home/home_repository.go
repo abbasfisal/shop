@@ -782,10 +782,50 @@ func (h HomeRepository) GetOrder(c *gin.Context, orderNumber string) (entities.O
 	if !exists {
 		return entities.Order{}, errors.New("user must be loggedIn")
 	}
-	var order entities.Order
-	if err := h.db.WithContext(c).Preload("OrderItems").Preload("Payment").Where("order_number=? AND customer_id=?", orderNumber, customer.ID).First(&order).Error; err != nil {
-		return order, gorm.ErrRecordNotFound
-	}
-	return order, nil
 
+	//--
+	var order entities.Order
+
+	//برای گرفتن دیتای جدول
+	//product_attributes
+	//مجبور هستیم که ابتدا دو ستون
+	//product_id , inventory_id
+	//که در جدول order_items هستند
+	// رو بدست بیاریم و بعد نتایج اونها رو درون preload استفاده کنیم
+
+	var productAndInventory []struct {
+		ProductID   uint
+		InventoryID uint
+	}
+	if err := h.db.WithContext(c).
+		Table("order_items").
+		Select("product_id , inventory_id").
+		Where("customer_id = ?", customer.ID).
+		Scan(&productAndInventory).Error; err != nil {
+		return order, nil
+	}
+
+	//حالا نتایج رو به صورت اسلایس در میاریم که مستقیم بشه درون preload استفاده کرد
+	var productIDs, inventoryIDs []uint
+	for _, item := range productAndInventory {
+		productIDs = append(productIDs, item.ProductID)
+		inventoryIDs = append(inventoryIDs, item.InventoryID)
+	}
+
+	if err := h.db.WithContext(c).
+		Preload("OrderItems.Product.ProductInventoryAttributes",
+			"product_inventory_attributes.product_id IN (?) AND product_inventory_attributes.product_inventory_id IN (?)",
+			productIDs, inventoryIDs,
+		).
+		Preload("OrderItems.Product.ProductInventoryAttributes.ProductAttribute",
+			"product_attributes.product_id IN (?)",
+			productIDs,
+		).
+		Preload("Payment").
+		Where("order_number=? AND customer_id = ?", orderNumber, customer.ID).
+		First(&order).Error; err != nil {
+		return order, err
+	}
+
+	return order, nil
 }
