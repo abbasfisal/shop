@@ -1,0 +1,374 @@
+{{define "customer_order_details"}}
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="/assets/shop/img/seller-logo.png" type="image/icon">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>DigiKala | Profile Order Details Page</title>
+        <!-- Font Icon -->
+        <link rel="stylesheet" href="/assets/shop/css/vendor/font-awesome.min.css">
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="/assets/shop/css/vendor/bootstrap.min.css">
+        <!-- Plugins -->
+        <link rel="stylesheet" href="/assets/shop/css/vendor/owl.carousel.min.css">
+        <link rel="stylesheet" href="/assets/shop/plugin/go-to-top/style.css">
+        <link rel="stylesheet" href="/assets/shop/plugin/iran-map/iranmap.css">
+        <!-- Main CSS File -->
+        <link rel="stylesheet" href="/assets/shop/css/main.css">
+    </head>
+
+    <body>
+    <div class="wrapper">
+        <!-------------------------------- Header Section -->
+        {{template "header_tmpl" .}}
+        <!-------------------------------- Header Section -->
+
+        <!--------------------- Mobile side menu Responsive Section -->
+        {{template "mobile_side_menu_tmpl" .}}
+        <!--------------------- Mobile side menu Responsive Section -->
+
+        <!---------------------------- Page Loader Section-->
+        <div class="page-loader">
+            <div class="page-loader-content">
+                <div class="logo-area">
+                    <img src="/assets/shop/img/svg/logo.svg" alt="">
+                </div>
+                <span class="loader"></span>
+            </div>
+        </div>
+        <!---------------------------- Page Loader Section-->
+
+        <!--------------------------------- Main Content -->
+        <main class="main-content dt-sl mb-3">
+            <div class="container main-container">
+                <div class="row" style="margin-top: 20px; margin-bottom: 20px; transform: none;">
+                    <!-- Start Sidebar -->
+                    {{template "customer_menu_tmpl" .}}
+                    <!-- End Sidebar -->
+                    <!-- Start Content -->
+                    <div class="col-xl-9 col-lg-8 col-md-8 col-sm-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="profile-navbar">
+                                    <a href="#" class="profile-navbar-btn-back">
+                                        <svg style="position: absolute;right: 6px;top: 2px;" width="30px" height="30px"
+                                             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.1"
+                                                  d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                  fill="#323232"/>
+                                            <path d="M11 15L13.7158 12.2842V12.2842C13.8728 12.1272 13.8728 11.8728 13.7158 11.7158V11.7158L11 9"
+                                                  stroke="#323232" stroke-width="2" stroke-linecap="round"
+                                                  stroke-linejoin="round"/>
+                                            <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z"
+                                                  stroke="#323232" stroke-width="2"/>
+                                        </svg>
+                                        بازگشت
+                                    </a>
+                                    {{if ne .DATA.OrderNumber "" }}
+                                        <h4>سفارش <span class="font-en">{{.DATA.OrderNumber}}</span><span>
+                                                ثبت شده:{{.DATA.CreatedAt}}
+                                            </span></h4>
+                                    {{end}}
+                                </div>
+                            </div>
+                            {{if ne .DATA.OrderNumber ""}}
+                                <div class="col-12 mb-4">
+                                    <div class="dt-sl dt-sn border">
+                                        <div class="row table-draught px-3">
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title">تحویل گیرنده:</span>
+                                                <span class="value">{{.DATA.Address.ReceiverName}}</span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title">شماره تماس تحویل گیرنده:</span>
+                                                <span class="value">{{.DATA.Address.ReceiverMobile}}</span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title">کد مرسوله:</span>
+                                                <span class="value">{{.DATA.OrderNumber}}</span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title">آدرس تحویل:</span>
+                                                <span class="value">{{.DATA.Address.ReceiverAddress}}</span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title">کد پستی:</span>
+                                                <span class="value">{{.DATA.Address.ReceiverPostalCode}}</span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title border-info">وضعیت سفارش:</span>
+                                                <span class="value  p-2" style="border: 1px solid skyblue;border-radius: 20px; ">{{.DATA.OrderStatusText}}</span>
+                                            </div>
+
+                                            <div class="col-12 text-center pb-0">
+                                                <span class="title">مبلغ این مرسوله:</span>
+                                                <span class="value">{{.DATA.PrettyTotalSalePrice}} تومان </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- order items -->
+                                <div class="col-12">
+                                    <div class="section-title text-sm-title title-wide mb-1 no-after-title-wide dt-sl mb-2 px-res-1">
+                                        <h2>اقلام سفارش داده شده</h2>
+                                    </div>
+                                    <div class="dt-sl">
+                                        <div class="table-responsive mb-4">
+                                            <table class="table table-order">
+                                                <thead>
+                                                <tr>
+                                                    <th>نام محصول</th>
+                                                    <th>ویژگی</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{range .DATA.OrderItems.Data}}
+                                                    <tr>
+                                                        <td>
+                                                            <a href="/product/{{.ProductSku}}/{{.ProductSlug}}">
+                                                                {{.ProductTitle}}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            {{range .OrderItemAttributes.Data}}
+                                                                {{.Title}}
+                                                                : {{.Value}}
+                                                            {{end}}
+                                                        </td>
+                                                    </tr>
+                                                {{end}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{else}}
+                                <div class="col-11 mb-4 p-4 card">
+                                    <span>سفارشی موجود نیست!</span>
+                                </div>
+                            {{end}}
+
+                        </div>
+                    </div>
+                    <!-- End Content -->
+                </div>
+            </div>
+        </main>
+        <!--------------------------------- Main Content -->
+
+        <!-------------------------- Mobile Footer Menu Section-->
+        {{template "mobile_footer_menu_tmpl" .}}
+        <!-------------------------- Mobile Footer menu Section-->
+
+        <!-------------------------------- Footer Section -->
+        <footer class="main-footer dt-sl">
+            <div class="back-to-top">
+                <!--<a href="#">
+                    <span class="icon">
+                    <i class="mdi mdi-chevron-up"></i>
+                    </span>
+                    <span>بازگشت به بالا</span>
+                </a>-->
+            </div>
+            <div class="container main-container">
+                <div class="footer-services">
+                    <div class="row">
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/delivery.svg">
+                            </a>
+                            <p>تحویل اکسپرس</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/contact-us.svg">
+                            </a>
+                            <p>پشتیبانی 24 ساعته</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/payment-terms.svg">
+                            </a>
+                            <p>پرداخت درمحل</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/return-policy.svg">
+                            </a>
+                            <p>۷ روز ضمانت بازگشت</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/origin-guarantee.svg">
+                            </a>
+                            <p>ضمانت اصل بودن کالا</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-widgets">
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">راهنمای خرید از دیجی پرس</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">نحوه ثبت سفارش</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">رویه ارسال سفارش</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">شیوه‌های پرداخت</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">خدمات مشتریان</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">پاسخ به پرسش‌های متداول</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">رویه‌های بازگرداندن کالا</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">شرایط استفاده</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">حریم خصوصی</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">با دیجی پرس</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">فروش در دیجی پرس</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">همکاری با سازمان‌ها</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">فرصت‌های شغلی</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">تماس با دیجی پرس</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">درباره دیجی پرس</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="newsletter">
+                                <p>از تخفیف‌ها و جدیدترین‌های فروشگاه باخبر شوید:</p>
+                                <form action="" class="mt-3">
+                                    <input type="email" class="form-control"
+                                           placeholder="آدرس ایمیل خود را وارد کنید...">
+                                    <input type="submit" class="btn btn-primary" value="ارسال">
+                                </form>
+                            </div>
+                            <div class="socials">
+                                <p>ما را در شبکه های اجتماعی دنبال کنید.</p>
+                                <div class="footer-social">
+                                    <ul class="text-center mt-2">
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-instagram"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-telegram"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-facebook"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-twitter"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info">
+                    <div class="row">
+                        <div class="col-12 text-right">
+                            <span>هفت روز هفته ، 24 ساعت شبانه‌روز پاسخگوی شما هستیم.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="description">
+                <div class="container main-container">
+                    <div class="row">
+                        <div class="site-description col-12 col-lg-7">
+                            <h1 class="site-title">فروشگاه اینترنتی دیجی پرس، بررسی، انتخاب و خرید آنلاین</h1>
+                            <p> دیجی پرس به عنوان یکی از قدیمی‌ترین فروشگاه های اینترنتی با بیش از یک دهه تجربه، با
+                                پایبندی به سه اصل کلیدی، پرداخت در محل، 7 روز ضمانت بازگشت کالا و تضمین اصل‌بودن کالا،
+                                موفق شده تا همگام با فروشگاه‌های معتبر جهان، به بزرگ‌ترین فروشگاه اینترنتی ایران تبدیل
+                                شود. به محض ورود به دیجی پرس با یک سایت پر از کالا رو به رو می‌شوید! هر آنچه که نیاز
+                                دارید و به ذهن شما خطور می‌کند در اینجا پیدا خواهید کرد. </p>
+                        </div>
+                        <div class="symbol col-12 col-lg-5">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/enamad/symbol-01.png" alt="">
+                            </a>
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/enamad/symbol-02.png" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <div class="container main-container">
+                    <p> استفاده از مطالب فروشگاه اینترنتی دیجی پرس فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع است.
+                        کلیه حقوق این سایت متعلق به شرکت نوآوران فن آوازه (فروشگاه آنلاین دیجی پرس) می‌باشد. </p>
+                </div>
+            </div>
+        </footer>
+        <!-------------------------------- Footer Section -->
+
+        <!----------------------------- Go To Top Section -->
+        {{template "go_to_top_tmpl" .}}
+        <!----------------------------- Go To Top Section -->
+
+    </div>
+
+    <!-- Core JS Files -->
+    <script src="/assets/shop/js/vendor/jquery.min.js"></script>
+    <script src="/assets/shop/js/vendor/popper.min.js"></script>
+    <script src="/assets/shop/js/vendor/bootstrap.bundle.min.js"></script>
+    <!-- Plugins -->
+    <script src="/assets/shop/js/vendor/owl.carousel.min.js"></script>
+    <script src="/assets/shop/js/vendor/theia-sticky-sidebar.min.js"></script>
+    <script src="/assets/shop/plugin/go-to-top/script.js"></script>
+    <script src="/assets/shop/plugin/iran-map/iranmap.js"></script>
+    <!-- Main JS File -->
+    <script src="/assets/shop/js/js-profile/js-profile.js"></script>
+    <!-- my custom JS File -->
+    <script src="/assets/shop/js/mylink/my-link.js"></script>
+    </body>
+    </html>
+{{end}}
