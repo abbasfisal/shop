@@ -669,11 +669,17 @@ func (p PublicHandler) ShowOrderList(c *gin.Context) {
 func (p PublicHandler) ShowOrderDetails(c *gin.Context) {
 	q := c.Param("order_number")
 	order, err := p.homeSrv.GetOrderBy(c, q)
-	log.Println("---- er:", err)
-	c.JSON(200, gin.H{
-		"orderNumber": q,
-		//	"err":         err.(error).Error(),
-		"order": order,
+	if err != nil {
+		log.Println("---- [public - handlers]-[ShowOrderDetails]----", err)
+		c.JSON(http.StatusOK, gin.H{
+			"msg": custom_error.SomethingWrongHappened,
+		})
+		return
+	}
+	html.CustomerRender(c, http.StatusFound, "customer_order_details", gin.H{
+		"TITLE":  "جزییات سفارش",
+		"DATA":   order,
+		"ACTIVE": "orders",
 	})
 	return
 }
