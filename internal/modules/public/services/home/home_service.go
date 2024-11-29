@@ -304,5 +304,6 @@ func (h HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
 }
 
 func (h HomeService) GetOrderBy(c *gin.Context, orderNumber string) (interface{}, interface{}) {
-	return h.repo.GetOrder(c, orderNumber)
+	order, err := h.repo.GetOrder(c, orderNumber)
+	return CustomerRes.ToCustomerOrder(order), err
 }
