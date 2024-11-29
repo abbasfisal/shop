@@ -133,3 +133,18 @@ func PrettyJson(v any) {
 		fmt.Printf("~~~~~~~~~~~~~~~~~~~~ [pretty json ] : data:\n%s\n ~~~~~~~~~~~~~~~~~~~~", string(jsonData))
 	}
 }
+
+// PrettyPrice show prices with commas
+func PrettyPrice(price int) string {
+	formattedNumber := strconv.FormatInt(int64(price), 10)
+
+	return formatWithCommas(formattedNumber)
+}
+
+func formatWithCommas(input string) string {
+	n := len(input)
+	if n <= 3 {
+		return input
+	}
+	return formatWithCommas(input[:n-3]) + "," + input[n-3:]
+}
