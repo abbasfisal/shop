@@ -1,3 +1,5 @@
+include .env
+
 run:
 	@go run cmd/http/main.go
 
@@ -22,3 +24,28 @@ production_server_up:
 #remove production docker-compose running server
 production_server_down:
 	@docker-compose -f docker-compose.prod.yml down
+
+
+date:
+	@date +%Y%m%d%H%M%S
+
+
+migration-up:
+	@sql-migrate up -env=production -config=internal/database/mysql/dbconfig.yml
+
+
+migration-down:
+	@sql-migrate down -env=production -config=internal/database/mysql/dbconfig.yml -limit=1
+
+migration-status:
+	@sql-migrate status -env=production -config=internal/database/mysql/dbconfig.yml
+
+
+#doc: https://github.com/golang-migrate/migrate
+#generate dbconfig.yml
+generate-sql-migrator-dbconfig:
+	@echo "production:\
+           \n  dialect: mysql\
+           \n  datasource: ${MYSQL_USER}:${MYSQL_PASSWORD}@(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DB}?parseTime=true\
+           \n  dir: internal/database/mysql/migrations #migration director\
+           \n  table: migrations" > internal/database/mysql/dbconfig.yml
