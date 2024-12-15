@@ -1,0 +1,9 @@
+-- -- +migrate Up
+-- CREATE TABLE example
+-- (
+--     id   int,
+--     name varchar(30)
+-- );
+--
+-- -- +migrate Down
+-- DROP TABLE example;
