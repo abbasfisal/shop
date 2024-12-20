@@ -43,9 +43,20 @@ migration-status:
 
 #doc: https://github.com/golang-migrate/migrate
 #generate dbconfig.yml
+# this dbconfig.yml file is necessary when you want use sql-migrator pkg to migration-up and down
 generate-sql-migrator-dbconfig:
 	@echo "production:\
            \n  dialect: mysql\
            \n  datasource: ${MYSQL_USER}:${MYSQL_PASSWORD}@(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DB}?parseTime=true\
            \n  dir: internal/database/mysql/migrations #migration director\
            \n  table: migrations" > internal/database/mysql/dbconfig.yml
+
+
+# start schedule system using asynq pkg
+start-schedule:
+	@go ./cmd/job/scheduler/main.go
+
+
+# start worker which is responsible to execute tasks
+start-worker:
+	@go ./cmd/job/worker/main.go
