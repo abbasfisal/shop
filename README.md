@@ -59,6 +59,8 @@ Start the task scheduler for periodic jobs:
 ```bash
 make start-schedule
 ```
+### 🔎 monitoring & administering Asynq task queue
+    go to admin route => /monitoring
 
 ---
 

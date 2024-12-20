@@ -112,6 +112,8 @@ __
 - [x] show detail of an order in admin side 
 - [x] implement event/listener system
 - [x] implement job/queue/schedule system using asynq pkg
+- [x] install [Asynqmon](https://github.com/hibiken/asynqmon) Web UI for monitoring & administering Asynq task queue
+
 add make file :
 
 `docker-compose -f docker-compose.dev.yml --env-file .env.development up
