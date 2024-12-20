@@ -109,7 +109,9 @@ __
 - [x] show customer paginated orders
 - [x] show detail of an order in customer side
 - [x] show paginated orders in admin panel
-- [ ] show detail of an order in admin side 
+- [x] show detail of an order in admin side 
+- [x] implement event/listener system
+- [x] implement job/queue/schedule system using asynq pkg
 add make file :
 
 `docker-compose -f docker-compose.dev.yml --env-file .env.development up
