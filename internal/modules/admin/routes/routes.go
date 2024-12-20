@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
@@ -25,7 +26,7 @@ import (
 	"shop/internal/modules/admin/services/product"
 )
 
-func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle) {
+func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client) {
 
 	authRepo := authRepository.NewAuthenticateRepository(mysql.Get())
 	authSrv := auth.NewAuthenticateService(authRepo)

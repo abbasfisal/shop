@@ -5,7 +5,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
+	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
@@ -13,6 +13,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"log"
 	"net/http"
+	"os"
 	"shop/cmd/commands"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
@@ -25,15 +26,16 @@ import (
 )
 
 var (
-	validate   *validator.Validate
 	i18nBundle *i18n.Bundle
 	once       sync.Once
-	logger     logging.Logger
+
+	asynqClient *asynq.Client
 )
 
 func main() {
 
 	defer mysql.Close()
+	defer asynqClient.Close()
 
 	once.Do(initialize)
 
@@ -47,7 +49,7 @@ func main() {
 
 	r := gin.Default()
 	setupSessions(r)
-	setupRoutes(r)
+	setupRoutes(r, asynqClient)
 
 	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
 	log.Printf("[start server ]: %s", "http://"+addr)
@@ -62,6 +64,12 @@ func initialize() {
 	loadConfig()
 	initializeDatabase()
 	InitializeSmsService()
+	initAsynqClient()
+}
+
+func initAsynqClient() {
+	opt := asynq.RedisClientOpt{Addr: fmt.Sprintf("%s:%s", os.Getenv("REDIS_DB"), os.Getenv("REDIS_PORT"))}
+	asynqClient = asynq.NewClient(opt)
 }
 
 func InitializeSmsService() {
@@ -106,15 +114,15 @@ func setupSessions(r *gin.Engine) {
 	r.Use(sessions.Sessions("session", store))
 }
 
-func setupRoutes(r *gin.Engine) {
+func setupRoutes(r *gin.Engine, asynqClient *asynq.Client) {
 	r.LoadHTMLGlob("internal/**/**/**/*.html")
 	r.Static("uploads", "./uploads")
 	r.Static("assets", "./assets")
 
 	r.StaticFile("/favicon.ico", "./assets/shop/img/seller-logo.png")
 
-	AdminRoutes.SetAdminRoutes(r, i18nBundle)
-	PublicRoutes.SetPublic(r, i18nBundle)
+	AdminRoutes.SetAdminRoutes(r, i18nBundle, asynqClient)
+	PublicRoutes.SetPublic(r, i18nBundle, asynqClient)
 
 	r.GET("/500", func(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "templates/html/errors/500", nil)
