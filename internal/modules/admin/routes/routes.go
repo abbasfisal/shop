@@ -1,9 +1,12 @@
 package routes
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
+	"github.com/hibiken/asynqmon"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"os"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
 	"shop/internal/middlewares"
@@ -65,6 +68,15 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client
 	authGrp := r.Group("/")
 	authGrp.Use(middlewares.IsAdmin)
 	{
+
+		//----- asynq monitor panel
+		h := asynqmon.New(asynqmon.Options{
+			RootPath:     "/monitoring",
+			RedisConnOpt: asynq.RedisClientOpt{Addr: fmt.Sprintf(":%s", os.Getenv("REDIS_PORT"))},
+		})
+		authGrp.Any(h.RootPath()+"/*any", gin.WrapH(h))
+		//--------------------------------------------------------
+
 		authGrp.GET("/starter", func(c *gin.Context) {
 			c.HTML(200, "starter", nil)
 			return
