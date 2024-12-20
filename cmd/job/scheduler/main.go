@@ -22,6 +22,7 @@ func main() {
 
 }
 
+// registerSchedules is responsible to register our tasks with specific cronspec
 func registerSchedules(schedule *asynq.Scheduler) {
 
 	//---------------------- example task
