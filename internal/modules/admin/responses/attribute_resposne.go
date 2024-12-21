@@ -12,7 +12,7 @@ type Attributes struct {
 	Data []Attribute
 }
 
-func ToAttribute(attr entities.Attribute) Attribute {
+func ToAttribute(attr *entities.Attribute) Attribute {
 	return Attribute{
 		ID: attr.ID,
 		//CategoryID:      attr.CategoryID,
@@ -21,7 +21,7 @@ func ToAttribute(attr entities.Attribute) Attribute {
 	}
 }
 
-func ToAttributes(attr []entities.Attribute) Attributes {
+func ToAttributes(attr []*entities.Attribute) Attributes {
 	var response Attributes
 
 	for _, item := range attr {
