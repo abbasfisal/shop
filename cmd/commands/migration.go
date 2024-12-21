@@ -22,6 +22,39 @@ var migrationCmd = &cobra.Command{
 }
 
 func migrate() {
+	db := mysql.Get()
+	db.Exec("SET foreign_key_checks = 0")
+
+	if err := db.Migrator().DropTable(
+		&entities.Payment{},
+		&entities.OrderItem{},
+		&entities.Order{},
+		&entities.CartItem{},
+		&entities.Cart{},
+	); err != nil {
+		log.Fatal("[Drop tables] failed : ", err)
+	}
+	fmt.Println("[Drop] tables successfully")
+
+	err := db.AutoMigrate(
+		&entities.Order{},
+		&entities.Payment{},
+		&entities.OrderItem{},
+		&entities.Cart{},
+		&entities.CartItem{},
+	)
+	db.Exec("SET foreign_key_checks = 1")
+
+	if err != nil {
+		log.Fatal("~~~~ [Migrate] Tables Migration Failed : ", err)
+		return
+	}
+
+	fmt.Println("~~~~ [Migrate] Tables Migration Success")
+
+	os.Exit(1)
+}
+func migrate1() {
 
 	db := mysql.Get()
 	db.Exec("SET foreign_key_checks = 0")
