@@ -51,7 +51,7 @@ type AdminHandler struct {
 
 func NewAdminHandler(
 	authSrv auth.AuthenticateServiceInterface,
-	categorySrv category.CategoryService,
+	categorySrv category.CategoryServiceInterface,
 	productSrv product.ProductServiceInterface,
 	attributeSrv attribute.AttributeServiceInterface,
 	attrValueSrv attributeValue.AttributeValueServiceInterface,
@@ -60,8 +60,8 @@ func NewAdminHandler(
 	orderSrv order.OrderServiceInterface,
 
 	i18nBundle *i18n.Bundle,
-) AdminHandler {
-	return AdminHandler{
+) *AdminHandler {
+	return &AdminHandler{
 		authSrv:      authSrv,
 		categorySrv:  categorySrv,
 		productSrv:   productSrv,
@@ -75,12 +75,12 @@ func NewAdminHandler(
 	}
 }
 
-func (a AdminHandler) ShowLogin(c *gin.Context) {
+func (a *AdminHandler) ShowLogin(c *gin.Context) {
 	html.Render(c, http.StatusOK, "modules/admin/html/admin_login", gin.H{"title": "login"})
 	return
 }
 
-func (a AdminHandler) PostLogin(c *gin.Context) {
+func (a *AdminHandler) PostLogin(c *gin.Context) {
 	var req requests.LoginRequest
 	c.Request.ParseForm()
 
@@ -95,7 +95,7 @@ func (a AdminHandler) PostLogin(c *gin.Context) {
 		return
 	}
 
-	user, loginErr := a.authSrv.Login(context.TODO(), req)
+	user, loginErr := a.authSrv.Login(c.Request.Context(), &req)
 	if loginErr.Error() != "" {
 		if loginErr.Code == 404 {
 			html.Render(c, http.StatusFound, "modules/admin/html/admin_login", gin.H{
@@ -113,7 +113,7 @@ func (a AdminHandler) PostLogin(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/admins/home")
 }
 
-func (a AdminHandler) ShowHome(c *gin.Context) {
+func (a *AdminHandler) ShowHome(c *gin.Context) {
 	html.Render(c, http.StatusOK, "modules/admin/html/admin_home",
 		gin.H{
 			"TITLE": "admin home page",
@@ -125,7 +125,7 @@ func (a AdminHandler) ShowHome(c *gin.Context) {
 //		category routes
 //-------------------------------
 
-func (a AdminHandler) IndexCategory(c *gin.Context) {
+func (a *AdminHandler) IndexCategory(c *gin.Context) {
 
 	categories, err := a.categorySrv.Index(c)
 
@@ -144,7 +144,7 @@ func (a AdminHandler) IndexCategory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) CreateCategory(c *gin.Context) {
+func (a *AdminHandler) CreateCategory(c *gin.Context) {
 	categories, _ := a.categorySrv.GetAllCategories(c)
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_category", gin.H{
 		"TITLE":      "create new category",
@@ -153,7 +153,7 @@ func (a AdminHandler) CreateCategory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) StoreCategory(c *gin.Context) {
+func (a *AdminHandler) StoreCategory(c *gin.Context) {
 	var req requests.CreateCategoryRequest
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
@@ -261,7 +261,7 @@ func (a AdminHandler) StoreCategory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) ShowCategory(c *gin.Context) {
+func (a *AdminHandler) ShowCategory(c *gin.Context) {
 
 	catID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -286,7 +286,7 @@ func (a AdminHandler) ShowCategory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) EditCategory(c *gin.Context) {
+func (a *AdminHandler) EditCategory(c *gin.Context) {
 	catID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
@@ -316,7 +316,7 @@ func (a AdminHandler) EditCategory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) UpdateCategory(c *gin.Context) {
+func (a *AdminHandler) UpdateCategory(c *gin.Context) {
 
 	catID, catIDErr := strconv.Atoi(c.Param("id"))
 	if catIDErr != nil {
@@ -457,7 +457,7 @@ func (a AdminHandler) UpdateCategory(c *gin.Context) {
 
 }
 
-func (a AdminHandler) CategoryProducts(c *gin.Context) {
+func (a *AdminHandler) CategoryProducts(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"category_id": c.Param("id"),
 		"msg":         "implement me",
@@ -469,7 +469,7 @@ func (a AdminHandler) CategoryProducts(c *gin.Context) {
 //		product routes
 //-------------------------------
 
-func (a AdminHandler) IndexProduct(c *gin.Context) {
+func (a *AdminHandler) IndexProduct(c *gin.Context) {
 	products, err := a.productSrv.Index(context.TODO())
 	if err.Code == 404 {
 		//not found
@@ -492,7 +492,7 @@ func (a AdminHandler) IndexProduct(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) CreateProduct(c *gin.Context) {
+func (a *AdminHandler) CreateProduct(c *gin.Context) {
 	categories, err := a.categorySrv.GetAllCategories(c)
 	if err.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
@@ -525,7 +525,7 @@ func (a AdminHandler) CreateProduct(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) StoreProduct(c *gin.Context) {
+func (a *AdminHandler) StoreProduct(c *gin.Context) {
 	var req requests.CreateProductRequest
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
@@ -662,7 +662,7 @@ func (a AdminHandler) StoreProduct(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) ShowProduct(c *gin.Context) {
+func (a *AdminHandler) ShowProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -689,7 +689,7 @@ func (a AdminHandler) ShowProduct(c *gin.Context) {
 	)
 }
 
-func (a AdminHandler) EditProduct(c *gin.Context) {
+func (a *AdminHandler) EditProduct(c *gin.Context) {
 	pID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.Redirect(http.StatusFound, "/admins/products/")
@@ -739,7 +739,7 @@ func (a AdminHandler) EditProduct(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) UpdateProduct(c *gin.Context) {
+func (a *AdminHandler) UpdateProduct(c *gin.Context) {
 	//convert string id to int
 	productID, convErr := strconv.Atoi(c.Param("id"))
 	if convErr != nil {
@@ -882,14 +882,14 @@ func (a AdminHandler) UpdateProduct(c *gin.Context) {
 //	ATTRIBUTE HANDLERS
 //----------------------
 
-func (a AdminHandler) CreateAttribute(c *gin.Context) {
+func (a *AdminHandler) CreateAttribute(c *gin.Context) {
 	html.Render(c, http.StatusFound, "admin_create_attribute", gin.H{
 		"TITLE": "create new attribute",
 	})
 	return
 }
 
-func (a AdminHandler) CreateAttributeValues(c *gin.Context) {
+func (a *AdminHandler) CreateAttributeValues(c *gin.Context) {
 
 	attributes, _ := a.attributeSrv.Index(c)
 	html.Render(c, http.StatusFound, "admin_create_attribute_values", gin.H{
@@ -899,7 +899,7 @@ func (a AdminHandler) CreateAttributeValues(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) StoreAttribute(c *gin.Context) {
+func (a *AdminHandler) StoreAttribute(c *gin.Context) {
 	//todo: check uniqueness of title in given category
 
 	var req requests.CreateAttributeRequest
@@ -934,7 +934,7 @@ func (a AdminHandler) StoreAttribute(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
+func (a *AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
 	//todo: error for converting string to integer
 	cat, err := strconv.Atoi(c.Param("catID"))
 	fmt.Println(" category id : ", cat)
@@ -954,7 +954,7 @@ func (a AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
 	c.JSON(http.StatusOK, attributes)
 }
 
-func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
+func (a *AdminHandler) StoreAttributeValues(c *gin.Context) {
 
 	var req requests.CreateAttributeValueRequest
 	_ = c.Request.ParseForm()
@@ -998,7 +998,7 @@ func (a AdminHandler) StoreAttributeValues(c *gin.Context) {
 }
 
 // ProductsAddAttributes : show html form add attributes for given product
-func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
+func (a *AdminHandler) ProductsAddAttributes(c *gin.Context) {
 
 	//convert string id to int
 	productID, err := strconv.Atoi(c.Param("id"))
@@ -1034,7 +1034,7 @@ func (a AdminHandler) ProductsAddAttributes(c *gin.Context) {
 
 }
 
-func (a AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
+func (a *AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
 
 	//convert string id to int
 	productID, err := strconv.Atoi(c.Param("id"))
@@ -1068,7 +1068,7 @@ func (a AdminHandler) StoreProductsAddAttributes(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) ShowProductInventory(c *gin.Context) {
+func (a *AdminHandler) ShowProductInventory(c *gin.Context) {
 	productID, pErr := strconv.Atoi(c.Param("id"))
 	if pErr != nil {
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
@@ -1112,7 +1112,7 @@ func (a AdminHandler) ShowProductInventory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) StoreProductInventory(c *gin.Context) {
+func (a *AdminHandler) StoreProductInventory(c *gin.Context) {
 	productID, pErr := strconv.Atoi(c.Param("id"))
 	urlAdminProudcts := "/admins/products"
 	if pErr != nil {
@@ -1161,7 +1161,7 @@ func (a AdminHandler) StoreProductInventory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) ShowProductGallery(c *gin.Context) {
+func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 	pID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.Redirect(http.StatusFound, "/admins/products/")
@@ -1185,7 +1185,7 @@ func (a AdminHandler) ShowProductGallery(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) DeleteProductImage(c *gin.Context) {
+func (a *AdminHandler) DeleteProductImage(c *gin.Context) {
 
 	imageID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -1223,7 +1223,7 @@ func (a AdminHandler) DeleteProductImage(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) UploadProductImages(c *gin.Context) {
+func (a *AdminHandler) UploadProductImages(c *gin.Context) {
 
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -1310,7 +1310,7 @@ func (a AdminHandler) UploadProductImages(c *gin.Context) {
 
 }
 
-func (a AdminHandler) IndexAttribute(c *gin.Context) {
+func (a *AdminHandler) IndexAttribute(c *gin.Context) {
 
 	attributes, err := a.attributeSrv.Index(c)
 
@@ -1330,7 +1330,7 @@ func (a AdminHandler) IndexAttribute(c *gin.Context) {
 
 }
 
-func (a AdminHandler) ShowAttribute(c *gin.Context) {
+func (a *AdminHandler) ShowAttribute(c *gin.Context) {
 	attributeID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
@@ -1357,7 +1357,7 @@ func (a AdminHandler) ShowAttribute(c *gin.Context) {
 	)
 }
 
-func (a AdminHandler) UpdateAttribute(c *gin.Context) {
+func (a *AdminHandler) UpdateAttribute(c *gin.Context) {
 
 	attributeID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -1422,7 +1422,7 @@ func (a AdminHandler) UpdateAttribute(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/admins/attributes")
 }
 
-func (a AdminHandler) IndexAttributeValues(c *gin.Context) {
+func (a *AdminHandler) IndexAttributeValues(c *gin.Context) {
 
 	attributes, err := a.attrValueSrv.IndexAttribute(c)
 	if err.Code == 404 {
@@ -1443,7 +1443,7 @@ func (a AdminHandler) IndexAttributeValues(c *gin.Context) {
 
 }
 
-func (a AdminHandler) ShowAttributeValues(c *gin.Context) {
+func (a *AdminHandler) ShowAttributeValues(c *gin.Context) {
 	attributeID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
@@ -1471,7 +1471,7 @@ func (a AdminHandler) ShowAttributeValues(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) EditAttributeValues(c *gin.Context) {
+func (a *AdminHandler) EditAttributeValues(c *gin.Context) {
 	attValID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
@@ -1513,7 +1513,7 @@ func (a AdminHandler) EditAttributeValues(c *gin.Context) {
 
 }
 
-func (a AdminHandler) UpdateAttributeValues(c *gin.Context) {
+func (a *AdminHandler) UpdateAttributeValues(c *gin.Context) {
 
 	//convert string id to int
 	attValID, err := strconv.Atoi(c.Param("id"))
@@ -1581,7 +1581,7 @@ func (a AdminHandler) UpdateAttributeValues(c *gin.Context) {
 
 }
 
-func (a AdminHandler) DeleteProductInventoryAttribute(c *gin.Context) {
+func (a *AdminHandler) DeleteProductInventoryAttribute(c *gin.Context) {
 	productInventoryAttributeID, convErr := strconv.Atoi(c.Param("id"))
 	if convErr != nil {
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
@@ -1608,7 +1608,7 @@ func (a AdminHandler) DeleteProductInventoryAttribute(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) DeleteInventory(c *gin.Context) {
+func (a *AdminHandler) DeleteInventory(c *gin.Context) {
 	inventoryID, convErr := strconv.Atoi(c.Param("id"))
 	if convErr != nil {
 		sessions.Set(c, "message", custom_error.IDIsNotCorrect)
@@ -1634,7 +1634,7 @@ func (a AdminHandler) DeleteInventory(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) AppendAttribute(c *gin.Context) {
+func (a *AdminHandler) AppendAttribute(c *gin.Context) {
 
 	//convert string id to int
 	inventoryID, err := strconv.Atoi(c.Param("id"))
@@ -1668,7 +1668,7 @@ func (a AdminHandler) AppendAttribute(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) UpdateQuantity(c *gin.Context) {
+func (a *AdminHandler) UpdateQuantity(c *gin.Context) {
 	//convert string id to int
 	inventoryID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -1705,7 +1705,7 @@ func (a AdminHandler) UpdateQuantity(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) IndexCustomer(c *gin.Context) {
+func (a *AdminHandler) IndexCustomer(c *gin.Context) {
 	customers, err := a.customerSrv.Index(c)
 	if err.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
@@ -1721,7 +1721,7 @@ func (a AdminHandler) IndexCustomer(c *gin.Context) {
 	})
 
 }
-func (a AdminHandler) CreateProductFeature(c *gin.Context) {
+func (a *AdminHandler) CreateProductFeature(c *gin.Context) {
 	pID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.Redirect(http.StatusFound, "/admins/products/")
@@ -1744,7 +1744,7 @@ func (a AdminHandler) CreateProductFeature(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) StoreProductFeature(c *gin.Context) {
+func (a *AdminHandler) StoreProductFeature(c *gin.Context) {
 	pID, err := strconv.Atoi(c.Param("id"))
 	url := fmt.Sprintf("/admins/products/%d/add-feature", pID)
 	if err != nil {
@@ -1790,7 +1790,7 @@ func (a AdminHandler) StoreProductFeature(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) ShowProductFeature(c *gin.Context) {
+func (a *AdminHandler) ShowProductFeature(c *gin.Context) {
 	pID, err := strconv.Atoi(c.Param("id"))
 	//url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
 	if err != nil {
@@ -1813,7 +1813,7 @@ func (a AdminHandler) ShowProductFeature(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) DeleteProductFeature(c *gin.Context) {
+func (a *AdminHandler) DeleteProductFeature(c *gin.Context) {
 	pID, pErr := strconv.Atoi(c.Param("id"))
 	fID, fErr := strconv.Atoi(c.Param("featureID"))
 	url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
@@ -1835,7 +1835,7 @@ func (a AdminHandler) DeleteProductFeature(c *gin.Context) {
 
 }
 
-func (a AdminHandler) EditProductFeature(c *gin.Context) {
+func (a *AdminHandler) EditProductFeature(c *gin.Context) {
 	pID, pErr := strconv.Atoi(c.Param("id"))
 	fID, fErr := strconv.Atoi(c.Param("featureID"))
 	url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
@@ -1859,7 +1859,7 @@ func (a AdminHandler) EditProductFeature(c *gin.Context) {
 
 }
 
-func (a AdminHandler) UpdateProductFeature(c *gin.Context) {
+func (a *AdminHandler) UpdateProductFeature(c *gin.Context) {
 	pID, pErr := strconv.Atoi(c.Param("id"))
 	fID, fErr := strconv.Atoi(c.Param("featureID"))
 	url := fmt.Sprintf("/admins/products/%d/show-feature", pID)
@@ -1900,7 +1900,7 @@ func (a AdminHandler) UpdateProductFeature(c *gin.Context) {
 
 }
 
-func (a AdminHandler) IndexOrders(c *gin.Context) {
+func (a *AdminHandler) IndexOrders(c *gin.Context) {
 	orderPaginate, err := a.orderSrv.GetOrderPaginate(c)
 
 	if err != nil {
@@ -1925,7 +1925,7 @@ func (a AdminHandler) IndexOrders(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) ShowOrder(c *gin.Context) {
+func (a *AdminHandler) ShowOrder(c *gin.Context) {
 
 	//get and convert order id from url
 	orderID, err := strconv.Atoi(c.Param("id"))
@@ -1950,7 +1950,7 @@ func (a AdminHandler) ShowOrder(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) EditOrder(c *gin.Context) {
+func (a *AdminHandler) EditOrder(c *gin.Context) {
 	//get order id from url
 	orderID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

@@ -21,12 +21,12 @@ import (
 	"strings"
 )
 
-func (a AdminHandler) ShowCreateBrand(c *gin.Context) {
+func (a *AdminHandler) ShowCreateBrand(c *gin.Context) {
 	html.Render(c, 200, "create-brand", gin.H{"TITLE": "create new brand"})
 	return
 }
 
-func (a AdminHandler) IndexBrand(c *gin.Context) {
+func (a *AdminHandler) IndexBrand(c *gin.Context) {
 	//categories, err := a.categorySrv.Index(c)
 	brands, err := a.brandSrv.Index(c)
 
@@ -47,7 +47,7 @@ func (a AdminHandler) IndexBrand(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) ShowBrand(c *gin.Context) {
+func (a *AdminHandler) ShowBrand(c *gin.Context) {
 	brandID, brand, done := checkIDAndExistence(c, a)
 	if done {
 		return
@@ -61,7 +61,7 @@ func (a AdminHandler) ShowBrand(c *gin.Context) {
 	return
 }
 
-func checkIDAndExistence(c *gin.Context, a AdminHandler) (int, responses.Brand, bool) {
+func checkIDAndExistence(c *gin.Context, a *AdminHandler) (int, responses.Brand, bool) {
 	brandID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		sessions.Set(c, "message", "ID برند صحیح نمی باشد.")
@@ -81,7 +81,7 @@ func checkIDAndExistence(c *gin.Context, a AdminHandler) (int, responses.Brand, 
 	return brandID, brand, false
 }
 
-func (a AdminHandler) EditBrand(c *gin.Context) {
+func (a *AdminHandler) EditBrand(c *gin.Context) {
 	brandID, brand, done := checkIDAndExistence(c, a)
 	if done {
 		return
@@ -95,7 +95,7 @@ func (a AdminHandler) EditBrand(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) UpdateBrand(c *gin.Context) {
+func (a *AdminHandler) UpdateBrand(c *gin.Context) {
 	brandID, brand, done := checkIDAndExistence(c, a)
 	if done {
 		return
@@ -204,7 +204,7 @@ func (a AdminHandler) UpdateBrand(c *gin.Context) {
 	return
 }
 
-func (a AdminHandler) StoreBrand(c *gin.Context) {
+func (a *AdminHandler) StoreBrand(c *gin.Context) {
 
 	var req requests.CreateBrandRequest
 	_ = c.Request.ParseForm()
