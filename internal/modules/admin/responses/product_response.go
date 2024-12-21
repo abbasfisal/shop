@@ -21,26 +21,26 @@ type Product struct {
 	//relation
 	Category                   *Category
 	Brand                      Brand
-	Images                     ImageProducts
+	Images                     *ImageProducts
 	ProductAttributes          ProductAttributes
 	ProductInventories         ProductInventories
 	ProductInventoryAttributes ProductInventoryAttributes
-	Features                   Features
+	Features                   *Features
 }
 
 type Products struct {
 	Data []Product
 }
 
-func ToProducts(products []entities.Product) Products {
+func ToProducts(products []*entities.Product) *Products {
 	var pResponse Products
 	for _, p := range products {
-		pResponse.Data = append(pResponse.Data, ToProduct(p))
+		pResponse.Data = append(pResponse.Data, *ToProduct(p))
 	}
-	return pResponse
+	return &pResponse
 }
-func ToProduct(p entities.Product) Product {
-	return Product{
+func ToProduct(p *entities.Product) *Product {
+	return &Product{
 		ID:            p.ID,
 		CategoryID:    p.CategoryID,
 		BrandID:       p.BrandID,

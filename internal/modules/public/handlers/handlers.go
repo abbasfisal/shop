@@ -275,7 +275,7 @@ func (p PublicHandler) PostVerifyOtp(c *gin.Context) {
 	}
 
 	//verify otp
-	otpVerifyErr := p.homeSrv.VerifyOtp(c, mobile, req)
+	otpVerifyErr := p.homeSrv.VerifyOtp(c, mobile, &req)
 	if otpVerifyErr.Code == 404 {
 		sessions.Set(c, "message", custom_messages.OTPIsNotValid)
 		c.Redirect(http.StatusFound, "/verify")
@@ -396,7 +396,7 @@ func (p PublicHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	uErr := p.homeSrv.UpdateProfile(c, req)
+	uErr := p.homeSrv.UpdateProfile(c, &req)
 	if uErr.Code > 0 {
 		sessions.Set(c, "message", custom_error.UpdateWasFailed)
 	}
@@ -447,7 +447,7 @@ func (p PublicHandler) CartItemIncrement(c *gin.Context) {
 	}
 	util.PrettyJson(req)
 
-	res := p.homeSrv.CartItemIncrement(c, req)
+	res := p.homeSrv.CartItemIncrement(c, &req)
 	fmt.Println("---------- res:", res)
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
@@ -462,7 +462,7 @@ func (p PublicHandler) CartItemDecrement(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/checkout/cart")
 	}
 
-	p.homeSrv.CartItemDecrement(c, req)
+	p.homeSrv.CartItemDecrement(c, &req)
 
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
@@ -477,7 +477,7 @@ func (p PublicHandler) RemoveCartItem(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/checkout/cart")
 	}
 
-	p.homeSrv.RemoveCartItem(c, req)
+	p.homeSrv.RemoveCartItem(c, &req)
 
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
@@ -530,7 +530,7 @@ func (p PublicHandler) StoreAddress(c *gin.Context) {
 		return
 	}
 
-	p.homeSrv.StoreAddress(c, req)
+	p.homeSrv.StoreAddress(c, &req)
 
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return

@@ -10,8 +10,8 @@ type Category struct {
 	ParentID      *uint
 	Image         string
 	Status        bool
-	SubCategories []Category `gorm:"foreignKey:ParentID"`
-	Products      []Product  `gorm:"foreignKey:CategoryID"`
+	SubCategories []*Category `gorm:"foreignKey:ParentID"`
+	Products      []Product   `gorm:"foreignKey:CategoryID"`
 
 	//Attribute []Attribute `gorm:"foreignKey:CategoryID"`
 }

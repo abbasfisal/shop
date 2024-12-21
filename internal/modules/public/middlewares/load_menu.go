@@ -8,7 +8,7 @@ import (
 	"shop/internal/pkg/custom_error"
 )
 
-func LoadMenu(homeSrv *home.HomeService) gin.HandlerFunc {
+func LoadMenu(homeSrv home.HomeServiceInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		menu, err := homeSrv.GetMenu(c)
 		if err != nil {

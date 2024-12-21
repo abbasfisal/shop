@@ -23,8 +23,8 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client) {
 	homeSrv := home.NewHomeService(homeRep, MongoHomeRepo)
 
 	//--- [Global Middleware]
-	r.Use(CustomerMiddlewares.LoadMenu(&homeSrv)) //load menu by LoadMenu middleware
-	r.Use(CustomerMiddlewares.CheckUserAuth())    //set `auth` key in context if user was existed in database
+	r.Use(CustomerMiddlewares.LoadMenu(homeSrv)) //load menu by LoadMenu middleware
+	r.Use(CustomerMiddlewares.CheckUserAuth())   //set `auth` key in context if user was existed in database
 	//----
 
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)

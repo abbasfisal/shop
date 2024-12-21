@@ -14,8 +14,8 @@ type Features struct {
 	Data []Feature
 }
 
-func ToFeature(f entities.Feature) Feature {
-	return Feature{
+func ToFeature(f *entities.Feature) *Feature {
+	return &Feature{
 		ID:        f.ID,
 		ProductID: f.ProductID,
 		Title:     f.Title,
@@ -23,10 +23,10 @@ func ToFeature(f entities.Feature) Feature {
 	}
 }
 
-func ToFeatures(f []entities.Feature) Features {
+func ToFeatures(f []*entities.Feature) *Features {
 	var fResponse Features
 	for _, featureItem := range f {
-		fResponse.Data = append(fResponse.Data, ToFeature(featureItem))
+		fResponse.Data = append(fResponse.Data, *ToFeature(featureItem))
 	}
-	return fResponse
+	return &fResponse
 }

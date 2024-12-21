@@ -9,9 +9,9 @@ import (
 )
 
 type AttributeServiceInterface interface {
-	Create(ctx context.Context, req requests.CreateAttributeRequest) (responses.Attribute, error)
-	FetchByCategoryID(ctx context.Context, categoryID int) (responses.Attributes, error)
-	Index(c *gin.Context) (responses.Attributes, custom_error.CustomError)
-	Show(c context.Context, attributeID int) (responses.Attribute, custom_error.CustomError)
-	Update(c *gin.Context, attributeID int, req requests.CreateAttributeRequest) custom_error.CustomError
+	Create(ctx context.Context, req *requests.CreateAttributeRequest) (*responses.Attribute, error)
+	FetchByCategoryID(ctx context.Context, categoryID int) (*responses.Attributes, error)
+	Index(c *gin.Context) (*responses.Attributes, custom_error.CustomError)
+	Show(c context.Context, attributeID int) (*responses.Attribute, custom_error.CustomError)
+	Update(c *gin.Context, attributeID int, req *requests.CreateAttributeRequest) custom_error.CustomError
 }

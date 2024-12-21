@@ -29,31 +29,41 @@ type HomeRepository struct {
 	db *gorm.DB
 }
 
-func NewHomeRepository() HomeRepository {
-	return HomeRepository{
+func NewHomeRepository() HomeRepositoryInterface {
+	return &HomeRepository{
 		db: mysql.Get(),
 	}
 }
-func (h HomeRepository) GetRandomProducts(ctx context.Context, limit int) ([]entities.Product, error) {
-	var products []entities.Product
+
+//--------------------------------------
+//>>>>>>>>>>> Method >>>>>>>>>>>>>>>>>>>
+//--------------------------------------
+
+func (h *HomeRepository) GetRandomProducts(ctx context.Context, limit int) ([]*entities.Product, error) {
+	var products []*entities.Product
 	//implement Me
 	return products, nil
 }
-
-func (h HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]entities.Product, error) {
-	var products []entities.Product
+func (h *HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]*entities.Product, error) {
+	var products []*entities.Product
 	//todo: just load data if category.status = true and product.status=true
-	err := h.db.Preload("Category").Where("status=?", true).Limit(limit).Find(&products).Error
+	err := h.db.WithContext(ctx).
+		Preload("Category").Where("status=?", true).
+		Limit(limit).Find(&products).
+		Error
+
 	return products, err
 }
-
-func (h HomeRepository) GetCategories(ctx context.Context, limit int) ([]*entities.Category, error) {
+func (h *HomeRepository) GetCategories(ctx context.Context, limit int) ([]*entities.Category, error) {
 	var categories []*entities.Category
-	err := h.db.WithContext(ctx).Limit(limit).Find(&categories, "status=?", true).Error
+	err := h.db.WithContext(ctx).
+		Limit(limit).
+		Find(&categories, "status=?", true).
+		Error
 
 	return categories, err
 }
-func (h HomeRepository) GetProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, error) {
+func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, error) {
 
 	type InventoryWithAttributes struct {
 		InventoryID                 uint
@@ -124,23 +134,26 @@ func (h HomeRepository) GetProduct(c *gin.Context, productSku string, productSlu
 
 	return result, nil
 }
-
-func (h HomeRepository) GetProductsBy(ctx context.Context, columnName string, value any) ([]entities.Product, error) {
-	var products []entities.Product
+func (h *HomeRepository) GetProductsBy(ctx context.Context, columnName string, value any) ([]*entities.Product, error) {
+	var products []*entities.Product
 	condition := fmt.Sprintf("%s = ?", columnName)
-	err := h.db.Where(condition, value).Find(&products).Error
+	err := h.db.WithContext(ctx).
+		Where(condition, value).
+		Find(&products).
+		Error
 
 	return products, err
 }
-
-func (h HomeRepository) GetCategoryBy(ctx context.Context, columnName string, value any) (*entities.Category, error) {
+func (h *HomeRepository) GetCategoryBy(ctx context.Context, columnName string, value any) (*entities.Category, error) {
 	var category entities.Category
-	err := h.db.WithContext(ctx).Where(fmt.Sprintf("%s = ?", columnName), value).Find(&category).Error
+	err := h.db.WithContext(ctx).
+		Where(fmt.Sprintf("%s = ?", columnName), value).
+		Find(&category).
+		Error
 
 	return &category, err
 }
-
-func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP, custom_error.CustomError) {
+func (h *HomeRepository) NewOtp(ctx context.Context, mobile string) (*entities.OTP, custom_error.CustomError) {
 	var maxOTPRequestPerHour = 4
 	var lastOtp entities.OTP
 	var otpCount int64
@@ -150,7 +163,7 @@ func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP
 
 	if otpCount >= int64(maxOTPRequestPerHour) {
 		fmt.Println("---- to many request otp ---line : 77  ---- ")
-		return lastOtp, custom_error.New(custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequestCode)
+		return nil, custom_error.New(custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequest, custom_error.OTPTooManyRequestCode)
 	}
 
 	//check under 4 min
@@ -159,7 +172,7 @@ func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP
 	fmt.Println(" ******** time since ******: ", time.Since(lastOtp.CreatedAt))
 	if lastOtp.ID != 0 && time.Since(lastOtp.CreatedAt) <= 4*time.Minute {
 		fmt.Println("---- to soon request otp ---line : 86  ---- ")
-		return lastOtp, custom_error.New(custom_error.OTPRequestTooSoon, custom_error.OTPRequestTooSoon, custom_error.OTPTooSoonCode)
+		return nil, custom_error.New(custom_error.OTPRequestTooSoon, custom_error.OTPRequestTooSoon, custom_error.OTPTooSoonCode)
 	}
 
 	newOtp := entities.OTP{
@@ -169,12 +182,11 @@ func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP
 	}
 
 	if err := h.db.Create(&newOtp).Error; err != nil {
-		return newOtp, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, custom_error.OtpSomethingGoesWrongCode)
+		return nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, custom_error.OtpSomethingGoesWrongCode)
 	}
-	return newOtp, custom_error.CustomError{}
+	return &newOtp, custom_error.CustomError{}
 }
-
-func (h HomeRepository) VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) (entities.OTP, error) {
+func (h *HomeRepository) VerifyOtp(c *gin.Context, mobile string, req *requests.CustomerVerifyRequest) (*entities.OTP, error) {
 	var otp entities.OTP
 	otpCode := fmt.Sprintf("%s%s%s%s", req.N1, req.N2, req.N3, req.N4)
 	fmt.Println("------ VerifyOtp : home repository : 105 : otp : ", otpCode)
@@ -182,10 +194,9 @@ func (h HomeRepository) VerifyOtp(c *gin.Context, mobile string, req requests.Cu
 	err := h.db.Where("mobile = ? AND code = ? ", mobile, otpCode).First(&otp).Error
 
 	fmt.Println("--- verify otp err:--- ", err)
-	return otp, err
+	return &otp, err
 }
-
-func (h HomeRepository) ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error) {
+func (h *HomeRepository) ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error) {
 
 	tx := h.db.Begin()
 	if tx.Error != nil {
@@ -253,18 +264,18 @@ func (h HomeRepository) ProcessCustomerAuthenticate(c *gin.Context, mobile strin
 	return sess, nil
 
 }
+func (h *HomeRepository) LogOut(c *gin.Context) error {
+	sessionId := sessions.GET(c, "session_id")
 
-func (h HomeRepository) LogOut(c *gin.Context) error {
-	session_id := sessions.GET(c, "session_id")
-
-	return h.db.Where("session_id = ?", session_id).Delete(&entities.Session{}).Error
+	return h.db.Where("session_id = ?", sessionId).
+		Delete(&entities.Session{}).
+		Error
 }
-
-func (h HomeRepository) UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) error {
+func (h *HomeRepository) UpdateProfile(c *gin.Context, req *requests.CustomerProfileRequest) error {
 
 	var sess entities.Session
-	session_id := sessions.GET(c, "session_id")
-	if sessErr := h.db.Where("session_id = ? ", session_id).First(&sess).Error; sessErr != nil {
+	sessionId := sessions.GET(c, "session_id")
+	if sessErr := h.db.Where("session_id = ? ", sessionId).First(&sess).Error; sessErr != nil {
 		return sessErr
 	}
 
@@ -281,25 +292,28 @@ func (h HomeRepository) UpdateProfile(c *gin.Context, req requests.CustomerProfi
 
 	return nil
 }
-
-func (h HomeRepository) GetMenu(ctx context.Context) ([]entities.Category, error) {
-	var menu []entities.Category
-	err := h.db.Preload("SubCategories", func(db *gorm.DB) *gorm.DB {
-		return db.Order("priority is null ,priority ASC")
-	}).Preload("SubCategories.SubCategories", func(db *gorm.DB) *gorm.DB {
-		// مرتب‌سازی زیرمجموعه‌های سطح دوم
-		return db.Order("priority is null ,priority ASC")
-	}).Where("status = ?", true).
+func (h *HomeRepository) GetMenu(ctx context.Context) ([]*entities.Category, error) {
+	var menu []*entities.Category
+	err := h.db.WithContext(ctx).
+		Preload("SubCategories", func(db *gorm.DB) *gorm.DB {
+			return db.Order("priority is null ,priority ASC")
+		}).
+		Preload("SubCategories.SubCategories", func(db *gorm.DB) *gorm.DB {
+			// مرتب‌سازی زیرمجموعه‌های سطح دوم
+			return db.Order("priority is null ,priority ASC")
+		}).
+		Where("status = ?", true).
 		Where("parent_id IS NULL").              // دریافت دسته‌های اصلی (والدین)
 		Order("priority is null ,priority ASC"). // مرتب‌سازی دسته‌های اصلی
-		Find(&menu).Error
+		Find(&menu).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
 	return menu, nil
 }
-
-func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error) {
+func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error) {
 
 	// Convert query parameters from string to int
 	limitStr := c.Query("limit")
@@ -324,7 +338,7 @@ func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.P
 		return pg, err
 	}
 
-	var products []entities.Product
+	var products []*entities.Product
 	condition := fmt.Sprintf("category_id=%d", category.ID)
 
 	paginateQuery, exist := pagination.Paginate(c, condition, &products, &pg, h.db)
@@ -332,15 +346,17 @@ func (h HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.P
 		return pg, gorm.ErrRecordNotFound
 	}
 
-	if pErr := paginateQuery(h.db).Preload("ProductImages").Where("category_id=?", category.ID).Find(&products).Error; pErr != nil {
+	if pErr := paginateQuery(h.db).
+		Preload("ProductImages").
+		Where("category_id=?", category.ID).
+		Find(&products).Error; pErr != nil {
 		return pg, pErr
 	}
 
 	pg.Rows = products
 	return pg, nil
 }
-
-func (h HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest) {
+func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest) {
 	maxQuantity := uint8(2)
 	//todo: set max quantity in config
 	//todo:check inventories stock_reserved before insert
@@ -420,8 +436,7 @@ func (h HomeRepository) InsertCart(c *gin.Context, user responses.Customer, prod
 	}
 
 }
-
-func (h HomeRepository) IncreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error {
+func (h *HomeRepository) IncreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error {
 	customer, exist := helpers.GetAuthUser(c)
 	if !exist {
 		return errors.New(custom_error.SomethingWrongHappened)
@@ -438,8 +453,7 @@ func (h HomeRepository) IncreaseCartItemCount(c *gin.Context, req requests.Incre
 		Update("quantity", gorm.Expr("quantity + ?", 1)).Error //todo:qty <3
 
 }
-
-func (h HomeRepository) DecreaseCartItemCount(c *gin.Context, req requests.IncreaseCartItemQty) error {
+func (h *HomeRepository) DecreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error {
 	customer, exist := helpers.GetAuthUser(c)
 	if !exist {
 		return errors.New(custom_error.SomethingWrongHappened)
@@ -456,7 +470,7 @@ func (h HomeRepository) DecreaseCartItemCount(c *gin.Context, req requests.Incre
 		Error
 
 }
-func (h HomeRepository) DeleteCartItem(c *gin.Context, req requests.IncreaseCartItemQty) error {
+func (h *HomeRepository) DeleteCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) error {
 	customer, exist := helpers.GetAuthUser(c)
 	if !exist {
 		return errors.New(custom_error.SomethingWrongHappened)
@@ -472,8 +486,7 @@ func (h HomeRepository) DeleteCartItem(c *gin.Context, req requests.IncreaseCart
 		Error
 
 }
-
-func (h HomeRepository) CreateOrUpdateAddress(c *gin.Context, req requests.StoreAddressRequest) error {
+func (h *HomeRepository) CreateOrUpdateAddress(c *gin.Context, req *requests.StoreAddressRequest) error {
 	customer, ok := helpers.GetAuthUser(c)
 	if !ok {
 		return nil
@@ -492,13 +505,15 @@ func (h HomeRepository) CreateOrUpdateAddress(c *gin.Context, req requests.Store
 		}
 	}
 
-	if err := h.db.Model(&entities.Address{}).Where("customer_id=?", customer.ID).Updates(&entities.Address{
-		CustomerID:         customer.ID,
-		ReceiverName:       req.ReceiverName,
-		ReceiverMobile:     req.ReceiverMobile,
-		ReceiverAddress:    req.ReceiverAddress,
-		ReceiverPostalCode: req.ReceiverPostalCode,
-	}).Error; err != nil {
+	if err := h.db.Model(&entities.Address{}).
+		Where("customer_id=?", customer.ID).
+		Updates(&entities.Address{
+			CustomerID:         customer.ID,
+			ReceiverName:       req.ReceiverName,
+			ReceiverMobile:     req.ReceiverMobile,
+			ReceiverAddress:    req.ReceiverAddress,
+			ReceiverPostalCode: req.ReceiverPostalCode,
+		}).Error; err != nil {
 		util.PrettyJson(err)
 		return errors.New("خطا در بروزرسانی آدرس")
 	}
@@ -507,10 +522,10 @@ func (h HomeRepository) CreateOrUpdateAddress(c *gin.Context, req requests.Store
 }
 
 // GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
-func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, error) {
+func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (*entities.Order, error) {
 	customer, ok := helpers.GetAuthUser(c)
 	if !ok {
-		return entities.Order{}, errors.New(custom_error.SomethingWrongHappened)
+		return nil, errors.New(custom_error.SomethingWrongHappened)
 	}
 
 	tx := h.db.WithContext(c).Begin()
@@ -527,14 +542,14 @@ func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, e
 			Error; cItemErr != nil {
 			tx.Rollback()
 			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[find-inventory]-error:", cItemErr.Error())
-			return entities.Order{}, cItemErr
+			return nil, cItemErr
 		}
 
 		realQty := pInventory.Quantity - pInventory.ReservedStock
 		if realQty < uint(cartItem.Quantity) {
 			//out of stock
 			tx.Rollback()
-			return entities.Order{}, errors.New("out of stock")
+			return nil, errors.New("out of stock")
 		}
 
 		//update and save reserved stock
@@ -542,7 +557,7 @@ func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, e
 		if updateInventoryReservedStock := tx.Save(&pInventory).Error; updateInventoryReservedStock != nil {
 			tx.Rollback()
 			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[update-reserve-stock]-error:", updateInventoryReservedStock.Error())
-			return entities.Order{}, updateInventoryReservedStock
+			return nil, updateInventoryReservedStock
 		}
 
 	}
@@ -565,7 +580,7 @@ func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, e
 	if createOrderError := tx.Create(&order).Error; createOrderError != nil {
 		tx.Rollback()
 		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order]-error:", createOrderError.Error())
-		return order, createOrderError
+		return nil, createOrderError
 	}
 
 	//create order-items
@@ -588,7 +603,7 @@ func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, e
 	if createOrderItemsErr := tx.Create(&orderItems).Error; createOrderItemsErr != nil {
 		tx.Rollback()
 		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order-items]-error:", createOrderItemsErr.Error())
-		return order, createOrderItemsErr
+		return nil, createOrderItemsErr
 	}
 
 	//Delete Cart and its CartItem
@@ -596,19 +611,17 @@ func (h HomeRepository) GenerateOrderFromCart(c *gin.Context) (entities.Order, e
 		if deleteCartErr := h.db.WithContext(c).Unscoped().Delete(&entities.Cart{}, customer.Cart.ID).Error; deleteCartErr != nil {
 			tx.Rollback()
 			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[delete-cart-and-cartItem]-error:", deleteCartErr.Error())
-			return order, deleteCartErr
+			return nil, deleteCartErr
 		}
 	}
 
 	tx.Commit()
-	return order, nil
+	return &order, nil
 }
-
-func (h HomeRepository) Release(order entities.Order, tx *gorm.DB) {
+func (h *HomeRepository) Release(order *entities.Order, tx *gorm.DB) {
 	tx.Rollback()
 }
-
-func (h HomeRepository) OrderPaidSuccessfully(c *gin.Context, order entities.Order, refID string, verified bool) (entities.Order, bool, custom_error.CustomError) {
+func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.Order, refID string, verified bool) (*entities.Order, bool, custom_error.CustomError) {
 	util.PrettyJson(order)
 	log.Println("---- verify :", verified)
 
@@ -697,36 +710,33 @@ func (h HomeRepository) OrderPaidSuccessfully(c *gin.Context, order entities.Ord
 	return order, true, custom_error.CustomError{}
 
 }
-
-func (h HomeRepository) CreatePayment(c *gin.Context, payment entities.Payment) error {
-	if err := h.db.Create(&payment).Error; err != nil {
+func (h *HomeRepository) CreatePayment(c *gin.Context, payment *entities.Payment) error {
+	if err := h.db.WithContext(c).Create(payment).Error; err != nil {
 		return err
 	}
 	return nil
 }
-
-func (h HomeRepository) GetPayment(c *gin.Context, authority string) (entities.Order, entities.Customer, error) {
+func (h *HomeRepository) GetPayment(c *gin.Context, authority string) (*entities.Order, entities.Customer, error) {
 	var payment entities.Payment
 	var order entities.Order
 
 	if err := h.db.WithContext(c).Where("authority = ?", authority).First(&payment).Error; err != nil {
-		return order, entities.Customer{}, err
+		return nil, entities.Customer{}, err
 	}
 
 	if orderErr := h.db.WithContext(c).Preload("OrderItems").Where("id=?", payment.OrderID).First(&order).Error; orderErr != nil {
-		return order, entities.Customer{}, orderErr
+		return nil, entities.Customer{}, orderErr
 	}
 
 	var customer entities.Customer
 	if customerErr := h.db.WithContext(c).Where("id=?", payment.CustomerID).First(&customer).Error; customerErr != nil {
-		return order, entities.Customer{}, customerErr
+		return nil, entities.Customer{}, customerErr
 	}
 
 	order.Payment = payment
-	return order, customer, nil
+	return &order, customer, nil
 }
-
-func (h HomeRepository) GetPaginatedOrders(c *gin.Context) (pagination.Pagination, error) {
+func (h *HomeRepository) GetPaginatedOrders(c *gin.Context) (pagination.Pagination, error) {
 
 	customer, exists := helpers.GetAuthUser(c)
 	if !exists {
@@ -775,12 +785,11 @@ func (h HomeRepository) GetPaginatedOrders(c *gin.Context) (pagination.Paginatio
 	pg.Rows = orders
 	return pg, nil
 }
-
-func (h HomeRepository) GetOrder(c *gin.Context, orderNumber string) (entities.Order, error) {
+func (h *HomeRepository) GetOrder(c *gin.Context, orderNumber string) (*entities.Order, error) {
 
 	customer, exists := helpers.GetAuthUser(c)
 	if !exists {
-		return entities.Order{}, errors.New("user must be loggedIn")
+		return nil, errors.New("user must be loggedIn")
 	}
 
 	//--
@@ -802,7 +811,7 @@ func (h HomeRepository) GetOrder(c *gin.Context, orderNumber string) (entities.O
 		Select("product_id , inventory_id").
 		Where("customer_id = ?", customer.ID).
 		Scan(&productAndInventory).Error; err != nil {
-		return order, nil
+		return nil, err
 	}
 
 	//حالا نتایج رو به صورت اسلایس در میاریم که مستقیم بشه درون preload استفاده کرد
@@ -824,8 +833,8 @@ func (h HomeRepository) GetOrder(c *gin.Context, orderNumber string) (entities.O
 		Preload("Payment").
 		Where("order_number=? AND customer_id = ?", orderNumber, customer.ID).
 		First(&order).Error; err != nil {
-		return order, err
+		return nil, err
 	}
 
-	return order, nil
+	return &order, nil
 }

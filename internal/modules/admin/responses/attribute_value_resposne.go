@@ -8,11 +8,12 @@ type AttributeValue struct {
 	AttributeTitle string
 	Title          string
 }
+
 type AttributeValues struct {
 	Data []AttributeValue
 }
 
-func ToAttributeValue(attr entities.AttributeValue) AttributeValue {
+func ToAttributeValue(attr *entities.AttributeValue) AttributeValue {
 	return AttributeValue{
 		ID:             attr.ID,
 		AttributeID:    attr.AttributeID,
@@ -21,12 +22,12 @@ func ToAttributeValue(attr entities.AttributeValue) AttributeValue {
 	}
 }
 
-func ToAttributeValues(attrValue []entities.AttributeValue) AttributeValues {
+func ToAttributeValues(attrValue []entities.AttributeValue) *AttributeValues {
 	var response AttributeValues
 
 	for _, item := range attrValue {
-		response.Data = append(response.Data, ToAttributeValue(item))
+		response.Data = append(response.Data, ToAttributeValue(&item))
 	}
 
-	return response
+	return &response // Return a value (not pointer)
 }

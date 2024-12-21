@@ -29,23 +29,27 @@ type HomeService struct {
 	mongoRepo home_mongo.MongoHomeRepositoryInterface
 }
 
-func NewHomeService(repo home.HomeRepositoryInterface, mongoRepo home_mongo.MongoHomeRepositoryInterface) HomeService {
-	return HomeService{
+func NewHomeService(repo home.HomeRepositoryInterface, mongoRepo home_mongo.MongoHomeRepositoryInterface) HomeServiceInterface {
+	return &HomeService{
 		repo:      repo,
 		mongoRepo: mongoRepo,
 	}
 }
 
-func (h HomeService) GetProducts(ctx context.Context, limit int) (responses.Products, custom_error.CustomError) {
+//-----------------------------------
+//<<<<<<<<<<<< Method >>>>>>>>>>>>>>>
+//-----------------------------------
+
+func (h *HomeService) GetProducts(ctx context.Context, limit int) (*responses.Products, custom_error.CustomError) {
 
 	products, err := h.repo.GetLatestProducts(ctx, limit)
 	if err != nil {
-		return responses.Products{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToProducts(products), custom_error.CustomError{}
 }
 
-func (h HomeService) GetCategories(ctx context.Context, limit int) (*responses.Categories, custom_error.CustomError) {
+func (h *HomeService) GetCategories(ctx context.Context, limit int) (*responses.Categories, custom_error.CustomError) {
 
 	categories, err := h.repo.GetCategories(ctx, limit)
 	if err != nil {
@@ -54,19 +58,19 @@ func (h HomeService) GetCategories(ctx context.Context, limit int) (*responses.C
 	return responses.ToCategories(categories), custom_error.CustomError{}
 }
 
-func (h HomeService) ListProductByCategorySlug(c *gin.Context, slug string) (pagination.Pagination, error) {
+func (h *HomeService) ListProductByCategorySlug(c *gin.Context, slug string) (pagination.Pagination, error) {
 
 	productList, err := h.repo.ListProductBy(c, slug)
 	if err != nil {
 		return pagination.Pagination{}, err
 	}
 
-	productList.Rows = responses.ToProducts(productList.Rows.([]entities.Product))
+	productList.Rows = responses.ToProducts(productList.Rows.([]*entities.Product))
 	return productList, nil
 
 }
 
-func (h HomeService) ShowCategory(ctx context.Context, columnName string, value any) (*responses.Category, custom_error.CustomError) {
+func (h *HomeService) ShowCategory(ctx context.Context, columnName string, value any) (*responses.Category, custom_error.CustomError) {
 
 	category, err := h.repo.GetCategoryBy(ctx, columnName, value)
 	if err != nil {
@@ -75,13 +79,11 @@ func (h HomeService) ShowCategory(ctx context.Context, columnName string, value 
 	return responses.ToCategory(category), custom_error.CustomError{}
 }
 
-//
-
-func (h HomeService) SendOtp(ctx context.Context, Mobile string) (entities.OTP, custom_error.CustomError) {
+func (h *HomeService) SendOtp(ctx context.Context, Mobile string) (*entities.OTP, custom_error.CustomError) {
 	return h.repo.NewOtp(ctx, Mobile)
 }
 
-func (h HomeService) VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) custom_error.CustomError {
+func (h *HomeService) VerifyOtp(c *gin.Context, mobile string, req *requests.CustomerVerifyRequest) custom_error.CustomError {
 	otp, err := h.repo.VerifyOtp(c, mobile, req)
 
 	if err != nil {
@@ -92,7 +94,7 @@ func (h HomeService) VerifyOtp(c *gin.Context, mobile string, req requests.Custo
 	return custom_error.CustomError{}
 }
 
-func (h HomeService) ProcessCustomerAuthentication(c *gin.Context, mobile string) (CustomerRes.CustomerSession, custom_error.CustomError) {
+func (h *HomeService) ProcessCustomerAuthentication(c *gin.Context, mobile string) (CustomerRes.CustomerSession, custom_error.CustomError) {
 	sess, err := h.repo.ProcessCustomerAuthenticate(c, mobile)
 	if err != nil {
 		fmt.Println("------ error ProcessCustomerAuthentication: line : 99 ", err)
@@ -102,9 +104,8 @@ func (h HomeService) ProcessCustomerAuthentication(c *gin.Context, mobile string
 	return CustomerRes.ToCustomerSession(sess), custom_error.CustomError{}
 }
 
-func (h HomeService) LogOut(c *gin.Context) bool {
+func (h *HomeService) LogOut(c *gin.Context) bool {
 	err := h.repo.LogOut(c)
-	fmt.Println("---- error log for LogOut : ", err, " -------- ")
 	if err != nil {
 		return false
 	}
@@ -113,7 +114,7 @@ func (h HomeService) LogOut(c *gin.Context) bool {
 	return true
 }
 
-func (h HomeService) UpdateProfile(c *gin.Context, req requests.CustomerProfileRequest) custom_error.CustomError {
+func (h *HomeService) UpdateProfile(c *gin.Context, req *requests.CustomerProfileRequest) custom_error.CustomError {
 	if err := h.repo.UpdateProfile(c, req); err != nil {
 		fmt.Println("--- update profile failed : --- ", err)
 		return custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 500)
@@ -121,12 +122,12 @@ func (h HomeService) UpdateProfile(c *gin.Context, req requests.CustomerProfileR
 	return custom_error.CustomError{}
 }
 
-func (h HomeService) GetMenu(c context.Context) ([]CustomerRes.CategoryResponse, error) {
+func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryResponse, error) {
 
 	//get menu from cache
 	menu := cache.Get(c, "menu")
 
-	var categoryResponses []CustomerRes.CategoryResponse
+	var categoryResponses []*CustomerRes.CategoryResponse
 
 	if menu == "" {
 		fmt.Println("--- menu was not exist in cache ------")
@@ -168,7 +169,7 @@ func (h HomeService) GetMenu(c context.Context) ([]CustomerRes.CategoryResponse,
 	return categoryResponses, nil
 }
 
-func (h HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, custom_error.CustomError) {
+func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, custom_error.CustomError) {
 
 	mongoProduct, err := h.mongoRepo.GetProduct(c, productSku, productSlug)
 	if err == nil {
@@ -183,13 +184,13 @@ func (h HomeService) GetSingleProduct(c *gin.Context, productSku string, product
 		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 
-	p := responses.ToProduct(product["product"].(entities.Product))
+	p := responses.ToProduct(product["product"].(*entities.Product))
 	product["product"] = p
 
 	return product, custom_error.CustomError{}
 }
 
-func (h HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest) {
+func (h *HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest) {
 	mongoProduct, err := h.mongoRepo.GetProductByObjectID(c, productObjectID, req)
 
 	if err != nil {
@@ -208,7 +209,7 @@ func (h HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectI
 	fmt.Println("succ find :title", mongoProduct.ID)
 }
 
-func (h HomeService) CartItemIncrement(c *gin.Context, req requests.IncreaseCartItemQty) bool {
+func (h *HomeService) CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool {
 	err := h.repo.IncreaseCartItemCount(c, req)
 	if err != nil {
 		fmt.Println("[failed]-[CartItemIncrement]-[error]:", err)
@@ -217,7 +218,7 @@ func (h HomeService) CartItemIncrement(c *gin.Context, req requests.IncreaseCart
 	return true
 }
 
-func (h HomeService) CartItemDecrement(c *gin.Context, req requests.IncreaseCartItemQty) bool {
+func (h *HomeService) CartItemDecrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool {
 	err := h.repo.DecreaseCartItemCount(c, req)
 	if err != nil {
 		fmt.Println("[failed]-[CartItemDecrement]-[error]:", err)
@@ -226,7 +227,7 @@ func (h HomeService) CartItemDecrement(c *gin.Context, req requests.IncreaseCart
 	return true
 }
 
-func (h HomeService) RemoveCartItem(c *gin.Context, req requests.IncreaseCartItemQty) bool {
+func (h *HomeService) RemoveCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) bool {
 	err := h.repo.DeleteCartItem(c, req)
 	if err != nil {
 		fmt.Println("[failed]-[RemoveCartItem]-[error]:", err)
@@ -236,7 +237,7 @@ func (h HomeService) RemoveCartItem(c *gin.Context, req requests.IncreaseCartIte
 	return true
 }
 
-func (h HomeService) StoreAddress(c *gin.Context, req requests.StoreAddressRequest) {
+func (h *HomeService) StoreAddress(c *gin.Context, req *requests.StoreAddressRequest) {
 	err := h.repo.CreateOrUpdateAddress(c, req)
 	if err != nil {
 		fmt.Println("[home_service]-[StoreAddress]-err:", err)
@@ -244,11 +245,11 @@ func (h HomeService) StoreAddress(c *gin.Context, req requests.StoreAddressReque
 }
 
 // ProcessOrderPayment convert cart to order and remove cart
-func (h HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (entities.Order, entities.Payment, custom_error.CustomError) {
+func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (*entities.Order, *entities.Payment, custom_error.CustomError) {
 
 	order, err := h.repo.GenerateOrderFromCart(c)
 	if err != nil {
-		return order, entities.Payment{}, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 1000)
+		return nil, nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 1000)
 	}
 
 	customer, _ := helpers.GetAuthUser(c)
@@ -258,7 +259,7 @@ func (h HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpa
 	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), os.Getenv("ZARINPAL_CALLBACKURL"), description, "", customer.Mobile)
 	if zarinErr != nil || statusCode != 100 {
 		log.Println("[home_service]-[ProcessOrderPayment]-[New ZarinPal Payment Request Error]:", zarinErr)
-		return order, entities.Payment{}, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10001)
+		return nil, nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10001)
 	}
 	log.Println("[ZarinPal New Request Success]:", "paymentURL:", paymentURL, "|authority:", authority, "|statusCode:", statusCode)
 
@@ -274,23 +275,23 @@ func (h HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpa
 		RefID:       "",
 		Status:      0, //pending
 	}
-	paymentErr := h.repo.CreatePayment(c, payment)
+	paymentErr := h.repo.CreatePayment(c, &payment)
 	if paymentErr != nil {
-		return order, entities.Payment{}, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10002)
+		return order, nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10002)
 	}
 
-	return order, payment, custom_error.CustomError{}
+	return order, &payment, custom_error.CustomError{}
 }
 
-func (h HomeService) VerifyPayment(c *gin.Context, order entities.Order, refID string, verified bool) {
+func (h *HomeService) VerifyPayment(c *gin.Context, order *entities.Order, refID string, verified bool) {
 	h.repo.OrderPaidSuccessfully(c, order, refID, verified)
 }
 
-func (h HomeService) GetPaymentBy(c *gin.Context, authority string) (entities.Order, entities.Customer, error) {
+func (h *HomeService) GetPaymentBy(c *gin.Context, authority string) (*entities.Order, entities.Customer, error) {
 	return h.repo.GetPayment(c, authority)
 }
 
-func (h HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
+func (h *HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
 	orderList, err := h.repo.GetPaginatedOrders(c)
 
 	util.PrettyJson(orderList)
@@ -303,7 +304,7 @@ func (h HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
 
 }
 
-func (h HomeService) GetOrderBy(c *gin.Context, orderNumber string) (interface{}, interface{}) {
+func (h *HomeService) GetOrderBy(c *gin.Context, orderNumber string) (interface{}, interface{}) {
 	order, err := h.repo.GetOrder(c, orderNumber)
 	return CustomerRes.ToCustomerOrder(order), err
 }

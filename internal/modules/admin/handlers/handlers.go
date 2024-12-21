@@ -82,7 +82,7 @@ func (a *AdminHandler) ShowLogin(c *gin.Context) {
 
 func (a *AdminHandler) PostLogin(c *gin.Context) {
 	var req requests.LoginRequest
-	c.Request.ParseForm()
+	_ = c.Request.ParseForm()
 
 	if err := c.ShouldBind(&req); err != nil {
 		errors.SetErrors(c, a.i18nBundle, err)
@@ -645,7 +645,7 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 		}
 	}
 	req.ProductImage = imagesStoredPath
-	_, pErr := a.productSrv.Create(c, req)
+	_, pErr := a.productSrv.Create(c, &req)
 	if pErr.Code > 0 {
 		//remove images from disk
 		for _, img := range imagesStoredPath {
@@ -696,7 +696,7 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 		return
 	}
 
-	product, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+	productShow, pErr := a.productSrv.Show(context.TODO(), "id", pID)
 
 	if pErr.Code == 404 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -727,11 +727,11 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
-	fmt.Println("------- product : ", product.BrandID)
+	fmt.Println("------- productShow : ", productShow.BrandID)
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_edit_product",
 		gin.H{
-			"TITLE":      "edit product",
-			"PRODUCT":    product,
+			"TITLE":      "edit productShow",
+			"PRODUCT":    productShow,
 			"CATEGORIES": categories,
 			"BRANDS":     brands,
 		},
@@ -865,7 +865,7 @@ func (a *AdminHandler) UpdateProduct(c *gin.Context) {
 	}
 
 	//update product
-	updateErr := a.productSrv.Update(c, productID, req)
+	updateErr := a.productSrv.Update(c, productID, &req)
 	if updateErr.Code > 0 {
 		fmt.Println("--- handler update product : 857 : err : ", updateErr)
 		sessions.Set(c, "message", custom_messages.ProductUpdateFailed)
@@ -920,7 +920,7 @@ func (a *AdminHandler) StoreAttribute(c *gin.Context) {
 		return
 	}
 
-	newAttr, Aerr := a.attributeSrv.Create(c, req)
+	newAttr, Aerr := a.attributeSrv.Create(c, &req)
 
 	if Aerr != nil || newAttr.ID <= 0 {
 		fmt.Println("Error in creating new attribute : ", err)
@@ -979,7 +979,7 @@ func (a *AdminHandler) StoreAttributeValues(c *gin.Context) {
 		return
 	}
 
-	_, attErr := a.attrValueSrv.Create(c, req)
+	_, attErr := a.attrValueSrv.Create(c, &req)
 
 	if attErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
@@ -1076,9 +1076,9 @@ func (a *AdminHandler) ShowProductInventory(c *gin.Context) {
 		return
 	}
 
-	//fetch product data and product-attributes relation
-	fmt.Println("show product inventory : product id : ", productID)
-	product, err := a.productSrv.FetchByProductID(c, productID)
+	//fetch productResult data and productResult-attributes relation
+	fmt.Println("show productResult inventory : productResult id : ", productID)
+	productResult, err := a.productSrv.FetchByProductID(c, productID)
 
 	if err.Code == 404 {
 		url := fmt.Sprintf("/admins/products/%d/add-attributes", productID)
@@ -1105,9 +1105,9 @@ func (a *AdminHandler) ShowProductInventory(c *gin.Context) {
 		"PRODUCT_ID": productID,
 		"PRODUCT": gin.H{
 			"Inventory": productData["inventories"],
-			"Product":   productData["product"],
+			"Product":   productData["productResult"],
 		},
-		"PRODUCT_ATTRIBUTES": product.ProductAttributes,
+		"PRODUCT_ATTRIBUTES": productResult.ProductAttributes,
 	})
 	return
 }
@@ -1143,7 +1143,7 @@ func (a *AdminHandler) StoreProductInventory(c *gin.Context) {
 	}
 
 	//insert with transaction [product inventory - product-inventory-attribute ]
-	iErr := a.productSrv.CreateInventory(c, productID, req)
+	iErr := a.productSrv.CreateInventory(c, productID, &req)
 	if iErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, urlAdminProudcts)
@@ -1168,7 +1168,7 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		return
 	}
 
-	product, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+	productShow, pErr := a.productSrv.Show(context.TODO(), "id", pID)
 
 	if pErr.Code == 404 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -1178,9 +1178,9 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		html.Error500(c)
 		return
 	}
-	html.Render(c, http.StatusFound, "edit-gallery-product", gin.H{
-		"TITLE":   "edit gallery product",
-		"PRODUCT": product,
+	html.Render(c, http.StatusFound, "edit-gallery-productShow", gin.H{
+		"TITLE":   "edit gallery productShow",
+		"PRODUCT": productShow,
 	})
 	return
 }
@@ -1338,7 +1338,7 @@ func (a *AdminHandler) ShowAttribute(c *gin.Context) {
 		return
 	}
 
-	attribute, attErr := a.attributeSrv.Show(c, attributeID)
+	attributeShow, attErr := a.attributeSrv.Show(c, attributeID)
 	if attErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/attributes")
@@ -1351,8 +1351,8 @@ func (a *AdminHandler) ShowAttribute(c *gin.Context) {
 
 	html.Render(c, http.StatusFound, "admin_show_attribute",
 		gin.H{
-			"TITLE":     "show attribute",
-			"ATTRIBUTE": attribute,
+			"TITLE":     "show attributeShow",
+			"ATTRIBUTE": attributeShow,
 		},
 	)
 }
@@ -1406,7 +1406,7 @@ func (a *AdminHandler) UpdateAttribute(c *gin.Context) {
 		return
 	}
 
-	updateErr := a.attributeSrv.Update(c, attributeID, req)
+	updateErr := a.attributeSrv.Update(c, attributeID, &req)
 	if updateErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/attributes")
@@ -1562,7 +1562,7 @@ func (a *AdminHandler) UpdateAttributeValues(c *gin.Context) {
 	}
 
 	//update attribute-value
-	updateErr := a.attrValueSrv.Update(c, attValID, req)
+	updateErr := a.attrValueSrv.Update(c, attValID, &req)
 	if updateErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, url)
@@ -1728,7 +1728,7 @@ func (a *AdminHandler) CreateProductFeature(c *gin.Context) {
 		return
 	}
 
-	product, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+	productShow, pErr := a.productSrv.Show(context.TODO(), "id", pID)
 
 	if pErr.Code > 0 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -1737,8 +1737,8 @@ func (a *AdminHandler) CreateProductFeature(c *gin.Context) {
 
 	html.Render(c, http.StatusFound, "admin_add_product_feature",
 		gin.H{
-			"TITLE":   "add product feature",
-			"PRODUCT": product,
+			"TITLE":   "add productShow feature",
+			"PRODUCT": productShow,
 		},
 	)
 	return
@@ -1777,7 +1777,7 @@ func (a *AdminHandler) StoreProductFeature(c *gin.Context) {
 		return
 	}
 
-	addErr := a.productSrv.AddFeature(c, pID, req)
+	addErr := a.productSrv.AddFeature(c, pID, &req)
 	if addErr.Code > 0 {
 		fmt.Println("-- add feature error :", addErr)
 		sessions.Set(c, "errors", custom_error.SomethingWrongHappened)
@@ -1886,7 +1886,7 @@ func (a *AdminHandler) UpdateProductFeature(c *gin.Context) {
 		return
 	}
 
-	updateErr := a.productSrv.UpdateFeature(c, pID, fID, req)
+	updateErr := a.productSrv.UpdateFeature(c, pID, fID, &req)
 	if updateErr.Code > 0 {
 		fmt.Println("-- update feature error :", updateErr)
 		sessions.Set(c, "errors", custom_error.SomethingWrongHappened)

@@ -12,16 +12,17 @@ type CategoryResponse struct {
 	ParentID *uint
 	Status   bool
 
-	SubCategories []CategoryResponse `json:"SubCategories,omitempty"`
+	SubCategories []*CategoryResponse `json:"SubCategories,omitempty"`
 }
 
-func ToMenuResponse(category entities.Category) CategoryResponse {
-	var subCategories []CategoryResponse
+func ToMenuResponse(category *entities.Category) *CategoryResponse {
+	var subCategories []*CategoryResponse
+
 	for _, subCategory := range category.SubCategories {
 		subCategories = append(subCategories, ToMenuResponse(subCategory))
 	}
 
-	return CategoryResponse{
+	return &CategoryResponse{
 		ID:            category.ID,
 		Priority:      category.Priority,
 		Title:         category.Title,

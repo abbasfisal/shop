@@ -33,12 +33,12 @@ type CustomerOrders struct {
 func ToCustomerOrders(ordersList []entities.Order) CustomerOrders {
 	var oResponse CustomerOrders
 	for _, o := range ordersList {
-		oResponse.Data = append(oResponse.Data, ToCustomerOrder(o))
+		oResponse.Data = append(oResponse.Data, ToCustomerOrder(&o))
 	}
 	return oResponse
 }
 
-func ToCustomerOrder(o entities.Order) CustomerOrder {
+func ToCustomerOrder(o *entities.Order) CustomerOrder {
 	orderResponse := CustomerOrder{
 		//ID:                 o.ID,
 		//CustomerID:         o.CustomerID,

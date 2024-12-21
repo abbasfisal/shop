@@ -22,33 +22,38 @@ type ProductRepository struct {
 	mongoClient *mongo.Client
 }
 
-func NewProductRepository(db *gorm.DB, mongoClient *mongo.Client) ProductRepository {
-	return ProductRepository{
+func NewProductRepository(db *gorm.DB, mongoClient *mongo.Client) ProductRepositoryInterface {
+	return &ProductRepository{
 		db:          db,
 		mongoClient: mongoClient,
 	}
 }
 
-func (p ProductRepository) GetAll(ctx context.Context) ([]entities.Product, error) {
-	var products []entities.Product
+func (p *ProductRepository) GetAll(ctx context.Context) ([]*entities.Product, error) {
+	var products []*entities.Product
 	err := p.db.WithContext(ctx).Preload("Category").Preload("Brand").Find(&products).Error
 	return products, err
 }
 
-func (p ProductRepository) FindBy(ctx context.Context, columnName string, value any) (entities.Product, error) {
+func (p *ProductRepository) FindBy(ctx context.Context, columnName string, value any) (*entities.Product, error) {
 	var product entities.Product
 	condition := fmt.Sprintf("%s=?", columnName)
-	err := p.db.Preload("Category").Preload("Brand").Preload("ProductAttributes").Preload("ProductInventories").Preload("ProductImages").Preload("Features").First(&product, condition, value).Error
-	return product, err
+	err := p.db.
+		Preload("Category").Preload("Brand").
+		Preload("ProductAttributes").Preload("ProductInventories").
+		Preload("ProductImages").Preload("Features").
+		First(&product, condition, value).
+		Error
+	return &product, err
 }
 
-func (p ProductRepository) FindByID(ctx context.Context, ID int) (entities.Product, error) {
+func (p *ProductRepository) FindByID(ctx context.Context, ID int) (*entities.Product, error) {
 	var product entities.Product
 	err := p.db.WithContext(ctx).Preload("ProductAttributes").First(&product, ID).Error
-	return product, err
+	return &product, err
 }
 
-func (p ProductRepository) Store(ctx context.Context, product entities.Product) (entities.Product, error) {
+func (p *ProductRepository) Store(ctx context.Context, product *entities.Product) (*entities.Product, error) {
 
 	err := p.db.WithContext(ctx).Create(&product).Error
 
@@ -58,15 +63,15 @@ func (p ProductRepository) Store(ctx context.Context, product entities.Product) 
 	return product, err
 }
 
-func (p ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]entities.Attribute, error) {
+func (p *ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]*entities.Attribute, error) {
 	var category entities.Category
-	var attributes []entities.Attribute
+	var attributes []*entities.Attribute
 
 	var product entities.Product
 	pErr := p.db.WithContext(c).Where("id = ? ", productID).First(&product).Error
 
 	if pErr != nil {
-		return attributes, pErr
+		return nil, pErr
 	}
 
 	err := p.db.Raw(
@@ -89,7 +94,7 @@ func (p ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]e
 
 	if err != nil {
 		fmt.Println("product repository _ root category not found")
-		return attributes, err
+		return nil, err
 	}
 
 	aErr := p.db.WithContext(c).Preload("AttributeValues").Find(&attributes).Error
@@ -97,7 +102,7 @@ func (p ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]e
 	return attributes, aErr
 }
 
-func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error {
+func (p *ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error {
 	//find product by id
 	_, err := p.FindByID(ctx, productID)
 	if err != nil {
@@ -122,7 +127,7 @@ func (p ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int,
 	return nil
 }
 
-func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID int) (map[string]interface{}, error) {
+func (p *ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID int) (map[string]interface{}, error) {
 	type InventoryWithAttributes struct {
 		InventoryID                 uint
 		Quantity                    uint
@@ -191,7 +196,7 @@ func (p ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID i
 	return result, nil
 }
 
-func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) (entities.ProductInventory, error) {
+func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) (*entities.ProductInventory, error) {
 
 	var inventory entities.ProductInventory
 
@@ -249,21 +254,21 @@ func (p ProductRepository) StoreProductInventory(c *gin.Context, productID int, 
 
 	if txErr != nil {
 		fmt.Println("---- create inventory product err: ", txErr)
-		return entities.ProductInventory{}, txErr
+		return nil, txErr
 	}
 
 	SyncMongo(c, p.db, uint(productID))
 
-	return inventory, nil
+	return &inventory, nil
 }
 
-func (p ProductRepository) GetImage(c *gin.Context, imageID int) (entities.ProductImages, error) {
+func (p *ProductRepository) GetImage(c *gin.Context, imageID int) (*entities.ProductImages, error) {
 	var image entities.ProductImages
 	err := p.db.Find(&image, imageID).Error
-	return image, err
+	return &image, err
 }
 
-func (p ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
+func (p *ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
 
 	var productImage entities.ProductImages
 	if imgErr := p.db.WithContext(c).Where("id=?", imageID).First(&productImage).Error; imgErr != nil {
@@ -278,7 +283,7 @@ func (p ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
 	return nil
 }
 
-func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStoredPath []string) error {
+func (p *ProductRepository) StoreImages(c *gin.Context, productID int, imageStoredPath []string) error {
 	var images []entities.ProductImages
 	for _, image := range imageStoredPath {
 		images = append(images, entities.ProductImages{
@@ -296,13 +301,13 @@ func (p ProductRepository) StoreImages(c *gin.Context, productID int, imageStore
 	return nil
 }
 
-func (p ProductRepository) Update(c *gin.Context, productID int, req requests.UpdateProductRequest) (entities.Product, error) {
+func (p *ProductRepository) Update(c *gin.Context, productID int, req *requests.UpdateProductRequest) (*entities.Product, error) {
 
 	var product entities.Product
 	pErr := p.db.WithContext(c).First(&product, productID).Error
 	if pErr != nil {
-		fmt.Println("---- repo product find err : 182 ", pErr)
-		return product, pErr
+		fmt.Println("---- repo product find err : ", pErr)
+		return nil, pErr
 	}
 
 	updateErr := p.db.WithContext(c).Model(&product).Update("category_id", req.CategoryID).
@@ -321,15 +326,15 @@ func (p ProductRepository) Update(c *gin.Context, productID int, req requests.Up
 		Update("description", req.Description).Error
 
 	if updateErr != nil {
-		return entities.Product{}, pErr
+		return nil, pErr
 	}
 
 	SyncMongo(c, p.db, uint(productID))
 
-	return product, nil
+	return &product, nil
 }
 
-func (p ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) error {
+func (p *ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) error {
 
 	//find
 	var productInventoryAttribute entities.ProductInventoryAttribute
@@ -347,7 +352,7 @@ func (p ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInven
 	return nil
 }
 
-func (p ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) error {
+func (p *ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) error {
 
 	var productID uint
 
@@ -384,7 +389,7 @@ func (p ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) erro
 	return nil
 }
 
-func (p ProductRepository) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) error {
+func (p *ProductRepository) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) error {
 
 	var productInventory entities.ProductInventory
 
@@ -429,7 +434,7 @@ func (p ProductRepository) AppendAttributesToInventory(c *gin.Context, inventory
 	return nil
 }
 
-func (p ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) error {
+func (p *ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) error {
 	var inventory entities.ProductInventory
 	if iErr := p.db.WithContext(c).First(&inventory, inventoryID).Error; iErr != nil {
 		return iErr
@@ -444,7 +449,7 @@ func (p ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID i
 	return nil
 }
 
-func (p ProductRepository) InsertFeature(c *gin.Context, productID int, req requests.CreateProductFeatureRequest) error {
+func (p *ProductRepository) InsertFeature(c *gin.Context, productID int, req *requests.CreateProductFeatureRequest) error {
 
 	if err := p.db.Create(&entities.Feature{
 		ProductID: uint(productID),
@@ -459,7 +464,7 @@ func (p ProductRepository) InsertFeature(c *gin.Context, productID int, req requ
 	return nil
 }
 
-func (p ProductRepository) DeleteFeature(c *gin.Context, productID int, featureID int) error {
+func (p *ProductRepository) DeleteFeature(c *gin.Context, productID int, featureID int) error {
 	if err := p.db.WithContext(c).Where("product_id=? ", productID).Where("id = ?", featureID).Unscoped().Delete(&entities.Feature{}).Error; err != nil {
 		return err
 	}
@@ -469,16 +474,20 @@ func (p ProductRepository) DeleteFeature(c *gin.Context, productID int, featureI
 	return nil
 }
 
-func (p ProductRepository) GetFeatureBy(c *gin.Context, productID int, featureID int) (entities.Feature, error) {
+func (p *ProductRepository) GetFeatureBy(c *gin.Context, productID int, featureID int) (*entities.Feature, error) {
 	var feature entities.Feature
 	if err := p.db.WithContext(c).Where("id=?", featureID).Where("product_id=?", productID).First(&feature).Error; err != nil {
-		return feature, err
+		return nil, err
 	}
-	return feature, nil
+	return &feature, nil
 }
 
-func (p ProductRepository) EditFeature(c *gin.Context, productID int, featureID int, req requests.UpdateProductFeatureRequest) error {
-	if err := p.db.Where("id=?", featureID).Where("product_id=?", productID).Model(&entities.Feature{}).Update("title", req.Title).
+func (p *ProductRepository) EditFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) error {
+	if err := p.db.
+		Where("id=?", featureID).
+		Where("product_id=?", productID).
+		Model(&entities.Feature{}).
+		Update("title", req.Title).
 		Update("value", req.Value).Error; err != nil {
 		return err
 	}
@@ -615,7 +624,7 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 	return nil
 }
 
-func transformImages(images []entities.ProductImages) []entities.ImgData {
+func transformImages(images []*entities.ProductImages) []entities.ImgData {
 	var imgData []entities.ImgData
 	for _, img := range images {
 		imgData = append(imgData, entities.ImgData{
@@ -627,7 +636,7 @@ func transformImages(images []entities.ProductImages) []entities.ImgData {
 	return imgData
 }
 
-func transformFeatures(features []entities.Feature) []entities.FData {
+func transformFeatures(features []*entities.Feature) []entities.FData {
 	var fData []entities.FData
 	for _, feature := range features {
 		fData = append(fData, entities.FData{

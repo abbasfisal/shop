@@ -3,7 +3,6 @@ package product
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"shop/internal/entities"
@@ -18,29 +17,33 @@ type ProductService struct {
 	repo product.ProductRepositoryInterface
 }
 
-func NewProductService(repo product.ProductRepositoryInterface) *ProductService {
+func NewProductService(repo product.ProductRepositoryInterface) ProductServiceInterface {
 	return &ProductService{repo: repo}
 }
 
-func (p ProductService) Index(ctx context.Context) (responses.Products, custom_error.CustomError) {
-	var response responses.Products
+//-----------------------------------------
+//<<<<<<<<<<<<<<<< Method >>>>>>>>>>>>>>>>>
+//-----------------------------------------
+
+func (p *ProductService) Index(ctx context.Context) (*responses.Products, custom_error.CustomError) {
+
 	products, err := p.repo.GetAll(ctx)
 	if err != nil {
-		return response, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToProducts(products), custom_error.CustomError{}
 }
 
-func (p ProductService) Show(ctx context.Context, columnName string, value any) (responses.Product, custom_error.CustomError) {
+func (p *ProductService) Show(ctx context.Context, columnName string, value any) (*responses.Product, custom_error.CustomError) {
 
-	product, err := p.repo.FindBy(ctx, columnName, value)
+	pResult, err := p.repo.FindBy(ctx, columnName, value)
 	if err != nil {
-		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-	return responses.ToProduct(product), custom_error.CustomError{}
+	return responses.ToProduct(pResult), custom_error.CustomError{}
 }
 
-func (p ProductService) Create(ctx context.Context, req requests.CreateProductRequest) (responses.Product, custom_error.CustomError) {
+func (p *ProductService) Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, custom_error.CustomError) {
 
 	var prepareProduct = entities.Product{
 		CategoryID: uint(req.CategoryID),
@@ -60,22 +63,22 @@ func (p ProductService) Create(ctx context.Context, req requests.CreateProductRe
 		ProductImages: prepareProductImages(req.ProductImage),
 	}
 
-	newProduct, err := p.repo.Store(ctx, prepareProduct)
+	newProduct, err := p.repo.Store(ctx, &prepareProduct)
 	if err != nil {
-		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToProduct(newProduct), custom_error.CustomError{}
 }
 
-func prepareProductImages(imageNames []string) []entities.ProductImages {
-	var pImages []entities.ProductImages
+func prepareProductImages(imageNames []string) []*entities.ProductImages {
+	var pImages []*entities.ProductImages
 	for _, imageName := range imageNames {
-		pImages = append(pImages, entities.ProductImages{Path: imageName})
+		pImages = append(pImages, &entities.ProductImages{Path: imageName})
 	}
 	return pImages
 }
 
-func (p ProductService) CheckSkuIsUnique(ctx context.Context, sku string) (bool, custom_error.CustomError) {
+func (p *ProductService) CheckSkuIsUnique(ctx context.Context, sku string) (bool, custom_error.CustomError) {
 	_, err := p.repo.FindBy(ctx, "sku", sku)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -86,26 +89,26 @@ func (p ProductService) CheckSkuIsUnique(ctx context.Context, sku string) (bool,
 	return false, custom_error.CustomError{}
 }
 
-func (p ProductService) FetchByProductID(c *gin.Context, productID int) (responses.Product, custom_error.CustomError) {
-	product, err := p.repo.FindByID(c, productID)
+func (p *ProductService) FetchByProductID(c *gin.Context, productID int) (*responses.Product, custom_error.CustomError) {
+	pResult, err := p.repo.FindByID(c, productID)
 
 	if err != nil {
-		return responses.Product{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-	return responses.ToProduct(product), custom_error.CustomError{}
+	return responses.ToProduct(pResult), custom_error.CustomError{}
 }
 
-func (p ProductService) FetchRootAttributes(c *gin.Context, productID int) (responses.Attributes, custom_error.CustomError) {
+func (p *ProductService) FetchRootAttributes(c *gin.Context, productID int) (*responses.Attributes, custom_error.CustomError) {
 
 	attributes, err := p.repo.GetRootAttributes(c, productID)
 
 	if err != nil {
-		return responses.Attributes{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToAttributes(attributes), custom_error.CustomError{}
 }
 
-func (p ProductService) AddAttributeValues(c *gin.Context, productID int, attributes []string) custom_error.CustomError {
+func (p *ProductService) AddAttributeValues(c *gin.Context, productID int, attributes []string) custom_error.CustomError {
 
 	if err := p.repo.StoreAttributeValues(c, productID, attributes); err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
@@ -114,16 +117,16 @@ func (p ProductService) AddAttributeValues(c *gin.Context, productID int, attrib
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) FetchProductAttributes(c *gin.Context, productID int) (map[string]interface{}, custom_error.CustomError) {
+func (p *ProductService) FetchProductAttributes(c *gin.Context, productID int) (map[string]interface{}, custom_error.CustomError) {
 	//fetch product and its attribute and also inventories
-	product, err := p.repo.GetProductAndAttributes(c, productID)
+	pResult, err := p.repo.GetProductAndAttributes(c, productID)
 	if err != nil {
-		return product, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return pResult, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-	return product, custom_error.CustomError{}
+	return pResult, custom_error.CustomError{}
 }
 
-func (p ProductService) CreateInventory(c *gin.Context, productID int, req requests.CreateProductInventoryRequest) custom_error.CustomError {
+func (p *ProductService) CreateInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) custom_error.CustomError {
 	_, err := p.repo.StoreProductInventory(c, productID, req)
 	if err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
@@ -131,29 +134,29 @@ func (p ProductService) CreateInventory(c *gin.Context, productID int, req reque
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) FetchImage(c *gin.Context, imageID int) (responses.ImageProduct, custom_error.CustomError) {
+func (p *ProductService) FetchImage(c *gin.Context, imageID int) (*responses.ImageProduct, custom_error.CustomError) {
 	image, err := p.repo.GetImage(c, imageID)
 	if err != nil {
-		return responses.ImageProduct{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToImageProduct(image), custom_error.CustomError{}
 }
 
-func (p ProductService) RemoveImage(c *gin.Context, imageID int) custom_error.CustomError {
+func (p *ProductService) RemoveImage(c *gin.Context, imageID int) custom_error.CustomError {
 	if err := p.repo.DeleteImage(c, imageID); err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) UploadImage(c *gin.Context, productID int, imageStoredPath []string) custom_error.CustomError {
+func (p *ProductService) UploadImage(c *gin.Context, productID int, imageStoredPath []string) custom_error.CustomError {
 	if err := p.repo.StoreImages(c, productID, imageStoredPath); err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) Update(c *gin.Context, productID int, req requests.UpdateProductRequest) custom_error.CustomError {
+func (p *ProductService) Update(c *gin.Context, productID int, req *requests.UpdateProductRequest) custom_error.CustomError {
 	_, err := p.repo.Update(c, productID, req)
 	if err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
@@ -162,7 +165,7 @@ func (p ProductService) Update(c *gin.Context, productID int, req requests.Updat
 }
 
 // DeleteInventoryAttribute delete record form product_inventory_attributes table
-func (p ProductService) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) custom_error.CustomError {
+func (p *ProductService) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) custom_error.CustomError {
 	err := p.repo.DeleteInventoryAttribute(c, productInventoryAttributeID)
 	if err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
@@ -170,28 +173,27 @@ func (p ProductService) DeleteInventoryAttribute(c *gin.Context, productInventor
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) DeleteInventory(c *gin.Context, inventoryID int) custom_error.CustomError {
+func (p *ProductService) DeleteInventory(c *gin.Context, inventoryID int) custom_error.CustomError {
 	if err := p.repo.DeleteInventory(c, inventoryID); err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) custom_error.CustomError {
+func (p *ProductService) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) custom_error.CustomError {
 	if err := p.repo.AppendAttributesToInventory(c, inventoryID, attributes); err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
 }
-func (p ProductService) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) custom_error.CustomError {
+func (p *ProductService) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) custom_error.CustomError {
 	if err := p.repo.UpdateInventoryQuantity(c, inventoryID, quantity); err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
-
 }
 
-func (p ProductService) AddFeature(c *gin.Context, productID int, req requests.CreateProductFeatureRequest) custom_error.CustomError {
+func (p *ProductService) AddFeature(c *gin.Context, productID int, req *requests.CreateProductFeatureRequest) custom_error.CustomError {
 	err := p.repo.InsertFeature(c, productID, req)
 	if err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
@@ -199,7 +201,7 @@ func (p ProductService) AddFeature(c *gin.Context, productID int, req requests.C
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) RemoveFeature(c *gin.Context, productID int, featureID int) custom_error.CustomError {
+func (p *ProductService) RemoveFeature(c *gin.Context, productID int, featureID int) custom_error.CustomError {
 	err := p.repo.DeleteFeature(c, productID, featureID)
 	if err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
@@ -207,21 +209,19 @@ func (p ProductService) RemoveFeature(c *gin.Context, productID int, featureID i
 	return custom_error.CustomError{}
 }
 
-func (p ProductService) FetchFeature(c *gin.Context, productID int, featureID int) (responses.Feature, custom_error.CustomError) {
+func (p *ProductService) FetchFeature(c *gin.Context, productID int, featureID int) (*responses.Feature, custom_error.CustomError) {
 	feat, err := p.repo.GetFeatureBy(c, productID, featureID)
 
 	if err != nil {
-		return responses.Feature{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 
 	return responses.ToFeature(feat), custom_error.CustomError{}
 }
 
-func (p ProductService) UpdateFeature(c *gin.Context, productID int, featureID int, req requests.UpdateProductFeatureRequest) custom_error.CustomError {
+func (p *ProductService) UpdateFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) custom_error.CustomError {
 	if err := p.repo.EditFeature(c, productID, featureID, req); err != nil {
-		fmt.Println("--- update feature err :", err)
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
-
 }

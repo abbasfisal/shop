@@ -66,7 +66,7 @@ func fakeProducts() []entities.Product {
 			OriginalPrice: 822_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
-			ProductImages: []entities.ProductImages{
+			ProductImages: []*entities.ProductImages{
 				{
 					Path: "2024/09/27/1.webp",
 				},
@@ -82,7 +82,7 @@ func fakeProducts() []entities.Product {
 					Quantity: 150,
 				},
 			},
-			Features: []entities.Feature{
+			Features: []*entities.Feature{
 				{
 					Title: "نوع عطر",
 					Value: "ادو پرفیوم",
@@ -131,7 +131,7 @@ func fakeProducts() []entities.Product {
 			OriginalPrice: 822_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
-			ProductImages: []entities.ProductImages{
+			ProductImages: []*entities.ProductImages{
 				{
 					Path: "2024/09/27/1.webp",
 				},
@@ -147,7 +147,7 @@ func fakeProducts() []entities.Product {
 					Quantity: 150,
 				},
 			},
-			Features: []entities.Feature{
+			Features: []*entities.Feature{
 				{
 					Title: "نوع عطر",
 					Value: "ادو پرفیوم",
@@ -192,7 +192,7 @@ func fakeProducts() []entities.Product {
 			OriginalPrice: 780_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson عطری است زنانه با رایحه ای شیرین و گرم که مکمل شخصیت زنانه است و به شما احساس منحصر به فرد و جذاب می دهد. با بسته‌بندی و طراحی لوکس شیشه، این عطر بهترین کیفیت را در اختیار شما قرار می‌دهد.",
-			ProductImages: []entities.ProductImages{
+			ProductImages: []*entities.ProductImages{
 				{
 					Path: "2024/09/27/11.webp",
 				},
@@ -208,7 +208,7 @@ func fakeProducts() []entities.Product {
 					Quantity: 200,
 				},
 			},
-			Features: []entities.Feature{
+			Features: []*entities.Feature{
 				{
 					Title: "نوع محصول (غلظت)",
 					Value: "ادو پرفیوم",
@@ -257,7 +257,7 @@ func fakeProducts() []entities.Product {
 			OriginalPrice: 815_000,
 			SalePrice:     477_600,
 			Description:   "ادو پرفیوم زنانه بایلندو مدل d’ Eclatto قصیده ای فریبنده برای ظرافت زنانگی است،‌ جاییکه ترکیب مست کننده میوه ها، لمس مخملی گل پائونیا، و با حضور باشکوه سرو گرد هم می آیند.تا نقش و نگار طلسم کننده ای از جذابیت و اعتماد به نفس را بیافریند.",
-			ProductImages: []entities.ProductImages{
+			ProductImages: []*entities.ProductImages{
 				{
 					Path: "2024/09/27/111.webp",
 				},
@@ -273,7 +273,7 @@ func fakeProducts() []entities.Product {
 					Quantity: 200,
 				},
 			},
-			Features: []entities.Feature{
+			Features: []*entities.Feature{
 				{
 					Title: "نوع محصول (غلظت)",
 					Value: "ادو پرفیوم",
@@ -321,7 +321,7 @@ func fakeProducts() []entities.Product {
 			SalePrice:     238_000,
 			Description:   "شلوار از پارچه ی به اصطلاح بنگال تولید شده است،پارچه ی کتان بنگال پارچه ای با ظرافت بالا همراه با کشسانی نسبی مناسب می باشد که زیبایی دو چندانی در پوشیدن شلوار به شما می دهد پس اگر دنبال شلوار ضخیم میگردید ما پارچه ی بنگال را توصیه نمیکنیم.قد شلوار صد سانتی متر است،پاچه ی شلوار پاکتی است و در قسمت پاچه و کمربند مارک فلزی کار شده است،قسمت پشت کمر کش کار شده است و در جلوی کار طراحی کمربندی زیبا که شمارا از بستن کمربند بی نیاز میکند و راحتی دو چندانی را به ارمغان خواهد آورد.شلوار دارای دو جیب در بغل و یک جیب کوچک در پشت است،یک ساسون در پای چپ و یک ساسون در روی پای راست به ظاهر کلاسیکی شلوار می افزاید.رنگ شلوار مشکی است و مهمترین ویژگی آن استایل جذب و قابلیت پوشیدن با کفش کالج و تیپ رسمی و همینطور قابلیت پوشیدن با کفش اسپرت و تیپ اسپرت را دارد.",
 
-			ProductImages: []entities.ProductImages{
+			ProductImages: []*entities.ProductImages{
 				{
 					Path: "2024/09/27/4444.webp",
 				},
@@ -390,7 +390,7 @@ func fakeProducts() []entities.Product {
 					ProductAttributeID: 3, //x-large
 				},
 			},
-			Features: []entities.Feature{
+			Features: []*entities.Feature{
 				{
 					Title: "جنس",
 					Value: "بنگال",
@@ -501,7 +501,7 @@ func fakeCategories() []entities.Category {
 			Slug:     "apparel",
 			ParentID: nil,
 			Status:   true,
-			SubCategories: []entities.Category{
+			SubCategories: []*entities.Category{
 				//men clothing
 				{
 					Priority: nil,
@@ -510,7 +510,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "تی شرت مردانه",
@@ -578,7 +578,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority:      nil,
 							Title:         "عینک مردانه",
@@ -631,7 +631,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "لباس خواب و راحتی زنانه",
@@ -652,7 +652,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "بادی زنانه",
@@ -701,7 +701,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "شورت زنانه",
@@ -729,7 +729,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "ساعت زنانه",
@@ -765,7 +765,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "بلوز و شومیز",
@@ -785,7 +785,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "شورت دخترانه",
@@ -813,7 +813,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "شال و روسری دخترانه",
@@ -833,7 +833,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "تیشرت پسرانه",
@@ -869,7 +869,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "شورت پسرانه",
@@ -931,7 +931,7 @@ func fakeCategories() []entities.Category {
 			ParentID: nil,
 			Image:    "",
 			Status:   true,
-			SubCategories: []entities.Category{
+			SubCategories: []*entities.Category{
 				{
 					Priority: nil,
 					Title:    "عطر و ادکلن",
@@ -939,7 +939,7 @@ func fakeCategories() []entities.Category {
 					ParentID: nil,
 					Image:    "",
 					Status:   true,
-					SubCategories: []entities.Category{
+					SubCategories: []*entities.Category{
 						{
 							Priority: nil,
 							Title:    "عطر و ادکلن زنانه",

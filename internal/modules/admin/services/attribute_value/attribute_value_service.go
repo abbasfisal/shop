@@ -15,13 +15,17 @@ type AttributeValueService struct {
 	repo attributeValue.AttributeValueRepositoryInterface
 }
 
-func NewAttributeValueService(repo attributeValue.AttributeValueRepositoryInterface) AttributeValueService {
-	return AttributeValueService{repo: repo}
+func NewAttributeValueService(repo attributeValue.AttributeValueRepositoryInterface) AttributeValueServiceInterface {
+	return &AttributeValueService{repo: repo}
 }
 
-func (av AttributeValueService) Create(ctx context.Context, req requests.CreateAttributeValueRequest) (responses.AttributeValue, custom_error.CustomError) {
+//-------------------------
+//>>>>>>>> Methods <<<<<<<<
+//-------------------------
 
-	newAttrValue, err := av.repo.Store(ctx, entities.AttributeValue{
+func (av *AttributeValueService) Create(ctx context.Context, req *requests.CreateAttributeValueRequest) (responses.AttributeValue, custom_error.CustomError) {
+
+	newAttrValue, err := av.repo.Store(ctx, &entities.AttributeValue{
 		AttributeID: req.AttributeID,
 		Value:       req.Value,
 	})
@@ -34,24 +38,22 @@ func (av AttributeValueService) Create(ctx context.Context, req requests.CreateA
 }
 
 // IndexAttribute get attributes by its attribute-values relation
-func (av AttributeValueService) IndexAttribute(c *gin.Context) (responses.Attributes, custom_error.CustomError) {
+func (av *AttributeValueService) IndexAttribute(c *gin.Context) (*responses.Attributes, custom_error.CustomError) {
 	attributes, err := av.repo.GetAllAttribute(c)
-	if err != nil {
-		return responses.Attributes{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+	if err != nil || attributes == nil {
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToAttributes(attributes), custom_error.CustomError{}
 }
-
-func (av AttributeValueService) Show(c *gin.Context, attributeValueID int) (responses.AttributeValue, custom_error.CustomError) {
+func (av *AttributeValueService) Show(c *gin.Context, attributeValueID int) (responses.AttributeValue, custom_error.CustomError) {
 	attValue, err := av.repo.Find(c, attributeValueID)
-	if err != nil {
+	if err != nil || attValue == nil {
 		return responses.AttributeValue{}, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 
 	return responses.ToAttributeValue(attValue), custom_error.CustomError{}
 }
-
-func (av AttributeValueService) Update(c *gin.Context, attributeValueID int, req requests.UpdateAttributeValueRequest) custom_error.CustomError {
+func (av *AttributeValueService) Update(c *gin.Context, attributeValueID int, req *requests.UpdateAttributeValueRequest) custom_error.CustomError {
 	attributeValue, err := av.repo.Update(c, attributeValueID, req)
 
 	fmt.Println("--- update succ att-value : ", attributeValue)
