@@ -8,5 +8,5 @@ import (
 )
 
 type AuthenticateServiceInterface interface {
-	Login(ctx context.Context, req requests.LoginRequest) (AdminUserResponse.User, custom_error.CustomError)
+	Login(ctx context.Context, req *requests.LoginRequest) (*AdminUserResponse.User, custom_error.CustomError)
 }

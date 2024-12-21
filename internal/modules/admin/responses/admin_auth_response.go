@@ -10,8 +10,8 @@ type User struct {
 	Type        string
 }
 
-func ToUserResponse(user entities.User) User {
-	return User{
+func ToUserResponse(user *entities.User) *User {
+	return &User{
 		ID:          user.ID,
 		FirstName:   user.FirstName,
 		LastName:    user.LastName,
