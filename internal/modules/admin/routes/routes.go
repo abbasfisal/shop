@@ -62,7 +62,6 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client
 	{
 		guestGrp.GET("/admins/login", adminHlr.ShowLogin)
 		guestGrp.POST("/admins/login", adminHlr.PostLogin)
-		//register routes
 	}
 
 	authGrp := r.Group("/")
