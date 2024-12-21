@@ -12,11 +12,11 @@ import (
 	"strconv"
 )
 
-func Auth(c *gin.Context) entities.User {
+func Auth(c *gin.Context) *entities.User {
 	authID := sessions.GET(c, "auth_id")
 	fmt.Println("helpers - Auth() - authid:", authID)
 	if authID == "" {
-		return entities.User{}
+		return &entities.User{}
 	}
 
 	repo := adminAuthRepo.NewAuthenticateRepository(mysql.Get())
