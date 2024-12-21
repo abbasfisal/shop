@@ -26,24 +26,20 @@ import (
 )
 
 var (
-	i18nBundle *i18n.Bundle
-	once       sync.Once
-
+	i18nBundle  *i18n.Bundle
 	asynqClient *asynq.Client
+	once        sync.Once
 )
 
 func main() {
+	once.Do(initialize)
 
 	defer mysql.Close()
-	defer asynqClient.Close()
-
-	once.Do(initialize)
 
 	cache.InitRedisClient()
 
-	if mErr := mongodb.Connect(); mErr != nil {
-		log.Fatalln("mongo db error : ", mErr)
-	}
+	mongodb.Connect()
+	defer mongodb.Disconnect()
 
 	commands.Execute()
 
@@ -59,9 +55,9 @@ func main() {
 }
 
 func initialize() {
+	loadConfig()
 	loadTranslation()
 	initializeLogger()
-	loadConfig()
 	initializeDatabase()
 	InitializeSmsService()
 	initAsynqClient()
@@ -73,8 +69,7 @@ func initAsynqClient() {
 }
 
 func InitializeSmsService() {
-	//todo:get from env
-	kaveNegar := sms.NewKaveNegar("apiKey")
+	kaveNegar := sms.NewKaveNegar(os.Getenv("KAVENEGAR_SECRETKEY"))
 	sms.GetSMSManager().SetService(kaveNegar)
 }
 
