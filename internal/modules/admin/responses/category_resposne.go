@@ -15,8 +15,8 @@ type Categories struct {
 	Data []Category
 }
 
-func ToCategory(category entities.Category) Category {
-	return Category{
+func ToCategory(category *entities.Category) *Category {
+	return &Category{
 		ID:       category.ID,
 		ParentID: category.ParentID,
 		Priority: category.Priority,
@@ -27,12 +27,19 @@ func ToCategory(category entities.Category) Category {
 	}
 }
 
-func ToCategories(categories []entities.Category) Categories {
-	var response Categories
+func ToCategories(categories []*entities.Category) *Categories {
 
-	for _, cat := range categories {
-		response.Data = append(response.Data, ToCategory(cat))
+	if categories == nil {
+		return nil
 	}
 
-	return response
+	response := Categories{
+		Data: make([]Category, 0, len(categories)),
+	}
+
+	for _, cat := range categories {
+		response.Data = append(response.Data, *ToCategory(cat))
+	}
+
+	return &response
 }

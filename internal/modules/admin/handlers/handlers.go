@@ -247,7 +247,7 @@ func (a *AdminHandler) StoreCategory(c *gin.Context) {
 	//	end upload and save image
 	//---------------------------
 
-	newCategory, err := a.categorySrv.Create(context.TODO(), req)
+	newCategory, err := a.categorySrv.Create(context.TODO(), &req)
 	if err != nil || newCategory.ID <= 0 {
 		_ = os.Remove(pathToUpload)
 		fmt.Println("error in creating category : ", err)
@@ -428,8 +428,8 @@ func (a *AdminHandler) UpdateCategory(c *gin.Context) {
 	//	end upload and save image
 	//---------------------------
 
-	categoryUpdateErr := a.categorySrv.Edit(c, catID, req)
-	fmt.Println("----- hanlder category edit : error  ", categoryUpdateErr)
+	categoryUpdateErr := a.categorySrv.Edit(c, catID, &req)
+	fmt.Println("----- handler category edit : error  ", categoryUpdateErr)
 	if categoryUpdateErr.Code > 0 {
 		fmt.Println("------- update category err : ", categoryUpdateErr.Error())
 		if categoryUpdateErr.Code == 404 {

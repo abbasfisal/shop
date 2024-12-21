@@ -19,7 +19,7 @@ type Product struct {
 	Discount      uint
 
 	//relation
-	Category                   Category
+	Category                   *Category
 	Brand                      Brand
 	Images                     ImageProducts
 	ProductAttributes          ProductAttributes
@@ -61,7 +61,7 @@ func ToProduct(p entities.Product) Product {
 		}(),
 
 		//relation
-		Category:                   ToCategory(p.Category),
+		Category:                   ToCategory(&p.Category),
 		Brand:                      ToBrand(p.Brand),
 		Images:                     ToImageProducts(p.ProductImages),
 		ProductAttributes:          ToProductAttributes(p.ProductAttributes),

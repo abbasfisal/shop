@@ -47,9 +47,9 @@ func (h HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]ent
 	return products, err
 }
 
-func (h HomeRepository) GetCategories(ctx context.Context, limit int) ([]entities.Category, error) {
-	var categories []entities.Category
-	err := h.db.Limit(limit).Find(&categories, "status=?", true).Error
+func (h HomeRepository) GetCategories(ctx context.Context, limit int) ([]*entities.Category, error) {
+	var categories []*entities.Category
+	err := h.db.WithContext(ctx).Limit(limit).Find(&categories, "status=?", true).Error
 
 	return categories, err
 }
@@ -133,11 +133,11 @@ func (h HomeRepository) GetProductsBy(ctx context.Context, columnName string, va
 	return products, err
 }
 
-func (h HomeRepository) GetCategoryBy(ctx context.Context, columnName string, value any) (entities.Category, error) {
+func (h HomeRepository) GetCategoryBy(ctx context.Context, columnName string, value any) (*entities.Category, error) {
 	var category entities.Category
-	err := h.db.Where(fmt.Sprintf("%s = ?", columnName), value).Find(&category).Error
+	err := h.db.WithContext(ctx).Where(fmt.Sprintf("%s = ?", columnName), value).Find(&category).Error
 
-	return category, err
+	return &category, err
 }
 
 func (h HomeRepository) NewOtp(ctx context.Context, mobile string) (entities.OTP, custom_error.CustomError) {

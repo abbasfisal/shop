@@ -45,11 +45,11 @@ func (h HomeService) GetProducts(ctx context.Context, limit int) (responses.Prod
 	return responses.ToProducts(products), custom_error.CustomError{}
 }
 
-func (h HomeService) GetCategories(ctx context.Context, limit int) (responses.Categories, custom_error.CustomError) {
+func (h HomeService) GetCategories(ctx context.Context, limit int) (*responses.Categories, custom_error.CustomError) {
 
 	categories, err := h.repo.GetCategories(ctx, limit)
 	if err != nil {
-		return responses.Categories{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategories(categories), custom_error.CustomError{}
 }
@@ -66,11 +66,11 @@ func (h HomeService) ListProductByCategorySlug(c *gin.Context, slug string) (pag
 
 }
 
-func (h HomeService) ShowCategory(ctx context.Context, columnName string, value any) (responses.Category, custom_error.CustomError) {
+func (h HomeService) ShowCategory(ctx context.Context, columnName string, value any) (*responses.Category, custom_error.CustomError) {
 
 	category, err := h.repo.GetCategoryBy(ctx, columnName, value)
 	if err != nil {
-		return responses.Category{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategory(category), custom_error.CustomError{}
 }

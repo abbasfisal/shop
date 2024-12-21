@@ -15,18 +15,14 @@ import (
 
 type HomeServiceInterface interface {
 	GetProducts(ctx context.Context, limit int) (responses.Products, custom_error.CustomError)
-	GetCategories(ctx context.Context, limit int) (responses.Categories, custom_error.CustomError)
-	ShowCategory(ctx context.Context, columnName string, value any) (responses.Category, custom_error.CustomError)
+	GetCategories(ctx context.Context, limit int) (*responses.Categories, custom_error.CustomError)
+	ShowCategory(ctx context.Context, columnName string, value any) (*responses.Category, custom_error.CustomError)
 
 	ListProductByCategorySlug(c *gin.Context, slug string) (pagination.Pagination, error)
 
 	// GetMenu fetch categories to show in menu
 	GetMenu(c context.Context) ([]CustomerResp.CategoryResponse, error)
-
-	// otp
-
 	SendOtp(ctx context.Context, Mobile string) (entities.OTP, custom_error.CustomError)
-
 	VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) custom_error.CustomError
 	ProcessCustomerAuthentication(c *gin.Context, mobile string) (CustomerResp.CustomerSession, custom_error.CustomError)
 	LogOut(c *gin.Context) bool

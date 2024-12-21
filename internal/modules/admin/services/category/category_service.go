@@ -14,30 +14,31 @@ type CategoryService struct {
 	repo category.CategoryRepositoryInterface
 }
 
-func NewCategoryService(categoryRepo category.CategoryRepositoryInterface) CategoryService {
-	return CategoryService{
+func NewCategoryService(categoryRepo category.CategoryRepositoryInterface) CategoryServiceInterface {
+	return &CategoryService{
 		repo: categoryRepo,
 	}
 }
-func (cs CategoryService) Index(ctx context.Context) (responses.Categories, custom_error.CustomError) {
+
+func (cs *CategoryService) Index(ctx context.Context) (*responses.Categories, custom_error.CustomError) {
 
 	categories, err := cs.repo.GetAll(ctx)
 	if err != nil {
-		return responses.Categories{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategories(categories), custom_error.CustomError{}
 }
 
-func (cs CategoryService) Show(ctx context.Context, categoryID int) (responses.Category, custom_error.CustomError) {
+func (cs *CategoryService) Show(ctx context.Context, categoryID int) (*responses.Category, custom_error.CustomError) {
 
 	cat, err := cs.repo.SelectBy(ctx, categoryID)
 	if err != nil {
-		return responses.Category{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategory(cat), custom_error.CustomError{}
 }
 
-func (cs CategoryService) CheckSlugUniqueness(ctx context.Context, slug string) bool {
+func (cs *CategoryService) CheckSlugUniqueness(ctx context.Context, slug string) bool {
 	cat, _ := cs.repo.FindBy(ctx, "slug", slug)
 	if cat.ID > 0 {
 		return true
@@ -45,7 +46,7 @@ func (cs CategoryService) CheckSlugUniqueness(ctx context.Context, slug string) 
 	return false
 }
 
-func (cs CategoryService) Create(ctx context.Context, req requests.CreateCategoryRequest) (responses.Category, error) {
+func (cs *CategoryService) Create(ctx context.Context, req *requests.CreateCategoryRequest) (*responses.Category, error) {
 
 	var cat = entities.Category{
 		Title: req.Title,
@@ -65,32 +66,32 @@ func (cs CategoryService) Create(ctx context.Context, req requests.CreateCategor
 	if *req.Priority != 0 {
 		cat.Priority = req.Priority
 	}
-	newCategory, err := cs.repo.Store(ctx, cat)
+	newCategory, err := cs.repo.Store(ctx, &cat)
 	if err != nil {
-		return responses.Category{}, err
+		return nil, err
 	}
 	return responses.ToCategory(newCategory), nil
 }
 
-func (cs CategoryService) GetAllCategories(ctx context.Context) (responses.Categories, custom_error.CustomError) {
+func (cs *CategoryService) GetAllCategories(ctx context.Context) (*responses.Categories, custom_error.CustomError) {
 
 	categories, err := cs.repo.GetAll(ctx)
 	if err != nil {
-		return responses.Categories{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategories(categories), custom_error.CustomError{}
 }
 
-func (cs CategoryService) GetAllParentCategory(ctx context.Context) (responses.Categories, custom_error.CustomError) {
+func (cs *CategoryService) GetAllParentCategory(ctx context.Context) (*responses.Categories, custom_error.CustomError) {
 
 	categories, err := cs.repo.GetAllParent(ctx)
 	if err != nil {
-		return responses.Categories{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return responses.ToCategories(categories), custom_error.CustomError{}
 }
 
-func (cs CategoryService) Edit(c *gin.Context, categoryID int, req requests.UpdateCategoryRequest) custom_error.CustomError {
+func (cs *CategoryService) Edit(c *gin.Context, categoryID int, req *requests.UpdateCategoryRequest) custom_error.CustomError {
 	_, err := cs.repo.Update(c, categoryID, req)
 
 	if err != nil {

@@ -14,46 +14,46 @@ type CategoryRepository struct {
 	db *gorm.DB
 }
 
-func NewCategoryRepository(db *gorm.DB) CategoryRepository {
-	return CategoryRepository{db: db}
+func NewCategoryRepository(db *gorm.DB) CategoryRepositoryInterface {
+	return &CategoryRepository{db: db}
 }
 
-func (cr CategoryRepository) GetAll(ctx context.Context) ([]entities.Category, error) {
-	var categories []entities.Category
+func (cr *CategoryRepository) GetAll(ctx context.Context) ([]*entities.Category, error) {
+	var categories []*entities.Category
 	err := cr.db.WithContext(ctx).Find(&categories).Error
 	return categories, err
 }
 
-func (cr CategoryRepository) GetAllParent(ctx context.Context) ([]entities.Category, error) {
-	var categories []entities.Category
+func (cr *CategoryRepository) GetAllParent(ctx context.Context) ([]*entities.Category, error) {
+	var categories []*entities.Category
 	err := cr.db.WithContext(ctx).Where("parent_id IS NULL").Find(&categories).Error
 	return categories, err
 }
 
-func (cr CategoryRepository) SelectBy(ctx context.Context, categoryID int) (entities.Category, error) {
+func (cr *CategoryRepository) SelectBy(ctx context.Context, categoryID int) (*entities.Category, error) {
 	var category entities.Category
 	err := cr.db.WithContext(ctx).First(&category, "id = ?", categoryID).Error
-	return category, err
+	return &category, err
 }
 
-func (cr CategoryRepository) FindBy(ctx context.Context, columnName string, value any) (entities.Category, error) {
+func (cr *CategoryRepository) FindBy(ctx context.Context, columnName string, value any) (*entities.Category, error) {
 	var category entities.Category
 	condition := fmt.Sprintf("%s = ?", columnName)
 	err := cr.db.WithContext(ctx).First(&category, condition, value).Error
-	return category, err
+	return &category, err
 }
 
-func (cr CategoryRepository) Store(ctx context.Context, category entities.Category) (entities.Category, error) {
+func (cr *CategoryRepository) Store(ctx context.Context, category *entities.Category) (*entities.Category, error) {
 	err := cr.db.WithContext(ctx).Create(&category).Error
 	return category, err
 }
 
-func (cr CategoryRepository) Update(c *gin.Context, categoryID int, req requests.UpdateCategoryRequest) (entities.Category, error) {
-
+func (cr *CategoryRepository) Update(c *gin.Context, categoryID int, req *requests.UpdateCategoryRequest) (*entities.Category, error) {
 	var category entities.Category
+
 	err := cr.db.WithContext(c).First(&category, categoryID).Error
 	if err != nil {
-		return category, err
+		return &category, err
 	}
 
 	err = cr.db.WithContext(c).Model(&category).
@@ -86,5 +86,5 @@ func (cr CategoryRepository) Update(c *gin.Context, categoryID int, req requests
 			return true
 		}()).Error
 
-	return category, err
+	return &category, err
 }

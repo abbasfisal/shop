@@ -14,10 +14,10 @@ import (
 type HomeRepositoryInterface interface {
 	GetRandomProducts(ctx context.Context, limit int) ([]entities.Product, error)
 	GetLatestProducts(ctx context.Context, limit int) ([]entities.Product, error)
-	GetCategories(ctx context.Context, limit int) ([]entities.Category, error)
+	GetCategories(ctx context.Context, limit int) ([]*entities.Category, error)
 	GetProduct(c *gin.Context, productSku, productSlug string) (map[string]interface{}, error)
 	GetProductsBy(ctx context.Context, columnName string, value any) ([]entities.Product, error)
-	GetCategoryBy(ctx context.Context, columnName string, value any) (entities.Category, error)
+	GetCategoryBy(ctx context.Context, columnName string, value any) (*entities.Category, error)
 	NewOtp(ctx context.Context, mobile string) (entities.OTP, custom_error.CustomError)
 	VerifyOtp(c *gin.Context, mobile string, req requests.CustomerVerifyRequest) (entities.OTP, error)
 	ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error)
