@@ -77,7 +77,7 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/3.webp",
 				},
 			},
-			ProductInventories: []entities.ProductInventory{
+			ProductInventories: []*entities.ProductInventory{
 				{
 					Quantity: 150,
 				},
@@ -142,7 +142,7 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/3.webp",
 				},
 			},
-			ProductInventories: []entities.ProductInventory{
+			ProductInventories: []*entities.ProductInventory{
 				{
 					Quantity: 150,
 				},
@@ -203,7 +203,7 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/33.webp",
 				},
 			},
-			ProductInventories: []entities.ProductInventory{
+			ProductInventories: []*entities.ProductInventory{
 				{
 					Quantity: 200,
 				},
@@ -268,7 +268,7 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/333.webp",
 				},
 			},
-			ProductInventories: []entities.ProductInventory{
+			ProductInventories: []*entities.ProductInventory{
 				{
 					Quantity: 200,
 				},
@@ -332,7 +332,7 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/6666.webp",
 				},
 			},
-			ProductAttributes: []entities.ProductAttribute{
+			ProductAttributes: []*entities.ProductAttribute{
 
 				{
 					//medium
@@ -359,7 +359,7 @@ func fakeProducts() []entities.Product {
 					AttributeValueTitle: "xl",
 				},
 			},
-			ProductInventories: []entities.ProductInventory{
+			ProductInventories: []*entities.ProductInventory{
 				{
 					//ProductID: 4,
 					Quantity: 25,
@@ -373,7 +373,7 @@ func fakeProducts() []entities.Product {
 					Quantity: 75,
 				},
 			},
-			ProductInventoryAttributes: []entities.ProductInventoryAttribute{
+			ProductInventoryAttributes: []*entities.ProductInventoryAttribute{
 				{
 					ProductID:          204,
 					ProductInventoryID: 204,

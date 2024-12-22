@@ -17,12 +17,12 @@ type Product struct {
 	//--------------relations
 	///////////////////////////////////
 
-	Category                   Category                    `gorm:"foreignKey:CategoryID"`
-	Brand                      *Brand                      `gorm:"foreignKey:BrandID"`
-	ProductImages              []*ProductImages            `gorm:"foreignKey:ProductID"`
-	ProductAttributes          []ProductAttribute          `gorm:"foreignKye:ProductID"`
-	ProductInventories         []ProductInventory          `gorm:"foreignKey:ProductID"`
-	ProductInventoryAttributes []ProductInventoryAttribute `gorm:"foreignKey:ProductID"`
-	Features                   []*Feature                  `gorm:"foreignKey:ProductID"`
+	Category                   Category                     `gorm:"foreignKey:CategoryID"`
+	Brand                      *Brand                       `gorm:"foreignKey:BrandID"`
+	ProductImages              []*ProductImages             `gorm:"foreignKey:ProductID"`
+	ProductAttributes          []*ProductAttribute          `gorm:"foreignKye:ProductID"`
+	ProductInventories         []*ProductInventory          `gorm:"foreignKey:ProductID"`
+	ProductInventoryAttributes []*ProductInventoryAttribute `gorm:"foreignKey:ProductID"`
+	Features                   []*Feature                   `gorm:"foreignKey:ProductID"`
 	///Carts                      []Cart                      `gorm:"foreignKey:ProductID"`
 }

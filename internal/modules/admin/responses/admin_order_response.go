@@ -18,24 +18,24 @@ type AdminOrder struct {
 	OrderNote          string
 	OrderStatus        uint
 	OrderStatusText    string
-	OrderItems         AdminOrderItems
-	Payment            Payment
-	Address            Address
+	OrderItems         *AdminOrderItems
+	Payment            *Payment
+	Address            *Address
 }
 
 type AdminOrders struct {
 	Data []AdminOrder
 }
 
-func ToAdminOrders(ordersList []entities.Order) AdminOrders {
+func ToAdminOrders(ordersList []*entities.Order) *AdminOrders {
 	var oResponse AdminOrders
 	for _, o := range ordersList {
-		oResponse.Data = append(oResponse.Data, ToAdminOrder(o))
+		oResponse.Data = append(oResponse.Data, *ToAdminOrder(o))
 	}
-	return oResponse
+	return &oResponse
 }
 
-func ToAdminOrder(o entities.Order) AdminOrder {
+func ToAdminOrder(o *entities.Order) *AdminOrder {
 	orderResponse := AdminOrder{
 		ID:                 o.ID,
 		CustomerID:         o.CustomerID,
@@ -57,7 +57,7 @@ func ToAdminOrder(o entities.Order) AdminOrder {
 		orderResponse.Payment = ToPayment(o.Payment)
 	}
 
-	return orderResponse
+	return &orderResponse
 }
 
 func AdminOrderStatusMap(status uint) string {
@@ -114,8 +114,8 @@ type AdminOrderItems struct {
 	Data []AdminOrderItem
 }
 
-func ToAdminOrderItem(oItem entities.OrderItem) AdminOrderItem {
-	return AdminOrderItem{
+func ToAdminOrderItem(oItem *entities.OrderItem) *AdminOrderItem {
+	return &AdminOrderItem{
 		CustomerID:         oItem.CustomerID,
 		OrderID:            oItem.OrderID,
 		ProductID:          oItem.ProductID,
@@ -131,16 +131,16 @@ func ToAdminOrderItem(oItem entities.OrderItem) AdminOrderItem {
 		ProductSalePrice:     oItem.SalePrice,
 		ProductSku:           oItem.Product.Sku,
 
-		OrderItemAttributes: ToOrderItemAttributes(oItem.Product.ProductInventoryAttributes),
+		OrderItemAttributes: *ToOrderItemAttributes(oItem.Product.ProductInventoryAttributes),
 	}
 }
 
-func ToAdminOrderItems(oItems []entities.OrderItem) AdminOrderItems {
+func ToAdminOrderItems(oItems []*entities.OrderItem) *AdminOrderItems {
 	var orderItems AdminOrderItems
 	for _, oItem := range oItems {
-		orderItems.Data = append(orderItems.Data, ToAdminOrderItem(oItem))
+		orderItems.Data = append(orderItems.Data, *ToAdminOrderItem(oItem))
 	}
-	return orderItems
+	return &orderItems
 }
 
 type OrderItemAttributes struct {
@@ -151,18 +151,18 @@ type OrderItemAttribute struct {
 	Value string
 }
 
-func ToOrderItemAttribute(oItemAttribute entities.ProductAttribute) OrderItemAttribute {
-	return OrderItemAttribute{
+func ToOrderItemAttribute(oItemAttribute *entities.ProductAttribute) *OrderItemAttribute {
+	return &OrderItemAttribute{
 		Title: oItemAttribute.AttributeTitle,
 		Value: oItemAttribute.AttributeValueTitle,
 	}
 }
-func ToOrderItemAttributes(oItemAttributes []entities.ProductInventoryAttribute) OrderItemAttributes {
+func ToOrderItemAttributes(oItemAttributes []*entities.ProductInventoryAttribute) *OrderItemAttributes {
 	var a OrderItemAttributes
 	for _, i2 := range oItemAttributes {
-		a.Data = append(a.Data, ToOrderItemAttribute(i2.ProductAttribute))
+		a.Data = append(a.Data, *ToOrderItemAttribute(i2.ProductAttribute))
 	}
-	return a
+	return &a
 }
 
 type Address struct {
@@ -172,11 +172,11 @@ type Address struct {
 	ReceiverPostalCode string
 }
 
-func ToAddress(address string) Address {
+func ToAddress(address string) *Address {
 	var add Address
 	err := json.Unmarshal([]byte(address), &add)
 	if err != nil {
-		return add
+		return nil
 	}
-	return add
+	return &add
 }

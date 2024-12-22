@@ -20,11 +20,11 @@ type Product struct {
 
 	//relation
 	Category                   *Category
-	Brand                      Brand
+	Brand                      *Brand
 	Images                     *ImageProducts
-	ProductAttributes          ProductAttributes
-	ProductInventories         ProductInventories
-	ProductInventoryAttributes ProductInventoryAttributes
+	ProductAttributes          *ProductAttributes
+	ProductInventories         *ProductInventories
+	ProductInventoryAttributes *ProductInventoryAttributes
 	Features                   *Features
 }
 
@@ -39,6 +39,7 @@ func ToProducts(products []*entities.Product) *Products {
 	}
 	return &pResponse
 }
+
 func ToProduct(p *entities.Product) *Product {
 	return &Product{
 		ID:            p.ID,
@@ -62,7 +63,7 @@ func ToProduct(p *entities.Product) *Product {
 
 		//relation
 		Category:                   ToCategory(&p.Category),
-		Brand:                      *ToBrand(p.Brand),
+		Brand:                      ToBrand(p.Brand),
 		Images:                     ToImageProducts(p.ProductImages),
 		ProductAttributes:          ToProductAttributes(p.ProductAttributes),
 		ProductInventories:         ToProductInventories(p.ProductInventories),

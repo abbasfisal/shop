@@ -11,14 +11,14 @@ type CustomerService struct {
 	repo customer.CustomerRepositoryInterface
 }
 
-func NewCustomerService(customerRepo customer.CustomerRepositoryInterface) CustomerService {
-	return CustomerService{repo: customerRepo}
+func NewCustomerService(customerRepo customer.CustomerRepositoryInterface) CustomerServiceInterface {
+	return &CustomerService{repo: customerRepo}
 }
 
-func (cs CustomerService) Index(c *gin.Context) (responses.Customers, custom_error.CustomError) {
+func (cs *CustomerService) Index(c *gin.Context) (*responses.Customers, custom_error.CustomError) {
 	customers, err := cs.repo.GetAll(c)
-	if err != nil {
-		return responses.Customers{}, custom_error.HandleError(err, custom_error.RecordNotFound)
+	if err != nil || customers == nil {
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 
 	return responses.ToCustomers(customers), custom_error.CustomError{}

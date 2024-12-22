@@ -13,8 +13,8 @@ type OrderService struct {
 	repo order.OrderRepositoryInterface
 }
 
-func NewOrderService(repo order.OrderRepositoryInterface) OrderService {
-	return OrderService{repo: repo}
+func NewOrderService(repo order.OrderRepositoryInterface) OrderServiceInterface {
+	return &OrderService{repo: repo}
 }
 
 func (o OrderService) GetOrderPaginate(c *gin.Context) (pagination.Pagination, error) {
@@ -24,21 +24,21 @@ func (o OrderService) GetOrderPaginate(c *gin.Context) (pagination.Pagination, e
 		return pagination.Pagination{}, err
 	}
 
-	orderList.Rows = responses.ToOrders(orderList.Rows.([]entities.Order))
+	orderList.Rows = responses.ToOrders(orderList.Rows.([]*entities.Order))
 	return orderList, nil
 }
 
-func (o OrderService) GetOrderBy(c *gin.Context, orderID int) (responses.OrderDetail, error) {
+func (o OrderService) GetOrderBy(c *gin.Context, orderID int) (*responses.OrderDetail, error) {
 	orderEntity, customerEntity, err := o.repo.FindOrderBy(c, orderID)
 
 	if err != nil {
-		return responses.OrderDetail{}, err
+		return nil, err
 	}
 
 	return responses.ToOrderDetail(orderEntity, customerEntity), nil
 }
 
-func (o OrderService) ChangeOrderStatus(c *gin.Context, orderID int, req requests.UpdateOrderStatus) error {
+func (o OrderService) ChangeOrderStatus(c *gin.Context, orderID int, req *requests.UpdateOrderStatus) error {
 	_, err := o.repo.UpdateOrderStatusAndNote(c, orderID, req)
 	if err != nil {
 		return err

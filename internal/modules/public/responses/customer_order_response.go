@@ -21,24 +21,24 @@ type CustomerOrder struct {
 	//OrderNote          string
 	//OrderStatus     uint
 	OrderStatusText string
-	OrderItems      CustomerOrderItems
+	OrderItems      *CustomerOrderItems
 	//Payment         Payment
-	Address Address
+	Address *Address
 }
 
 type CustomerOrders struct {
 	Data []CustomerOrder
 }
 
-func ToCustomerOrders(ordersList []entities.Order) CustomerOrders {
+func ToCustomerOrders(ordersList []*entities.Order) *CustomerOrders {
 	var oResponse CustomerOrders
 	for _, o := range ordersList {
-		oResponse.Data = append(oResponse.Data, ToCustomerOrder(&o))
+		oResponse.Data = append(oResponse.Data, *ToCustomerOrder(o))
 	}
-	return oResponse
+	return &oResponse
 }
 
-func ToCustomerOrder(o *entities.Order) CustomerOrder {
+func ToCustomerOrder(o *entities.Order) *CustomerOrder {
 	orderResponse := CustomerOrder{
 		//ID:                 o.ID,
 		//CustomerID:         o.CustomerID,
@@ -62,7 +62,7 @@ func ToCustomerOrder(o *entities.Order) CustomerOrder {
 	//	orderResponse.Payment = ToPayment(o.Payment)
 	//}
 
-	return orderResponse
+	return &orderResponse
 }
 
 func CustomerOrderStatusMap(status uint) string {
@@ -113,15 +113,15 @@ type CustomerOrderItem struct {
 	ProductSalePrice     uint
 	ProductSku           string
 	ProductSlug          string
-	OrderItemAttributes  OrderItemAttributes
+	OrderItemAttributes  *OrderItemAttributes
 }
 
 type CustomerOrderItems struct {
 	Data []CustomerOrderItem
 }
 
-func ToCustomerOrderItem(oItem entities.OrderItem) CustomerOrderItem {
-	return CustomerOrderItem{
+func ToCustomerOrderItem(oItem *entities.OrderItem) *CustomerOrderItem {
+	return &CustomerOrderItem{
 		CustomerID:         oItem.CustomerID,
 		OrderID:            oItem.OrderID,
 		ProductID:          oItem.ProductID,
@@ -142,12 +142,12 @@ func ToCustomerOrderItem(oItem entities.OrderItem) CustomerOrderItem {
 	}
 }
 
-func ToCustomerOrderItems(oItems []entities.OrderItem) CustomerOrderItems {
+func ToCustomerOrderItems(oItems []*entities.OrderItem) *CustomerOrderItems {
 	var orderItems CustomerOrderItems
 	for _, oItem := range oItems {
-		orderItems.Data = append(orderItems.Data, ToCustomerOrderItem(oItem))
+		orderItems.Data = append(orderItems.Data, *ToCustomerOrderItem(oItem))
 	}
-	return orderItems
+	return &orderItems
 }
 
 type OrderItemAttributes struct {
@@ -158,18 +158,18 @@ type OrderItemAttribute struct {
 	Value string
 }
 
-func ToOrderItemAttribute(oItemAttribute entities.ProductAttribute) OrderItemAttribute {
-	return OrderItemAttribute{
+func ToOrderItemAttribute(oItemAttribute *entities.ProductAttribute) *OrderItemAttribute {
+	return &OrderItemAttribute{
 		Title: oItemAttribute.AttributeTitle,
 		Value: oItemAttribute.AttributeValueTitle,
 	}
 }
-func ToOrderItemAttributes(oItemAttributes []entities.ProductInventoryAttribute) OrderItemAttributes {
-	var a OrderItemAttributes
-	for _, i2 := range oItemAttributes {
-		a.Data = append(a.Data, ToOrderItemAttribute(i2.ProductAttribute))
+func ToOrderItemAttributes(itemAttributes []*entities.ProductInventoryAttribute) *OrderItemAttributes {
+	var orderItemAttributes OrderItemAttributes
+	for _, attribute := range itemAttributes {
+		orderItemAttributes.Data = append(orderItemAttributes.Data, *ToOrderItemAttribute(attribute.ProductAttribute))
 	}
-	return a
+	return &orderItemAttributes
 }
 
 type address struct {
@@ -179,11 +179,11 @@ type address struct {
 	ReceiverPostalCode string
 }
 
-func ToAddress(address string) Address {
+func ToAddress(address string) *Address {
 	var add Address
 	err := json.Unmarshal([]byte(address), &add)
 	if err != nil {
-		return add
+		return nil
 	}
-	return add
+	return &add
 }

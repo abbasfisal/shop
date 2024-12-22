@@ -20,8 +20,8 @@ type Payment struct {
 	PaymentStatusText string
 }
 
-func ToPayment(paymentEntity entities.Payment) Payment {
-	return Payment{
+func ToPayment(paymentEntity *entities.Payment) *Payment {
+	return &Payment{
 		ID:                paymentEntity.ID,
 		CustomerID:        paymentEntity.CustomerID,
 		OrderID:           paymentEntity.OrderID,

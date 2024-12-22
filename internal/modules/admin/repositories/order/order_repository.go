@@ -16,14 +16,14 @@ type OrderRepository struct {
 	mongoClient *mongo.Client
 }
 
-func NewOrderRepository(db *gorm.DB, mongoClient *mongo.Client) OrderRepository {
-	return OrderRepository{
+func NewOrderRepository(db *gorm.DB, mongoClient *mongo.Client) OrderRepositoryInterface {
+	return &OrderRepository{
 		db:          db,
 		mongoClient: mongoClient,
 	}
 }
 
-func (oRepo OrderRepository) GetOrders(c *gin.Context) (pagination.Pagination, error) {
+func (oRepo *OrderRepository) GetOrders(c *gin.Context) (pagination.Pagination, error) {
 
 	// Convert query parameters from string to int
 	limitStr := c.Query("limit")
@@ -62,7 +62,7 @@ func (oRepo OrderRepository) GetOrders(c *gin.Context) (pagination.Pagination, e
 	return pg, nil
 }
 
-func (oRepo OrderRepository) FindOrderBy(c *gin.Context, orderID int) (entities.Order, entities.Customer, error) {
+func (oRepo *OrderRepository) FindOrderBy(c *gin.Context, orderID int) (*entities.Order, *entities.Customer, error) {
 	var order entities.Order
 	var customer entities.Customer
 
@@ -82,7 +82,7 @@ func (oRepo OrderRepository) FindOrderBy(c *gin.Context, orderID int) (entities.
 		Select("product_id , inventory_id").
 		Where("order_id = ?", orderID).
 		Scan(&productAndInventory).Error; err != nil {
-		return order, customer, err
+		return nil, nil, err
 	}
 
 	//حالا نتایج رو به صورت اسلایس در میاریم که مستقیم بشه درون preload استفاده کرد
@@ -103,21 +103,21 @@ func (oRepo OrderRepository) FindOrderBy(c *gin.Context, orderID int) (entities.
 		).
 		Preload("Payment").
 		First(&order, orderID).Error; err != nil {
-		return order, customer, err
+		return nil, nil, err
 	}
 
 	//select customer
 	if err := oRepo.db.WithContext(c).Preload("Address").First(&customer, order.CustomerID).Error; err != nil {
-		return order, customer, err
+		return nil, nil, err
 	}
 
-	return order, customer, nil
+	return &order, &customer, nil
 }
 
-func (oRepo OrderRepository) UpdateOrderStatusAndNote(c *gin.Context, orderID int, req requests.UpdateOrderStatus) (entities.Order, error) {
+func (oRepo *OrderRepository) UpdateOrderStatusAndNote(c *gin.Context, orderID int, req *requests.UpdateOrderStatus) (*entities.Order, error) {
 	var order entities.Order
 	if err := oRepo.db.WithContext(c).Where("id=?", orderID).First(&order).Error; err != nil {
-		return entities.Order{}, err
+		return nil, err
 	}
 
 	// عدد منفی یک به این معنی هست که که ادمین نمیخواهد حالت پیشفرض وضعیت سفارش را تغییر دهد
@@ -133,7 +133,7 @@ func (oRepo OrderRepository) UpdateOrderStatusAndNote(c *gin.Context, orderID in
 	}
 
 	if err := oRepo.db.WithContext(c).Save(&order).Error; err != nil {
-		return entities.Order{}, nil
+		return nil, nil
 	}
-	return order, nil
+	return &order, nil
 }

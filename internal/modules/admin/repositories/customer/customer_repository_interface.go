@@ -6,5 +6,5 @@ import (
 )
 
 type CustomerRepositoryInterface interface {
-	GetAll(c *gin.Context) ([]entities.Customer, error)
+	GetAll(c *gin.Context) ([]*entities.Customer, error)
 }

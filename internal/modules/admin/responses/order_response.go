@@ -16,23 +16,23 @@ type Order struct {
 	OrderStatus        uint
 	OrderStatusText    string
 	CreatedAt          time.Time
-	OrderItems         OrderItems
-	Payment            Payment
+	OrderItems         *OrderItems
+	Payment            *Payment
 }
 
 type Orders struct {
 	Data []Order
 }
 
-func ToOrders(ordersList []entities.Order) Orders {
+func ToOrders(ordersList []*entities.Order) *Orders {
 
 	var oResponse Orders
 	for _, o := range ordersList {
-		oResponse.Data = append(oResponse.Data, ToOrder(o))
+		oResponse.Data = append(oResponse.Data, *ToOrder(o))
 	}
-	return oResponse
+	return &oResponse
 }
-func ToOrder(o entities.Order) Order {
+func ToOrder(o *entities.Order) *Order {
 
 	orderResponse := Order{
 		CustomerID:         o.CustomerID,
@@ -50,7 +50,7 @@ func ToOrder(o entities.Order) Order {
 	if o.Payment.ID != 0 {
 		orderResponse.Payment = ToPayment(o.Payment)
 	}
-	return orderResponse
+	return &orderResponse
 }
 
 func OrderStatusMap(status uint) string {
@@ -84,8 +84,8 @@ type OrderItems struct {
 	Data []OrderItem
 }
 
-func ToOrderItem(oItem entities.OrderItem) OrderItem {
-	return OrderItem{
+func ToOrderItem(oItem *entities.OrderItem) *OrderItem {
+	return &OrderItem{
 		CustomerID:         oItem.CustomerID,
 		OrderID:            oItem.OrderID,
 		ProductID:          oItem.ProductID,
@@ -98,10 +98,10 @@ func ToOrderItem(oItem entities.OrderItem) OrderItem {
 	}
 }
 
-func ToOrderItems(oItems []entities.OrderItem) OrderItems {
+func ToOrderItems(oItems []*entities.OrderItem) *OrderItems {
 	var orderItems OrderItems
 	for _, oItem := range oItems {
-		orderItems.Data = append(orderItems.Data, ToOrderItem(oItem))
+		orderItems.Data = append(orderItems.Data, *ToOrderItem(oItem))
 	}
-	return orderItems
+	return &orderItems
 }

@@ -10,15 +10,15 @@ type CustomerRepository struct {
 	db *gorm.DB
 }
 
-func NewCustomerRepository(db *gorm.DB) CustomerRepository {
-	return CustomerRepository{db: db}
+func NewCustomerRepository(db *gorm.DB) CustomerRepositoryInterface {
+	return &CustomerRepository{db: db}
 }
 
-func (cr CustomerRepository) GetAll(c *gin.Context) ([]entities.Customer, error) {
+func (cr *CustomerRepository) GetAll(c *gin.Context) ([]*entities.Customer, error) {
 
-	var customers []entities.Customer
+	var customers []*entities.Customer
 	if err := cr.db.WithContext(c).Find(&customers).Error; err != nil {
-		return customers, err
+		return nil, err
 	}
 	return customers, nil
 }

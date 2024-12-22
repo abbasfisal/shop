@@ -14,15 +14,15 @@ type Customers struct {
 	Data []Customer
 }
 
-func ToCustomers(customers []entities.Customer) Customers {
+func ToCustomers(customers []*entities.Customer) *Customers {
 	var cResponse Customers
 	for _, p := range customers {
-		cResponse.Data = append(cResponse.Data, ToCustomer(p))
+		cResponse.Data = append(cResponse.Data, *ToCustomer(p))
 	}
-	return cResponse
+	return &cResponse
 }
-func ToCustomer(c entities.Customer) Customer {
-	return Customer{
+func ToCustomer(c *entities.Customer) *Customer {
+	return &Customer{
 		ID:        c.ID,
 		FirstName: c.FirstName,
 		LastName:  c.LastName,

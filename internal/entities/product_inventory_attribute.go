@@ -11,7 +11,7 @@ type ProductInventoryAttribute struct {
 	ProductAttributeID uint
 
 	//relations
-	Product          Product          `gorm:"foreignKey:ProductID"`
-	ProductInventory ProductInventory `gorm:"foreignKey:ProductInventoryID"`
-	ProductAttribute ProductAttribute `gorm:"foreignKey:ProductAttributeID"`
+	Product          Product           `gorm:"foreignKey:ProductID"`
+	ProductInventory ProductInventory  `gorm:"foreignKey:ProductInventoryID"`
+	ProductAttribute *ProductAttribute `gorm:"foreignKey:ProductAttributeID"`
 }

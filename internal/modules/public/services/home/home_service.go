@@ -299,7 +299,7 @@ func (h *HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) 
 		return pagination.Pagination{}, err
 	}
 
-	orderList.Rows = responses.ToOrders(orderList.Rows.([]entities.Order))
+	orderList.Rows = responses.ToOrders(orderList.Rows.([]*entities.Order))
 	return orderList, nil
 
 }

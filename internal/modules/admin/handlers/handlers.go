@@ -1978,7 +1978,7 @@ func (a *AdminHandler) EditOrder(c *gin.Context) {
 	}
 
 	//update order
-	if err := a.orderSrv.ChangeOrderStatus(c, orderID, req); err != nil {
+	if err := a.orderSrv.ChangeOrderStatus(c, orderID, &req); err != nil {
 		sessions.Set(c, "message", custom_error.UpdateOrderFaileds)
 		c.Redirect(http.StatusFound, url)
 		return

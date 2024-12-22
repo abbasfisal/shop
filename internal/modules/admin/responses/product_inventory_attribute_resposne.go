@@ -9,16 +9,15 @@ type ProductInventoryAttribute struct {
 	ProductID          uint
 	ProductInventoryID uint
 	ProductAttributeID uint
-
-	//
-	ProductAttribute ProductAttribute
+	ProductAttribute   *ProductAttribute
 }
+
 type ProductInventoryAttributes struct {
 	Data []ProductInventoryAttribute
 }
 
-func ToProductInventoryAttribute(pi entities.ProductInventoryAttribute) ProductInventoryAttribute {
-	return ProductInventoryAttribute{
+func ToProductInventoryAttribute(pi *entities.ProductInventoryAttribute) *ProductInventoryAttribute {
+	return &ProductInventoryAttribute{
 		ID:        pi.ID,
 		ProductID: pi.ProductID,
 
@@ -30,10 +29,10 @@ func ToProductInventoryAttribute(pi entities.ProductInventoryAttribute) ProductI
 	}
 }
 
-func ToProductInventoryAttributes(pis []entities.ProductInventoryAttribute) ProductInventoryAttributes {
+func ToProductInventoryAttributes(pis []*entities.ProductInventoryAttribute) *ProductInventoryAttributes {
 	var pResponse ProductInventoryAttributes
 	for _, p := range pis {
-		pResponse.Data = append(pResponse.Data, ToProductInventoryAttribute(p))
+		pResponse.Data = append(pResponse.Data, *ToProductInventoryAttribute(p))
 	}
-	return pResponse
+	return &pResponse
 }

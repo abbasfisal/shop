@@ -40,9 +40,9 @@ func NewHomeRepository() HomeRepositoryInterface {
 //--------------------------------------
 
 func (h *HomeRepository) GetRandomProducts(ctx context.Context, limit int) ([]*entities.Product, error) {
-	var products []*entities.Product
+	//var products []*entities.Product
 	//implement Me
-	return products, nil
+	return nil, nil
 }
 func (h *HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]*entities.Product, error) {
 	var products []*entities.Product
@@ -159,7 +159,7 @@ func (h *HomeRepository) NewOtp(ctx context.Context, mobile string) (*entities.O
 	var otpCount int64
 
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
-	h.db.Model(entities.OTP{}).Where("mobile = ? AND created_at >= ?", mobile, oneHourAgo).Count(&otpCount)
+	h.db.Model(entities.OTP{}).WithContext(ctx).Where("mobile = ? AND created_at >= ?", mobile, oneHourAgo).Count(&otpCount)
 
 	if otpCount >= int64(maxOTPRequestPerHour) {
 		fmt.Println("---- to many request otp ---line : 77  ---- ")
@@ -167,7 +167,7 @@ func (h *HomeRepository) NewOtp(ctx context.Context, mobile string) (*entities.O
 	}
 
 	//check under 4 min
-	h.db.Where("mobile = ? AND is_expired = ? ", mobile, false).Order("created_at desc").First(&lastOtp)
+	h.db.WithContext(ctx).Where("mobile = ? AND is_expired = ? ", mobile, false).Order("created_at desc").First(&lastOtp)
 	fmt.Println("-------- before check --------- : ", lastOtp)
 	fmt.Println(" ******** time since ******: ", time.Since(lastOtp.CreatedAt))
 	if lastOtp.ID != 0 && time.Since(lastOtp.CreatedAt) <= 4*time.Minute {
@@ -181,7 +181,7 @@ func (h *HomeRepository) NewOtp(ctx context.Context, mobile string) (*entities.O
 		IsExpired: false,
 	}
 
-	if err := h.db.Create(&newOtp).Error; err != nil {
+	if err := h.db.WithContext(ctx).Create(&newOtp).Error; err != nil {
 		return nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, custom_error.OtpSomethingGoesWrongCode)
 	}
 	return &newOtp, custom_error.CustomError{}
@@ -191,7 +191,7 @@ func (h *HomeRepository) VerifyOtp(c *gin.Context, mobile string, req *requests.
 	otpCode := fmt.Sprintf("%s%s%s%s", req.N1, req.N2, req.N3, req.N4)
 	fmt.Println("------ VerifyOtp : home repository : 105 : otp : ", otpCode)
 	fmt.Println("------ VerifyOtp : home repository : 105 : mobile : ", mobile)
-	err := h.db.Where("mobile = ? AND code = ? ", mobile, otpCode).First(&otp).Error
+	err := h.db.WithContext(c).Where("mobile = ? AND code = ? ", mobile, otpCode).First(&otp).Error
 
 	fmt.Println("--- verify otp err:--- ", err)
 	return &otp, err
@@ -366,6 +366,7 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 
 	//todo:check cart status
 	err := h.db.
+		WithContext(c).
 		Preload("CartItems").
 		Where("customer_id = ? AND status = ? ", user.ID, 0).
 		First(&cart).
@@ -733,7 +734,7 @@ func (h *HomeRepository) GetPayment(c *gin.Context, authority string) (*entities
 		return nil, entities.Customer{}, customerErr
 	}
 
-	order.Payment = payment
+	order.Payment = &payment
 	return &order, customer, nil
 }
 func (h *HomeRepository) GetPaginatedOrders(c *gin.Context) (pagination.Pagination, error) {
