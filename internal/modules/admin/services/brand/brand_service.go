@@ -16,11 +16,11 @@ type BrandService struct {
 	repo brand.BrandRepositoryInterface
 }
 
-func NewBrandService(repo brand.BrandRepositoryInterface) *BrandService {
+func NewBrandService(repo brand.BrandRepositoryInterface) BrandServiceInterface {
 	return &BrandService{repo: repo}
 }
 
-func (bs BrandService) CheckSlugUniqueness(ctx context.Context, slug string) bool {
+func (bs *BrandService) CheckSlugUniqueness(ctx context.Context, slug string) bool {
 	existingBrand, _ := bs.repo.FindBy(ctx, "slug", slug)
 	if existingBrand.ID > 0 {
 		return true
@@ -28,7 +28,7 @@ func (bs BrandService) CheckSlugUniqueness(ctx context.Context, slug string) boo
 	return false
 }
 
-func (bs BrandService) Create(ctx context.Context, req *requests.CreateBrandRequest) (*responses.Brand, error) {
+func (bs *BrandService) Create(ctx context.Context, req *requests.CreateBrandRequest) (*responses.Brand, error) {
 
 	var brandToCreate = entities.Brand{
 		Title: req.Title,
@@ -44,7 +44,7 @@ func (bs BrandService) Create(ctx context.Context, req *requests.CreateBrandRequ
 	return responses.ToBrand(newBrand), nil
 }
 
-func (bs BrandService) Index(ctx context.Context) (*responses.Brands, custom_error.CustomError) {
+func (bs *BrandService) Index(ctx context.Context) (*responses.Brands, custom_error.CustomError) {
 
 	brands, err := bs.repo.GetAll(ctx)
 	if err != nil {
@@ -53,7 +53,7 @@ func (bs BrandService) Index(ctx context.Context) (*responses.Brands, custom_err
 	return responses.ToBrands(brands), custom_error.CustomError{}
 }
 
-func (bs BrandService) Show(ctx context.Context, brandID int) (*responses.Brand, custom_error.CustomError) {
+func (bs *BrandService) Show(ctx context.Context, brandID int) (*responses.Brand, custom_error.CustomError) {
 
 	fetchedBrand, err := bs.repo.SelectBy(ctx, brandID)
 	if err != nil {
@@ -69,7 +69,7 @@ func (bs BrandService) Show(ctx context.Context, brandID int) (*responses.Brand,
 	return responses.ToBrand(fetchedBrand), custom_error.CustomError{}
 }
 
-func (bs BrandService) Update(c *gin.Context, brandID int, req *requests.UpdateBrandRequest) (*responses.Brand, custom_error.CustomError) {
+func (bs *BrandService) Update(c *gin.Context, brandID int, req *requests.UpdateBrandRequest) (*responses.Brand, custom_error.CustomError) {
 
 	updatedBrand, err := bs.repo.Update(c, brandID, req)
 	if err != nil {
