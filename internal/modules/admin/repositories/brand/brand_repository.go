@@ -14,20 +14,20 @@ type BrandRepository struct {
 	db *gorm.DB
 }
 
-func NewBrandRepository(db *gorm.DB) BrandRepository {
-	return BrandRepository{db: db}
+func NewBrandRepository(db *gorm.DB) BrandRepositoryInterface {
+	return &BrandRepository{db: db}
 }
 
-func (br BrandRepository) FindBy(ctx context.Context, columnName string, value any) (entities.Brand, error) {
+func (br *BrandRepository) FindBy(ctx context.Context, columnName string, value any) (*entities.Brand, error) {
 	var brand entities.Brand
 	condition := fmt.Sprintf("%s = ?", columnName)
 	value = strings.TrimSpace(value.(string))
 
 	err := br.db.WithContext(ctx).First(&brand, condition, value).Error
-	return brand, err
+	return &brand, err
 }
 
-func (br BrandRepository) Store(ctx context.Context, brand entities.Brand) (entities.Brand, error) {
+func (br *BrandRepository) Store(ctx context.Context, brand *entities.Brand) (*entities.Brand, error) {
 	brand.Title = strings.TrimSpace(brand.Title)
 	brand.Slug = strings.TrimSpace(brand.Slug)
 	brand.Image = strings.TrimSpace(brand.Image)
@@ -35,23 +35,23 @@ func (br BrandRepository) Store(ctx context.Context, brand entities.Brand) (enti
 	return brand, err
 }
 
-func (br BrandRepository) GetAll(ctx context.Context) ([]entities.Brand, error) {
-	var brands []entities.Brand
+func (br *BrandRepository) GetAll(ctx context.Context) ([]*entities.Brand, error) {
+	var brands []*entities.Brand
 	err := br.db.WithContext(ctx).Find(&brands).Error
 	return brands, err
 }
 
-func (br BrandRepository) SelectBy(ctx context.Context, brandID int) (entities.Brand, error) {
+func (br *BrandRepository) SelectBy(ctx context.Context, brandID int) (*entities.Brand, error) {
 	var brand entities.Brand
 	err := br.db.WithContext(ctx).First(&brand, "id = ?", brandID).Error
-	return brand, err
+	return &brand, err
 }
 
-func (br BrandRepository) Update(c *gin.Context, brandID int, req requests.UpdateBrandRequest) (entities.Brand, error) {
+func (br *BrandRepository) Update(c *gin.Context, brandID int, req *requests.UpdateBrandRequest) (*entities.Brand, error) {
 	var brand entities.Brand
 	err := br.db.WithContext(c).First(&brand, brandID).Error
 	if err != nil {
-		return brand, err
+		return nil, err
 	}
 
 	err = br.db.WithContext(c).Model(&brand).Updates(entities.Brand{
@@ -60,5 +60,5 @@ func (br BrandRepository) Update(c *gin.Context, brandID int, req requests.Updat
 		Image: strings.TrimSpace(req.Image),
 	}).Error
 
-	return brand, err
+	return &brand, err
 }

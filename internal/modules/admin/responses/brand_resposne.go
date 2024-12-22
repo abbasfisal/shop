@@ -12,8 +12,8 @@ type Brands struct {
 	Data []Brand
 }
 
-func ToBrand(brand entities.Brand) Brand {
-	return Brand{
+func ToBrand(brand *entities.Brand) *Brand {
+	return &Brand{
 		ID:    brand.ID,
 		Title: brand.Title,
 		Slug:  brand.Slug,
@@ -21,12 +21,12 @@ func ToBrand(brand entities.Brand) Brand {
 	}
 }
 
-func ToBrands(brands []entities.Brand) Brands {
+func ToBrands(brands []*entities.Brand) *Brands {
 	var response Brands
 
 	for _, brand := range brands {
-		response.Data = append(response.Data, ToBrand(brand))
+		response.Data = append(response.Data, *ToBrand(brand))
 	}
 
-	return response
+	return &response
 }

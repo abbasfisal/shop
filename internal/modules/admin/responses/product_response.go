@@ -62,7 +62,7 @@ func ToProduct(p *entities.Product) *Product {
 
 		//relation
 		Category:                   ToCategory(&p.Category),
-		Brand:                      ToBrand(p.Brand),
+		Brand:                      *ToBrand(p.Brand),
 		Images:                     ToImageProducts(p.ProductImages),
 		ProductAttributes:          ToProductAttributes(p.ProductAttributes),
 		ProductInventories:         ToProductInventories(p.ProductInventories),

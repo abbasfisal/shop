@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -61,7 +60,7 @@ func (a *AdminHandler) ShowBrand(c *gin.Context) {
 	return
 }
 
-func checkIDAndExistence(c *gin.Context, a *AdminHandler) (int, responses.Brand, bool) {
+func checkIDAndExistence(c *gin.Context, a *AdminHandler) (int, *responses.Brand, bool) {
 	brandID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		sessions.Set(c, "message", "ID برند صحیح نمی باشد.")
@@ -71,12 +70,12 @@ func checkIDAndExistence(c *gin.Context, a *AdminHandler) (int, responses.Brand,
 	if bErr.Code == 404 {
 		sessions.Set(c, "message", "برند موجود نمی باشد.")
 		c.Redirect(http.StatusFound, "/admins/brands")
-		return 0, responses.Brand{}, true
+		return 0, nil, true
 	}
 	if bErr.Code == 500 {
 		sessions.Set(c, "message", custom_error.InternalServerError)
 		c.Redirect(http.StatusFound, "/admins/brands")
-		return 0, responses.Brand{}, true
+		return 0, nil, true
 	}
 	return brandID, brand, false
 }
@@ -168,7 +167,7 @@ func (a *AdminHandler) UpdateBrand(c *gin.Context) {
 	}
 	req.Image = pathToUpload
 
-	_, uErr := a.brandSrv.Update(c, brandID, req)
+	_, uErr := a.brandSrv.Update(c, brandID, &req)
 	if uErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, url)
@@ -224,7 +223,7 @@ func (a *AdminHandler) StoreBrand(c *gin.Context) {
 	}
 
 	//slug unique validation
-	if ok := a.brandSrv.CheckSlugUniqueness(context.TODO(), req.Slug); ok {
+	if ok := a.brandSrv.CheckSlugUniqueness(c.Request.Context(), req.Slug); ok {
 		errors.Init()
 		errors.Add("slug", custom_error.MustBeUnique)
 		sessions.Set(c, "errors", errors.ToString())
@@ -300,7 +299,7 @@ func (a *AdminHandler) StoreBrand(c *gin.Context) {
 	//	end upload and save image
 	//---------------------------
 
-	newBrand, err := a.brandSrv.Create(context.TODO(), req)
+	newBrand, err := a.brandSrv.Create(c.Request.Context(), &req)
 	if err != nil || newBrand.ID <= 0 {
 		_ = os.Remove(pathToUpload)
 		fmt.Println("----- error in creating brand ---- : ", err)

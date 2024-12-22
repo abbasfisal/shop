@@ -18,7 +18,7 @@ type Product struct {
 	///////////////////////////////////
 
 	Category                   Category                    `gorm:"foreignKey:CategoryID"`
-	Brand                      Brand                       `gorm:"foreignKey:BrandID"`
+	Brand                      *Brand                      `gorm:"foreignKey:BrandID"`
 	ProductImages              []*ProductImages            `gorm:"foreignKey:ProductID"`
 	ProductAttributes          []ProductAttribute          `gorm:"foreignKye:ProductID"`
 	ProductInventories         []ProductInventory          `gorm:"foreignKey:ProductID"`
