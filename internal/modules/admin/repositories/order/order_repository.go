@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
+	"shop/internal/modules/admin/responses"
 	"shop/internal/pkg/pagination"
 	"strconv"
 	"strings"
@@ -43,7 +44,7 @@ func (oRepo *OrderRepository) GetOrders(c *gin.Context) (pagination.Pagination, 
 		Page:  page,
 	}
 
-	var orders []entities.Order
+	var orders []*entities.Order
 	//condition := fmt.Sprintf("customer_id=%d", customer.ID)
 	condition := ""
 
@@ -58,7 +59,7 @@ func (oRepo *OrderRepository) GetOrders(c *gin.Context) (pagination.Pagination, 
 		return pg, pErr
 	}
 
-	pg.Rows = orders
+	pg.Rows = responses.ToOrders(orders)
 	return pg, nil
 }
 

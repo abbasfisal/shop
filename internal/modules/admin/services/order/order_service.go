@@ -2,7 +2,6 @@ package order
 
 import (
 	"github.com/gin-gonic/gin"
-	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/order"
 	"shop/internal/modules/admin/requests"
 	"shop/internal/modules/admin/responses"
@@ -20,11 +19,10 @@ func NewOrderService(repo order.OrderRepositoryInterface) OrderServiceInterface 
 func (o OrderService) GetOrderPaginate(c *gin.Context) (pagination.Pagination, error) {
 
 	orderList, err := o.repo.GetOrders(c)
-	if err != nil {
+	if err != nil || orderList.Rows == nil {
 		return pagination.Pagination{}, err
 	}
 
-	orderList.Rows = responses.ToOrders(orderList.Rows.([]*entities.Order))
 	return orderList, nil
 }
 
