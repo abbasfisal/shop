@@ -21,7 +21,6 @@ import (
 	"shop/internal/pkg/pagination"
 	"shop/internal/pkg/payment/zarinpal"
 	"shop/internal/pkg/sessions"
-	"shop/internal/pkg/util"
 )
 
 type HomeService struct {
@@ -65,7 +64,6 @@ func (h *HomeService) ListProductByCategorySlug(c *gin.Context, slug string) (pa
 		return pagination.Pagination{}, err
 	}
 
-	productList.Rows = responses.ToProducts(productList.Rows.([]*entities.Product))
 	return productList, nil
 
 }
@@ -293,18 +291,20 @@ func (h *HomeService) GetPaymentBy(c *gin.Context, authority string) (*entities.
 
 func (h *HomeService) ListOrders(c *gin.Context) (pagination.Pagination, error) {
 	orderList, err := h.repo.GetPaginatedOrders(c)
-
-	util.PrettyJson(orderList)
 	if err != nil {
 		return pagination.Pagination{}, err
 	}
 
-	orderList.Rows = responses.ToOrders(orderList.Rows.([]*entities.Order))
+	//orderList.Rows = responses.ToOrders(orderList.Rows.([]*entities.Order))
+
 	return orderList, nil
 
 }
 
 func (h *HomeService) GetOrderBy(c *gin.Context, orderNumber string) (interface{}, interface{}) {
 	order, err := h.repo.GetOrder(c, orderNumber)
+	if order == nil || err != nil {
+		return nil, err
+	}
 	return CustomerRes.ToCustomerOrder(order), err
 }

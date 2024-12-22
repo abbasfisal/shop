@@ -17,19 +17,27 @@ type ProductInventoryAttributes struct {
 }
 
 func ToProductInventoryAttribute(pi *entities.ProductInventoryAttribute) *ProductInventoryAttribute {
-	return &ProductInventoryAttribute{
+	pia := ProductInventoryAttribute{
 		ID:        pi.ID,
 		ProductID: pi.ProductID,
 
 		ProductInventoryID: pi.ProductInventoryID,
 		ProductAttributeID: pi.ProductAttributeID,
-
-		//
-		ProductAttribute: ToProductAttribute(pi.ProductAttribute),
 	}
+
+	if pi.ProductAttribute != nil {
+		pia.ProductAttribute = ToProductAttribute(pi.ProductAttribute)
+	}
+
+	return &pia
 }
 
 func ToProductInventoryAttributes(pis []*entities.ProductInventoryAttribute) *ProductInventoryAttributes {
+
+	if pis == nil {
+		return &ProductInventoryAttributes{}
+	}
+
 	var pResponse ProductInventoryAttributes
 	for _, p := range pis {
 		pResponse.Data = append(pResponse.Data, *ToProductInventoryAttribute(p))

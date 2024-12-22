@@ -16,6 +16,10 @@ type ImageProducts struct {
 }
 
 func ToImageProducts(productImages []*entities.ProductImages) *ImageProducts {
+	if productImages == nil {
+		return &ImageProducts{}
+	}
+
 	var pResponse ImageProducts
 	for _, p := range productImages {
 		pResponse.Data = append(pResponse.Data, *ToImageProduct(p))

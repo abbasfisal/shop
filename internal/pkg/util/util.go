@@ -148,3 +148,23 @@ func formatWithCommas(input string) string {
 	}
 	return formatWithCommas(input[:n-3]) + "," + input[n-3:]
 }
+
+func ConvertIfNotNil[T any, R any](input *T, convertFunc func(*T) R) R {
+	if input != nil {
+		return convertFunc(input)
+	}
+	var zero R
+	return zero
+}
+
+func ConvertSliceIfNotNil[T any, R any](input []*T, convertFunc func(*T) R) []R {
+	if input == nil {
+		return nil
+	}
+
+	var result []R
+	for _, item := range input {
+		result = append(result, convertFunc(item))
+	}
+	return result
+}

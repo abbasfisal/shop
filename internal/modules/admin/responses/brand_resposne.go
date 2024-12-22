@@ -22,8 +22,11 @@ func ToBrand(brand *entities.Brand) *Brand {
 }
 
 func ToBrands(brands []*entities.Brand) *Brands {
-	var response Brands
+	if brands == nil {
+		return &Brands{}
+	}
 
+	var response Brands
 	for _, brand := range brands {
 		response.Data = append(response.Data, *ToBrand(brand))
 	}

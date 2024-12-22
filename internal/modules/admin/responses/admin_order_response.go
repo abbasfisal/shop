@@ -27,14 +27,6 @@ type AdminOrders struct {
 	Data []AdminOrder
 }
 
-func ToAdminOrders(ordersList []*entities.Order) *AdminOrders {
-	var oResponse AdminOrders
-	for _, o := range ordersList {
-		oResponse.Data = append(oResponse.Data, *ToAdminOrder(o))
-	}
-	return &oResponse
-}
-
 func ToAdminOrder(o *entities.Order) *AdminOrder {
 	orderResponse := AdminOrder{
 		ID:                 o.ID,
@@ -48,12 +40,14 @@ func ToAdminOrder(o *entities.Order) *AdminOrder {
 		OrderStatus:        o.OrderStatus,
 		OrderNote:          o.Note,
 		OrderStatusText:    AdminOrderStatusMap(o.OrderStatus),
-		OrderItems:         ToAdminOrderItems(o.OrderItems),
 		Address:            ToAddress(o.Address),
 	}
 
-	// بررسی وجود Payment
-	if o.Payment.ID != 0 {
+	if o.OrderItems != nil {
+		orderResponse.OrderItems = ToAdminOrderItems(o.OrderItems)
+	}
+
+	if o.Payment != nil {
 		orderResponse.Payment = ToPayment(o.Payment)
 	}
 

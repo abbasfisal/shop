@@ -23,11 +23,16 @@ func ToAttributeValue(attr *entities.AttributeValue) *AttributeValue {
 }
 
 func ToAttributeValues(attrValue []*entities.AttributeValue) *AttributeValues {
+
+	if attrValue == nil {
+		return &AttributeValues{}
+	}
+
 	var response AttributeValues
 
 	for _, item := range attrValue {
 		response.Data = append(response.Data, *ToAttributeValue(item))
 	}
 
-	return &response // Return a value (not pointer)
+	return &response
 }

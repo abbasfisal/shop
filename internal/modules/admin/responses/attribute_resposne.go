@@ -21,8 +21,11 @@ func ToAttribute(attr *entities.Attribute) *Attribute {
 }
 
 func ToAttributes(attr []*entities.Attribute) *Attributes {
-	var response Attributes
+	if attr == nil {
+		return &Attributes{}
+	}
 
+	var response Attributes
 	for _, item := range attr {
 		response.Data = append(response.Data, *ToAttribute(item))
 	}

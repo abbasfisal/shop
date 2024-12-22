@@ -13,6 +13,7 @@ import (
 	"math/rand"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
+	AdminUserResponse "shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/responses"
 	"shop/internal/pkg/custom_error"
@@ -353,7 +354,8 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 		return pg, pErr
 	}
 
-	pg.Rows = products
+	pg.Rows = AdminUserResponse.ToProducts(products)
+
 	return pg, nil
 }
 func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest) {
@@ -623,10 +625,7 @@ func (h *HomeRepository) Release(order *entities.Order, tx *gorm.DB) {
 	tx.Rollback()
 }
 func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.Order, refID string, verified bool) (*entities.Order, bool, custom_error.CustomError) {
-	util.PrettyJson(order)
-	log.Println("---- verify :", verified)
 
-	//	var order entities.Order
 	tx := h.db.WithContext(c).Begin()
 
 	//if err := tx.Preload("OrderItems").Where("id=? AND amount=?", payment.OrderID).First(&order).Error; err != nil {
@@ -767,23 +766,21 @@ func (h *HomeRepository) GetPaginatedOrders(c *gin.Context) (pagination.Paginati
 	//	return pg, err
 	//}
 
-	var orders []entities.Order
+	var orders []*entities.Order
 	condition := fmt.Sprintf("customer_id=%d", customer.ID)
 
 	paginateQuery, exist := pagination.Paginate(c, condition, &orders, &pg, h.db)
-	util.PrettyJson(customer)
 
 	if !exist {
-		log.Println("--------- here :", exist)
 		return pg, gorm.ErrRecordNotFound
 	}
 
 	if pErr := paginateQuery(h.db).Preload("OrderItems").Where("customer_id=?", customer.ID).Find(&orders).Error; pErr != nil {
-		log.Println("----------- here 2:", pErr)
 		return pg, pErr
 	}
 
-	pg.Rows = orders
+	pg.Rows = AdminUserResponse.ToOrders(orders)
+
 	return pg, nil
 }
 func (h *HomeRepository) GetOrder(c *gin.Context, orderNumber string) (*entities.Order, error) {

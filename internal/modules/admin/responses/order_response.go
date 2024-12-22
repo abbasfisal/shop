@@ -27,11 +27,18 @@ type Orders struct {
 func ToOrders(ordersList []*entities.Order) *Orders {
 
 	var oResponse Orders
+	if ordersList == nil {
+		return &Orders{Data: []Order{}}
+	}
 	for _, o := range ordersList {
+		if o == nil {
+			continue
+		}
 		oResponse.Data = append(oResponse.Data, *ToOrder(o))
 	}
 	return &oResponse
 }
+
 func ToOrder(o *entities.Order) *Order {
 
 	orderResponse := Order{
@@ -45,11 +52,17 @@ func ToOrder(o *entities.Order) *Order {
 		OrderStatus:        o.OrderStatus,
 		CreatedAt:          o.CreatedAt,
 		OrderStatusText:    OrderStatusMap(o.OrderStatus),
-		OrderItems:         ToOrderItems(o.OrderItems),
 	}
-	if o.Payment.ID != 0 {
+
+	if o.OrderItems != nil {
+		orderResponse.OrderItems = ToOrderItems(o.OrderItems)
+	}
+
+	if o.Payment != nil {
 		orderResponse.Payment = ToPayment(o.Payment)
+
 	}
+
 	return &orderResponse
 }
 
@@ -99,6 +112,10 @@ func ToOrderItem(oItem *entities.OrderItem) *OrderItem {
 }
 
 func ToOrderItems(oItems []*entities.OrderItem) *OrderItems {
+	if oItems == nil {
+		return &OrderItems{}
+	}
+
 	var orderItems OrderItems
 	for _, oItem := range oItems {
 		orderItems.Data = append(orderItems.Data, *ToOrderItem(oItem))

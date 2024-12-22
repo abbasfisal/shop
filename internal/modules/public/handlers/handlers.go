@@ -636,8 +636,8 @@ func (p PublicHandler) VerifyPayment(c *gin.Context) {
 func (p PublicHandler) ShowOrderList(c *gin.Context) {
 
 	orderPaginations, err := p.homeSrv.ListOrders(c)
-
-	if err != nil {
+	fmt.Println("----------------------orderPagination:", orderPaginations)
+	if err != nil || orderPaginations.Rows == nil {
 		//هر خطایی به جز خطای مرتبط با پیدانکردن رکورد اگر وجود داشت اون خطا رو نشون میدیم
 		//در غیر این صورت پیغام رکورد یافت نشد به کاربر نشون داده میشه :)
 		if errors2.Is(err, gorm.ErrRecordNotFound) {
@@ -669,7 +669,7 @@ func (p PublicHandler) ShowOrderList(c *gin.Context) {
 func (p PublicHandler) ShowOrderDetails(c *gin.Context) {
 	q := c.Param("order_number")
 	order, err := p.homeSrv.GetOrderBy(c, q)
-	if err != nil {
+	if err != nil || order == nil {
 		log.Println("---- [public - handlers]-[ShowOrderDetails]----", err)
 		c.JSON(http.StatusOK, gin.H{
 			"msg": custom_error.SomethingWrongHappened,

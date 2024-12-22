@@ -3,12 +3,10 @@ package responses
 import "shop/internal/entities"
 
 type ProductAttribute struct {
-	ID        uint
-	ProductID uint
-
-	AttributeID    uint
-	AttributeTitle string
-
+	ID                  uint
+	ProductID           uint
+	AttributeID         uint
+	AttributeTitle      string
 	AttributeValueID    uint
 	AttributeValueTitle string
 }
@@ -28,6 +26,10 @@ func ToProductAttribute(productAttribute *entities.ProductAttribute) *ProductAtt
 }
 
 func ToProductAttributes(productAttributes []*entities.ProductAttribute) *ProductAttributes {
+	if productAttributes == nil {
+		return &ProductAttributes{}
+	}
+
 	var response ProductAttributes
 
 	for _, productAtt := range productAttributes {
@@ -36,14 +38,3 @@ func ToProductAttributes(productAttributes []*entities.ProductAttribute) *Produc
 
 	return &response
 }
-
-///
-//
-//func ToInventoryProductAttributes(productAttributes []entities.ProductAttribute) []ProductAttribute {
-//	var response []ProductAttribute
-//
-//	for _, productAtt := range productAttributes {
-//		response = append(response, ToProductAttribute(productAtt))
-//	}
-//	return response
-//}

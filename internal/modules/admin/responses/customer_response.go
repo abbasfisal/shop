@@ -15,6 +15,10 @@ type Customers struct {
 }
 
 func ToCustomers(customers []*entities.Customer) *Customers {
+	if customers == nil {
+		return &Customers{}
+	}
+
 	var cResponse Customers
 	for _, p := range customers {
 		cResponse.Data = append(cResponse.Data, *ToCustomer(p))

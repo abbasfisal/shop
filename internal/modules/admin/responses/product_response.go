@@ -41,7 +41,7 @@ func ToProducts(products []*entities.Product) *Products {
 }
 
 func ToProduct(p *entities.Product) *Product {
-	return &Product{
+	var product = Product{
 		ID:            p.ID,
 		CategoryID:    p.CategoryID,
 		BrandID:       p.BrandID,
@@ -53,21 +53,40 @@ func ToProduct(p *entities.Product) *Product {
 		SalePrice:     p.SalePrice,
 		Description:   p.Description,
 		Discount: func() uint {
-
 			originalPrice := float64(p.OriginalPrice)
 			salePrice := float64(p.SalePrice)
 			dis := ((originalPrice - salePrice) / originalPrice) * 100
 
 			return uint(math.Round(dis))
 		}(),
-
-		//relation
-		Category:                   ToCategory(&p.Category),
-		Brand:                      ToBrand(p.Brand),
-		Images:                     ToImageProducts(p.ProductImages),
-		ProductAttributes:          ToProductAttributes(p.ProductAttributes),
-		ProductInventories:         ToProductInventories(p.ProductInventories),
-		ProductInventoryAttributes: ToProductInventoryAttributes(p.ProductInventoryAttributes),
-		Features:                   ToFeatures(p.Features),
 	}
+
+	if p.Features != nil {
+		product.Features = ToFeatures(p.Features)
+	}
+
+	if p.ProductInventoryAttributes != nil {
+		product.ProductInventoryAttributes = ToProductInventoryAttributes(p.ProductInventoryAttributes)
+	}
+
+	if p.ProductInventories != nil {
+		product.ProductInventories = ToProductInventories(p.ProductInventories)
+	}
+	if p.ProductAttributes != nil {
+		product.ProductAttributes = ToProductAttributes(p.ProductAttributes)
+	}
+
+	if p.Category != nil {
+		product.Category = ToCategory(p.Category)
+	}
+
+	if p.Brand != nil {
+		product.Brand = ToBrand(p.Brand)
+	}
+
+	if p.ProductImages != nil {
+		product.Images = ToImageProducts(p.ProductImages)
+	}
+
+	return &product
 }

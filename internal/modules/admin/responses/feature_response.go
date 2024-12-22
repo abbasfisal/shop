@@ -24,6 +24,10 @@ func ToFeature(f *entities.Feature) *Feature {
 }
 
 func ToFeatures(f []*entities.Feature) *Features {
+	if f == nil {
+		return &Features{}
+	}
+
 	var fResponse Features
 	for _, featureItem := range f {
 		fResponse.Data = append(fResponse.Data, *ToFeature(featureItem))
