@@ -7,5 +7,5 @@ type Attribute struct {
 	//CategoryID      uint
 	Title string
 	//Category        Category
-	AttributeValues []AttributeValue `gorm:"foreignKey:AttributeID"` //1:M
+	AttributeValues []*AttributeValue `gorm:"foreignKey:AttributeID"` //1:M
 }

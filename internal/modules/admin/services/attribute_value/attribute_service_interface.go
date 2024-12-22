@@ -9,8 +9,8 @@ import (
 )
 
 type AttributeValueServiceInterface interface {
-	Create(ctx context.Context, req *requests.CreateAttributeValueRequest) (responses.AttributeValue, custom_error.CustomError)
+	Create(ctx context.Context, req *requests.CreateAttributeValueRequest) (*responses.AttributeValue, custom_error.CustomError)
 	IndexAttribute(c *gin.Context) (*responses.Attributes, custom_error.CustomError)
-	Show(c *gin.Context, attributeValueID int) (responses.AttributeValue, custom_error.CustomError)
+	Show(c *gin.Context, attributeValueID int) (*responses.AttributeValue, custom_error.CustomError)
 	Update(c *gin.Context, attributeValueID int, req *requests.UpdateAttributeValueRequest) custom_error.CustomError
 }

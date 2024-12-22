@@ -429,7 +429,7 @@ func fakeAttributeAndValues() []entities.Attribute {
 			Model: gorm.Model{},
 			Title: "سایز",
 
-			AttributeValues: []entities.AttributeValue{
+			AttributeValues: []*entities.AttributeValue{
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
@@ -465,7 +465,7 @@ func fakeAttributeAndValues() []entities.Attribute {
 		{
 			Model: gorm.Model{},
 			Title: "رنگ",
-			AttributeValues: []entities.AttributeValue{
+			AttributeValues: []*entities.AttributeValue{
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
