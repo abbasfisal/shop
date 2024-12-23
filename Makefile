@@ -54,9 +54,9 @@ generate-sql-migrator-dbconfig:
 
 # start schedule system using asynq pkg
 start-schedule:
-	@go ./cmd/job/scheduler/main.go
+	@go run ./cmd/job/scheduler/main.go
 
 
 # start worker which is responsible to execute tasks
 start-worker:
-	@go ./cmd/job/worker/main.go
+	@go run ./cmd/job/worker/main.go
