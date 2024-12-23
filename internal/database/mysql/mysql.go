@@ -31,10 +31,11 @@ func Get() *gorm.DB {
 	return db
 }
 
-func Close() {
+func Close() error {
 	connection, _ := db.DB()
 	err := connection.Close()
 	if err != nil {
-		return
+		return err
 	}
+	return nil
 }
