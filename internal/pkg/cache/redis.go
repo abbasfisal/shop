@@ -30,10 +30,10 @@ func InitRedisClient() {
 		})
 
 		if err := client.Ping(context.Background()).Err(); err != nil {
-			log.Fatal("redis init error : ", err)
+			log.Fatal("[error] redis ping error : ", err)
 		}
 
-		fmt.Println("---- redis initialized successfully ---- ")
+		fmt.Println("[info] redis successfully initialized")
 		redisClient = client
 	})
 }
@@ -46,7 +46,7 @@ func CloseRedisClient() {
 
 func Set(ctx context.Context, key, val string, ttl time.Duration) error {
 	if err := redisClient.Set(ctx, key, val, ttl).Err(); err != nil {
-		fmt.Println("---- redis set error : ", err)
+		fmt.Println("[error] redis set key failed: ", err)
 		return err
 	}
 	return nil
@@ -55,7 +55,7 @@ func Set(ctx context.Context, key, val string, ttl time.Duration) error {
 func Get(ctx context.Context, key string) string {
 	result, err := redisClient.Get(ctx, key).Result()
 	if err != nil {
-		fmt.Printf("--- Key %s not found in Redis cache", key)
+		fmt.Printf("[error] Key %s not found in Redis cache", key)
 		return ""
 	}
 	return result
