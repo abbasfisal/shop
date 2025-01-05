@@ -72,15 +72,5 @@ func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client) {
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
 	{
-		//guestGrp.GET("/users/login", publicHlr.ShowLogin)
-		//guestGrp.POST("/users/login", publicHlr.PostLogin)
-		//register routes
 	}
-
-	authGrp := r.Group("/")
-	authGrp.Use(middlewares.IsAdmin)
-	{
-
-	}
-
 }
