@@ -39,6 +39,7 @@ func (p *ProductRepository) FindBy(ctx context.Context, columnName string, value
 	var product entities.Product
 	condition := fmt.Sprintf("%s=?", columnName)
 	err := p.db.
+		WithContext(ctx).
 		Preload("Category").Preload("Brand").
 		Preload("ProductAttributes").Preload("ProductInventories").
 		Preload("ProductImages").Preload("Features").
