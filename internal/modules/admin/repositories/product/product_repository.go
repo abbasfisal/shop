@@ -140,9 +140,7 @@ func (p *ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID 
 	}
 
 	var product entities.Product
-	aerr := p.db.WithContext(ctx).
-		Where("id = ?", productID).
-		First(&product).Error
+	aerr := p.db.WithContext(ctx).Where("id = ?", productID).First(&product).Error
 
 	if aerr != nil {
 		return map[string]interface{}{}, aerr
@@ -537,7 +535,7 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id AND product_attributes.deleted_at IS NULL").
 		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
 		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
-		Where("product_inventories.product_id = ? and product_inventories.deleted_at IS NULL", product.ID).
+		Where("product_inventories.product_id = ? AND product_inventories.deleted_at IS NULL", product.ID).
 		Scan(&inventories).
 		Error
 
@@ -547,9 +545,10 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 	}
 
 	// آماده‌سازی برای ذخیره در MongoDB
-	inventoryMap := make(map[string]entities.Inventory)
+	inventoryMap := make(map[string]entities.Inventory) // prepare product inventory
+
 	for _, inventory := range inventories {
-		key := fmt.Sprintf("%d", inventory.InventoryID)
+		key := fmt.Sprintf("%d", inventory.InventoryID) //convert int to string
 		if _, exists := inventoryMap[key]; !exists {
 			inventoryMap[key] = entities.Inventory{
 				InventoryID: int64(inventory.InventoryID),
@@ -558,6 +557,8 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 			}
 		}
 
+		//بعضی محصولات attribute ندارند و فقط موجودی دارند
+		// prepare attributes array for inventories field (note : some products has no any attributes they just have inventory_id and quantity )
 		inv := inventoryMap[key]
 		inv.Attributes = append(inv.Attributes, entities.InventoryAttributes{
 			AttributeID:                 int64(inventory.AttributeID),
