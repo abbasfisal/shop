@@ -60,3 +60,12 @@ start-schedule:
 # start worker which is responsible to execute tasks
 start-worker:
 	@go run ./cmd/job/worker/main.go
+
+
+# start minio server
+minio_run :
+	@docker run -p 9000:9000 -p 9001:9001 --name my_golang_minio \
+  			-v /data:/data \
+  			-e "MINIO_ROOT_USER=vivify" \
+  			-e "MINIO_ROOT_PASSWORD=vivify" \
+  			minio/minio:RELEASE.2024-05-01T01-11-10Z server /data --console-address ":9001"
