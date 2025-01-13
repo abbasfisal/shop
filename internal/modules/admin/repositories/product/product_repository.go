@@ -59,7 +59,7 @@ func (p *ProductRepository) Store(ctx context.Context, product *entities.Product
 	err := p.db.WithContext(ctx).Create(&product).Error
 
 	if err == nil {
-		SyncMongo(ctx, p.db, product.ID)
+		_ = SyncMongo(ctx, p.db, product.ID)
 	}
 	return product, err
 }
@@ -124,7 +124,7 @@ func (p *ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int
 			AttributeValueTitle: parts[7],
 		})
 	}
-	SyncMongo(ctx, p.db, uint(productID))
+	_ = SyncMongo(ctx, p.db, uint(productID))
 	return nil
 }
 
@@ -217,7 +217,7 @@ func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int,
 
 		inventory = entities.ProductInventory{
 			ProductID: uint(productID),
-			Quantity:  uint(req.Quantity),
+			Quantity:  req.Quantity,
 		}
 
 		//todo: باید چک کنی که چندتا موجودی بدون اتریبیوت ذخیره شده تا بتونی روی ایجاد چندین موجودی بدون ویژگی کنترل داشته باشی
@@ -256,14 +256,14 @@ func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int,
 		return nil, txErr
 	}
 
-	SyncMongo(c, p.db, uint(productID))
+	_ = SyncMongo(c, p.db, uint(productID))
 
 	return &inventory, nil
 }
 
 func (p *ProductRepository) GetImage(c *gin.Context, imageID int) (*entities.ProductImages, error) {
 	var image entities.ProductImages
-	err := p.db.Find(&image, imageID).Error
+	err := p.db.WithContext(c).Find(&image, imageID).Error
 	return &image, err
 }
 
@@ -277,7 +277,7 @@ func (p *ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
 		return delImgErr
 	}
 
-	SyncMongo(c, p.db, uint(productImage.ProductID))
+	_ = SyncMongo(c, p.db, productImage.ProductID)
 
 	return nil
 }
@@ -296,7 +296,7 @@ func (p *ProductRepository) StoreImages(c *gin.Context, productID int, imageStor
 		return storeImgErr
 	}
 
-	SyncMongo(c, p.db, uint(productID))
+	_ = SyncMongo(c, p.db, uint(productID))
 	return nil
 }
 
@@ -328,7 +328,7 @@ func (p *ProductRepository) Update(c *gin.Context, productID int, req *requests.
 		return nil, pErr
 	}
 
-	SyncMongo(c, p.db, uint(productID))
+	_ = SyncMongo(c, p.db, uint(productID))
 
 	return &product, nil
 }
@@ -346,7 +346,7 @@ func (p *ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInve
 		return piaErr
 	}
 
-	SyncMongo(c, p.db, uint(productInventoryAttribute.ProductID))
+	_ = SyncMongo(c, p.db, productInventoryAttribute.ProductID)
 
 	return nil
 }
@@ -383,7 +383,7 @@ func (p *ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) err
 		return txErr
 	}
 
-	SyncMongo(c, p.db, productID)
+	_ = SyncMongo(c, p.db, productID)
 
 	return nil
 }
@@ -428,7 +428,7 @@ func (p *ProductRepository) AppendAttributesToInventory(c *gin.Context, inventor
 		return txErr
 	}
 
-	SyncMongo(c, p.db, uint(productInventory.ProductID))
+	_ = SyncMongo(c, p.db, productInventory.ProductID)
 
 	return nil
 }
@@ -443,7 +443,7 @@ func (p *ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID 
 		return updateErr
 	}
 
-	SyncMongo(c, p.db, uint(inventory.ProductID))
+	_ = SyncMongo(c, p.db, inventory.ProductID)
 
 	return nil
 }
@@ -458,7 +458,7 @@ func (p *ProductRepository) InsertFeature(c *gin.Context, productID int, req *re
 		return err
 	}
 
-	SyncMongo(c, p.db, uint(productID))
+	_ = SyncMongo(c, p.db, uint(productID))
 
 	return nil
 }
@@ -468,7 +468,7 @@ func (p *ProductRepository) DeleteFeature(c *gin.Context, productID int, feature
 		return err
 	}
 
-	SyncMongo(c, p.db, uint(productID))
+	_ = SyncMongo(c, p.db, uint(productID))
 
 	return nil
 }
@@ -491,7 +491,7 @@ func (p *ProductRepository) EditFeature(c *gin.Context, productID int, featureID
 		return err
 	}
 
-	SyncMongo(c, p.db, uint(productID))
+	_ = SyncMongo(c, p.db, uint(productID))
 
 	return nil
 }
