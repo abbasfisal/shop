@@ -168,3 +168,9 @@ func ConvertSliceIfNotNil[T any, R any](input []*T, convertFunc func(*T) R) []R 
 	}
 	return result
 }
+
+// StringToUint convert string to uint function which is used in front-end
+func StringToUint(s string) uint {
+	i, _ := strconv.ParseUint(s, 10, 64)
+	return uint(i)
+}

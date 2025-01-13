@@ -8,6 +8,7 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
+	"html/template"
 	"log"
 	"net/http"
 	"shop/cmd/commands"
@@ -17,6 +18,7 @@ import (
 	PublicRoutes "shop/internal/modules/public/routes"
 	"shop/internal/pkg/bootstrap"
 	"shop/internal/pkg/logging"
+	"shop/internal/pkg/util"
 )
 
 func main() {
@@ -33,6 +35,11 @@ func main() {
 	commands.Execute()
 
 	r := gin.Default()
+
+	r.SetFuncMap(template.FuncMap{
+		"stringToUint": util.StringToUint,
+	})
+
 	setupSessions(r)
 	setupRoutes(r, dependencies.I18nBundle, dependencies.AsynqClient)
 
