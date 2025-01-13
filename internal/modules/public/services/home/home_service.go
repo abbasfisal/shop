@@ -3,6 +3,7 @@ package home
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,6 +22,7 @@ import (
 	"shop/internal/pkg/pagination"
 	"shop/internal/pkg/payment/zarinpal"
 	"shop/internal/pkg/sessions"
+	"time"
 )
 
 type HomeService struct {
@@ -207,13 +209,13 @@ func (h *HomeService) AddToCart(c *gin.Context, productObjectID primitive.Object
 	fmt.Println("succ find :title", mongoProduct.ID)
 }
 
-func (h *HomeService) CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool {
+func (h *HomeService) CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) error {
 	err := h.repo.IncreaseCartItemCount(c, req)
+
 	if err != nil {
-		fmt.Println("[failed]-[CartItemIncrement]-[error]:", err)
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 func (h *HomeService) CartItemDecrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool {
@@ -243,11 +245,18 @@ func (h *HomeService) StoreAddress(c *gin.Context, req *requests.StoreAddressReq
 }
 
 // ProcessOrderPayment convert cart to order and remove cart
-func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (*entities.Order, *entities.Payment, custom_error.CustomError) {
+func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (*entities.Order, *entities.Payment, uint, error) {
 
-	order, err := h.repo.GenerateOrderFromCart(c)
+	t := time.Now()
+	order, inventoryID, err := h.repo.GenerateOrderFromCart(c)
+	s := time.Since(t)
+	fmt.Println("time left : ", s)
+
 	if err != nil {
-		return nil, nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 1000)
+		if errors.Is(err, custom_error.OutOfStock) {
+			return nil, nil, inventoryID, custom_error.OutOfStock
+		}
+		return nil, nil, 0, custom_error.InternalServerErr
 	}
 
 	customer, _ := helpers.GetAuthUser(c)
@@ -257,11 +266,11 @@ func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinp
 	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), os.Getenv("ZARINPAL_CALLBACKURL"), description, "", customer.Mobile)
 	if zarinErr != nil || statusCode != 100 {
 		log.Println("[home_service]-[ProcessOrderPayment]-[New ZarinPal Payment Request Error]:", zarinErr)
-		return nil, nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10001)
+		return nil, nil, 0, custom_error.InternalServerErr
 	}
 	log.Println("[ZarinPal New Request Success]:", "paymentURL:", paymentURL, "|authority:", authority, "|statusCode:", statusCode)
 
-	//create new payment
+	//prepare new payment
 	payment := entities.Payment{
 		CustomerID:  customer.ID,
 		OrderID:     order.ID,
@@ -273,12 +282,14 @@ func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinp
 		RefID:       "",
 		Status:      0, //pending
 	}
+
+	// store new payment in db
 	paymentErr := h.repo.CreatePayment(c, &payment)
 	if paymentErr != nil {
-		return order, nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, 10002)
+		return order, nil, 0, paymentErr
 	}
 
-	return order, &payment, custom_error.CustomError{}
+	return order, &payment, 0, nil
 }
 
 func (h *HomeService) VerifyPayment(c *gin.Context, order *entities.Order, refID string, verified bool) {
