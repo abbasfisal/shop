@@ -6,7 +6,7 @@
         <link rel="shortcut icon" href="/assets/shop/img/seller-logo.png" type="image/icon">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title></title>
+        <title>{{.TITLE}}</title>
         <!-- Font Icon -->
         <link rel="stylesheet" href="/assets/shop/css/vendor/font-awesome.min.css">
         <!-- Bootstrap -->
@@ -31,7 +31,8 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-12 text-center">
+
+                    <div class="col-12 text-center ">
                         <ul class="checkout-steps">
                             <li>
                                 <a href="#" class="active">
@@ -93,7 +94,7 @@
                                                             {{if .MESSAGE}}
                                                                 <div class="text-center p-2 ">
                                                                     <b class="text-danger fa-1x">
-                                                                        ** {{.MESSAGE}}
+                                                                         {{.MESSAGE}}
                                                                     </b>
                                                                 </div>
                                                                 <br>
@@ -296,8 +297,8 @@
 
                             </form>
                             <div class="mt-5">
-                                <a href="/checkout/cart" class="float-right border-bottom-dt"><i
-                                            class="mdi mdi-chevron-double-right"></i>بازگشت به سبد خرید</a>
+                                <a href="/checkout/cart" class="float-right  btn btn-lg btn-danger"><i
+                                            class="mdi  mdi-chevron-double-right"></i>بازگشت به سبد خرید</a>
                             </div>
                         </section>
                     </div>

@@ -42,7 +42,22 @@
         <!--------------------------------- Main Content -->
         <main class="main-content dt-sl mb-3">
             <div class="container main-container">
-                <div class="row mx-0">
+
+
+                <div class="row mx-0 ">
+                    {{if .MESSAGE}}
+                        <div class="col-xl-9 col-lg-8 col-md-12 col-sm-12 mb-2 mt-2"
+                             style="padding-left: 0;padding-right: 0;">
+                            <nav class="tab-cart-page">
+                                <div class="nav nav-tabs w-auto">
+                                    <h4 class="text-center  text-danger">
+                                        {{.MESSAGE}}
+                                    </h4>
+                                </div>
+                            </nav>
+                        </div>
+                    {{end}}
+
                     <div class="col-xl-9 col-lg-8 col-md-12 col-sm-12 mb-2 mt-2"
                          style="padding-left: 0;padding-right: 0;">
                         <nav class="tab-cart-page">
@@ -87,9 +102,12 @@
                                             </div>
                                             <div class="checkout-section-content-dd-k">
                                                 <div class="cart-items-dd-k">
+
+                                                    {{$ERRORS:=.ERRORS}}
                                                     {{if gt (len .AUTH.Cart.CartItem.Data) 0}}
                                                         {{$carItem:=.AUTH.Cart.CartItem}}
                                                         {{range $item:= $carItem.Data}}
+
                                                             <div class="cart-item py-4 px-3">
                                                                 <div class="item-thumbnail">
                                                                     <a href="#">
@@ -169,11 +187,21 @@
                                                                                         حذف
                                                                                     </button>
                                                                                 </form>
+                                                                                <div>
+
+                                                                                    {{range $productID,$a:=$ERRORS}}
+                                                                                        {{if eq $item.ProductID (stringToUint $productID)}}
+                                                                                            <div class="badge-pill badge-danger mr-1">{{$a}}</div>
+                                                                                        {{end}}
+                                                                                    {{end}}
+                                                                                </div>
                                                                             </div>
                                                                             <div class="item-price">
                                                                                 {{$item.SalePrice}}
                                                                                 <span class="text-sm mr-1">تومان</span>
                                                                             </div>
+
+
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -596,6 +624,11 @@
             <div class="description">
                 <div class="container main-container">
                     <div class="row">
+                        {{ range . }}
+                            {{ . }}
+                        {{ end }}
+
+                        <br>
                         <div class="site-description col-12 col-lg-7">
                             <h1 class="site-title">فروشگاه اینترنتی دیجی پرس، بررسی، انتخاب و خرید آنلاین</h1>
                             <p> دیجی پرس به عنوان یکی از قدیمی‌ترین فروشگاه های اینترنتی با بیش از یک دهه تجربه، با
