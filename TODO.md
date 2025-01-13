@@ -119,3 +119,72 @@ add make file :
 `docker-compose -f docker-compose.dev.yml --env-file .env.development up
 `
 
+
+
+-----------_/\_------------
+`sample rediLock code`
+```go
+package services
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"project/internal/models"
+	"project/internal/repositories"
+	"project/pkg/redis"
+
+	"github.com/redis/go-redis/v9"
+)
+
+type OrderService interface {
+	PlaceOrder(ctx context.Context, order *models.Order) error
+}
+
+type orderService struct {
+	orderRepo repositories.OrderRepository
+	redis     *redis.Client
+}
+
+func NewOrderService(orderRepo repositories.OrderRepository, redisClient *redis.Client) OrderService {
+	return &orderService{orderRepo: orderRepo, redis: redisClient}
+}
+
+func (s *orderService) PlaceOrder(ctx context.Context, order *models.Order) error {
+	// قفل‌ها برای محصولات
+	lockKeys := make([]string, 0)
+	for _, item := range order.Items {
+		lockKey := fmt.Sprintf("lock:product:%d", item.ProductID)
+		locked, err := s.redis.SetNX(ctx, lockKey, "locked", 10*time.Second).Result()
+		if err != nil {
+			// آزاد کردن قفل‌های قبلی در صورت خطا
+			s.releaseLocks(ctx, lockKeys)
+			return fmt.Errorf("error acquiring lock for product %d: %w", item.ProductID, err)
+		}
+		if !locked {
+			s.releaseLocks(ctx, lockKeys)
+			return fmt.Errorf("product %d is locked by another process", item.ProductID)
+		}
+		lockKeys = append(lockKeys, lockKey)
+	}
+
+	// آزاد کردن قفل‌ها در انتها
+	defer s.releaseLocks(ctx, lockKeys)
+
+	// ذخیره سفارش و آیتم‌ها در دیتابیس
+	if err := s.orderRepo.CreateOrder(ctx, order); err != nil {
+		return fmt.Errorf("error creating order: %w", err)
+	}
+
+	return nil
+}
+
+func (s *orderService) releaseLocks(ctx context.Context, lockKeys []string) {
+	for _, lockKey := range lockKeys {
+		s.redis.Del(ctx, lockKey)
+	}
+}
+
+
+```
