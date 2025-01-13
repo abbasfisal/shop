@@ -24,6 +24,7 @@ import (
 	"shop/internal/pkg/sessions"
 	"shop/internal/pkg/sms"
 	"shop/internal/pkg/util"
+	"strconv"
 	"time"
 )
 
@@ -431,9 +432,11 @@ func (p PublicHandler) AddToCart(c *gin.Context) {
 }
 
 func (p PublicHandler) Cart(c *gin.Context) {
-	html.CustomerRender(c, 200, "cart", gin.H{
-		"TITLE": "cart",
-	})
+
+	html.CustomerRender(c, 200, "cart",
+		gin.H{
+			"TITLE": "سبد خرید",
+		})
 	return
 }
 
@@ -442,13 +445,22 @@ func (p PublicHandler) CartItemIncrement(c *gin.Context) {
 	var req requests.IncreaseCartItemQty
 	err := c.ShouldBind(&req)
 	if err != nil {
-		fmt.Println("-- bind error :", err.Error())
 		c.Redirect(http.StatusFound, "/checkout/cart")
 	}
-	util.PrettyJson(req)
 
 	res := p.homeSrv.CartItemIncrement(c, &req)
-	fmt.Println("---------- res:", res)
+	if errors2.Is(res, custom_error.QuantityExceedsLimit) {
+		errors.Init()
+		errors.Add(strconv.Itoa(int(req.ProductID)), "سقف سفارش هر محصول ۳ عدد می باشد")
+		sessions.Set(c, "errors", errors.ToString())
+
+	}
+	if errors2.Is(res, custom_error.OutOfStock) {
+		errors.Init()
+		errors.Add(strconv.Itoa(int(req.ProductID)), "موجودی محصول کافی نمی باشد")
+		sessions.Set(c, "errors", errors.ToString())
+	}
+
 	c.Redirect(http.StatusFound, "/checkout/cart")
 	return
 }
@@ -554,20 +566,35 @@ func (p PublicHandler) Payment(c *gin.Context) {
 	zarin, err := zarinpal.NewZarinpal(os.Getenv("ZARINPAL_MERCHANTID"), false)
 	if err != nil {
 		log.Println("[zarinpal err]:", err)
-		html.CustomerRender(c, http.StatusInternalServerError, "500", gin.H{})
+		sessions.Set(c, "message", custom_error.InternalServerError)
+		c.Redirect(http.StatusFound, c.Request.Referer())
+
 		return
 	}
 
 	//todo: after 10 minute if nothing happened cancel order and free reserved_stock
-	_, payment, pErr := p.homeSrv.ProcessOrderPayment(c, zarin)
-	if pErr.Code > 0 || payment.PaymentURL == "" {
-		log.Println("[handler]-[payment]-[error]:", pErr.OriginalMessage, "|display err :", pErr.DisplayMessage)
-		html.CustomerRender(c, http.StatusInternalServerError, "500", gin.H{})
+	_, paymentEntity, inventoryID, paymentError := p.homeSrv.ProcessOrderPayment(c, zarin)
+
+	if paymentError != nil {
+
+		if errors2.Is(paymentError, custom_error.InternalServerErr) {
+
+			sessions.Set(c, "message", custom_error.InternalServerError)
+		}
+		if errors2.Is(paymentError, custom_error.OutOfStock) {
+
+			errors.Init()
+			errors.Add(strconv.Itoa(int(inventoryID)), "موجودی محصول کافی نمی باشد")
+			sessions.Set(c, "errors", errors.ToString())
+		}
+
+		c.Redirect(http.StatusFound, "/checkout/cart")
 		return
 	}
 
 	//redirect to bank gateway
-	c.Redirect(http.StatusPermanentRedirect, payment.PaymentURL)
+
+	c.Redirect(http.StatusPermanentRedirect, paymentEntity.PaymentURL)
 	return
 }
 
