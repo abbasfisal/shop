@@ -32,13 +32,13 @@ type HomeServiceInterface interface {
 	//------cart
 
 	AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest)
-	CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool
+	CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) error
 	CartItemDecrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool
 	RemoveCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) bool
 	StoreAddress(c *gin.Context, req *requests.StoreAddressRequest)
 
 	// ProcessOrderPayment convert cart to order and remove cart
-	ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (*entities.Order, *entities.Payment, custom_error.CustomError)
+	ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinpal) (*entities.Order, *entities.Payment, uint, error)
 
 	VerifyPayment(c *gin.Context, payment *entities.Order, refID string, verified bool)
 	GetPaymentBy(c *gin.Context, authority string) (*entities.Order, entities.Customer, error)
