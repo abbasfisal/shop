@@ -63,8 +63,10 @@ func (cs *CategoryService) Create(ctx context.Context, req *requests.CreateCateg
 		cat.ParentID = &req.ParentID
 	}
 
-	if *req.Priority != 0 {
-		cat.Priority = req.Priority
+	if req.Priority != nil {
+		if *req.Priority != 0 {
+			cat.Priority = req.Priority
+		}
 	}
 	newCategory, err := cs.repo.Store(ctx, &cat)
 	if err != nil {

@@ -138,7 +138,7 @@ func (a *AdminHandler) IndexCategory(c *gin.Context) {
 		return
 	}
 	html.Render(c, 200, "modules/admin/html/admin_index_category", gin.H{
-		"TITLE":      "Index Category",
+		"TITLE":      "لیست دسته بندی",
 		"CATEGORIES": categories,
 	})
 	return
@@ -146,10 +146,11 @@ func (a *AdminHandler) IndexCategory(c *gin.Context) {
 
 func (a *AdminHandler) CreateCategory(c *gin.Context) {
 	categories, _ := a.categorySrv.GetAllCategories(c)
-	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_category", gin.H{
-		"TITLE":      "create new category",
-		"CATEGORIES": categories,
-	})
+	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_category",
+		gin.H{
+			"TITLE":      "ایجاد کتگوری",
+			"CATEGORIES": categories,
+		})
 	return
 }
 
@@ -247,10 +248,9 @@ func (a *AdminHandler) StoreCategory(c *gin.Context) {
 	//	end upload and save image
 	//---------------------------
 
-	newCategory, err := a.categorySrv.Create(context.TODO(), &req)
+	newCategory, err := a.categorySrv.Create(c.Request.Context(), &req)
 	if err != nil || newCategory.ID <= 0 {
 		_ = os.Remove(pathToUpload)
-		fmt.Println("error in creating category : ", err)
 		sessions.Set(c, "message", "خطا در ایجاد دسته بندی")
 		c.Redirect(http.StatusFound, "/admins/categories/create")
 		return
@@ -294,7 +294,7 @@ func (a *AdminHandler) EditCategory(c *gin.Context) {
 		return
 	}
 
-	cat, cErr := a.categorySrv.Show(context.TODO(), catID)
+	cat, cErr := a.categorySrv.Show(c.Request.Context(), catID)
 	categories, _ := a.categorySrv.GetAllCategories(c)
 
 	if cErr.Code == 500 {
@@ -308,11 +308,12 @@ func (a *AdminHandler) EditCategory(c *gin.Context) {
 		return
 	}
 
-	html.Render(c, http.StatusFound, "admin_edit_category", gin.H{
-		"TITLE":      "edit category",
-		"CATEGORY":   cat,
-		"CATEGORIES": categories,
-	})
+	html.Render(c, http.StatusFound, "admin_edit_category",
+		gin.H{
+			"TITLE":      "ویرایش دسته بندی",
+			"CATEGORY":   cat,
+			"CATEGORIES": categories,
+		})
 	return
 }
 
@@ -335,7 +336,6 @@ func (a *AdminHandler) UpdateCategory(c *gin.Context) {
 	var req requests.UpdateCategoryRequest
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
-		fmt.Println("------- bind err : ", err)
 		errors.Init()
 		errors.SetFromErrors(err)
 
@@ -429,9 +429,8 @@ func (a *AdminHandler) UpdateCategory(c *gin.Context) {
 	//---------------------------
 
 	categoryUpdateErr := a.categorySrv.Edit(c, catID, &req)
-	fmt.Println("----- handler category edit : error  ", categoryUpdateErr)
+
 	if categoryUpdateErr.Code > 0 {
-		fmt.Println("------- update category err : ", categoryUpdateErr.Error())
 		if categoryUpdateErr.Code == 404 {
 			sessions.Set(c, "message", custom_error.RecordNotFound)
 			c.Redirect(http.StatusFound, "/admins/categories/")
@@ -445,11 +444,7 @@ func (a *AdminHandler) UpdateCategory(c *gin.Context) {
 	}
 
 	if pathToUpload != "" {
-		delImg := os.Remove(viper.GetString("upload.categories") + categoryData.Image)
-		if delImg != nil {
-			fmt.Println("----- dele image  err: ", delImg.Error())
-		}
-		fmt.Println("--- delete succ imag")
+		_ = os.Remove(viper.GetString("upload.categories") + categoryData.Image)
 	}
 	sessions.Set(c, "message", custom_messages.CategoryUpdatedSucc)
 	c.Redirect(http.StatusFound, "/admins/categories/")
@@ -458,10 +453,11 @@ func (a *AdminHandler) UpdateCategory(c *gin.Context) {
 }
 
 func (a *AdminHandler) CategoryProducts(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"category_id": c.Param("id"),
-		"msg":         "implement me",
-	})
+	c.JSON(200,
+		gin.H{
+			"category_id": c.Param("id"),
+			"msg":         "implement me",
+		})
 	return
 }
 
@@ -486,7 +482,7 @@ func (a *AdminHandler) IndexProduct(c *gin.Context) {
 
 	fmt.Println("found products : ", products)
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_index_product", gin.H{
-		"TITLE":    "index products",
+		"TITLE":    "لیست محصولات",
 		"PRODUCTS": products,
 	})
 	return
@@ -518,7 +514,7 @@ func (a *AdminHandler) CreateProduct(c *gin.Context) {
 	}
 
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_product", gin.H{
-		"TITLE":      "create new product",
+		"TITLE":      "ایجاد محصول",
 		"CATEGORIES": categories,
 		"BRANDS":     brands.Data,
 	})
@@ -529,7 +525,6 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 	var req requests.CreateProductRequest
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
-		fmt.Println("=== bind err : ", err)
 		errors.Init()
 		errors.SetFromErrors(err)
 
@@ -555,7 +550,6 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 		return
 	}
 	if !IsUnique {
-		fmt.Println("unique error :", CheckErr)
 		errors.Init()
 		errors.Add("sku", custom_error.MustBeUnique)
 		sessions.Set(c, "errors", errors.ToString())
@@ -568,7 +562,6 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("here======")
 	//check category_id existence
 	_, cErr := a.categorySrv.Show(c, req.CategoryID)
 	if cErr.Code > 0 {
@@ -581,10 +574,6 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 		return
 	}
 
-	//c.JSON(200, gin.H{
-	//	"data": req,
-	//})
-	//return
 	imagesForm, _ := c.MultipartForm()
 	imagesFile := imagesForm.File["images[]"]
 	//check required validation
@@ -683,7 +672,7 @@ func (a *AdminHandler) ShowProduct(c *gin.Context) {
 
 	html.Render(c, http.StatusFound, "admin_show_product",
 		gin.H{
-			"TITLE":   "show product",
+			"TITLE":   "نمایش محصول",
 			"PRODUCT": selectedP,
 		},
 	)
@@ -727,10 +716,10 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/admins/products")
 		return
 	}
-	fmt.Println("------- productShow : ", productShow.BrandID)
+
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_edit_product",
 		gin.H{
-			"TITLE":      "edit productShow",
+			"TITLE":      "ویرایش محصول",
 			"PRODUCT":    productShow,
 			"CATEGORIES": categories,
 			"BRANDS":     brands,
@@ -762,7 +751,6 @@ func (a *AdminHandler) UpdateProduct(c *gin.Context) {
 
 	//bind request
 	if err := c.ShouldBind(&req); err != nil {
-		fmt.Println("=== bind err : ", err)
 		errors.Init()
 		errors.SetFromErrors(err)
 
@@ -867,7 +855,6 @@ func (a *AdminHandler) UpdateProduct(c *gin.Context) {
 	//update product
 	updateErr := a.productSrv.Update(c, productID, &req)
 	if updateErr.Code > 0 {
-		fmt.Println("--- handler update product : 857 : err : ", updateErr)
 		sessions.Set(c, "message", custom_messages.ProductUpdateFailed)
 		c.Redirect(http.StatusFound, "/admins/products/")
 	}

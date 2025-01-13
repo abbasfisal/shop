@@ -45,8 +45,9 @@
                                         </option>
 
                                         {{range .CATEGORIES.Data}}
-                                        <option value="{{.ID}}"
-                                                {{if and ( ne $.CATEGORY.ParentID nil) (eq .ID $.CATEGORY.ID)}}
+                                        <option
+                                                value="{{.ID}}"
+                                                {{if and ( ne $.CATEGORY.ParentID nil) (eq .ID $.CATEGORY.ParentIDID)}}
                                                     selected
                                                 {{end}}
                                         >
