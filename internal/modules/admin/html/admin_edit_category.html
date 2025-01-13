@@ -37,7 +37,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>  {{if eq .CATEGORY.ParentID nil}}yes {{end}}سطح</td>
+                                <td>  {{if eq .CATEGORY.ParentID nil}} {{end}}سطح</td>
                                 <td>
                                     <select class="form-control" name="category_id" id="">
 
@@ -101,13 +101,6 @@
                     </form>
                 </div>
                 <!-- /.col-md-6 -->
-
-                ss
-                {{.AUTH.FirstName}}
-                <br>
-                {{range $a,$key:=.}}
-                    {{$a}}:{{$key}}<br>
-                {{end}}
             </div>
             <!-- /.row -->
         </div><!-- /.container-fluid -->
