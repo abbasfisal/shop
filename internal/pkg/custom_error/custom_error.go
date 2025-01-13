@@ -51,6 +51,13 @@ const (
 	UpdatePaymentFaileds          = "ویرایش رکورد پرداخت با خطا روبرو شد"
 	UpdateProductInventoryFaileds = "ویرایش رکورد موجودی محصول با خطا روبرو شد"
 )
+
+var (
+	QuantityExceedsLimit = errors.New("quantity exceeds limit")
+	OutOfStock           = errors.New("out of stock")
+	InternalServerErr    = errors.New("internal Server Error")
+)
+
 const (
 	OTPTooSoonCode            = 4152
 	OTPTooManyRequestCode     = 4150
