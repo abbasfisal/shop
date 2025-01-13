@@ -1,7 +1,6 @@
 package html
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"net/http"
@@ -12,7 +11,6 @@ import (
 )
 
 func Render(c *gin.Context, code int, name string, data gin.H) {
-	fmt.Println("--- render.go - Render() : url : ", c.Request.URL)
 	data = WithGlobalData(c, data)
 
 	format := c.DefaultQuery("format", "html")

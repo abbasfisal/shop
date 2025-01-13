@@ -12,7 +12,7 @@ const (
 	//attribute
 	AttributeCreateFailed        = "خطا در ایجاد ویژگی"
 	AttributeCreateSuccessful    = "ایجاد ویژگی با موفقیت انجام شد"
-	AttributeUpdatedSuccessfully = "ویژگی با موفقیت بروزرسانی شاد"
+	AttributeUpdatedSuccessfully = "ویژگی با موفقیت بروزرسانی شد"
 
 	//Attribute-value
 	AttValueCreatedSuccessfully      = "ایجاد attribute-value با موفقیت انجام شد"

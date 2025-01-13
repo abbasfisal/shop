@@ -466,13 +466,9 @@ func (a *AdminHandler) CategoryProducts(c *gin.Context) {
 //-------------------------------
 
 func (a *AdminHandler) IndexProduct(c *gin.Context) {
-	products, err := a.productSrv.Index(context.TODO())
+	products, err := a.productSrv.Index(c.Request.Context())
 	if err.Code == 404 {
-		//not found
-		html.Render(c, http.StatusFound, "modules/admin/html/admin_index_product", gin.H{
-			"TITLE":   "index products",
-			"MESSAGE": custom_error.RecordNotFound,
-		})
+		c.JSON(http.StatusOK, gin.H{"msg": "محصولی یافت نشد / محصول اضافه کنید"})
 		return
 	}
 	if err.Code == 500 {
@@ -480,7 +476,6 @@ func (a *AdminHandler) IndexProduct(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("found products : ", products)
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_index_product", gin.H{
 		"TITLE":    "لیست محصولات",
 		"PRODUCTS": products,
@@ -870,9 +865,10 @@ func (a *AdminHandler) UpdateProduct(c *gin.Context) {
 //----------------------
 
 func (a *AdminHandler) CreateAttribute(c *gin.Context) {
-	html.Render(c, http.StatusFound, "admin_create_attribute", gin.H{
-		"TITLE": "create new attribute",
-	})
+	html.Render(c, http.StatusFound, "admin_create_attribute",
+		gin.H{
+			"TITLE": "ایجاد اتریبیوت",
+		})
 	return
 }
 
@@ -1155,7 +1151,7 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		return
 	}
 
-	productShow, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+	productShow, pErr := a.productSrv.Show(c.Request.Context(), "id", pID)
 
 	if pErr.Code == 404 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -1165,8 +1161,8 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		html.Error500(c)
 		return
 	}
-	html.Render(c, http.StatusFound, "edit-gallery-productShow", gin.H{
-		"TITLE":   "edit gallery productShow",
+	html.Render(c, http.StatusFound, "edit-gallery-product", gin.H{
+		"TITLE":   "ویرایش تصاویر محصول",
 		"PRODUCT": productShow,
 	})
 	return
@@ -1309,10 +1305,11 @@ func (a *AdminHandler) IndexAttribute(c *gin.Context) {
 		html.Error500(c)
 		return
 	}
-	html.Render(c, 200, "admin_index_attribute", gin.H{
-		"TITLE":      "Index Attributes",
-		"ATTRIBUTES": attributes,
-	})
+	html.Render(c, 200, "admin_index_attribute",
+		gin.H{
+			"TITLE":      "لیست اتریبیوت ها",
+			"ATTRIBUTES": attributes,
+		})
 	return
 
 }
@@ -1338,7 +1335,7 @@ func (a *AdminHandler) ShowAttribute(c *gin.Context) {
 
 	html.Render(c, http.StatusFound, "admin_show_attribute",
 		gin.H{
-			"TITLE":     "show attributeShow",
+			"TITLE":     "نمایش اتریبیوت",
 			"ATTRIBUTE": attributeShow,
 		},
 	)
@@ -1373,7 +1370,6 @@ func (a *AdminHandler) UpdateAttribute(c *gin.Context) {
 	_ = c.Request.ParseForm()
 	bErr := c.ShouldBind(&req)
 	if bErr != nil {
-		fmt.Println(" ---- update attr bErr:", bErr)
 		errors.Init()
 		errors.SetFromErrors(bErr)
 		sessions.Set(c, "errors", errors.ToString())
@@ -1724,7 +1720,7 @@ func (a *AdminHandler) CreateProductFeature(c *gin.Context) {
 
 	html.Render(c, http.StatusFound, "admin_add_product_feature",
 		gin.H{
-			"TITLE":   "add productShow feature",
+			"TITLE":   "افزودن feature به محصول",
 			"PRODUCT": productShow,
 		},
 	)
