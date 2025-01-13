@@ -134,6 +134,7 @@ func (a *AdminHandler) UpdateBrand(c *gin.Context) {
 	imageFile, imageErr := c.FormFile("image")
 	oldImagePath := brand.Image
 	pathToUpload := brand.Image
+	newImageName := ""
 
 	if imageErr == nil {
 
@@ -154,7 +155,7 @@ func (a *AdminHandler) UpdateBrand(c *gin.Context) {
 		}
 
 		//upload image and store on disk
-		newImageName := util.GenerateFilename(imageFile.Filename)
+		newImageName = util.GenerateFilename(imageFile.Filename)
 		pathToUpload = viper.GetString("Upload.Brands") + newImageName
 
 	}
@@ -165,7 +166,9 @@ func (a *AdminHandler) UpdateBrand(c *gin.Context) {
 	if req.Slug == "" {
 		req.Slug = brand.Slug
 	}
-	req.Image = pathToUpload
+	if imageFile != nil {
+		req.Image = newImageName
+	}
 
 	_, uErr := a.brandSrv.Update(c, brandID, &req)
 	if uErr.Code == 404 {
