@@ -21,7 +21,7 @@ import (
 )
 
 func (a *AdminHandler) ShowCreateBrand(c *gin.Context) {
-	html.Render(c, 200, "create-brand", gin.H{"TITLE": "create new brand"})
+	html.Render(c, 200, "create-brand", gin.H{"TITLE": "ایجاد برند"})
 	return
 }
 
@@ -40,7 +40,7 @@ func (a *AdminHandler) IndexBrand(c *gin.Context) {
 	}
 
 	html.Render(c, 200, "modules/admin/html/admin_index_brand", gin.H{
-		"TITLE":  "Index Brand",
+		"TITLE":  "لیست برند ها",
 		"BRANDS": brands,
 	})
 	return
@@ -53,7 +53,7 @@ func (a *AdminHandler) ShowBrand(c *gin.Context) {
 	}
 
 	html.Render(c, http.StatusOK, "show-brand", gin.H{
-		"TITLE":    "show brand",
+		"TITLE":    "نمایش برند",
 		"BRAND_ID": brandID,
 		"BRAND":    brand,
 	})
@@ -87,7 +87,7 @@ func (a *AdminHandler) EditBrand(c *gin.Context) {
 	}
 
 	html.Render(c, http.StatusFound, "edit-brand", gin.H{
-		"TITLE":    "update brand",
+		"TITLE":    "بروزرسانی برند",
 		"BRAND_ID": brandID,
 		"BRAND":    brand,
 	})
@@ -208,7 +208,6 @@ func (a *AdminHandler) StoreBrand(c *gin.Context) {
 	var req requests.CreateBrandRequest
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
-		fmt.Println("error ---------- :", err)
 		errors.Init()
 		errors.SetFromErrors(err)
 
@@ -302,7 +301,6 @@ func (a *AdminHandler) StoreBrand(c *gin.Context) {
 	newBrand, err := a.brandSrv.Create(c.Request.Context(), &req)
 	if err != nil || newBrand.ID <= 0 {
 		_ = os.Remove(pathToUpload)
-		fmt.Println("----- error in creating brand ---- : ", err)
 		sessions.Set(c, "message", "خطا در ایجاد برند")
 		c.Redirect(http.StatusFound, "/admins/categories/create")
 		return
