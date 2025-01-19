@@ -53,9 +53,10 @@ const (
 )
 
 var (
-	QuantityExceedsLimit = errors.New("quantity exceeds limit")
-	OutOfStock           = errors.New("out of stock")
-	InternalServerErr    = errors.New("internal Server Error")
+	QuantityExceedsLimit        = errors.New("quantity exceeds limit")
+	OutOfStock                  = errors.New("out of stock")
+	InternalServerErr           = errors.New("internal Server Error")
+	InventoryLockedByAnotherOne = errors.New("inventory locked by another process")
 )
 
 const (
