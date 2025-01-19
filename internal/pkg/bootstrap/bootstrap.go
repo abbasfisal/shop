@@ -5,6 +5,7 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/text/language"
@@ -29,6 +30,7 @@ type Dependencies struct {
 	I18nBundle  *i18n.Bundle
 	AsynqClient *asynq.Client
 	DB          *gorm.DB
+	RedisClient *redis.Client
 	MongoClient *mongo.Client
 }
 
@@ -69,7 +71,9 @@ func Initialize() (*Dependencies, error) {
 			I18nBundle:  bundle,
 			AsynqClient: asynqClient,
 			DB:          mysql.Get(),
+			RedisClient: cache.NewRedisClient(),
 			MongoClient: mongodb.Get(),
+			//	EventManager: events.NewEventManager(&eventManagerDep),
 		}
 
 	})
