@@ -2,32 +2,30 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hibiken/asynq"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"shop/internal/events"
 	"shop/internal/middlewares"
 	PublicHandler "shop/internal/modules/public/handlers"
 	CustomerMiddlewares "shop/internal/modules/public/middlewares"
-	homeRepository "shop/internal/modules/public/repositories/home"
+	mysqlRepo "shop/internal/modules/public/repositories/home"
 	"shop/internal/modules/public/repositories/home_mongo"
 	"shop/internal/modules/public/services/home"
+	"shop/internal/pkg/bootstrap"
 )
 
-func SetPublic(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client) {
+func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.EventManager) {
 
-	//home repository
-	homeRep := homeRepository.NewHomeRepository()
-
-	MongoHomeRepo := home_mongo.NewMongoRepository()
+	repo := mysqlRepo.NewHomeRepository(dep, eventManager)
+	MongoHomeRepo := home_mongo.NewMongoRepository() // we don't pass dep , eventManager bcz its not necessary
 
 	//home service
-	homeSrv := home.NewHomeService(homeRep, MongoHomeRepo)
+	homeSrv := home.NewHomeService(dep, repo, MongoHomeRepo, eventManager)
 
 	//--- [Global Middleware]
 	r.Use(CustomerMiddlewares.LoadMenu(homeSrv)) //load menu by LoadMenu middleware
 	r.Use(CustomerMiddlewares.CheckUserAuth())   //set `auth` key in context if user was existed in database
 	//----
 
-	publicHdl := PublicHandler.NewPublicHandler(homeSrv, i18nBundle)
+	publicHdl := PublicHandler.NewPublicHandler(homeSrv, dep)
 
 	r.GET("/", publicHdl.HomePage)
 	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct) //show single product
