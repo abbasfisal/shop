@@ -1,4 +1,6 @@
-//example
+// ---------------------------
+// example with multi listener
+// ----------------------------
 
 package events
 
