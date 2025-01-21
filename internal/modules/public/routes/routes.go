@@ -13,7 +13,7 @@ import (
 )
 
 func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.EventManager) {
-
+	// note: we need to access to the eventManager in everywhere like repo , service
 	repo := mysqlRepo.NewHomeRepository(dep, eventManager)
 	MongoHomeRepo := home_mongo.NewMongoRepository() // we don't pass dep , eventManager bcz its not necessary
 
