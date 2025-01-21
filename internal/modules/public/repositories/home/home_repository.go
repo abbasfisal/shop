@@ -7,15 +7,16 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"log"
 	"math/rand"
-	"shop/internal/database/mysql"
 	"shop/internal/entities"
+	"shop/internal/events"
 	AdminUserResponse "shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/responses"
+	"shop/internal/pkg/bootstrap"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/helpers"
 	"shop/internal/pkg/pagination"
@@ -27,12 +28,14 @@ import (
 )
 
 type HomeRepository struct {
-	db *gorm.DB
+	dep          *bootstrap.Dependencies
+	eventManager *events.EventManager
 }
 
-func NewHomeRepository() HomeRepositoryInterface {
+func NewHomeRepository(dep *bootstrap.Dependencies, eventManager *events.EventManager) HomeRepositoryInterface {
 	return &HomeRepository{
-		db: mysql.Get(),
+		dep:          dep,
+		eventManager: eventManager,
 	}
 }
 
@@ -48,7 +51,7 @@ func (h *HomeRepository) GetRandomProducts(ctx context.Context, limit int) ([]*e
 func (h *HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]*entities.Product, error) {
 	var products []*entities.Product
 	//todo: just load data if category.status = true and product.status=true
-	err := h.db.WithContext(ctx).
+	err := h.dep.DB.WithContext(ctx).
 		Preload("Category").Where("status=?", true).
 		Limit(limit).Find(&products).
 		Error
@@ -57,7 +60,7 @@ func (h *HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]*e
 }
 func (h *HomeRepository) GetCategories(ctx context.Context, limit int) ([]*entities.Category, error) {
 	var categories []*entities.Category
-	err := h.db.WithContext(ctx).
+	err := h.dep.DB.WithContext(ctx).
 		Limit(limit).
 		Find(&categories, "status=?", true).
 		Error
@@ -77,7 +80,7 @@ func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSl
 	}
 
 	var product entities.Product
-	aerr := h.db.WithContext(c).
+	aerr := h.dep.DB.WithContext(c).
 		Preload("Category").
 		Preload("Brand").
 		Preload("ProductImages").
@@ -93,7 +96,7 @@ func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSl
 
 	result := make(map[string]interface{})
 
-	serr := h.db.
+	serr := h.dep.DB.
 		WithContext(c).
 		Table("product_inventories").
 		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, product_inventory_attributes.id AS product_inventory_attribute_id").
@@ -138,7 +141,7 @@ func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSl
 func (h *HomeRepository) GetProductsBy(ctx context.Context, columnName string, value any) ([]*entities.Product, error) {
 	var products []*entities.Product
 	condition := fmt.Sprintf("%s = ?", columnName)
-	err := h.db.WithContext(ctx).
+	err := h.dep.DB.WithContext(ctx).
 		Where(condition, value).
 		Find(&products).
 		Error
@@ -147,7 +150,7 @@ func (h *HomeRepository) GetProductsBy(ctx context.Context, columnName string, v
 }
 func (h *HomeRepository) GetCategoryBy(ctx context.Context, columnName string, value any) (*entities.Category, error) {
 	var category entities.Category
-	err := h.db.WithContext(ctx).
+	err := h.dep.DB.WithContext(ctx).
 		Where(fmt.Sprintf("%s = ?", columnName), value).
 		Find(&category).
 		Error
@@ -160,7 +163,7 @@ func (h *HomeRepository) NewOtp(ctx context.Context, mobile string) (*entities.O
 	var otpCount int64
 
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
-	h.db.Model(entities.OTP{}).WithContext(ctx).Where("mobile = ? AND created_at >= ?", mobile, oneHourAgo).Count(&otpCount)
+	h.dep.DB.Model(entities.OTP{}).WithContext(ctx).Where("mobile = ? AND created_at >= ?", mobile, oneHourAgo).Count(&otpCount)
 
 	if otpCount >= int64(maxOTPRequestPerHour) {
 		fmt.Println("---- to many request otp ---line : 77  ---- ")
@@ -168,7 +171,7 @@ func (h *HomeRepository) NewOtp(ctx context.Context, mobile string) (*entities.O
 	}
 
 	//check under 4 min
-	h.db.WithContext(ctx).Where("mobile = ? AND is_expired = ? ", mobile, false).Order("created_at desc").First(&lastOtp)
+	h.dep.DB.WithContext(ctx).Where("mobile = ? AND is_expired = ? ", mobile, false).Order("created_at desc").First(&lastOtp)
 	fmt.Println("-------- before check --------- : ", lastOtp)
 	fmt.Println(" ******** time since ******: ", time.Since(lastOtp.CreatedAt))
 	if lastOtp.ID != 0 && time.Since(lastOtp.CreatedAt) <= 4*time.Minute {
@@ -182,7 +185,7 @@ func (h *HomeRepository) NewOtp(ctx context.Context, mobile string) (*entities.O
 		IsExpired: false,
 	}
 
-	if err := h.db.WithContext(ctx).Create(&newOtp).Error; err != nil {
+	if err := h.dep.DB.WithContext(ctx).Create(&newOtp).Error; err != nil {
 		return nil, custom_error.New(err.Error(), custom_error.SomethingWrongHappened, custom_error.OtpSomethingGoesWrongCode)
 	}
 	return &newOtp, custom_error.CustomError{}
@@ -192,14 +195,14 @@ func (h *HomeRepository) VerifyOtp(c *gin.Context, mobile string, req *requests.
 	otpCode := fmt.Sprintf("%s%s%s%s", req.N1, req.N2, req.N3, req.N4)
 	fmt.Println("------ VerifyOtp : home repository : 105 : otp : ", otpCode)
 	fmt.Println("------ VerifyOtp : home repository : 105 : mobile : ", mobile)
-	err := h.db.WithContext(c).Where("mobile = ? AND code = ? ", mobile, otpCode).First(&otp).Error
+	err := h.dep.DB.WithContext(c).Where("mobile = ? AND code = ? ", mobile, otpCode).First(&otp).Error
 
 	fmt.Println("--- verify otp err:--- ", err)
 	return &otp, err
 }
 func (h *HomeRepository) ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error) {
 
-	tx := h.db.Begin()
+	tx := h.dep.DB.Begin()
 	if tx.Error != nil {
 		return entities.Session{}, tx.Error
 	}
@@ -268,7 +271,7 @@ func (h *HomeRepository) ProcessCustomerAuthenticate(c *gin.Context, mobile stri
 func (h *HomeRepository) LogOut(c *gin.Context) error {
 	sessionId := sessions.GET(c, "session_id")
 
-	return h.db.Where("session_id = ?", sessionId).
+	return h.dep.DB.Where("session_id = ?", sessionId).
 		Delete(&entities.Session{}).
 		Error
 }
@@ -276,16 +279,16 @@ func (h *HomeRepository) UpdateProfile(c *gin.Context, req *requests.CustomerPro
 
 	var sess entities.Session
 	sessionId := sessions.GET(c, "session_id")
-	if sessErr := h.db.Where("session_id = ? ", sessionId).First(&sess).Error; sessErr != nil {
+	if sessErr := h.dep.DB.Where("session_id = ? ", sessionId).First(&sess).Error; sessErr != nil {
 		return sessErr
 	}
 
 	var customer entities.Customer
-	if cErr := h.db.First(&customer, sess.CustomerID).Error; cErr != nil {
+	if cErr := h.dep.DB.First(&customer, sess.CustomerID).Error; cErr != nil {
 		return cErr
 	}
 
-	if uErr := h.db.Model(&customer).
+	if uErr := h.dep.DB.Model(&customer).
 		Update("first_name", strings.TrimSpace(req.FirstName)).
 		Update("last_name", strings.TrimSpace(req.LastName)).Error; uErr != nil {
 		return uErr
@@ -295,7 +298,7 @@ func (h *HomeRepository) UpdateProfile(c *gin.Context, req *requests.CustomerPro
 }
 func (h *HomeRepository) GetMenu(ctx context.Context) ([]*entities.Category, error) {
 	var menu []*entities.Category
-	err := h.db.WithContext(ctx).
+	err := h.dep.DB.WithContext(ctx).
 		Preload("SubCategories", func(db *gorm.DB) *gorm.DB {
 			return db.Order("priority is null ,priority ASC")
 		}).
@@ -335,19 +338,19 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 	}
 
 	var category entities.Category
-	if err := h.db.WithContext(c).Where("slug = ?", slug).First(&category).Error; err != nil {
+	if err := h.dep.DB.WithContext(c).Where("slug = ?", slug).First(&category).Error; err != nil {
 		return pg, err
 	}
 
 	var products []*entities.Product
 	condition := fmt.Sprintf("category_id=%d", category.ID)
 
-	paginateQuery, exist := pagination.Paginate(c, condition, &products, &pg, h.db)
+	paginateQuery, exist := pagination.Paginate(c, condition, &products, &pg, h.dep.DB)
 	if !exist {
 		return pg, gorm.ErrRecordNotFound
 	}
 
-	if pErr := paginateQuery(h.db).
+	if pErr := paginateQuery(h.dep.DB).
 		Preload("ProductImages").
 		Where("category_id=?", category.ID).
 		Find(&products).Error; pErr != nil {
@@ -367,7 +370,7 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 	var cart entities.Cart
 
 	//todo:check cart status
-	err := h.db.
+	err := h.dep.DB.
 		WithContext(c).
 		Preload("CartItems").
 		Where("customer_id = ? AND status = ? ", user.ID, 0).
@@ -395,7 +398,7 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 			},
 		}
 
-		h.db.Create(&cart)
+		h.dep.DB.Create(&cart)
 		fmt.Println("~~~~~~~ [create] new cart created ,cart id is : ", cart.ID)
 	} else {
 
@@ -430,23 +433,70 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 					ProductSlug:   product.Product.Slug,
 				},
 			}
-			h.db.Model(&cart).Association("CartItems").Append(&CartItems)
+			h.dep.DB.Model(&cart).Association("CartItems").Append(&CartItems)
 
 		}
 
-		h.db.Save(&cart)
+		h.dep.DB.Save(&cart)
 
 	}
 
 }
 func (h *HomeRepository) IncreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error {
+	log.Printf("data : %+v \n", req)
+
 	customer, exist := helpers.GetAuthUser(c)
 	if !exist {
+		fmt.Println("----1")
+		return errors.New(custom_error.SomethingWrongHappened)
+	}
+	fmt.Println("----2")
+
+	var currentQty int
+	checkCartQtyErr := h.dep.DB.
+		WithContext(c).
+		Model(&entities.CartItem{}).
+		Select("SUM(quantity)").
+		Where("cart_id = ?", req.CartID).
+		Where("customer_id = ?", customer.ID).
+		Where("product_id = ?", req.ProductID).
+		Where("inventory_id = ?", req.InventoryID).
+		Scan(&currentQty).Error
+
+	if checkCartQtyErr != nil {
+		fmt.Println("----3 :current qty:", currentQty)
 		return errors.New(custom_error.SomethingWrongHappened)
 	}
 
+	if currentQty >= 3 {
+		fmt.Println("----4")
+		return custom_error.QuantityExceedsLimit
+	}
+
+	//check inventory
+	var productInventory entities.ProductInventory
+	err := h.dep.DB.WithContext(c).
+		Where("id = ? AND product_id = ?", req.InventoryID, req.ProductID).
+		First(&productInventory).Error
+
+	if err != nil {
+		fmt.Println("----5")
+		return errors.New(custom_error.SomethingWrongHappened)
+	}
+	realQty := productInventory.Quantity - productInventory.ReservedStock
+	fmt.Println("----6 : real qty:", realQty)
+
+	// 2<3 || 3<3+1
+	if realQty < uint(currentQty) || realQty < uint(currentQty)+1 {
+		fmt.Println("----7")
+		//out of stock
+		return custom_error.OutOfStock
+	}
+
+	fmt.Println("----8")
+
 	//return nil
-	return h.db.
+	qtyExceedLimitErr := h.dep.DB.
 		Model(&entities.CartItem{}).
 		Where("cart_id=?", req.CartID).
 		Where("customer_id=?", customer.ID).
@@ -454,7 +504,11 @@ func (h *HomeRepository) IncreaseCartItemCount(c *gin.Context, req *requests.Inc
 		Where("inventory_id=?", req.InventoryID).
 		Where("quantity<?", 3).                                //max qty to order
 		Update("quantity", gorm.Expr("quantity + ?", 1)).Error //todo:qty <3
+	if qtyExceedLimitErr != nil {
+		return custom_error.QuantityExceedsLimit
+	}
 
+	return nil
 }
 func (h *HomeRepository) DecreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error {
 	customer, exist := helpers.GetAuthUser(c)
@@ -462,7 +516,7 @@ func (h *HomeRepository) DecreaseCartItemCount(c *gin.Context, req *requests.Inc
 		return errors.New(custom_error.SomethingWrongHappened)
 	}
 
-	return h.db.
+	return h.dep.DB.
 		Model(&entities.CartItem{}).
 		Where("cart_id=?", req.CartID).
 		Where("customer_id=?", customer.ID).
@@ -479,7 +533,7 @@ func (h *HomeRepository) DeleteCartItem(c *gin.Context, req *requests.IncreaseCa
 		return errors.New(custom_error.SomethingWrongHappened)
 	}
 
-	return h.db.
+	return h.dep.DB.
 		Model(&entities.CartItem{}).Unscoped().
 		Where("cart_id=?", req.CartID).
 		Where("customer_id=?", customer.ID).
@@ -496,7 +550,7 @@ func (h *HomeRepository) CreateOrUpdateAddress(c *gin.Context, req *requests.Sto
 	}
 
 	if customer.Address.ID <= 0 {
-		if err := h.db.Create(&entities.Address{
+		if err := h.dep.DB.Create(&entities.Address{
 			CustomerID:         customer.ID,
 			ReceiverName:       req.ReceiverName,
 			ReceiverMobile:     req.ReceiverMobile,
@@ -508,7 +562,7 @@ func (h *HomeRepository) CreateOrUpdateAddress(c *gin.Context, req *requests.Sto
 		}
 	}
 
-	if err := h.db.Model(&entities.Address{}).
+	if err := h.dep.DB.Model(&entities.Address{}).
 		Where("customer_id=?", customer.ID).
 		Updates(&entities.Address{
 			CustomerID:         customer.ID,
@@ -524,51 +578,115 @@ func (h *HomeRepository) CreateOrUpdateAddress(c *gin.Context, req *requests.Sto
 	return nil
 }
 
+func releaseLocks(ctx context.Context, redisClient *redis.Client, lockKeys []string) {
+	if len(lockKeys) > 0 {
+		redisClient.Del(ctx, lockKeys...)
+	}
+}
+
+// retryWithBackoff attempts an operation with retries and exponential backoff
+func retryWithBackoff(attempts int, delay time.Duration, operation func() error) error {
+	var err error
+	for i := 0; i < attempts; i++ {
+		if err = operation(); err == nil {
+			return nil
+		}
+		time.Sleep(delay)
+		delay *= 2 // Exponential backoff
+	}
+	return err
+}
+
 // GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
-func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (*entities.Order, error) {
+func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *entities.Order, inventoryID uint, GenerateOrderErr error) {
 	customer, ok := helpers.GetAuthUser(c)
 	if !ok {
-		return nil, errors.New(custom_error.SomethingWrongHappened)
+		return nil, inventoryID, errors.New(custom_error.SomethingWrongHappened)
 	}
 
-	tx := h.db.WithContext(c).Begin()
+	// start transaction
+	tx := h.dep.DB.WithContext(c).Begin()
+
+	// store redis lock keys
+	lockKeys := make([]string, 0)
 
 	//check qty and reserve it
 	for _, cartItem := range customer.Cart.CartItem.Data {
+
+		// generate keys to store in redis -> e.g. key "lock:inventory:203"
+		lockKey := fmt.Sprintf("lock:inventory:%d", cartItem.InventoryID)
+
+		// store `lockKey` in redis
+		lockErr := retryWithBackoff(3, 100*time.Millisecond,
+			func() error {
+				locked, redisErr := h.dep.RedisClient.SetNX(c, lockKey, "locked", 5*time.Second).Result()
+				if redisErr != nil {
+					return redisErr
+				}
+				if !locked {
+					return custom_error.InventoryLockedByAnotherOne
+				}
+				lockKeys = append(lockKeys, lockKey)
+				return nil
+			})
+
+		if lockErr != nil {
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
+			return nil, inventoryID, lockErr
+		}
+
 		var pInventory entities.ProductInventory
 
-		//lock for update
-		if cItemErr := tx.
-			Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where("id = ? AND product_id = ?", cartItem.InventoryID, cartItem.ProductID).
-			First(&pInventory).
-			Error; cItemErr != nil {
+		// find specific inventory
+		findErr := retryWithBackoff(3, 100*time.Millisecond,
+			func() error {
+				return tx.WithContext(c).
+					Where("id = ? AND product_id = ?", cartItem.InventoryID, cartItem.ProductID).
+					First(&pInventory).
+					Error
+			})
+		// not found
+		if findErr != nil {
 			tx.Rollback()
-			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[find-inventory]-error:", cItemErr.Error())
-			return nil, cItemErr
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
+
+			return nil, inventoryID, findErr
 		}
 
+		// real inventory quantity
 		realQty := pInventory.Quantity - pInventory.ReservedStock
+
+		// out of stock
 		if realQty < uint(cartItem.Quantity) {
-			//out of stock
 			tx.Rollback()
-			return nil, errors.New("out of stock")
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
+
+			return nil, pInventory.ID, custom_error.OutOfStock
 		}
+
+		//var finalQty uint
+		pInventory.ReservedStock += uint(cartItem.Quantity)
 
 		//update and save reserved stock
-		pInventory.ReservedStock += uint(cartItem.Quantity)
-		if updateInventoryReservedStock := tx.Save(&pInventory).Error; updateInventoryReservedStock != nil {
+		updateInventoryReservedStock := retryWithBackoff(3, 100*time.Millisecond,
+			func() error {
+				return tx.Save(&pInventory).Error
+			})
+
+		//update and save reserved stock (rollback)
+		if updateInventoryReservedStock != nil {
 			tx.Rollback()
-			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[update-reserve-stock]-error:", updateInventoryReservedStock.Error())
-			return nil, updateInventoryReservedStock
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
+
+			return nil, pInventory.ID, updateInventoryReservedStock
 		}
 
 	}
 
-	//convert address struct to json
+	//convert address struct to json to store in order
 	addressJson, _ := json.Marshal(customer.Address)
 
-	//create order
+	// prepare order entity
 	order := entities.Order{
 		CustomerID:         customer.ID,
 		OrderNumber:        strconv.Itoa(rand.Intn(9999999)),
@@ -580,13 +698,21 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (*entities.Order,
 		Address:            string(addressJson),
 	}
 
-	if createOrderError := tx.Create(&order).Error; createOrderError != nil {
+	// store order in db
+	createOrderError := retryWithBackoff(3, 100*time.Millisecond,
+		func() error {
+			return tx.Create(&order).Error
+		})
+
+	// store order failed
+	if createOrderError != nil {
 		tx.Rollback()
-		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order]-error:", createOrderError.Error())
-		return nil, createOrderError
+		releaseLocks(c, h.dep.RedisClient, lockKeys)
+
+		return nil, inventoryID, createOrderError
 	}
 
-	//create order-items
+	// prepare order-item (rollback)
 	var orderItems []entities.OrderItem
 	for _, cartItem := range customer.Cart.CartItem.Data {
 		orderItems = append(orderItems, entities.OrderItem{
@@ -600,33 +726,51 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (*entities.Order,
 			TotalOriginalPrice: cartItem.OriginalPrice * uint(cartItem.Quantity),
 			TotalSalePrice:     cartItem.SalePrice * uint(cartItem.Quantity),
 		})
-		util.PrettyJson(cartItem)
+
 	}
 
-	if createOrderItemsErr := tx.Create(&orderItems).Error; createOrderItemsErr != nil {
+	// store order-item in db
+	createOrderItemsErr := retryWithBackoff(3, 100*time.Millisecond,
+		func() error {
+			return tx.Create(&orderItems).Error
+		})
+
+	// store order-item failed(rollback)
+	if createOrderItemsErr != nil {
 		tx.Rollback()
+		releaseLocks(c, h.dep.RedisClient, lockKeys)
+
 		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order-items]-error:", createOrderItemsErr.Error())
-		return nil, createOrderItemsErr
+		return nil, inventoryID, createOrderItemsErr
 	}
 
 	//Delete Cart and its CartItem
 	if true {
-		if deleteCartErr := h.db.WithContext(c).Unscoped().Delete(&entities.Cart{}, customer.Cart.ID).Error; deleteCartErr != nil {
+		deleteCartErr := retryWithBackoff(3, 100*time.Millisecond,
+			func() error {
+				return h.dep.DB.WithContext(c).Unscoped().Delete(&entities.Cart{}, customer.Cart.ID).Error
+			},
+		)
+
+		if deleteCartErr != nil {
 			tx.Rollback()
-			fmt.Println("[home_repository]-[GenerateOrderFromCart]-[delete-cart-and-cartItem]-error:", deleteCartErr.Error())
-			return nil, deleteCartErr
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
+
+			return nil, inventoryID, deleteCartErr
 		}
 	}
 
+	// release redis locks
+	defer releaseLocks(c, h.dep.RedisClient, lockKeys)
+
 	tx.Commit()
-	return &order, nil
+
+	return &order, inventoryID, nil
 }
-func (h *HomeRepository) Release(order *entities.Order, tx *gorm.DB) {
-	tx.Rollback()
-}
+
 func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.Order, refID string, verified bool) (*entities.Order, bool, custom_error.CustomError) {
 
-	tx := h.db.WithContext(c).Begin()
+	tx := h.dep.DB.WithContext(c).Begin()
 
 	//if err := tx.Preload("OrderItems").Where("id=? AND amount=?", payment.OrderID).First(&order).Error; err != nil {
 	//	tx.Rollback()
@@ -670,66 +814,115 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 	}
 
 	//decrees product inventory quantity and product inventory reserved stock
+	lockKeys := make([]string, 0)
+
 	for _, orderItem := range order.OrderItems {
+		lockKey := fmt.Sprintf("lock:inventory:%d", orderItem.InventoryID)
+		lockErr := retryWithBackoff(3, 100*time.Millisecond, func() error {
+			locked, redisLockErr := h.dep.RedisClient.SetNX(c, lockKey, "locked", 5*time.Second).Result()
+			if redisLockErr != nil {
+				return redisLockErr
+			}
+			if !locked {
+				return custom_error.InventoryLockedByAnotherOne
+			}
+			lockKeys = append(lockKeys, lockKey)
+			return nil
+		})
+		if lockErr != nil {
+			fmt.Println("failed to to lock keys in OrderPaidSuccessfully")
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
+			return nil, false, custom_error.CustomError{}
+		}
+
 		log.Println("----- x 3")
 		var productInventory entities.ProductInventory
-		if findProductInventoryErr := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where("product_id=? AND id=?", orderItem.ProductID, orderItem.InventoryID).
-			First(&productInventory).Error; findProductInventoryErr != nil {
-			log.Println("----- x 4")
-
+		findProductInventoryErr :=
+			retryWithBackoff(3, 100*time.Millisecond,
+				func() error {
+					log.Println("----- x 4")
+					return tx.
+						//Clauses(clause.Locking{Strength: "UPDATE"}).
+						WithContext(c).
+						Where("product_id=? AND id=?", orderItem.ProductID, orderItem.InventoryID).
+						First(&productInventory).Error
+				})
+		if findProductInventoryErr != nil {
 			tx.Rollback()
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
 			return order, false, custom_error.New(findProductInventoryErr.Error(), custom_error.ProductInventoryNotFounds, custom_error.ProductInventoryNotFound)
 		}
 
 		if verified {
 			log.Println("----- x 5")
-
 			productInventory.Quantity -= orderItem.Quantity
 			productInventory.ReservedStock -= orderItem.Quantity
 		} else {
 			log.Println("----- x 6")
-
 			productInventory.ReservedStock -= orderItem.Quantity
 		}
 
-		//todo: update mongodb
-		if updateProductInventoryErr := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Save(&productInventory).Error; updateProductInventoryErr != nil {
-			log.Println("----- x 7")
+		// update Product Inventory
+		updateProductInventoryErr :=
+			retryWithBackoff(3, 100*time.Millisecond, func() error {
+				log.Println("----- x 7")
+				return tx.Save(&productInventory).Error
+			})
 
+		// update product Inventory
+		if updateProductInventoryErr != nil {
+			log.Println("----- x 7-1")
 			tx.Rollback()
+			releaseLocks(c, h.dep.RedisClient, lockKeys)
 			return order, false, custom_error.New(updateProductInventoryErr.Error(), custom_error.UpdateProductInventoryFaileds, custom_error.UpdateProductInventoryFailed)
+		} else {
+
+			// if there is no any error we update sync mongo db
+			h.eventManager.Emit(c, events.SyncMongoEvent,
+				events.SyncMongoEventPayload{
+					ProductID: orderItem.ProductID,
+				}, true)
+
+			//product.SyncMongo(c, h.dep.DB, orderItem.ProductID) //todo: call Asynq to update
 		}
 		log.Println("----- x 8")
-
 	}
-
+	defer releaseLocks(c, h.dep.RedisClient, lockKeys)
 	tx.Commit()
 	log.Println("----- x 9")
 
 	return order, true, custom_error.CustomError{}
 
 }
+
 func (h *HomeRepository) CreatePayment(c *gin.Context, payment *entities.Payment) error {
-	if err := h.db.WithContext(c).Create(payment).Error; err != nil {
-		return err
+
+	err := retryWithBackoff(3, 100*time.Millisecond,
+		func() error {
+			return h.dep.DB.WithContext(c).Create(payment).Error
+		})
+
+	if err != nil {
+		fmt.Println("error while creating payment :", err)
+		return custom_error.InternalServerErr
 	}
 	return nil
 }
+
 func (h *HomeRepository) GetPayment(c *gin.Context, authority string) (*entities.Order, entities.Customer, error) {
 	var payment entities.Payment
 	var order entities.Order
 
-	if err := h.db.WithContext(c).Where("authority = ?", authority).First(&payment).Error; err != nil {
+	if err := h.dep.DB.WithContext(c).Where("authority = ?", authority).First(&payment).Error; err != nil {
 		return nil, entities.Customer{}, err
 	}
 
-	if orderErr := h.db.WithContext(c).Preload("OrderItems").Where("id=?", payment.OrderID).First(&order).Error; orderErr != nil {
+	if orderErr := h.dep.DB.WithContext(c).Preload("OrderItems").Where("id=?", payment.OrderID).First(&order).Error; orderErr != nil {
 		return nil, entities.Customer{}, orderErr
 	}
 
 	var customer entities.Customer
-	if customerErr := h.db.WithContext(c).Where("id=?", payment.CustomerID).First(&customer).Error; customerErr != nil {
+	if customerErr := h.dep.DB.WithContext(c).Where("id=?", payment.CustomerID).First(&customer).Error; customerErr != nil {
 		return nil, entities.Customer{}, customerErr
 	}
 
@@ -762,20 +955,20 @@ func (h *HomeRepository) GetPaginatedOrders(c *gin.Context) (pagination.Paginati
 	}
 
 	//var order entities.Order
-	//if err := h.db.WithContext(c).Where("customer_id = ?", customer.ID).First(&order).Error; err != nil {
+	//if err := h.dep.DB.WithContext(c).Where("customer_id = ?", customer.ID).First(&order).Error; err != nil {
 	//	return pg, err
 	//}
 
 	var orders []*entities.Order
 	condition := fmt.Sprintf("customer_id=%d", customer.ID)
 
-	paginateQuery, exist := pagination.Paginate(c, condition, &orders, &pg, h.db)
+	paginateQuery, exist := pagination.Paginate(c, condition, &orders, &pg, h.dep.DB)
 
 	if !exist {
 		return pg, gorm.ErrRecordNotFound
 	}
 
-	if pErr := paginateQuery(h.db).Preload("OrderItems").Where("customer_id=?", customer.ID).Find(&orders).Error; pErr != nil {
+	if pErr := paginateQuery(h.dep.DB).Preload("OrderItems").Where("customer_id=?", customer.ID).Find(&orders).Error; pErr != nil {
 		return pg, pErr
 	}
 
@@ -804,7 +997,7 @@ func (h *HomeRepository) GetOrder(c *gin.Context, orderNumber string) (*entities
 		ProductID   uint
 		InventoryID uint
 	}
-	if err := h.db.WithContext(c).
+	if err := h.dep.DB.WithContext(c).
 		Table("order_items").
 		Select("product_id , inventory_id").
 		Where("customer_id = ?", customer.ID).
@@ -819,7 +1012,7 @@ func (h *HomeRepository) GetOrder(c *gin.Context, orderNumber string) (*entities
 		inventoryIDs = append(inventoryIDs, item.InventoryID)
 	}
 
-	if err := h.db.WithContext(c).
+	if err := h.dep.DB.WithContext(c).
 		Preload("OrderItems.Product.ProductInventoryAttributes",
 			"product_inventory_attributes.product_id IN (?) AND product_inventory_attributes.product_inventory_id IN (?)",
 			productIDs, inventoryIDs,
