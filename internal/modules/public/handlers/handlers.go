@@ -5,7 +5,6 @@ import (
 	errors2 "errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
@@ -14,6 +13,7 @@ import (
 	"os"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/services/home"
+	"shop/internal/pkg/bootstrap"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/errors"
@@ -29,14 +29,14 @@ import (
 )
 
 type PublicHandler struct {
-	homeSrv    home.HomeServiceInterface
-	i18nBundle *i18n.Bundle
+	homeSrv home.HomeServiceInterface
+	dep     *bootstrap.Dependencies
 }
 
-func NewPublicHandler(homeSrv home.HomeServiceInterface, i18nBundle *i18n.Bundle) PublicHandler {
+func NewPublicHandler(homeSrv home.HomeServiceInterface, dep *bootstrap.Dependencies) PublicHandler {
 	return PublicHandler{
-		homeSrv:    homeSrv,
-		i18nBundle: i18nBundle,
+		homeSrv: homeSrv,
+		dep:     dep,
 	}
 }
 
@@ -200,7 +200,7 @@ func (p PublicHandler) PostLogin(c *gin.Context) {
 	//bind
 	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
-		errors.SetErrors(c, p.i18nBundle, err)
+		errors.SetErrors(c, p.dep.I18nBundle, err)
 
 		c.Redirect(http.StatusFound, "/login")
 		return
@@ -388,7 +388,7 @@ func (p PublicHandler) UpdateProfile(c *gin.Context) {
 	if bErr != nil {
 		fmt.Println("-- err : -- ", bErr)
 		errors.Init()
-		errors.SetErrors(c, p.i18nBundle, bErr)
+		errors.SetErrors(c, p.dep.I18nBundle, bErr)
 		old.Init()
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
@@ -519,7 +519,7 @@ func (p PublicHandler) StoreAddress(c *gin.Context) {
 	if err != nil {
 
 		errors.Init()
-		errors.SetErrors(c, p.i18nBundle, err)
+		errors.SetErrors(c, p.dep.I18nBundle, err)
 		old.Init()
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
@@ -600,9 +600,7 @@ func (p PublicHandler) Payment(c *gin.Context) {
 
 func (p PublicHandler) VerifyPayment(c *gin.Context) {
 
-	query := c.Request.URL.Query()
-	//status := query.Get("Status")
-	authority := query.Get("Authority")
+	authority := c.Request.URL.Query().Get("Authority")
 	if authority == "" {
 		html.CustomerRender(c, http.StatusPermanentRedirect, "404", gin.H{})
 		return
@@ -625,6 +623,7 @@ func (p PublicHandler) VerifyPayment(c *gin.Context) {
 		return
 	}
 
+	// call zarinPal to check payment status
 	verified, refID, statusCode, vErr := zarin.PaymentVerification(int(order.Payment.Amount), authority)
 	if vErr != nil || !verified || (statusCode != 100 && statusCode != 101) {
 
@@ -644,17 +643,19 @@ func (p PublicHandler) VerifyPayment(c *gin.Context) {
 	}
 
 	if verified {
-		html.CustomerRender(c, http.StatusOK, "shopping_complete_buy", gin.H{
-			"ORDER_NUMBER": order.OrderNumber,
-		})
+		html.CustomerRender(c, http.StatusOK, "shopping_complete_buy",
+			gin.H{
+				"ORDER_NUMBER": order.OrderNumber,
+			})
 		return
 	}
 
 	if !verified || vErr != nil {
 		//customer canceled payment
-		html.CustomerRender(c, http.StatusOK, "shopping_no_complete_buy", gin.H{
-			"ORDER_NUMBER": order.OrderNumber,
-		})
+		html.CustomerRender(c, http.StatusOK, "shopping_no_complete_buy",
+			gin.H{
+				"ORDER_NUMBER": order.OrderNumber,
+			})
 		return
 	}
 
