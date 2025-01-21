@@ -1,6 +1,7 @@
 package order
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
@@ -10,6 +11,7 @@ import (
 	"shop/internal/pkg/pagination"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type OrderRepository struct {
@@ -137,4 +139,18 @@ func (oRepo *OrderRepository) UpdateOrderStatusAndNote(c *gin.Context, orderID i
 		return nil, nil
 	}
 	return &order, nil
+}
+func (oRepo *OrderRepository) CancelPendingOrders(c *gin.Context) {
+	var orders []entities.Order
+
+	tenMinutesAgo := time.Now().Add(-10 * time.Minute)
+	err := oRepo.db.Where("created_at <=? AND status=?", tenMinutesAgo, entities.OrderPending).Find(&orders).Error
+	if err != nil {
+		fmt.Println("cancel Pending Orders Err:", err)
+	}
+
+	for _, order := range orders {
+		fmt.Println("order id :", order.ID)
+	}
+
 }
