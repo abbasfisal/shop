@@ -7,5 +7,5 @@ func RegisterEvents(em *EventManager) {
 	em.Register(UserCreatedEvent, SendWelcomeNotification, UserCreatedListener)
 
 	// add another event/listener
-
+	em.Register(SyncMongoEvent, SyncMongoListener)
 }
