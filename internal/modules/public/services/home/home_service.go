@@ -10,11 +10,13 @@ import (
 	"log"
 	"os"
 	"shop/internal/entities"
+	"shop/internal/events"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/repositories/home"
 	"shop/internal/modules/public/repositories/home_mongo"
 	"shop/internal/modules/public/requests"
 	CustomerRes "shop/internal/modules/public/responses"
+	"shop/internal/pkg/bootstrap"
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
@@ -26,12 +28,15 @@ import (
 )
 
 type HomeService struct {
+	dep       *bootstrap.Dependencies
 	repo      home.HomeRepositoryInterface
 	mongoRepo home_mongo.MongoHomeRepositoryInterface
 }
 
-func NewHomeService(repo home.HomeRepositoryInterface, mongoRepo home_mongo.MongoHomeRepositoryInterface) HomeServiceInterface {
+func NewHomeService(dep *bootstrap.Dependencies, repo home.HomeRepositoryInterface, mongoRepo home_mongo.MongoHomeRepository, eventManager *events.EventManager) HomeServiceInterface {
+
 	return &HomeService{
+		dep:       dep,
 		repo:      repo,
 		mongoRepo: mongoRepo,
 	}
