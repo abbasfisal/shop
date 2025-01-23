@@ -8,4 +8,6 @@ func RegisterEvents(em *EventManager) {
 
 	// add another event/listener
 	em.Register(SyncMongoEvent, SyncMongoListener)
+
+	em.Register(SendEmailEvent, SendEmailListener)
 }
