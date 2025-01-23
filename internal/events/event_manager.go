@@ -48,7 +48,7 @@ func (em *EventManager) Register(eventName eventName, listeners ...ListenerFunc)
 
 func (em *EventManager) Emit(ctx context.Context, eventName eventName, data any, async bool) {
 	em.mu.Lock()
-	defer em.mu.RUnlock()
+	defer em.mu.Unlock()
 
 	if listeners, ok := em.listeners[eventName]; ok {
 		for _, listener := range listeners {
