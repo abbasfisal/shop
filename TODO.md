@@ -88,13 +88,13 @@ ___
 - [x] implement redis as a cache driver
 - [ ] implement cache system for menu and rows(most orders,most viewed , newest , by categories , etc)
 - [x] add enable/disable , priority to category
-- [ ] store final product in mongodb(flat)
+- [x] store final product in mongodb(flat)
 - [x] crud product feature
 - [x] show single product in home page with multi qty
 - [x] show product by category in home page
 
 __
-- [ ] separate SyncMongo() from product_repository
+- [x] separate SyncMongo() from product_repository
 - [x] add some real menu
 - [x] load all menu in redis
 - 
