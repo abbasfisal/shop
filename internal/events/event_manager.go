@@ -33,6 +33,7 @@ type EventManagerDep struct {
 }
 
 func NewEventManager(dep *EventManagerDep) *EventManager {
+	fmt.Println("---- New Event Manager ---------")
 	once.Do(func() {
 		eventManagerInstance = &EventManager{
 			dep:       dep,
@@ -43,10 +44,12 @@ func NewEventManager(dep *EventManagerDep) *EventManager {
 }
 
 func (em *EventManager) Register(eventName eventName, listeners ...ListenerFunc) {
+	fmt.Println("----- Register Events ---------")
 	em.listeners[eventName] = append(em.listeners[eventName], listeners...)
 }
 
 func (em *EventManager) Emit(ctx context.Context, eventName eventName, data any, async bool) {
+	fmt.Println(" ------- emit ---------")
 	em.mu.Lock()
 	defer em.mu.Unlock()
 
