@@ -6,11 +6,14 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
+	"github.com/natefinch/lumberjack"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"shop/cmd/commands"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
@@ -26,6 +29,9 @@ import (
 func main() {
 
 	dependencies, err := bootstrap.Initialize()
+
+	setupLog()
+
 	if err != nil {
 		log.Fatal("[x] error initializing project :", err)
 	}
@@ -37,6 +43,22 @@ func main() {
 	commands.Execute()
 
 	r := gin.Default()
+	//logger middleware
+	//r.Use(func(c *gin.Context) {
+	//	//store in files only log
+	//	start := time.Now()
+	//
+	//	c.Next()
+	//
+	//	log.Printf(
+	//		"%s | %s | %s | %d | %s",
+	//		time.Now().Format("2006-01-02 15:04:05"),
+	//		c.Request.Method,
+	//		c.Request.URL.Path,
+	//		c.Writer.Status(),
+	//		time.Since(start),
+	//	)
+	//})
 
 	r.SetFuncMap(template.FuncMap{
 		"stringToUint": util.StringToUint,
@@ -50,6 +72,21 @@ func main() {
 	if err := r.Run(addr); err != nil {
 		logging.GlobalLog.FatalF("[Server start failed]: %v", err)
 	}
+}
+
+// setupLog store logs in file and print in stdOut
+func setupLog() {
+
+	fileWriter := &lumberjack.Logger{
+		Filename:   "./storage/logs/shop.log",
+		MaxSize:    10, //MB
+		MaxAge:     10, //day
+		MaxBackups: 5,
+		LocalTime:  false,
+		Compress:   true,
+	}
+	multi := io.MultiWriter(os.Stdout, fileWriter)
+	log.SetOutput(multi)
 }
 
 func setupSessions(r *gin.Engine) {
