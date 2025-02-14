@@ -82,15 +82,15 @@ func Initialize() (*Dependencies, error) {
 
 func loadConfig() error {
 
-	if err := godotenv.Load(".env"); err != nil {
-		return fmt.Errorf("[x] failed to load .env file :%w", err)
+	if err := godotenv.Load("../../.env"); err != nil {
+		return fmt.Errorf("[x] [bootstrap.go][line:86][loadConfig] failed to load .env file :%w", err)
 	}
 
 	viper.AutomaticEnv() //read local environment automatically
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
-	viper.AddConfigPath("./config/")
+	viper.AddConfigPath("../../config/")
 	if err := viper.ReadInConfig(); err != nil {
 		return fmt.Errorf("[x] viper reading config file was failed: %w", err)
 	}
@@ -102,7 +102,7 @@ func loadTranslation() (*i18n.Bundle, error) {
 	i18nBundle := i18n.NewBundle(language.Persian)
 	i18nBundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
-	if _, err := i18nBundle.LoadMessageFile("./internal/translation/active.fa.yaml"); err != nil {
+	if _, err := i18nBundle.LoadMessageFile("../../internal/translation/active.fa.yaml"); err != nil {
 		return nil, fmt.Errorf("[x] error loading translation file: %w", err)
 	}
 
