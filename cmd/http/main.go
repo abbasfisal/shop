@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -14,7 +15,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"shop/cmd/commands"
+	"shop/cmd/job/worker"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
 	"shop/internal/events"
@@ -24,25 +27,47 @@ import (
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/logging"
 	"shop/internal/pkg/util"
+	"syscall"
+	"time"
 )
 
 func main() {
 
 	dependencies, err := bootstrap.Initialize()
-
-	setupLog()
-
 	if err != nil {
 		log.Fatal("[x] error initializing project :", err)
 	}
 
-	defer mysql.Close()
-	defer mongodb.Disconnect()
-	defer dependencies.AsynqClient.Close()
+	setupLog()
 
-	commands.Execute()
+	// graceful shutdown
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
+	commands.Execute() // run cobra commands
+
+	go worker.RunWorker(ctx, dependencies) // run Asynq worker
+	go RunHttpServer(ctx, dependencies)    // run http server
+
+	select {
+	case <-ctx.Done():
+
+		log.Println("[Shutting down] Closing database connections and external clients... after 5 second")
+
+		<-time.After(time.Second * 5) // shut down after 5 second
+
+		mysql.Close()
+		mongodb.Disconnect()
+		dependencies.AsynqClient.Close()
+
+		log.Println("[Shutdown complete] All resources released. good by ;) ")
+
+	}
+}
+
+func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies) {
 	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
 	//logger middleware
 	//r.Use(func(c *gin.Context) {
 	//	//store in files only log
@@ -65,10 +90,10 @@ func main() {
 	})
 
 	setupSessions(r)
-	setupRoutes(r, dependencies.I18nBundle, dependencies.AsynqClient, dependencies)
+	setupRoutes(ctx, r, dependencies.I18nBundle, dependencies.AsynqClient, dependencies)
 
 	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
-	log.Printf("[start server ]: %s", "http://"+addr)
+	log.Printf("[start server ]: http://%s\n", addr)
 	if err := r.Run(addr); err != nil {
 		logging.GlobalLog.FatalF("[Server start failed]: %v", err)
 	}
@@ -94,9 +119,9 @@ func setupSessions(r *gin.Engine) {
 	r.Use(sessions.Sessions("session", store))
 }
 
-func setupRoutes(r *gin.Engine, i18nBundle *i18n.Bundle, asynqClient *asynq.Client, dep *bootstrap.Dependencies) {
+func setupRoutes(ctx context.Context, r *gin.Engine, i18nBundle *i18n.Bundle, asynqClient *asynq.Client, dep *bootstrap.Dependencies) {
 
-	r.LoadHTMLGlob("internal/**/**/**/*.html")
+	r.LoadHTMLGlob("../../internal/**/**/**/*.html")
 	r.Static("uploads", "./uploads")
 	r.Static("assets", "./assets")
 	r.StaticFile("/favicon.ico", "./assets/shop/img/seller-logo.png")
