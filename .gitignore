@@ -3,6 +3,7 @@ storage
 
 #./uploads
 #uploads/*
+/tmp
 
 tmp/*
 .env
