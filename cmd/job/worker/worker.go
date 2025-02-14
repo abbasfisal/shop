@@ -1,6 +1,7 @@
-package main
+package worker
 
 import (
+	"context"
 	"fmt"
 	"github.com/hibiken/asynq"
 	"log"
@@ -9,12 +10,12 @@ import (
 	"shop/internal/pkg/bootstrap"
 )
 
-func main() {
+func RunWorker(ctx context.Context, dep *bootstrap.Dependencies) {
 	//load bootstrap
-	dep, err := bootstrap.Initialize()
-	if err != nil {
-		log.Fatalf("[x] failed to initialize dependencies: %v", err)
-	}
+	//dep, err := bootstrap.Initialize()
+	//if err != nil {
+	//	log.Fatalf("[x] failed to initialize dependencies: %v", err)
+	//}
 
 	//config asynq server
 	server := asynq.
@@ -40,7 +41,8 @@ func main() {
 	mux.Handle(adminJob.CancelPendingOrders, adminJob.NewCancelJob(dep))
 	//mux.Handle(jobs.TypeSendEmail, jobs.NewSendEmailJob(dep))
 	//>>>>> run serve r<<<<<
-	err = server.Run(mux)
+	log.Println("[info] worker started")
+	err := server.Run(mux)
 	if err != nil {
 		log.Fatal("[x] job worker start failed:", err)
 	}
