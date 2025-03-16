@@ -84,17 +84,20 @@ func (k *KaveNegar) Send(receptors []string, message string) {
 func (k *KaveNegar) SendOTP(receptor string, token string) {
 
 	api := kavenegar.New(k.ApiKey)
-	template := "" //load from config
+	template := "otp-template"
 	params := &kavenegar.VerifyLookupParam{}
 
 	if res, err := api.Verify.Lookup(receptor, template, token, params); err != nil {
 		switch err := err.(type) {
 		case *kavenegar.APIError:
 			fmt.Println(err.Error())
+			return
 		case *kavenegar.HTTPError:
 			fmt.Println(err.Error())
+			return
 		default:
 			fmt.Println(err.Error())
+			return
 		}
 	} else {
 		fmt.Println("MessageID 	= ", res.MessageID)
