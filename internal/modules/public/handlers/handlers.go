@@ -220,6 +220,7 @@ func (p PublicHandler) PostLogin(c *gin.Context) {
 	fmt.Println("--- step 3 ----")
 
 	newOTP, otpErr := p.homeSrv.SendOtp(c, req.Mobile)
+	go sms.SendOTP(req.Mobile, newOTP.Code)
 	if otpErr.Code > 0 {
 		if otpErr.Code == custom_error.OTPTooSoonCode {
 			sessions.Set(c, "message", custom_error.OTPRequestTooSoon)
