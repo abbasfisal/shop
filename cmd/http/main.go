@@ -122,9 +122,9 @@ func setupSessions(r *gin.Engine) {
 func setupRoutes(ctx context.Context, r *gin.Engine, i18nBundle *i18n.Bundle, asynqClient *asynq.Client, dep *bootstrap.Dependencies) {
 
 	r.LoadHTMLGlob("../../internal/**/**/**/*.html")
-	r.Static("uploads", "./uploads")
-	r.Static("assets", "./assets")
-	r.StaticFile("/favicon.ico", "./assets/shop/img/seller-logo.png")
+	r.Static("/uploads", "../../uploads")
+	r.Static("/assets", "../../assets")
+	r.StaticFile("/favicon.ico", "../../assets/shop/img/seller-logo.png")
 
 	//eventManager dependencies : note: we have to prevent cycle import ,
 	//									therefor we create another dependency struct
