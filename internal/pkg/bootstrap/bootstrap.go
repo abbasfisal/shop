@@ -17,6 +17,7 @@ import (
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/logging"
 	"shop/internal/pkg/sms"
+	"shop/internal/pkg/util"
 	"sync"
 )
 
@@ -32,6 +33,7 @@ type Dependencies struct {
 	DB          *gorm.DB
 	RedisClient *redis.Client
 	MongoClient *mongo.Client
+	Storage     *util.Storage
 }
 
 func Initialize() (*Dependencies, error) {
@@ -73,6 +75,8 @@ func Initialize() (*Dependencies, error) {
 			DB:          mysql.Get(),
 			RedisClient: cache.NewRedisClient(),
 			MongoClient: mongodb.Get(),
+			Storage: util.NewStorage(os.Getenv("STORAGE_BUCKET_NAME"), os.Getenv("STORAGE_ENDPOINT_URL"),
+				os.Getenv("STORAGE_ACEESS_KEY"), os.Getenv("STORAGE_SECRET_KEY")),
 			//	EventManager: events.NewEventManager(&eventManagerDep),
 		}
 
