@@ -615,7 +615,7 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 			go func() {
 				{
 					imageFile, _ := image.Open()
-					err := a.dep.Storage.UploadFile(imageFile, viper.GetString("Upload.Products")+imageGenerateFileName)
+					err := a.dep.Storage.UploadFile(imageFile, os.Getenv("STORAGE_PRODUCT_PATH")+imageGenerateFileName)
 					if err != nil {
 						log.Println("-- failed to upload file to s3 : ", err)
 					}
@@ -1210,6 +1210,17 @@ func (a *AdminHandler) DeleteProductImage(c *gin.Context) {
 		fmt.Println("-- remove image from disk err:", imageDelErr)
 	}
 
+	//storage s3
+	if true {
+		go func() {
+			fmt.Println("-- image address to delete : ", image.OriginalPath)
+			err := a.dep.Storage.DeleteFile(os.Getenv("STORAGE_PRODUCT_PATH") + image.OriginalPath)
+			if err != nil {
+				log.Println("-- s3 delete file failed: ", err)
+			}
+		}()
+	}
+
 	//remove image form db
 	rImageErr := a.productSrv.RemoveImage(c, imageID)
 	if rImageErr.Code > 0 {
@@ -1269,6 +1280,18 @@ func (a *AdminHandler) UploadProductImages(c *gin.Context) {
 		imageGenerateFileName := util.GenerateFilename(image.Filename)
 		imagesStoredPath = append(imagesStoredPath, imageGenerateFileName)
 
+		//upload in s3
+		if true {
+			go func() {
+				{
+					imageFile, _ := image.Open()
+					err := a.dep.Storage.UploadFile(imageFile, os.Getenv("STORAGE_PRODUCT_PATH")+imageGenerateFileName)
+					if err != nil {
+						log.Println("-- failed to upload file to s3 : ", err)
+					}
+				}
+			}()
+		}
 		//store images on disk
 		saveUploadedImage := c.SaveUploadedFile(image, viper.GetString("Upload.Products")+imageGenerateFileName)
 		if saveUploadedImage != nil {
