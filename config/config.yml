@@ -16,9 +16,9 @@ db:
   password: root
 
 upload:
-  categories: "uploads/media/categories/"
-  products: "uploads/media/products/"
-  brands: "uploads/media/brands/"
+  categories: "../../uploads/media/categories/"
+  products: "../../uploads/media/products/"
+  brands: "../../uploads/media/brands/"
 
 kavenegar:
   api_key: ""
