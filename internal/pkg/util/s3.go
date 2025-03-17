@@ -43,7 +43,7 @@ func (s *Storage) initSession() error {
 			S3ForcePathStyle: aws.Bool(true),
 		})
 		if err != nil {
-			log.Printf("خطا در ایجاد سشن: %v", err)
+			log.Printf("create aws session failed : %v", err)
 			return
 		}
 		s.svc = s3.New(s.sess)
@@ -68,7 +68,7 @@ func (s *Storage) ListFiles() error {
 		fmt.Printf("%s (%d bytes)\n", *item.Key, *item.Size)
 	}
 
-	fmt.Printf("📌 number of files : %d\n", len(resp.Contents))
+	fmt.Printf("number of files : %d\n", len(resp.Contents))
 	return nil
 }
 
@@ -99,7 +99,7 @@ func (s *Storage) DownloadFile(remotePath, localPath string) error {
 
 	file, err := os.Create(localPath)
 	if err != nil {
-		return fmt.Errorf("خطا در ایجاد فایل %s: %v", localPath, err)
+		return fmt.Errorf("error while creating file %s: %v", localPath, err)
 	}
 	defer file.Close()
 
@@ -109,10 +109,10 @@ func (s *Storage) DownloadFile(remotePath, localPath string) error {
 		Key:    aws.String(remotePath),
 	})
 	if err != nil {
-		return fmt.Errorf("خطا در دانلود فایل %s: %v", remotePath, err)
+		return fmt.Errorf("file download  %s: error %v", remotePath, err)
 	}
 
-	fmt.Printf("✅ دانلود شد: %s (%d bytes)\n", localPath, numBytes)
+	fmt.Printf("downloaded: %s (%d bytes)\n", localPath, numBytes)
 	return nil
 }
 
@@ -126,9 +126,9 @@ func (s *Storage) DeleteFile(remotePath string) error {
 		Key:    aws.String(remotePath),
 	})
 	if err != nil {
-		return fmt.Errorf("خطا در حذف فایل %s: %v", remotePath, err)
+		return fmt.Errorf("error while deleting file %s: %v", remotePath, err)
 	}
 
-	fmt.Printf("🗑️ فایل %s حذف شد.\n", remotePath)
+	fmt.Printf("file  %s deleted\n", remotePath)
 	return nil
 }
