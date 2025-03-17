@@ -611,7 +611,7 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 		imagesStoredPath = append(imagesStoredPath, imageGenerateFileName)
 
 		//check upload and store file to storage bucket
-		if true {
+		if os.Getenv("STORAGE_STATUS") == "active" {
 			go func() {
 				{
 					imageFile, _ := image.Open()
@@ -1211,7 +1211,7 @@ func (a *AdminHandler) DeleteProductImage(c *gin.Context) {
 	}
 
 	//storage s3
-	if true {
+	if os.Getenv("STORAGE_STATUS") == "active" {
 		go func() {
 			fmt.Println("-- image address to delete : ", image.OriginalPath)
 			err := a.dep.Storage.DeleteFile(os.Getenv("STORAGE_PRODUCT_PATH") + image.OriginalPath)
@@ -1281,7 +1281,7 @@ func (a *AdminHandler) UploadProductImages(c *gin.Context) {
 		imagesStoredPath = append(imagesStoredPath, imageGenerateFileName)
 
 		//upload in s3
-		if true {
+		if os.Getenv("STORAGE_STATUS") == "active" {
 			go func() {
 				{
 					imageFile, _ := image.Open()
