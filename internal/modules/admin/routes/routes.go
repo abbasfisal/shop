@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
 	"github.com/hibiken/asynqmon"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"os"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
@@ -27,9 +26,10 @@ import (
 	"shop/internal/modules/admin/services/customer"
 	order "shop/internal/modules/admin/services/order"
 	"shop/internal/modules/admin/services/product"
+	"shop/internal/pkg/bootstrap"
 )
 
-func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client) {
+func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
 	authRepo := authRepository.NewAuthenticateRepository(mysql.Get())
 	authSrv := auth.NewAuthenticateService(authRepo)
@@ -55,7 +55,7 @@ func SetAdminRoutes(r *gin.Engine, i18nBundle *i18n.Bundle, client *asynq.Client
 	orderRepo := orderRepository.NewOrderRepository(mysql.Get(), mongodb.Get())
 	orderSrv := order.NewOrderService(orderRepo)
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, i18nBundle)
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dep)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)

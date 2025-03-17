@@ -6,9 +6,9 @@ import (
 	errors2 "errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,6 +21,7 @@ import (
 	"shop/internal/modules/admin/services/customer"
 	"shop/internal/modules/admin/services/order"
 	"shop/internal/modules/admin/services/product"
+	"shop/internal/pkg/bootstrap"
 	"shop/internal/pkg/custom_error"
 	"shop/internal/pkg/custom_messages"
 	"shop/internal/pkg/errors"
@@ -43,7 +44,7 @@ type AdminHandler struct {
 	customerSrv  customer.CustomerServiceInterface
 	orderSrv     order.OrderServiceInterface
 
-	i18nBundle *i18n.Bundle
+	dep *bootstrap.Dependencies
 
 	//user service
 	//cart service
@@ -59,7 +60,7 @@ func NewAdminHandler(
 	customerSrv customer.CustomerServiceInterface,
 	orderSrv order.OrderServiceInterface,
 
-	i18nBundle *i18n.Bundle,
+	dep *bootstrap.Dependencies,
 ) *AdminHandler {
 	return &AdminHandler{
 		authSrv:      authSrv,
@@ -71,7 +72,7 @@ func NewAdminHandler(
 		customerSrv:  customerSrv,
 		orderSrv:     orderSrv,
 
-		i18nBundle: i18nBundle,
+		dep: dep,
 	}
 }
 
@@ -85,7 +86,7 @@ func (a *AdminHandler) PostLogin(c *gin.Context) {
 	_ = c.Request.ParseForm()
 
 	if err := c.ShouldBind(&req); err != nil {
-		errors.SetErrors(c, a.i18nBundle, err)
+		errors.SetErrors(c, a.dep.I18nBundle, err)
 
 		old.Init()
 		old.Set(c)
@@ -608,6 +609,19 @@ func (a *AdminHandler) StoreProduct(c *gin.Context) {
 		//generate file name
 		imageGenerateFileName := util.GenerateFilename(image.Filename)
 		imagesStoredPath = append(imagesStoredPath, imageGenerateFileName)
+
+		//check upload and store file to storage bucket
+		if true {
+			go func() {
+				{
+					imageFile, _ := image.Open()
+					err := a.dep.Storage.UploadFile(imageFile, viper.GetString("Upload.Products")+imageGenerateFileName)
+					if err != nil {
+						log.Println("-- failed to upload file to s3 : ", err)
+					}
+				}
+			}()
+		}
 
 		//store images on disk
 		saveUploadedImage := c.SaveUploadedFile(image, viper.GetString("Upload.Products")+imageGenerateFileName)

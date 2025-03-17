@@ -6,9 +6,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/hibiken/asynq"
 	"github.com/natefinch/lumberjack"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/viper"
 	"html/template"
 	"io"
@@ -90,7 +88,7 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies) {
 	})
 
 	setupSessions(r)
-	setupRoutes(ctx, r, dependencies.I18nBundle, dependencies.AsynqClient, dependencies)
+	setupRoutes(ctx, r, dependencies)
 
 	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
 	log.Printf("[start server ]: http://%s\n", addr)
@@ -119,7 +117,7 @@ func setupSessions(r *gin.Engine) {
 	r.Use(sessions.Sessions("session", store))
 }
 
-func setupRoutes(ctx context.Context, r *gin.Engine, i18nBundle *i18n.Bundle, asynqClient *asynq.Client, dep *bootstrap.Dependencies) {
+func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies) {
 
 	r.LoadHTMLGlob("../../internal/**/**/**/*.html")
 	r.Static("/uploads", "../../uploads")
@@ -129,14 +127,14 @@ func setupRoutes(ctx context.Context, r *gin.Engine, i18nBundle *i18n.Bundle, as
 	//eventManager dependencies : note: we have to prevent cycle import ,
 	//									therefor we create another dependency struct
 	eventManagerDep := events.EventManagerDep{
-		AsynqClient: asynqClient,
+		AsynqClient: dep.AsynqClient,
 		DB:          mysql.Get(),
 		RedisClient: cache.NewRedisClient(),
 		MongoClient: mongodb.Get(),
 	}
 	em := events.NewEventManager(&eventManagerDep)
 
-	AdminRoutes.SetAdminRoutes(r, i18nBundle, asynqClient)
+	AdminRoutes.SetAdminRoutes(r, dep)
 	PublicRoutes.SetPublic(r, dep, em)
 
 	r.GET("/500", func(c *gin.Context) {
