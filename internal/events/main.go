@@ -6,12 +6,12 @@ import (
 	"shop/internal/pkg/bootstrap"
 )
 
-// e.g., this main.go file is just an example of how to use events and listeners.
+// e.g., this scheduler.go file is just an example of how to use events and listeners.
 
 func main() {
 	dep, err := bootstrap.Initialize()
 	if err != nil {
-		log.Fatalln("fail to initialize bootstrap in event main.go file :", err)
+		log.Fatalln("fail to initialize bootstrap in event scheduler.go file :", err)
 	}
 
 	evntDep := EventManagerDep{
