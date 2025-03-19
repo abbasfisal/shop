@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
 	"log"
 	"net/http/httptest"
@@ -45,7 +46,8 @@ func (c *CancelJob) ProcessTask(ctx context.Context, t *asynq.Task) error {
 	tenMinutesAgo := time.Now().Add(-10 * time.Minute)
 	err := c.DB.WithContext(ctx).
 		Table("orders").
-		Where("created_at <= ? AND order_status = ?", tenMinutesAgo, entities.OrderPending).
+		Where("created_at <= ? AND order_status = ? AND (updated_at >= ? OR created_at <= ?)",
+			tenMinutesAgo, entities.OrderPending, tenMinutesAgo, tenMinutesAgo).
 		Preload("OrderItems").
 		Preload("Payment").
 		Find(&orders).Error
@@ -82,7 +84,8 @@ func (c *CancelJob) ProcessTask(ctx context.Context, t *asynq.Task) error {
 			}
 
 			go func() {
-				h.OrderPaidSuccessfully(mockGinCtx, &order, "payment was not created", false)
+				_, _, err := h.OrderPaidSuccessfully(mockGinCtx, &order, "payment was not created", false)
+				fmt.Println("OrderPaidSuccessfully err in cancel_pending_orders :", err)
 			}()
 
 		} else {
