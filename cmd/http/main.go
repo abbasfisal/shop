@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/signal"
 	"shop/cmd/commands"
+	"shop/cmd/job/scheduler"
 	"shop/cmd/job/worker"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
@@ -22,7 +23,6 @@ import (
 	AdminRoutes "shop/internal/modules/admin/routes"
 	PublicRoutes "shop/internal/modules/public/routes"
 	"shop/internal/pkg/bootstrap"
-	"shop/internal/pkg/cache"
 	"shop/internal/pkg/logging"
 	"shop/internal/pkg/util"
 	"syscall"
@@ -36,6 +36,16 @@ func main() {
 		log.Fatal("[x] error initializing project :", err)
 	}
 
+	//eventManager dependencies : note: we have to prevent cycle import ,
+	//									therefor we create another dependency struct
+	eventManagerDep := events.EventManagerDep{
+		AsynqClient: dependencies.AsynqClient,
+		DB:          dependencies.DB,
+		RedisClient: dependencies.RedisClient,
+		MongoClient: dependencies.MongoClient,
+	}
+	em := events.NewEventManager(&eventManagerDep)
+
 	setupLog()
 
 	// graceful shutdown
@@ -44,15 +54,16 @@ func main() {
 
 	commands.Execute() // run cobra commands
 
-	go worker.RunWorker(ctx, dependencies) // run Asynq worker
-	go RunHttpServer(ctx, dependencies)    // run http server
+	go worker.RunWorker(ctx, dependencies, em)       // run Asynq worker
+	go scheduler.RunScheduler(ctx, dependencies, em) // run Asynq Schedule
+	go RunHttpServer(ctx, dependencies, em)          // run http server
 
 	select {
 	case <-ctx.Done():
 
 		log.Println("[Shutting down] Closing database connections and external clients... after 5 second")
 
-		<-time.After(time.Second * 5) // shut down after 5 second
+		<-time.After(time.Second) // shut down after 5 second
 
 		mysql.Close()
 		mongodb.Disconnect()
@@ -63,32 +74,16 @@ func main() {
 	}
 }
 
-func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies) {
+func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em *events.EventManager) {
 	r := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
-	//logger middleware
-	//r.Use(func(c *gin.Context) {
-	//	//store in files only log
-	//	start := time.Now()
-	//
-	//	c.Next()
-	//
-	//	log.Printf(
-	//		"%s | %s | %s | %d | %s",
-	//		time.Now().Format("2006-01-02 15:04:05"),
-	//		c.Request.Method,
-	//		c.Request.URL.Path,
-	//		c.Writer.Status(),
-	//		time.Since(start),
-	//	)
-	//})
 
 	r.SetFuncMap(template.FuncMap{
 		"stringToUint": util.StringToUint,
 	})
 
 	setupSessions(r)
-	setupRoutes(ctx, r, dependencies)
+	setupRoutes(ctx, r, dependencies, em)
 
 	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
 	log.Printf("[start server ]: http://%s\n", addr)
@@ -101,7 +96,7 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies) {
 func setupLog() {
 
 	fileWriter := &lumberjack.Logger{
-		Filename:   "./storage/logs/shop.log",
+		Filename:   "../../storage/logs/shop.log",
 		MaxSize:    10, //MB
 		MaxAge:     10, //day
 		MaxBackups: 5,
@@ -117,22 +112,12 @@ func setupSessions(r *gin.Engine) {
 	r.Use(sessions.Sessions("session", store))
 }
 
-func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies) {
+func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies, em *events.EventManager) {
 
 	r.LoadHTMLGlob("../../internal/**/**/**/*.html")
 	r.Static("/uploads", "../../uploads")
 	r.Static("/assets", "../../assets")
 	r.StaticFile("/favicon.ico", "../../assets/shop/img/seller-logo.png")
-
-	//eventManager dependencies : note: we have to prevent cycle import ,
-	//									therefor we create another dependency struct
-	eventManagerDep := events.EventManagerDep{
-		AsynqClient: dep.AsynqClient,
-		DB:          mysql.Get(),
-		RedisClient: cache.NewRedisClient(),
-		MongoClient: mongodb.Get(),
-	}
-	em := events.NewEventManager(&eventManagerDep)
 
 	AdminRoutes.SetAdminRoutes(r, dep)
 	PublicRoutes.SetPublic(r, dep, em)
