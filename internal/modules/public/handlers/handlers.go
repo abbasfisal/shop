@@ -22,7 +22,7 @@ import (
 	"shop/internal/pkg/old"
 	"shop/internal/pkg/payment/zarinpal"
 	"shop/internal/pkg/sessions"
-	"shop/internal/pkg/sms"
+	"shop/internal/pkg/sms/kavenegar"
 	"shop/internal/pkg/util"
 	"strconv"
 	"time"
@@ -220,7 +220,8 @@ func (p PublicHandler) PostLogin(c *gin.Context) {
 	fmt.Println("--- step 3 ----")
 
 	newOTP, otpErr := p.homeSrv.SendOtp(c, req.Mobile)
-	go sms.SendOTP(req.Mobile, newOTP.Code)
+	go kavenegar.SendOTP(req.Mobile, newOTP.Code)
+
 	if otpErr.Code > 0 {
 		if otpErr.Code == custom_error.OTPTooSoonCode {
 			sessions.Set(c, "message", custom_error.OTPRequestTooSoon)
@@ -573,7 +574,6 @@ func (p PublicHandler) Payment(c *gin.Context) {
 		return
 	}
 
-	//todo: after 10 minute if nothing happened cancel order and free reserved_stock
 	_, paymentEntity, inventoryID, paymentError := p.homeSrv.ProcessOrderPayment(c, zarin)
 
 	if paymentError != nil {
@@ -638,9 +638,8 @@ func (p PublicHandler) VerifyPayment(c *gin.Context) {
 
 	if statusCode == 100 {
 		go func() {
-			log.Println("------- call sms sender -----------")
-			message := fmt.Sprintf(custom_messages.OrderSuccessfulPaid, order.OrderNumber)
-			sms.Send([]string{customer.Mobile}, message)
+			log.Println("send success shopping sms to customer ", customer.Mobile)
+			kavenegar.SendSuccShop(customer.Mobile, order.OrderNumber)
 		}()
 	}
 
