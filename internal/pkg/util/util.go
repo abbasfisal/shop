@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -173,4 +174,26 @@ func ConvertSliceIfNotNil[T any, R any](input []*T, convertFunc func(*T) R) []R 
 func StringToUint(s string) uint {
 	i, _ := strconv.ParseUint(s, 10, 64)
 	return uint(i)
+}
+
+// Trace will log file, line, function name, and message (error or string)
+func Trace(input interface{}) {
+	pc, file, line, ok := runtime.Caller(1)
+	if !ok {
+		log.Printf("[Message]: %v (Unknown Location)\n", input)
+		return
+	}
+
+	//get method name
+	funcName := runtime.FuncForPC(pc).Name()
+
+	//declare input type
+	switch v := input.(type) {
+	case error:
+		log.Printf("[File]: %s | [Line]: %d | [Function]: %s | [Error]: %v\n", file, line, funcName, v)
+	case string:
+		log.Printf("[File]: %s | [Line]: %d | [Function]: %s | [Message]: %s\n", file, line, funcName, v)
+	default:
+		log.Printf("[File]: %s | [Line]: %d | [Function]: %s | [Unknown Type]: %v\n", file, line, funcName, v)
+	}
 }
