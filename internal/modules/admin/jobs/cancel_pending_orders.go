@@ -70,27 +70,49 @@ func (c *CancelJob) ProcessTask(ctx context.Context, t *asynq.Task) error {
 	mockGinCtx, _ := gin.CreateTestContext(httptest.NewRecorder())
 
 	for _, order := range orders {
-		if order.Payment.Authority == "" || order.ID == 0 {
+
+		if order.Payment == nil || order.Payment.Authority == "" {
+			// این حالت به ندرت اتفاق میفته اما احتمال داره که در بعضی حالت ها ما payment نداشته باشیم
+			// که دز این حالت صرفا عملیات ازاد کردن موجودی های رزرو شده رو انجام میدیم
+			// و بعد وضعیت سفارش و پرداخت رو به حالت کنسل شده تغییر میدیم
 			log.Println("authority was empty:", order)
-			continue
-		}
-
-		go func(order *entities.Order) {
-			authority := order.Payment.Authority
-			verified, refID, statusCode, vErr := zarin.PaymentVerification(int(order.Payment.Amount), authority)
-			fmt.Println("zarinpal payment verification output ", "| verified:", verified, "| refID:", refID, "| statusCode:", statusCode, "| verify error:", vErr)
-
-			if vErr != nil || !verified || (statusCode != 100 && statusCode != 101) {
-				return
+			order.Payment = &entities.Payment{CustomerID: order.CustomerID,
+				Description: "payment was not created",
+				Authority:   "not_created_" + uuid.New().String(),
 			}
 
-			util.Trace("call method OrderPaidSuccessfully() ")
+			go func() {
+				h.OrderPaidSuccessfully(mockGinCtx, &order, "payment was not created", false)
+			}()
 
-			OrderRes, status, errResult := h.OrderPaidSuccessfully(mockGinCtx, order, refID, verified)
+		} else {
 
-			fmt.Println("OrderPaidSuccessfully output", " | orderID:", OrderRes.ID, " | status:", status, "| errorResult:", errResult)
+			go func(order *entities.Order) {
+				authority := order.Payment.Authority
+				verified, refID, statusCode, vErr := zarin.PaymentVerification(int(order.Payment.Amount), authority)
+				fmt.Println("zarinpal payment verification output ", "| verified:", verified, "| refID:", refID, "| statusCode:", statusCode, "| verify error:", vErr)
 
-		}(&order)
+				// read zarinpal status code doc for more information
+				// https://www.zarinpal.com/docs/paymentGateway/errorList.html
+
+				// -51 = Session is not valid, session is not active paid try. پرداخت ناموفق
+				// 100 = Success عملیات موفق
+				// 101 = Verified تراکنش وریفای شده است.
+				if statusCode == -51 || statusCode == 101 || statusCode == 100 {
+
+					OrderRes, status, errResult := h.OrderPaidSuccessfully(mockGinCtx, order, refID, verified)
+					fmt.Println("OrderPaidSuccessfully output", " | orderID:", OrderRes.ID, " | status:", status, "| errorResult:", errResult)
+
+				} else if vErr != nil || !verified || (statusCode != 100 && statusCode != 101) {
+					log.Println(
+						"-- somethings wrong happened please check it ",
+						" | verified:", verified, " | refID:", refID, " | statusCode:", statusCode, " | vErr:", verified,
+					)
+					return
+				}
+
+			}(&order)
+		}
 
 	}
 
