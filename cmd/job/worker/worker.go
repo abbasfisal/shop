@@ -6,11 +6,12 @@ import (
 	"github.com/hibiken/asynq"
 	"log"
 	"os"
+	"shop/internal/events"
 	adminJob "shop/internal/modules/admin/jobs"
 	"shop/internal/pkg/bootstrap"
 )
 
-func RunWorker(ctx context.Context, dep *bootstrap.Dependencies) {
+func RunWorker(ctx context.Context, dep *bootstrap.Dependencies, em *events.EventManager) {
 	//load bootstrap
 	//dep, err := bootstrap.Initialize()
 	//if err != nil {
@@ -38,7 +39,7 @@ func RunWorker(ctx context.Context, dep *bootstrap.Dependencies) {
 	//mux.HandleFunc(publicJob.TypeSendWelcomeSMS, publicJob.HandleTaskSendWelcomeSMS)
 	//mux.HandleFunc(publicJob.TypeExample, publicJob.HandleExampleTask)
 
-	mux.Handle(adminJob.CancelPendingOrders, adminJob.NewCancelJob(dep))
+	mux.Handle(adminJob.CancelPendingOrders, adminJob.NewCancelJob(dep, em))
 	//mux.Handle(jobs.TypeSendEmail, jobs.NewSendEmailJob(dep))
 	//>>>>> run serve r<<<<<
 	log.Println("[info] worker started")
