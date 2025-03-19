@@ -13,6 +13,7 @@ import (
 	"math/rand"
 	"shop/internal/entities"
 	"shop/internal/events"
+	"shop/internal/modules/admin/repositories/product"
 	AdminUserResponse "shop/internal/modules/admin/responses"
 	"shop/internal/modules/public/requests"
 	"shop/internal/modules/public/responses"
@@ -787,6 +788,7 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 		log.Println("--- x1")
 
 		order.OrderStatus = entities.OrderConfirmed //paid successful
+		order.PaymentStatus = int(entities.OrderConfirmed)
 		if saveOrderErr := tx.Save(&order).Error; saveOrderErr != nil {
 			tx.Rollback()
 			return order, false, custom_error.New(saveOrderErr.Error(), custom_error.OrderChangeStatusToPaid, custom_error.OrderSavePaidStatusFailed)
@@ -801,7 +803,8 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 
 	} else {
 		log.Println("--- x2")
-		order.OrderStatus = entities.OrderCancelled //لغو شده
+		order.OrderStatus = entities.OrderCancelled        //لغو شده
+		order.PaymentStatus = int(entities.OrderCancelled) //لغو شده
 		if saveOrderErr := tx.Save(&order).Error; saveOrderErr != nil {
 			tx.Rollback()
 			return order, false, custom_error.New(saveOrderErr.Error(), custom_error.UpdateOrderFaileds, custom_error.UpdateOrderFailed)
@@ -879,12 +882,11 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 		} else {
 
 			// if there is no any error we update sync mongo db
-			h.eventManager.Emit(c, events.SyncMongoEvent,
-				events.SyncMongoEventPayload{
-					ProductID: orderItem.ProductID,
-				}, true)
+			syncMongoErr := product.SyncMongo(c, h.dep.DB, orderItem.ProductID)
+			if syncMongoErr != nil {
+				util.Trace(syncMongoErr)
+			}
 
-			//product.SyncMongo(c, h.dep.DB, orderItem.ProductID) //todo: call Asynq to update
 		}
 		log.Println("----- x 8")
 	}
