@@ -16,7 +16,6 @@ import (
 	"shop/internal/database/mysql"
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/logging"
-	"shop/internal/pkg/sms"
 	"shop/internal/pkg/util"
 	"sync"
 )
@@ -58,9 +57,6 @@ func Initialize() (*Dependencies, error) {
 
 		// initialize logger
 		initializeLogger()
-
-		// initialize SMS
-		initializeSmsService()
 
 		// initialize Asynq
 		asynqClient, err := initializeAsynqClient()
@@ -116,11 +112,6 @@ func loadTranslation() (*i18n.Bundle, error) {
 func initializeAsynqClient() (*asynq.Client, error) {
 	opt := asynq.RedisClientOpt{Addr: fmt.Sprintf("%s:%s", viper.GetString("REDIS_DB"), viper.GetString("REDIS_PORT"))}
 	return asynq.NewClient(opt), nil
-}
-
-func initializeSmsService() {
-	kaveNegar := sms.NewKaveNegar(os.Getenv("KAVENEGAR_SECRETKEY"))
-	sms.GetSMSManager().SetService(kaveNegar)
 }
 
 func initializeLogger() {
