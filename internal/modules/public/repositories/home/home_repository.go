@@ -785,14 +785,15 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 	}
 	if verified {
 		log.Println("--- x1")
-		order.OrderStatus = 1 //paid successful
+
+		order.OrderStatus = entities.OrderConfirmed //paid successful
 		if saveOrderErr := tx.Save(&order).Error; saveOrderErr != nil {
 			tx.Rollback()
 			return order, false, custom_error.New(saveOrderErr.Error(), custom_error.OrderChangeStatusToPaid, custom_error.OrderSavePaidStatusFailed)
 		}
 
 		order.Payment.RefID = refID
-		order.Payment.Status = 1 //paid
+		order.Payment.Status = int(entities.OrderConfirmed) //paid successful
 		if updatePayment := tx.Save(&order.Payment).Error; updatePayment != nil {
 			tx.Rollback()
 			return order, false, custom_error.New(updatePayment.Error(), custom_error.UpdatePaymentFaileds, custom_error.UpdatePaymentFailed)
@@ -800,13 +801,13 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 
 	} else {
 		log.Println("--- x2")
-		order.OrderStatus = 2 //failed
+		order.OrderStatus = entities.OrderCancelled //لغو شده
 		if saveOrderErr := tx.Save(&order).Error; saveOrderErr != nil {
 			tx.Rollback()
 			return order, false, custom_error.New(saveOrderErr.Error(), custom_error.UpdateOrderFaileds, custom_error.UpdateOrderFailed)
 		}
 
-		order.Payment.Status = 2 //failed
+		order.Payment.Status = int(entities.OrderCancelled) //لغو شده
 		if updatePayment := tx.Save(&order.Payment).Error; updatePayment != nil {
 			tx.Rollback()
 			return order, false, custom_error.New(updatePayment.Error(), custom_error.UpdatePaymentFaileds, custom_error.UpdatePaymentFailed)
@@ -819,7 +820,7 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 	for _, orderItem := range order.OrderItems {
 		lockKey := fmt.Sprintf("lock:inventory:%d", orderItem.InventoryID)
 		lockErr := retryWithBackoff(3, 100*time.Millisecond, func() error {
-			locked, redisLockErr := h.dep.RedisClient.SetNX(c, lockKey, "locked", 5*time.Second).Result()
+			locked, redisLockErr := h.dep.RedisClient.SetNX(c, lockKey, "locked", 1*time.Second).Result()
 			if redisLockErr != nil {
 				return redisLockErr
 			}
