@@ -1,20 +1,18 @@
-package main
+package scheduler
 
 import (
+	"context"
 	"fmt"
 	"github.com/hibiken/asynq"
 	"os"
+	"shop/internal/events"
 	adminJob "shop/internal/modules/admin/jobs"
 	"shop/internal/pkg/bootstrap"
 
 	"log"
 )
 
-func main() {
-	_, bErr := bootstrap.Initialize()
-	if bErr != nil {
-		log.Fatal("[x] failed to start scheduler :", bErr)
-	}
+func RunScheduler(ctx context.Context, dep *bootstrap.Dependencies, em *events.EventManager) {
 
 	schedule := asynq.NewScheduler(asynq.RedisClientOpt{Addr: fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOSTNAME"), os.Getenv("REDIS_PORT"))}, &asynq.SchedulerOpts{})
 
@@ -22,7 +20,7 @@ func main() {
 		log.Fatal("[x] scheduler ping failed:", err)
 	}
 
-	registerSchedules(schedule)
+	registerSchedules(schedule, dep)
 
 	err := schedule.Run()
 	if err != nil {
@@ -32,7 +30,7 @@ func main() {
 }
 
 // registerSchedules is responsible to register our tasks with specific cronspec
-func registerSchedules(schedule *asynq.Scheduler) {
+func registerSchedules(schedule *asynq.Scheduler, dep *bootstrap.Dependencies) {
 
 	//---------------------- example task blueprint
 	//	exampleTask, exampleTaskErr := jobs.TaskExample("your data ")
