@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 var db *gorm.DB
@@ -24,6 +25,11 @@ func Connect() {
 	if err != nil {
 		log.Fatal("mysql error connection ", err)
 	}
+
+	if os.Getenv("APP_DEBUG") == "true" {
+		db = db.Debug()
+	}
+
 	fmt.Println("\n [mysql] connected to mysql database successfully ")
 }
 
