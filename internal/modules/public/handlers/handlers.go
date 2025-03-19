@@ -610,8 +610,9 @@ func (p PublicHandler) VerifyPayment(c *gin.Context) {
 	//	//payment was canceled by user of failed
 	//}
 
-	//get payment
+	//get payment , order(preload OrderItems)
 	order, customer, pErr := p.homeSrv.GetPaymentBy(c, authority)
+
 	if pErr != nil || order.Payment.ID <= 0 {
 		html.CustomerRender(c, http.StatusPermanentRedirect, "404", gin.H{})
 		return
