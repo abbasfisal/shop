@@ -27,9 +27,9 @@ func (d *DashboardRepository) GetDashboardStates() (*DashboardData, error) {
 
 	err := d.db.Raw(`
 		SELECT 
-			SUM(CASE WHEN created_at >= ? THEN total_sale_price ELSE 0 END) AS today_sales,
-			SUM(CASE WHEN created_at >= ? THEN total_sale_price ELSE 0 END) AS month_sales,
-			SUM(total_sale_price) AS total_revenue,
+			SUM(CASE WHEN created_at >= ? AND  	order_status IN(1,3,4,5,6,7,9) THEN total_sale_price ELSE 0 END) AS today_sales,
+			SUM(CASE WHEN created_at >= ? AND 	order_status IN(1,3,4,5,6,7,9) THEN total_sale_price ELSE 0 END) AS month_sales,
+			SUM(CASE WHEN order_status IN(1,3,4,5,6,7,9) THEN total_sale_price ELSE 0 END) AS total_revenue,
 			COUNT(CASE WHEN created_at >= ? THEN 1 END) AS today_orders,
 			COUNT(CASE WHEN order_status = ? THEN 1 END) AS pending_orders
 			
@@ -112,12 +112,12 @@ func (d *DashboardRepository) GetDashboardStates() (*DashboardData, error) {
 }
 
 type DashboardStats struct {
-	TodaySales      float64 `gorm:"column:today_sales"`
-	MonthSales      float64 `gorm:"column:month_sales"`
-	TotalRevenue    float64 `gorm:"column:total_revenue"`
-	TodayOrders     int     `gorm:"column:today_orders"`
-	PendingOrders   int     `gorm:"column:pending_orders"`
-	UnshippedOrders int     `gorm:"column:unshipped_orders"`
+	TodaySales    float64 `gorm:"column:today_sales"`
+	MonthSales    float64 `gorm:"column:month_sales"`
+	TotalRevenue  float64 `gorm:"column:total_revenue"`
+	TodayOrders   int     `gorm:"column:today_orders"`
+	PendingOrders int     `gorm:"column:pending_orders"`
+	//UnshippedOrders int     `gorm:"column:unshipped_orders"`
 }
 
 type RecentOrder struct {
