@@ -16,6 +16,7 @@ import (
 	brandRepository "shop/internal/modules/admin/repositories/brand"
 	categoryRepository "shop/internal/modules/admin/repositories/category"
 	customerRepository "shop/internal/modules/admin/repositories/customer"
+	dashboardRepository "shop/internal/modules/admin/repositories/dashboard"
 	orderRepository "shop/internal/modules/admin/repositories/order"
 	productRepository "shop/internal/modules/admin/repositories/product"
 	"shop/internal/modules/admin/services/attribute"
@@ -24,6 +25,7 @@ import (
 	"shop/internal/modules/admin/services/brand"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/customer"
+	"shop/internal/modules/admin/services/dashboard"
 	order "shop/internal/modules/admin/services/order"
 	"shop/internal/modules/admin/services/product"
 	"shop/internal/pkg/bootstrap"
@@ -55,7 +57,9 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 	orderRepo := orderRepository.NewOrderRepository(mysql.Get(), mongodb.Get())
 	orderSrv := order.NewOrderService(orderRepo)
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dep)
+	dashboardSrv := dashboard.NewDashboardService(dashboardRepository.NewDashboardRepository(mysql.Get()))
+
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, dep)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
