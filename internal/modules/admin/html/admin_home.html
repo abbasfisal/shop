@@ -21,22 +21,237 @@
         <!-- /.content-header -->
 
         <!-- Main content -->
-        <div class="content">
+        <section class="content">
             <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-10">
-                        <a href="/admins/categories">مدیریت دسته بندی ها</a>
-                        <br>
-                        <a href="/admins/products">مدیریت محصولات</a>
-                        <br>
-                        <a href="/admins/brands">مدیریت دسته بندی ها</a>
-                        <hr>
+                <!-- Small boxes (Stat box) -->
+                {{if .DATA.Stats}}
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-info" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.Stats.TodaySales}}</h3>
+                                    <p data-rtl="true">مجموع فروش امروز</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-bag"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-success" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.Stats.MonthSales}}</h3>
+                                    <p data-rtl="true">مجموع فروش ماهیانه</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-stats-bars"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-warning" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.Stats.TotalRevenue}}</h3>
+                                    <p data-rtl="true">مجموع فروش کل</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-person-add"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-danger" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.Stats.TodayOrders}}</h3>
+                                    <p data-rtl="true">تعداد سفارشات امروز</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-pie-graph"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-danger" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.Stats.PendingOrders}}</h3>
+                                    <p data-rtl="true">تعداد کل سفارشات در حال پرداخت</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-pie-graph"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
                     </div>
-                    <!-- /.col-md-6 -->
+                {{end}}
+
+
+                {{if .DATA.StaticalReport}}
+                    <div class="row">
+                        {{if .DATA.StaticalReport.TotalCustomer}}
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <div class="small-box bg-info" data-rtl="true">
+                                    <div class="inner" data-rtl="true">
+                                        <h3 data-rtl="true">{{.DATA.StaticalReport.TotalCustomer}}</h3>
+                                        <p data-rtl="true">تعداد مشتریان</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="ion ion-person-add"></i>
+                                    </div>
+                                    <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                                class="fa fa-arrow-circle-left"></i></a>
+                                </div>
+                            </div>
+                        {{end}}
+                        <!-- ./col -->
+                        {{if .DATA.StaticalReport.TotalProduct}}
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <div class="small-box bg-success" data-rtl="true">
+                                    <div class="inner" data-rtl="true">
+                                        <h3 data-rtl="true">{{.DATA.StaticalReport.TotalProduct}}</h3>
+                                        <p data-rtl="true">تعداد محصولات</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="ion ion-stats-bars"></i>
+                                    </div>
+                                    <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                                class="fa fa-arrow-circle-left"></i></a>
+                                </div>
+                            </div>
+                        {{end}}
+                        <!-- ./col -->
+                    </div>
+                {{end}}
+
+
+                {{if .DATA.PaymentReport}}
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-info" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.PaymentReport.SuccessfulPayments}}</h3>
+                                    <p data-rtl="true">تعداد پرداخت های موفق</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-bag"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-success" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.PaymentReport.FailedPayments}}</h3>
+
+                                    <p data-rtl="true">تعداد پرداخت های ناموفق(کنسل)</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-stats-bars"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-warning" data-rtl="true">
+                                <div class="inner" data-rtl="true">
+                                    <h3 data-rtl="true">{{.DATA.PaymentReport.TotalSuccessfulSales}} <sup
+                                                style="font-size: 10px">تومان</sup></h3>
+                                    <p data-rtl="true">مجموع پرداخت های موفق</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-person-add"></i>
+                                </div>
+                                <a href="#" class="small-box-footer" data-rtl="true">اطلاعات بیشتر <i
+                                            class="fa fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                    </div>
+                {{end}}
+
+                <!-- /.row -->
+                <!-- Main row -->
+
+
+                <div class="row">
+                    {{if .DATA.NewUsers}}
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header no-border" data-rtl="true">
+                                    <h3 class="card-title" data-rtl="true">جدیدترین مشتریان</h3>
+                                    <div class="card-tools">
+                                        <a href="#" class="btn btn-tool btn-sm">
+                                            <i class="fa fa-download"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-tool btn-sm">
+                                            <i class="fa fa-bars"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-striped table-valign-middle table-hover">
+                                        <thead>
+                                        <tr data-rtl="true">
+                                            <th data-rtl="true">نام</th>
+                                            <th data-rtl="true">موبایل</th>
+                                            <th data-rtl="true">تعداد سفارشات</th>
+                                            <th data-rtl="true">بیشتر</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        {{range .DATA.NewUsers}}
+                                            <tr data-rtl="true">
+                                                <td data-rtl="true">{{.FirstName}}</td>
+                                                <td data-rtl="true">{{.Mobile}}</td>
+                                                <td data-rtl="true">{{.OrderCount}}</td>
+                                                <td>
+                                                    <a href="#" class="text-muted">
+                                                        <i class="fa fa-search"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                    {{end}}
                 </div>
                 <!-- /.row -->
+                <!-- /.row (main row) -->
             </div><!-- /.container-fluid -->
-        </div>
+        </section>
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -45,4 +260,5 @@
     {{template "footer" .}}
 
 {{end}}
+
 
