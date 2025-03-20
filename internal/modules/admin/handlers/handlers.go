@@ -19,6 +19,7 @@ import (
 	"shop/internal/modules/admin/services/brand"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/customer"
+	"shop/internal/modules/admin/services/dashboard"
 	"shop/internal/modules/admin/services/order"
 	"shop/internal/modules/admin/services/product"
 	"shop/internal/pkg/bootstrap"
@@ -35,14 +36,15 @@ import (
 )
 
 type AdminHandler struct {
-	authSrv      auth.AuthenticateServiceInterface
-	categorySrv  category.CategoryServiceInterface
-	productSrv   product.ProductServiceInterface
-	attributeSrv attribute.AttributeServiceInterface
-	attrValueSrv attributeValue.AttributeValueServiceInterface
-	brandSrv     brand.BrandServiceInterface
-	customerSrv  customer.CustomerServiceInterface
-	orderSrv     order.OrderServiceInterface
+	authSrv          auth.AuthenticateServiceInterface
+	categorySrv      category.CategoryServiceInterface
+	productSrv       product.ProductServiceInterface
+	attributeSrv     attribute.AttributeServiceInterface
+	attrValueSrv     attributeValue.AttributeValueServiceInterface
+	brandSrv         brand.BrandServiceInterface
+	customerSrv      customer.CustomerServiceInterface
+	orderSrv         order.OrderServiceInterface
+	DashboardService *dashboard.DashboardService
 
 	dep *bootstrap.Dependencies
 
@@ -60,17 +62,20 @@ func NewAdminHandler(
 	customerSrv customer.CustomerServiceInterface,
 	orderSrv order.OrderServiceInterface,
 
+	dashboardSrv *dashboard.DashboardService,
+
 	dep *bootstrap.Dependencies,
 ) *AdminHandler {
 	return &AdminHandler{
-		authSrv:      authSrv,
-		categorySrv:  categorySrv,
-		productSrv:   productSrv,
-		attributeSrv: attributeSrv,
-		attrValueSrv: attrValueSrv,
-		brandSrv:     brandSrv,
-		customerSrv:  customerSrv,
-		orderSrv:     orderSrv,
+		authSrv:          authSrv,
+		categorySrv:      categorySrv,
+		productSrv:       productSrv,
+		attributeSrv:     attributeSrv,
+		attrValueSrv:     attrValueSrv,
+		brandSrv:         brandSrv,
+		customerSrv:      customerSrv,
+		orderSrv:         orderSrv,
+		DashboardService: dashboardSrv,
 
 		dep: dep,
 	}
@@ -115,10 +120,17 @@ func (a *AdminHandler) PostLogin(c *gin.Context) {
 }
 
 func (a *AdminHandler) ShowHome(c *gin.Context) {
-	html.Render(c, http.StatusOK, "modules/admin/html/admin_home",
-		gin.H{
-			"TITLE": "admin home page",
+	data, err := a.DashboardService.GetStaticalData()
+	if err != nil {
+		c.JSON(200, gin.H{
+			"error": err.Error(),
 		})
+		return
+	}
+	html.Render(c, http.StatusOK, "modules/admin/html/admin_home", gin.H{
+		"TITLE": "داشبورد",
+		"DATA":  data,
+	})
 	return
 }
 
