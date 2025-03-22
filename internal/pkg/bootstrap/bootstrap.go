@@ -68,6 +68,9 @@ func Initialize() (*Dependencies, error) {
 			return
 		}
 
+		// initialize typesence
+		typesenceclient.Connect()
+
 		dep = &Dependencies{
 			I18nBundle:  bundle,
 			AsynqClient: asynqClient,
