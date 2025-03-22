@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"shop/internal/database/mongodb"
 	"shop/internal/entities"
 	"shop/internal/modules/public/requests"
@@ -32,17 +33,13 @@ func (m MongoHomeRepository) GetProduct(c *gin.Context, productSku string, produ
 	if FindProductErr != nil {
 		if FindProductErr == mongo.ErrNoDocuments {
 			// محصولی یافت نشد
-			fmt.Println("--هیچ سندی برای محصول با اسلاگ ", productSlug, " و SKU :", productSku, " یافت نشد.")
+			log.Println("product-slug : ", productSlug, " | SKU :", productSku, " not found.")
 			return nil, errors.New(custom_error.RecordNotFound)
 		}
-		fmt.Println("~~~~ error while finding doc :÷÷÷÷÷", FindProductErr)
 		return nil, errors.New(custom_error.SomethingWrongHappened)
 	}
 
-	fmt.Println("~~~~~~ document find succ ~~~~~~~~")
-	fmt.Printf("%+v", mongoProduct)
 	return responses.ToMongoProductResponse(mongoProduct), nil
-
 }
 
 func (m MongoHomeRepository) GetProductByObjectID(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest) (entities.MongoProduct, error) {
