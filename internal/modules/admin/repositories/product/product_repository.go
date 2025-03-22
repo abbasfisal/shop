@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	"shop/internal/entities"
@@ -90,29 +89,4 @@ func (p *ProductRepository) Update(c *gin.Context, productID int, req *requests.
 	_ = SyncMongo(c, p.db, uint(productID))
 
 	return &product, nil
-}
-
-func transformImages(images []*entities.ProductImages) []entities.ImgData {
-	var imgData []entities.ImgData
-	for _, img := range images {
-		imgData = append(imgData, entities.ImgData{
-			ID:           int64(img.ID),
-			OriginalPath: img.Path,
-			FullPath:     viper.GetString("Upload.Products") + img.Path,
-		})
-	}
-	return imgData
-}
-
-func transformFeatures(features []*entities.Feature) []entities.FData {
-	var fData []entities.FData
-	for _, feature := range features {
-		fData = append(fData, entities.FData{
-			ID:        int64(feature.ID),
-			ProductID: int64(feature.ProductID),
-			Title:     feature.Title,
-			Value:     feature.Value,
-		})
-	}
-	return fData
 }
