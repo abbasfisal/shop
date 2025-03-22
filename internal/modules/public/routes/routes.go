@@ -32,6 +32,9 @@ func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.
 	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)     //show products by category
 	r.GET("/checkout/payment/verify", publicHdl.VerifyPayment)            //payment callback url
 
+	r.GET("/tsearch", publicHdl.SearchProductByTypesence) //search product with typesence
+	r.GET("/tsearch/show", publicHdl.ShowTypeSenceForm)   //show typesence html form
+
 	publicAuthGrp := r.RouterGroup
 	customerRoute := r.RouterGroup
 	customerRoute.Use(CustomerMiddlewares.CheckCustomerSessionID())
