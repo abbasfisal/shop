@@ -7,6 +7,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
+	"github.com/typesense/typesense-go/v3/typesense"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
@@ -14,6 +15,7 @@ import (
 	"os"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
+	"shop/internal/database/typesenceclient"
 	"shop/internal/pkg/cache"
 	"shop/internal/pkg/logging"
 	"shop/internal/pkg/util"
@@ -27,12 +29,13 @@ var (
 )
 
 type Dependencies struct {
-	I18nBundle  *i18n.Bundle
-	AsynqClient *asynq.Client
-	DB          *gorm.DB
-	RedisClient *redis.Client
-	MongoClient *mongo.Client
-	Storage     *util.Storage
+	I18nBundle      *i18n.Bundle
+	AsynqClient     *asynq.Client
+	DB              *gorm.DB
+	RedisClient     *redis.Client
+	MongoClient     *mongo.Client
+	Storage         *util.Storage
+	TypeSenceClient *typesense.Client
 }
 
 func Initialize() (*Dependencies, error) {
@@ -74,6 +77,8 @@ func Initialize() (*Dependencies, error) {
 			Storage: util.NewStorage(os.Getenv("STORAGE_BUCKET_NAME"), os.Getenv("STORAGE_ENDPOINT_URL"),
 				os.Getenv("STORAGE_ACEESS_KEY"), os.Getenv("STORAGE_SECRET_KEY")),
 			//	EventManager: events.NewEventManager(&eventManagerDep),
+
+			TypeSenceClient: typesenceclient.GetTClient(),
 		}
 
 	})
