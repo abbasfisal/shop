@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/typesense/typesense-go/v3/typesense"
 	"github.com/typesense/typesense-go/v3/typesense/api"
 	"log"
@@ -23,11 +24,11 @@ func Connect() {
 
 		tClient = typesense.NewClient(
 			typesense.WithServer(url),
-			typesense.WithAPIKey(os.Getenv("APP_KEY")),
+			typesense.WithAPIKey(os.Getenv("TYPESENCE_API_KEY")),
 		)
 
 		if err := CreateSchema(tClient); err != nil {
-			log.Fatal("Error creating schema: ", err)
+			log.Println("Error creating schema: ", err)
 		}
 	})
 
@@ -45,16 +46,6 @@ func GetTClient() *typesense.Client {
 
 func CreateSchema(client *typesense.Client) error {
 
-	_, err := client.Collection("products").Retrieve(context.TODO())
-	if err == nil {
-		log.Println("Collection 'products' already exists")
-		return nil
-	}
-
-	if err != nil && !errors.Is(err, &typesense.HTTPError{}) {
-		return fmt.Errorf("unexpected error checking collection: %v", err)
-	}
-
 	create, err := client.Collections().Create(context.TODO(), &api.CollectionSchema{
 		Name: "products",
 		Fields: []api.Field{
@@ -65,6 +56,8 @@ func CreateSchema(client *typesense.Client) error {
 		},
 		TokenSeparators: &[]string{" ", "-", ".", ",", ":"},
 	})
+
+	createSampleDocument(client)
 
 	if err != nil {
 		var httpErr *typesense.HTTPError
@@ -85,4 +78,30 @@ func CreateSchema(client *typesense.Client) error {
 
 	log.Printf("Typesense collection '%s' created successfully", create.Name)
 	return nil
+}
+
+func createSampleDocument(client *typesense.Client) {
+	//create a doc just for testing
+	if false {
+
+		p := struct {
+			ID    string `json:"id,omitempty"`
+			Title string `json:"title,omitempty"`
+			Slug  string `json:"slug,omitempty"`
+			SKU   string `json:"sku,omitempty"`
+			Price int    `json:"price,omitempty"`
+		}{
+			ID:    uuid.New().String(),
+			Title: "کتاب شب های برره محسن چاوشی ۳۰ 9898",
+			Slug:  "کتاب-شب-های-برره-محسن-چاوشی-۳۰-9898",
+			SKU:   "sku888",
+			Price: 5000,
+		}
+		createDoc, err := client.Collection("products").Documents().
+			Create(context.Background(), p, &api.DocumentIndexParameters{})
+		if err != nil {
+			log.Fatal("create doc failed:", err)
+		}
+		log.Println("succ create doc:", createDoc)
+	}
 }
