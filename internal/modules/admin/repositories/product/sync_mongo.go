@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"fmt"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
@@ -15,16 +16,6 @@ import (
 
 // SyncMongo وظیفه ذخیره محصول و روابطش و نیز ذخیره موجودی انبار رو در استراکت دلخواه در مونگو دیبی به عهده داره
 func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
-	// تعریف ساختار مورد نیاز برای انبارها و ویژگی‌ها
-	type InventoryWithAttributes struct {
-		InventoryID                 uint
-		Quantity                    uint
-		AttributeID                 uint
-		AttributeTitle              string
-		AttributeValueID            uint
-		AttributeValueTitle         string
-		ProductInventoryAttributeID uint
-	}
 
 	// بارگذاری اطلاعات محصول
 	var product entities.Product
@@ -40,6 +31,17 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 	if productErr != nil {
 		fmt.Println("--- mongo product error:", productErr)
 		return productErr
+	}
+
+	// تعریف ساختار مورد نیاز برای انبارها و ویژگی‌ها
+	type InventoryWithAttributes struct {
+		InventoryID                 uint
+		Quantity                    uint
+		AttributeID                 uint
+		AttributeTitle              string
+		AttributeValueID            uint
+		AttributeValueTitle         string
+		ProductInventoryAttributeID uint
 	}
 
 	// بارگذاری موجودی‌ها
@@ -60,16 +62,6 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		log.Println("--- mongo scan error:", serr)
 		return serr
 	}
-
-	// upsert product in typesence
-	go func() {
-		util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
-			ID:    fmt.Sprintf("%d", product.ID),
-			Title: product.Title,
-			Slug:  product.Slug,
-			Sku:   product.Sku,
-		})
-	}()
 
 	// آماده‌سازی برای ذخیره در MongoDB
 	inventoryMap := make(map[string]entities.Inventory) // prepare product inventory
@@ -149,6 +141,41 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		return err
 	}
 
+	// upsert product in typesence
+	go func() {
+		util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
+			ID:    fmt.Sprintf("%d", product.ID),
+			Title: product.Title,
+			Slug:  product.Slug,
+			Sku:   product.Sku,
+		})
+	}()
+
 	log.Println("-- upsert product in mongoDB successfully")
 	return nil
+}
+
+func transformImages(images []*entities.ProductImages) []entities.ImgData {
+	var imgData []entities.ImgData
+	for _, img := range images {
+		imgData = append(imgData, entities.ImgData{
+			ID:           int64(img.ID),
+			OriginalPath: img.Path,
+			FullPath:     viper.GetString("Upload.Products") + img.Path,
+		})
+	}
+	return imgData
+}
+
+func transformFeatures(features []*entities.Feature) []entities.FData {
+	var fData []entities.FData
+	for _, feature := range features {
+		fData = append(fData, entities.FData{
+			ID:        int64(feature.ID),
+			ProductID: int64(feature.ProductID),
+			Title:     feature.Title,
+			Value:     feature.Value,
+		})
+	}
+	return fData
 }
