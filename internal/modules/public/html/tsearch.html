@@ -1,0 +1,57 @@
+{{define "tsearch"}}
+    <!DOCTYPE html>
+    <html lang="fa">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>جستجو</title>
+        <style>
+            .highlight {
+                background-color: yellow;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+    <h1>جستجو در کتاب‌ها</h1>
+    <form id="searchForm">
+        <input type="text" id="searchQuery" placeholder="جستجو کنید..." autocomplete="off">
+    </form>
+    <ul id="results"></ul>
+
+    <script>
+        document.getElementById("searchQuery").addEventListener("input", function () {
+            const query = this.value;
+
+            if (query.length > 0) {
+                fetch(`/tsearch?q=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultsList = document.getElementById("results");
+                        resultsList.innerHTML = '';
+
+                        if (data.results && Array.isArray(data.results)) {
+                            data.results.forEach(result => {
+                                const highlightedTitle = result.title.replace(new RegExp(query, 'gi'), (match) => {
+                                    return `<span class="highlight">${match}</span>`;
+                                });
+
+                                const li = document.createElement("li");
+                                li.innerHTML = `<a  href="${result.link}">${highlightedTitle}</a>`;
+                                resultsList.appendChild(li);
+                            });
+                        } else {
+                            resultsList.innerHTML = `<li>نتیجه‌ای یافت نشد.</li>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        });
+
+    </script>
+    </body>
+    </html>
+
+{{end}}
