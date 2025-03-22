@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 	"shop/internal/events"
-	adminJob "shop/internal/modules/admin/jobs"
+	//adminJob "shop/internal/modules/admin/jobs"
 	"shop/internal/pkg/bootstrap"
 )
 
@@ -39,7 +39,7 @@ func RunWorker(ctx context.Context, dep *bootstrap.Dependencies, em *events.Even
 	//mux.HandleFunc(publicJob.TypeSendWelcomeSMS, publicJob.HandleTaskSendWelcomeSMS)
 	//mux.HandleFunc(publicJob.TypeExample, publicJob.HandleExampleTask)
 
-	mux.Handle(adminJob.CancelPendingOrders, adminJob.NewCancelJob(dep, em))
+	//mux.Handle(adminJob.CancelPendingOrders, adminJob.NewCancelJob(dep, em))
 	//mux.Handle(jobs.TypeSendEmail, jobs.NewSendEmailJob(dep))
 	//>>>>> run serve r<<<<<
 	log.Println("[info] worker started")
