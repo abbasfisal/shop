@@ -8,6 +8,6 @@ import (
 )
 
 type MongoHomeRepositoryInterface interface {
-	GetProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, error)
+	GetProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.MongoProductRecommendation, error)
 	GetProductByObjectID(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest) (entities.MongoProduct, error)
 }

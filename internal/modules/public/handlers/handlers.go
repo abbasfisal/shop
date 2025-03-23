@@ -113,7 +113,8 @@ func (p PublicHandler) HomePage(c *gin.Context) {
 
 func (p PublicHandler) SingleProduct(c *gin.Context) {
 
-	product, err := p.homeSrv.GetSingleProduct(c, c.Param("product_sku"), c.Param("product_slug"))
+	//get single product with its recommendations product
+	product, recommendations, err := p.homeSrv.GetSingleProduct(c, c.Param("product_sku"), c.Param("product_slug"))
 	primaryMessage := ""
 	if err.Code > 0 {
 		if err.Code == 404 {
@@ -126,8 +127,9 @@ func (p PublicHandler) SingleProduct(c *gin.Context) {
 
 	html.CustomerRender(c, http.StatusFound, "single_product",
 		gin.H{
-			"PRODUCT":        product,
-			"PrimaryMessage": primaryMessage,
+			"PRODUCT":         product,
+			"RECOMMENDATIONS": recommendations,
+			"PrimaryMessage":  primaryMessage,
 		})
 	return
 }

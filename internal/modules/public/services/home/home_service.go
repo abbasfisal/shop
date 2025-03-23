@@ -174,25 +174,26 @@ func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryRespons
 	return categoryResponses, nil
 }
 
-func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, custom_error.CustomError) {
+func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.MongoProductRecommendation, custom_error.CustomError) {
 
-	mongoProduct, err := h.mongoRepo.GetProduct(c, productSku, productSlug)
+	mongoProduct, rec, err := h.mongoRepo.GetProduct(c, productSku, productSlug)
+	log.Println("---- recommendation count :", len(rec))
 	if err == nil {
-		fmt.Println("--- mongo success --- ")
-		return mongoProduct, custom_error.CustomError{}
+		log.Println("--- mongo success --- ")
+		return mongoProduct, rec, custom_error.CustomError{}
 	} else {
-		fmt.Println("--- mongo product get err: ", err)
+		log.Println("--- mongo product get err: ", err)
 	}
 
 	product, err := h.repo.GetProduct(c, productSku, productSlug)
 	if err != nil {
-		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 
 	p := responses.ToProduct(product["product"].(*entities.Product))
 	product["product"] = p
 
-	return product, custom_error.CustomError{}
+	return product, rec, custom_error.CustomError{}
 }
 
 func (h *HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest) {
