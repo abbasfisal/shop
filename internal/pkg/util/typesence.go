@@ -29,12 +29,13 @@ func UpsertInTypesence(c context.Context, product UpsertTypesenceProduct) {
 		Sku:   product.Sku,
 	}
 
-	updateRes, err := typesenceclient.GetTClient().Collection("products").
+	_, err := typesenceclient.GetTClient().
+		Collection("products").
 		Documents().Upsert(c, doc, &api.DocumentIndexParameters{})
 
 	if err != nil {
-		log.Println("-- upsert product typesence failed:", err)
+		log.Println("--- upsert product typesence failed:", err)
 	}
-	log.Println("--- upsert product typesence successfully: ", updateRes)
+	log.Println("--- upsert product typesence successfully")
 
 }
