@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
+	"log"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/repositories/product"
 	"shop/internal/modules/admin/requests"
@@ -34,13 +37,27 @@ func (p *ProductService) Index(ctx context.Context) (*responses.Products, custom
 	return responses.ToProducts(products), custom_error.CustomError{}
 }
 
-func (p *ProductService) Show(ctx context.Context, columnName string, value any) (*responses.Product, custom_error.CustomError) {
+func (p *ProductService) Show(ctx context.Context, columnName string, value any) (*responses.Product, []bson.M, custom_error.CustomError) {
 
 	pResult, err := p.repo.FindBy(ctx, columnName, value)
 	if err != nil {
-		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
+		return nil, nil, custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
-	return responses.ToProduct(pResult), custom_error.CustomError{}
+
+	mongoProduct, err := p.repo.GetAllMongoProduct(ctx)
+	log.Println("--- get all mongo product :", len(mongoProduct), " | err:", err)
+	if err != nil {
+		return nil, nil, custom_error.CustomError{}
+	} else {
+		//add id field which is string not object
+		for i := range mongoProduct {
+			if objID, ok := mongoProduct[i]["_id"].(primitive.ObjectID); ok {
+				mongoProduct[i]["id"] = objID.Hex()
+			}
+		}
+	}
+
+	return responses.ToProduct(pResult), mongoProduct, custom_error.CustomError{}
 }
 
 func (p *ProductService) Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, custom_error.CustomError) {
@@ -222,6 +239,14 @@ func (p *ProductService) FetchFeature(c *gin.Context, productID int, featureID i
 func (p *ProductService) UpdateFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) custom_error.CustomError {
 	if err := p.repo.EditFeature(c, productID, featureID, req); err != nil {
 		return custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return custom_error.CustomError{}
+}
+func (p *ProductService) AddRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) custom_error.CustomError {
+	err := p.repo.InsertRecommendation(c, productID, productRecommendationIDs)
+	if err != nil {
+		log.Println("--- AddRecommendation err: ", err)
+		return custom_error.CustomError{}
 	}
 	return custom_error.CustomError{}
 }

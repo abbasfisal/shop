@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"shop/internal/modules/admin/requests"
 	"shop/internal/modules/admin/responses"
 	"shop/internal/pkg/custom_error"
@@ -10,7 +11,7 @@ import (
 
 type ProductServiceInterface interface {
 	Index(ctx context.Context) (*responses.Products, custom_error.CustomError)
-	Show(ctx context.Context, columnName string, value any) (*responses.Product, custom_error.CustomError)
+	Show(ctx context.Context, columnName string, value any) (*responses.Product, []bson.M, custom_error.CustomError)
 	Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, custom_error.CustomError)
 	CheckSkuIsUnique(ctx context.Context, sku string) (bool, custom_error.CustomError)
 	FetchByProductID(c *gin.Context, productID int) (*responses.Product, custom_error.CustomError)
@@ -30,4 +31,5 @@ type ProductServiceInterface interface {
 	RemoveFeature(c *gin.Context, productID int, featureID int) custom_error.CustomError
 	FetchFeature(c *gin.Context, productID int, featureID int) (*responses.Feature, custom_error.CustomError)
 	UpdateFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) custom_error.CustomError
+	AddRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) custom_error.CustomError
 }

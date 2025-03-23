@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
 )
@@ -28,4 +29,6 @@ type ProductRepositoryInterface interface {
 	DeleteFeature(c *gin.Context, productID int, featureID int) error
 	GetFeatureBy(c *gin.Context, productID int, featureID int) (*entities.Feature, error)
 	EditFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) error
+	GetAllMongoProduct(c context.Context) ([]bson.M, error)
+	InsertRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) error
 }

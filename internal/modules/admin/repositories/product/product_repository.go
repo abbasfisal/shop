@@ -39,6 +39,7 @@ func (p *ProductRepository) FindBy(ctx context.Context, columnName string, value
 		Preload("ProductImages").Preload("Features").
 		First(&product, condition, value).
 		Error
+
 	return &product, err
 }
 
