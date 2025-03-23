@@ -122,6 +122,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/products", adminHlr.StoreProduct)
 		authGrp.GET("/admins/products/:id", adminHlr.ShowProduct)
 		authGrp.GET("/admins/products/:id/edit", adminHlr.EditProduct)
+		authGrp.POST("/admins/products/:id", adminHlr.UpdateProduct)
 
 		authGrp.GET("/admins/products/:id/add-feature", adminHlr.CreateProductFeature)
 		authGrp.POST("/admins/products/:id/add-feature", adminHlr.StoreProductFeature)
@@ -133,7 +134,6 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.GET("/admins/products/:id/show-gallery", adminHlr.ShowProductGallery)
 		authGrp.GET("/admins/products/images/:id/delete", adminHlr.DeleteProductImage)
 		authGrp.POST("/admins/products/:id/add-images", adminHlr.UploadProductImages)
-		authGrp.POST("/admins/products/:id", adminHlr.UpdateProduct)
 
 		//product-attribute
 		authGrp.GET("/admins/products/:id/add-attributes", adminHlr.ProductsAddAttributes)
