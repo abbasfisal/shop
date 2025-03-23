@@ -1,4 +1,11 @@
 {{define "mobile_side_menu_tmpl"}}
+    <style>
+        .highlight_search {
+            background-color: yellow;
+            font-weight: bold;
+        }
+    </style>
+
     <div class="header-responsive">
         <div class="header-top">
             <div class="side-navigation-wrapper">
@@ -147,7 +154,7 @@
         <div class="header-bottom">
             <div class="search-box">
                 <form action="#">
-                    <input type="text" placeholder="نام محصول یا برند را جستجو کنید...">
+                    <input type="text" id="searchQuery_small" placeholder="نام محصول یا برند را جستجو کنید...">
                     <i>
                         <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
@@ -162,39 +169,7 @@
                     </i>
                 </form>
                 <div class="search-result">
-                    <ul class="search-result-list">
-                        <li>
-                            <a href="#">موبایل</a>
-                        </li>
-                        <li>
-                            <a href="#">سامسونگ</a>
-                        </li>
-                        <li>
-                            <a href="#">مودم</a>
-                        </li>
-                        <li>
-                            <a href="#">اپل</a>
-                        </li>
-                        <li>
-                            <a href="#">تلویزیون</a>
-                        </li>
-                    </ul>
-                    <ul class="search-result-most-view">
-                        <li>
-                            <a href="#">موبایل</a>
-                        </li>
-                        <li>
-                            <a href="#">سامسونگ</a>
-                        </li>
-                        <li>
-                            <a href="#">مودم</a>
-                        </li>
-                        <li>
-                            <a href="#">اپل</a>
-                        </li>
-                        <li>
-                            <a href="#">تلویزیون</a>
-                        </li>
+                    <ul class="search-result-list" id="results_small">
                     </ul>
                 </div>
             </div>
