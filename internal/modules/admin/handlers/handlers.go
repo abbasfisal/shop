@@ -679,7 +679,7 @@ func (a *AdminHandler) ShowProduct(c *gin.Context) {
 		return
 	}
 
-	selectedP, pErr := a.productSrv.Show(context.TODO(), "id", productID)
+	selectedP, _, pErr := a.productSrv.Show(context.TODO(), "id", productID)
 	if pErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -706,7 +706,8 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 		return
 	}
 
-	productShow, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+	// get product data by repo
+	productShow, allProductsInMongo, pErr := a.productSrv.Show(c.Request.Context(), "id", pID)
 
 	if pErr.Code == 404 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -716,6 +717,7 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 		html.Error500(c)
 		return
 	}
+
 	categories, cErr := a.categorySrv.GetAllCategories(context.TODO())
 	if cErr.Code == 404 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -740,16 +742,18 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_edit_product",
 		gin.H{
-			"TITLE":      "ویرایش محصول",
-			"PRODUCT":    productShow,
-			"CATEGORIES": categories,
-			"BRANDS":     brands,
+			"TITLE":       "ویرایش محصول",
+			"PRODUCT":     productShow,
+			"AllProducts": allProductsInMongo, // products in collection products in mongodb
+			"CATEGORIES":  categories,
+			"BRANDS":      brands,
 		},
 	)
 	return
 }
 
 func (a *AdminHandler) UpdateProduct(c *gin.Context) {
+
 	//convert string id to int
 	productID, convErr := strconv.Atoi(c.Param("id"))
 	if convErr != nil {
@@ -786,7 +790,7 @@ func (a *AdminHandler) UpdateProduct(c *gin.Context) {
 	}
 
 	//select product from db
-	selectedProduct, pErr := a.productSrv.Show(context.TODO(), "id", productID)
+	selectedProduct, _, pErr := a.productSrv.Show(c, "id", productID)
 	if pErr.Code == 404 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -879,6 +883,13 @@ func (a *AdminHandler) UpdateProduct(c *gin.Context) {
 		sessions.Set(c, "message", custom_messages.ProductUpdateFailed)
 		c.Redirect(http.StatusFound, "/admins/products/")
 	}
+
+	//--add product recommendations
+
+	// get recommendation IDs from Form
+	productRecommendationIDs := c.PostFormArray("recommendations")
+
+	go a.productSrv.AddRecommendation(c, productID, productRecommendationIDs)
 
 	sessions.Set(c, "message", custom_messages.ProductUpdatedSuccessfully)
 	c.Redirect(http.StatusFound, url)
@@ -1177,7 +1188,7 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		return
 	}
 
-	productShow, pErr := a.productSrv.Show(c.Request.Context(), "id", pID)
+	productShow, _, pErr := a.productSrv.Show(c.Request.Context(), "id", pID)
 
 	if pErr.Code == 404 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -1760,7 +1771,7 @@ func (a *AdminHandler) CreateProductFeature(c *gin.Context) {
 		return
 	}
 
-	productShow, pErr := a.productSrv.Show(context.TODO(), "id", pID)
+	productShow, _, pErr := a.productSrv.Show(context.TODO(), "id", pID)
 
 	if pErr.Code > 0 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -1785,7 +1796,7 @@ func (a *AdminHandler) StoreProductFeature(c *gin.Context) {
 		return
 	}
 
-	_, pErr := a.productSrv.Show(c, "id", pID)
+	_, _, pErr := a.productSrv.Show(c, "id", pID)
 	if pErr.Code > 0 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -1831,7 +1842,7 @@ func (a *AdminHandler) ShowProductFeature(c *gin.Context) {
 		return
 	}
 
-	productData, pErr := a.productSrv.Show(c, "id", pID)
+	productData, _, pErr := a.productSrv.Show(c, "id", pID)
 	if pErr.Code > 0 {
 		sessions.Set(c, "message", custom_error.RecordNotFound)
 		c.Redirect(http.StatusFound, "/admins/products")
