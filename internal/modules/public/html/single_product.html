@@ -22,118 +22,115 @@
     </head>
 
     <body>
-    <form action="/add-to-cart" method="post">
-        <input type="hidden" name="product_id" value="{{.PRODUCT._id}}">
-        <div class="wrapper">
+    <div class="wrapper">
+        <!-------------------------------- Header Section -->
+        {{template "header_tmpl" .}}
+        <!-------------------------------- Header Section -->
 
-            <!-------------------------------- Header Section -->
-            {{template "header_tmpl" .}}
-            <!-------------------------------- Header Section -->
+        <!--------------------- Mobile side menu Responsive Section -->
+        {{template "mobile_side_menu_tmpl" .}}
+        <!------------------- Mobile side menu Responsive Section -->
 
-            <!--------------------- Mobile side menu Responsive Section -->
-            {{template "mobile_side_menu_tmpl" .}}
-            <!------------------- Mobile side menu Responsive Section -->
-
-            <!---------------------------- Page Loader Section-->
-            <div class="page-loader">
-                <div class="page-loader-content">
-                    <div class="logo-area">
-                        <img src="/assets/shop/img/svg/logo.svg" alt="">
-                    </div>
-                    <span class="loader"></span>
+        <!---------------------------- Page Loader Section-->
+        <div class="page-loader">
+            <div class="page-loader-content">
+                <div class="logo-area">
+                    <img src="/assets/shop/img/svg/logo.svg" alt="">
                 </div>
+                <span class="loader"></span>
             </div>
-            <!---------------------------- Page Loader Section-->
+        </div>
+        <!---------------------------- Page Loader Section-->
 
-            <!--------------------------------- Main Content -->
-            <main class="main-content dt-sl mb-3">
-                {{if  .PRODUCT.product }}
-                    <div class="container main-container">
-                        <!-- Start title - breadcrumb -->
-                        <div class="title-breadcrumb-special dt-sl mb-3">
-                            <div class="breadcrumb dt-sl">
-                                <nav>
-                                    <a href="/search/{{.PRODUCT.product.Category.Slug}}">
-                                        {{.PRODUCT.product.Category.Title}}
-                                        <i class="fa fa-caret-left"></i>
-                                    </a>
-                                    <a href="/product/{{.PRODUCT.product.Sku}}/{{.PRODUCT.product.Slug}}">{{.PRODUCT.product.Title}}</a>
-                                </nav>
-                            </div>
+        <!--------------------------------- Main Content -->
+        <main class="main-content dt-sl mb-3">
+            {{if  .PRODUCT.product }}
+                <div class="container main-container">
+                    <!-- Start title - breadcrumb -->
+                    <div class="title-breadcrumb-special dt-sl mb-3">
+                        <div class="breadcrumb dt-sl">
+                            <nav>
+                                <a href="/search/{{.PRODUCT.product.Category.Slug}}">
+                                    {{.PRODUCT.product.Category.Title}}
+                                    <i class="fa fa-caret-left"></i>
+                                </a>
+                                <a href="/product/{{.PRODUCT.product.Sku}}/{{.PRODUCT.product.Slug}}">{{.PRODUCT.product.Title}}</a>
+                            </nav>
                         </div>
-                        <!-- End title - breadcrumb -->
-                        <!-- Start Product -->
-                        <div class="dt-sn mb-5 dt-sl">
-                            <div class="row">
-                                <!-- Product Gallery-->
-                                <div class="col-lg-4 col-md-6 ps-relative">
-                                    <div class="product-gallery">
-                                        <div class="product-carousel owl-carousel" data-slider-id="1">
+                    </div>
+                    <!-- End title - breadcrumb -->
+                    <!-- Start Product -->
+                    <div class="dt-sn mb-5 dt-sl">
+                        <div class="row">
+                            <!-- Product Gallery-->
+                            <div class="col-lg-4 col-md-6 ps-relative">
+                                <div class="product-gallery">
+                                    <div class="product-carousel owl-carousel" data-slider-id="1">
+                                        {{range .PRODUCT.product.Images.Data}}
+                                            <div class="item">
+                                                <a class="gallery-item"
+                                                   href="/{{.FullPath}}"
+                                                   data-fancybox="gallery1">
+                                                    <img src="/{{.FullPath}}"
+                                                         alt="Product">
+                                                </a>
+                                            </div>
+                                        {{end}}
+                                    </div>
+                                    {{/*thumbs*/}}
+                                    <div class="d-flex justify-content-center flex-wrap">
+                                        <ul class="product-thumbnails owl-thumbs ml-2" data-slider-id="1">
                                             {{range .PRODUCT.product.Images.Data}}
-                                                <div class="item">
-                                                    <a class="gallery-item"
-                                                       href="/{{.FullPath}}"
-                                                       data-fancybox="gallery1">
+                                                <li class="owl-thumb-item active">
+                                                    <a href="">
                                                         <img src="/{{.FullPath}}"
                                                              alt="Product">
                                                     </a>
-                                                </div>
+                                                </li>
                                             {{end}}
-                                        </div>
-                                        {{/*thumbs*/}}
-                                        <div class="d-flex justify-content-center flex-wrap">
-                                            <ul class="product-thumbnails owl-thumbs ml-2" data-slider-id="1">
-                                                {{range .PRODUCT.product.Images.Data}}
-                                                    <li class="owl-thumb-item active">
-                                                        <a href="">
-                                                            <img src="/{{.FullPath}}"
-                                                                 alt="Product">
-                                                        </a>
-                                                    </li>
-                                                {{end}}
-                                            </ul>
+                                        </ul>
 
-                                            {{/*productvideo*/}}
-                                            <ul class="product-thumbnails">
-                                                <li>
-                                                    <a style="display: flex;align-items: center;"
-                                                       class="navi-link text-sm"
-                                                       href="/assets/shop/video/download.mp4"
-                                                       data-fancybox data-width="960" data-height="640">
-                                                        <i>
-                                                            <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                                                 xmlns="http://www.w3.org/2000/svg"
-                                                                 viewBox="0 0 511.999 511.999" xml:space="preserve"><polygon
-                                                                        style="fill:#4d4d4d"
-                                                                        points="503.828,206.98 503.828,479.32 471.147,454.417 427.572,343.15 471.147,231.883 "/>
-                                                                <polygon style="fill:#737373"
-                                                                         points="471.147,231.883 471.147,454.417 389.445,392.171 367.657,343.15 389.445,294.129 "/>
-                                                                <rect x="324.085" y="283.233" style="fill:#b9b9b9"
-                                                                      width="65.362" height="119.83"/>
-                                                                <path style="fill:#737373" d="M324.083,206.98h-32.681v272.34h32.681c17.974,0,32.681-14.706,32.681-32.681V239.661
+                                        {{/*productvideo*/}}
+                                        <ul class="product-thumbnails">
+                                            <li>
+                                                <a style="display: flex;align-items: center;"
+                                                   class="navi-link text-sm"
+                                                   href="/assets/shop/video/download.mp4"
+                                                   data-fancybox data-width="960" data-height="640">
+                                                    <i>
+                                                        <svg width="30px" height="30px" version="1.1" id="Layer_1"
+                                                             xmlns="http://www.w3.org/2000/svg"
+                                                             viewBox="0 0 511.999 511.999" xml:space="preserve"><polygon
+                                                                    style="fill:#4d4d4d"
+                                                                    points="503.828,206.98 503.828,479.32 471.147,454.417 427.572,343.15 471.147,231.883 "/>
+                                                            <polygon style="fill:#737373"
+                                                                     points="471.147,231.883 471.147,454.417 389.445,392.171 367.657,343.15 389.445,294.129 "/>
+                                                            <rect x="324.085" y="283.233" style="fill:#b9b9b9"
+                                                                  width="65.362" height="119.83"/>
+                                                            <path style="fill:#737373" d="M324.083,206.98h-32.681v272.34h32.681c17.974,0,32.681-14.706,32.681-32.681V239.661
                                                         C356.764,221.686,342.057,206.98,324.083,206.98z"/>
-                                                                <path style="fill:#969696" d="M324.083,239.661v206.979c0,17.974-14.706,32.681-32.681,32.681H40.849
+                                                            <path style="fill:#969696" d="M324.083,239.661v206.979c0,17.974-14.706,32.681-32.681,32.681H40.849
                                                         c-17.974,0-32.681-14.706-32.681-32.681V239.661c0-17.974,14.706-32.681,32.681-32.681h250.553
                                                         C309.377,206.98,324.083,221.686,324.083,239.661z"/>
-                                                                <polygon style="fill:#b9b9b9"
-                                                                         points="291.402,283.235 291.402,403.065 258.721,403.065 226.04,343.15 258.721,283.235 "/>
-                                                                <rect x="51.745" y="283.233" style="fill:#dcdcdc"
-                                                                      width="206.979" height="119.83"/>
-                                                                <path style="fill:#969696"
-                                                                      d="M95.319,32.682V206.98c48.128,0,87.149-39.021,87.149-87.149S143.447,32.682,95.319,32.682z"/>
-                                                                <path style="fill:#b9b9b9" d="M95.319,32.682c30.088,0,54.468,39.021,54.468,87.149s-24.38,87.149-54.468,87.149
+                                                            <polygon style="fill:#b9b9b9"
+                                                                     points="291.402,283.235 291.402,403.065 258.721,403.065 226.04,343.15 258.721,283.235 "/>
+                                                            <rect x="51.745" y="283.233" style="fill:#dcdcdc"
+                                                                  width="206.979" height="119.83"/>
+                                                            <path style="fill:#969696"
+                                                                  d="M95.319,32.682V206.98c48.128,0,87.149-39.021,87.149-87.149S143.447,32.682,95.319,32.682z"/>
+                                                            <path style="fill:#b9b9b9" d="M95.319,32.682c30.088,0,54.468,39.021,54.468,87.149s-24.38,87.149-54.468,87.149
                                                         c-48.128,0-87.149-39.021-87.149-87.149S47.191,32.682,95.319,32.682z"/>
-                                                                <path style="fill:#969696"
-                                                                      d="M269.615,32.682V206.98c48.128,0,87.149-39.021,87.149-87.149S317.743,32.682,269.615,32.682z"/>
-                                                                <path style="fill:#b9b9b9" d="M269.615,32.682c30.088,0,54.468,39.021,54.468,87.149s-24.38,87.149-54.468,87.149
+                                                            <path style="fill:#969696"
+                                                                  d="M269.615,32.682V206.98c48.128,0,87.149-39.021,87.149-87.149S317.743,32.682,269.615,32.682z"/>
+                                                            <path style="fill:#b9b9b9" d="M269.615,32.682c30.088,0,54.468,39.021,54.468,87.149s-24.38,87.149-54.468,87.149
                                                         c-48.128,0-87.149-39.021-87.149-87.149S221.487,32.682,269.615,32.682z"/>
-                                                                <g>
-                                                                    <path style="fill:#eee" d="M269.617,152.51c-18.02,0-32.681-14.661-32.681-32.681s14.661-32.681,32.681-32.681
+                                                            <g>
+                                                                <path style="fill:#eee" d="M269.617,152.51c-18.02,0-32.681-14.661-32.681-32.681s14.661-32.681,32.681-32.681
                                                             c18.02,0,32.681,14.661,32.681,32.681S287.637,152.51,269.617,152.51z"/>
-                                                                    <path style="fill:#eee" d="M95.319,152.51c-18.02,0-32.681-14.661-32.681-32.681s14.661-32.681,32.681-32.681
+                                                                <path style="fill:#eee" d="M95.319,152.51c-18.02,0-32.681-14.661-32.681-32.681s14.661-32.681,32.681-32.681
                                                             S128,101.808,128,119.829S113.339,152.51,95.319,152.51z"/>
-                                                                </g>
-                                                                <path d="M507.456,199.656c-2.783-1.379-6.107-1.06-8.578,0.822l-102.645,78.205c-1.466-2.184-3.959-3.621-6.787-3.621h-24.511
+                                                            </g>
+                                                            <path d="M507.456,199.656c-2.783-1.379-6.107-1.06-8.578,0.822l-102.645,78.205c-1.466-2.184-3.959-3.621-6.787-3.621h-24.511
                                                         v-35.404c0-22.526-18.325-40.851-40.851-40.851h-1.155c25.328-17.152,42.006-46.154,42.006-78.979
                                                         c0-52.56-42.76-95.319-95.319-95.319c-38.83,0-72.306,23.342-87.149,56.729C167.626,47.851,134.149,24.51,95.319,24.51
                                                         C42.76,24.51,0,67.269,0,119.829c0,32.825,16.678,61.827,42.006,78.979h-1.155C18.325,198.807,0,217.133,0,239.658v206.979
@@ -146,647 +143,651 @@
                                                         s78.979,35.429,78.979,78.979s-35.429,78.979-78.979,78.979S16.34,163.378,16.34,119.829z M348.596,446.637
                                                         c0,13.515-10.995,24.511-24.511,24.511H40.851c-13.516,0-24.511-10.996-24.511-24.511V239.658c0-13.515,10.995-24.511,24.511-24.511
                                                         h283.234c13.516,0,24.511,10.996,24.511,24.511V446.637z M381.277,394.893h-16.34V291.403h16.34V394.893z"/>
-                                                                <path d="M51.745,258.722h130.723c4.512,0,8.17-3.657,8.17-8.17s-3.658-8.17-8.17-8.17H51.745c-4.512,0-8.17,3.657-8.17,8.17
+                                                            <path d="M51.745,258.722h130.723c4.512,0,8.17-3.657,8.17-8.17s-3.658-8.17-8.17-8.17H51.745c-4.512,0-8.17,3.657-8.17,8.17
                                                         S47.233,258.722,51.745,258.722z"/>
-                                                                <path d="M291.404,275.063H51.745c-4.512,0-8.17,3.657-8.17,8.17v119.83c0,4.513,3.658,8.17,8.17,8.17h32.681
+                                                            <path d="M291.404,275.063H51.745c-4.512,0-8.17,3.657-8.17,8.17v119.83c0,4.513,3.658,8.17,8.17,8.17h32.681
                                                         c4.512,0,8.17-3.657,8.17-8.17c0-4.513-3.658-8.17-8.17-8.17H59.915V291.403h223.319v103.489H117.106c-4.512,0-8.17,3.657-8.17,8.17
                                                         c0,4.513,3.658,8.17,8.17,8.17h174.298c4.512,0,8.17-3.657,8.17-8.17v-119.83C299.574,278.72,295.916,275.063,291.404,275.063z"/>
-                                                                <path d="M240.168,136.177c4.359-1.169,6.944-5.651,5.775-10.009c-0.554-2.069-0.837-4.202-0.837-6.339
+                                                            <path d="M240.168,136.177c4.359-1.169,6.944-5.651,5.775-10.009c-0.554-2.069-0.837-4.202-0.837-6.339
                                                         c0-13.515,10.995-24.511,24.511-24.511s24.511,10.996,24.511,24.511s-10.995,24.511-24.511,24.511c-2.134,0-4.268-0.282-6.341-0.838
                                                         c-4.357-1.17-8.839,1.418-10.007,5.777c-1.169,4.359,1.418,8.838,5.776,10.007c3.452,0.926,7.01,1.394,10.572,1.394
                                                         c22.526,0,40.851-18.325,40.851-40.851s-18.325-40.851-40.851-40.851c-22.526,0-40.851,18.325-40.851,40.851
                                                         c0,3.565,0.47,7.123,1.394,10.573C231.33,134.762,235.816,137.348,240.168,136.177z"/>
-                                                                <path d="M95.319,78.978c-22.525,0-40.851,18.325-40.851,40.851c0,3.565,0.47,7.123,1.394,10.573c1.17,4.36,5.655,6.946,10.008,5.775
+                                                            <path d="M95.319,78.978c-22.525,0-40.851,18.325-40.851,40.851c0,3.565,0.47,7.123,1.394,10.573c1.17,4.36,5.655,6.946,10.008,5.775
                                                         c4.359-1.169,6.944-5.651,5.775-10.009c-0.554-2.069-0.837-4.202-0.837-6.339c0-13.515,10.995-24.511,24.511-24.511
                                                         s24.511,10.996,24.511,24.511s-10.995,24.511-24.511,24.511c-2.134,0-4.268-0.282-6.341-0.838c-4.359-1.17-8.838,1.418-10.007,5.777
                                                         s1.418,8.838,5.776,10.007c3.452,0.926,7.01,1.394,10.572,1.394c22.526,0,40.851-18.325,40.851-40.851S117.845,78.978,95.319,78.978
                                                         z"/>
                                                     </svg>
-                                                        </i>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Product Info -->
-                                <div class="col-lg-8 col-md-6 py-2">
-                                    <div class="product-info dt-sl">
-                                        <div class="product-title dt-sl mb-3">
-                                            <h1>
-                                                {{.PRODUCT.product.Title}}
-                                            </h1>
-                                            <h3>{{.PRODUCT.product.Brand.Title}}</h3>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <div class="product-params dt-sl">
-                                                    {{if .PRODUCT.product.Features}}
-                                                        <ul data-title="ویژگی‌های محصول">
-                                                            {{range .PRODUCT.product.Features.Data}}
-                                                                <li>
-                                                                    <span>{{.Title}}:</span>
-                                                                    <span>{{.Value}}</span>
-                                                                </li>
-                                                            {{end}}
-                                                        </ul>
-                                                    {{end}}
-                                                    <div class="sum-more">
-                                                <span class="show-more btn-link-border">
-                                                    + موارد بیشتر
-                                                </span>
-                                                        <span class="show-less btn-link-border">
-                                                    - بستن
-                                                </span>
-                                                    </div>
-                                                </div>
-                                                <div class="product-variant dt-sl">
-                                                    <div>
-                                                        {{if eq (len .PRODUCT.inventories) 1}}
-                                                            {{range $key,$item:=.PRODUCT.inventories}}
-                                                                <input type="hidden" name="inventory_id"
-                                                                       value="{{$item.InventoryID}}">
-                                                                {{if lt $item.Quantity 5}}
-                                                                    <b>موجودی</b>:
-                                                                    {{$item.Quantity}}
-                                                                    عدد
-                                                                {{end}}
-                                                            {{end}}
-                                                        {{else}}
-                                                            <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
-                                                                <h2>انتخاب :</h2>
-                                                            </div>
-                                                            <select name="inventory_id" class="custom-select">
-                                                                {{range $item:=.PRODUCT.inventories}}
-                                                                    {{$qty:=$item.Quantity}}
-                                                                    {{$inventory_id:=$item.InventoryID}}
-                                                                    {{if eq (len $item.Attributes) 1}}
-                                                                        {{range $item.Attributes}}
-                                                                            <option value="{{$inventory_id}}" class="">
-                                                                                {{.AttributeTitle}}
-                                                                                {{.AttributeValueTitle}}
-                                                                                {{if gt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
-                                                                            </option>
-                                                                        {{end}}
-
-                                                                    {{else}}
-                                                                        {{$composite:=""}}
-                                                                        {{range .Attributes}}
-                                                                            {{$composite = printf "%s%s:%s  " $composite .AttributeTitle .AttributeValueTitle}} <!-- افزودن هر ویژگی به رشته قبلی -->
-                                                                        {{end}}
-                                                                        <option value="{{.InventoryID}}">{{$composite}}
-                                                                            {{if gt $qty 5 }}
-                                                                                |موجودی:{{.Quantity}}
-                                                                                عدد
-                                                                            {{end}}
-                                                                        </option>
-                                                                    {{end}}
-                                                                {{end}}
-                                                            </select>
-                                                        {{end}}
-                                                    </div>
-                                                </div>
-
-                                                <div class="section-title text-sm-title title-wide no-after-title-wide mb-0 dt-sl">
-                                                    <br>
-                                                    <h2>کد محصول:{{.PRODUCT.product.Sku}}</h2>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-
-                                                <div class="product-summary">
-                                                    <nav id="stack-menu">
-                                                        <ul>
-
-                                                            <li>
-                                                                <a>
-                                                                    <i class="far fa-shield-check"></i>
-                                                                    گارانتی ۱۸ ماهه دیجی پرس
-                                                                </a>
-                                                            </li>
-                                                            <li>
-
-                                                            </li>
-                                                        </ul>
-                                                        <div class="product-seller-row product-seller-row--price">
-                                                            <div class="product-seller-price-info">
-                                                                <div class="product-seller-price-prev">
-                                                                    {{.PRODUCT.product.OriginalPrice}}
-                                                                </div>
-                                                                <div class="product-seller-price-off">
-                                                                    {{.PRODUCT.product.Discount}}%
-                                                                </div>
-                                                            </div>
-                                                            <div class="product-seller-price-real">
-                                                                <div class="product-seller-price-raw">
-                                                                    {{.PRODUCT.product.SalePrice}}
-                                                                </div>
-                                                                تومان
-                                                            </div>
-                                                        </div>
-                                                        <div class="product-seller-row product-seller-row--add-to-cart">
-                                                            {{$productIDVar:=.PRODUCT.product.ID}}
-                                                            {{$found:=false}}
-                                                            {{range $CartItem:=.AUTH.Cart.CartItem.Data}}
-                                                                {{if eq .ProductID $productIDVar}}
-                                                                    {{$found = true}}
-                                                                {{end}}
-                                                            {{end}}
-                                                            {{if $found}}
-                                                                <a href="/checkout/cart"
-                                                                   class="btn-add-to-cart bg-success  btn-add-to-cart--full-width">مشاهده
-                                                                    سبد خرید
-                                                                </a>
-                                                            {{else}}
-                                                                <button type="submit"
-                                                                        class="btn-add-to-cart btn-add-to-cart--full-width">
-                                                                    <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
-                                                                </button>
-                                                            {{end}}
-                                                        </div>
-                                                    </nav>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- <div class="mb-add-to-cart-btn-wrapper">
-                                <a href="#" class="mb-add-to-cart-btn">افزودن به سبد خرید</a>
-                            </div> -->
-                        </div>
-                        <!-- sellers -->
-                        <div class="product-sellers shadow-around mb-5" id="product-seller-all">
-                            <div class="product-seller">
-                                <div class="product-seller-col">
-                                    <div class="product-seller-title">
-                                        <div class="icon">
-                                            <i class="fas fa-store-alt"></i>
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">دیجی پرس <span
-                                                        class="badge badge-light rounded-pill">برگزیده</span>
-                                            </div>
-                                            <div class="rating">
-                                                <span class="value">۹۰٪</span>
-                                                <span class="label">رضایت خریداران</span>
-                                                <span class="divider">|</span>
-                                                <span class="label">عملکرد</span>
-                                                <span class="value">عالی</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-seller-col">
-                                    <div class="product-seller-conditions">
-                                        <div class="product-seller-info">
-                                            <i class="fad fa-truck-container"></i>
-                                            <span>ارسال از دیجی پرس</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-seller-col">
-                                    <div class="product-seller-guarantee">
-                                        <div class="product-seller-info">
-                                            <i class="fad fa-shield-check"></i>
-                                            <span>گارانتی ۱۸ ماهه دیجی پرس</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-seller-col">
-                                    <div class="product-seller-price-action">
-                                        <div class="product-seller-price">۵,00۰,۰۰۰<span class="currency">تومان</span>
-                                        </div>
-                                        <div class="product-seller-action"><a href="#" class="btn btn-outline-danger">افزودن
-                                                به
-                                                سبد</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-seller">
-                                <div class="product-seller-col">
-                                    <div class="product-seller-title">
-                                        <div class="icon">
-                                            <i class="fas fa-store-alt"></i>
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">دیجی پرس <span
-                                                        class="badge badge-light rounded-pill">برگزیده</span>
-                                            </div>
-                                            <div class="rating">
-                                                <span class="value">۹۰٪</span>
-                                                <span class="label">رضایت خریداران</span>
-                                                <span class="divider">|</span>
-                                                <span class="label">عملکرد</span>
-                                                <span class="value">عالی</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-seller-col">
-                                    <div class="product-seller-conditions">
-                                        <div class="product-seller-info">
-                                            <i class="fad fa-truck-container"></i>
-                                            <span>ارسال از دیجی پرس</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-seller-col">
-                                    <div class="product-seller-guarantee">
-                                        <div class="product-seller-info">
-                                            <i class="fad fa-shield-check"></i>
-                                            <span>گارانتی ۱۸ ماهه دیجی پرس</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-seller-col">
-                                    <div class="product-seller-price-action">
-                                        <div class="product-seller-price">۵,00۰,۰۰۰<span class="currency">تومان</span>
-                                        </div>
-                                        <div class="product-seller-action"><a href="#" class="btn btn-outline-danger">افزودن
-                                                به
-                                                سبد</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dt-sn mb-5 px-0 dt-sl pt-0">
-                            <!-- Start tabs -->
-                            <section class="tabs-product-info mb-3 dt-sl">
-                                <div class="ah-tab-wrapper border-bottom dt-sl">
-                                    <div class="ah-tab dt-sl">
-                                        <a class="ah-tab-item" data-ah-tab-active="true" href="">
-                                            <i>
-                                                <svg width="23px" height="23px" viewBox="0 0 128 128"
-                                                     xmlns="http://www.w3.org/2000/svg"
-                                                     aria-hidden="true" role="img" class="iconify iconify--noto"
-                                                     preserveAspectRatio="xMidYMid meet">
-                                                    <g opacity=".8" fill="#90caf9">
-                                                        <path d="M52.44 53.27c-1.03-1.71-3.17-5.28-18.55-5.69c-10.54-.36-16.68.93-18.81 3.97c-.93 1.46-1.85 5-.95 13.57c1.56 14.33 8.76 14.71 17.89 15.18l.69.04c.99.05 1.92.08 2.8.08c12.94 0 15.2-5.65 16.86-13.48c1.48-6.67 1.51-11.26.07-13.67z">
-                                                        </path>
-                                                        <path d="M112.7 51.51c-2.1-3.01-8.24-4.29-18.78-3.93c-15.39.42-17.53 3.98-18.56 5.69c-1.44 2.41-1.42 7 .08 13.64c1.67 7.85 3.92 13.49 16.86 13.49c.88 0 1.82-.03 2.8-.08l.69-.04c9.12-.47 16.33-.85 17.89-15.18c.89-8.55-.03-12.09-.98-13.59z">
-                                                        </path>
-                                                    </g>
-                                                    <path d="M123.8 47.84s-1-1.7-19.03-3.41c-18.93-1.8-28.35 2-32.25 4.41c-.7.3-1.9.6-3.31.5h-.3c-1.9-.1-3.61-.2-5.61-.2h-.1c-1.1 0-3.51.1-5.21.2c-.8.1-1.5 0-2.1-.2c-3.61-2.4-13.02-6.61-32.75-4.71C5.1 46.14 4.1 47.84 4.1 47.84L4 54.65s2.7.8 4.41 2.9c1.7 2.1 2.5 14.12 5.41 19.73c4.4 8.72 26.14 6.52 26.14 6.52s8.91.7 13.22-6.81c3.71-6.41 5.21-15.43 5.61-17.63c.9-.9 2.6-2 5.11-2.1c2.8 0 4.61 1.4 5.41 2.4c.4 2.7 1.9 11.22 5.51 17.33c4.31 7.51 13.22 6.81 13.22 6.81s21.74 2.2 26.14-6.51c2.8-5.61 3.61-17.63 5.41-19.73c1.7-2.2 4.41-2.9 4.41-2.9l-.2-6.82zM51.38 66.71c-1.7 8.01-3.91 13.42-18.63 12.62c-9.52-.5-16.13-.5-17.63-14.32c-.9-8.61.1-11.82.8-12.92c.7-1 3.21-4.01 17.93-3.51c14.72.4 16.83 3.71 17.73 5.21c.9 1.5 1.6 4.91-.2 12.92zm61.3-1.7c-1.5 13.82-8.11 13.82-17.63 14.32c-14.72.8-16.93-4.61-18.63-12.62c-1.8-8.01-1.1-11.42-.2-12.92c.9-1.5 3.01-4.81 17.73-5.21c14.72-.5 17.23 2.5 17.93 3.51c.7 1.1 1.7 4.3.8 12.92z"
-                                                          fill="#804833">
-                                                    </path>
-                                                    <path d="M26.82 52.22c4.33-.84 5.79 1.26 5.37 3.14c-.77 3.47-4.11 1.62-9 4.6c-2.06 1.26-2.9 2.16-3.66 2.13c-.73-.03-1.36-.78-1.01-2.2c.63-2.58 1.68-6.39 8.3-7.67z"
-                                                          opacity=".7" fill="#ffffff">
-                                                    </path>
-                                                    <path d="M83.66 53.21c1.77-.99 6.74-1.88 7.27.73c.54 2.69-1.99 3.43-3.78 4.04c-4.23 1.44-4.93 3.49-5.81 4.05c-.59.37-2.33 1.21-2.14-1.34c.22-3.24 1.28-5.69 4.46-7.48z"
-                                                          opacity=".7" fill="#ffffff">
-                                                    </path>
-                                                </svg>
-                                            </i>نقد و بررسی</a>
-                                        <a class="ah-tab-item" href="">
-                                            <i>
-                                                <svg width="18px" height="18px" viewBox="0 0 48 48" fill="none"
-                                                     xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M9 42C11.2091 42 13 40.2091 13 38C13 35.7909 11.2091 34 9 34C6.79086 34 5 35.7909 5 38C5 40.2091 6.79086 42 9 42Z"
-                                                          fill="#2F88FF" stroke="#000000" stroke-width="4"
-                                                          stroke-linejoin="round"/>
-                                                    <path d="M9 14C11.2091 14 13 12.2092 13 10C13 7.79086 11.2091 6 9 6C6.79086 6 5 7.79086 5 10C5 12.2092 6.79086 14 9 14Z"
-                                                          fill="#2F88FF" stroke="#000000" stroke-width="4"
-                                                          stroke-linejoin="round"/>
-                                                    <path d="M9 28C11.2091 28 13 26.2092 13 24C13 21.7908 11.2091 20 9 20C6.79086 20 5 21.7908 5 24C5 26.2092 6.79086 28 9 28Z"
-                                                          fill="#2F88FF" stroke="#000000" stroke-width="4"
-                                                          stroke-linejoin="round"/>
-                                                    <path d="M21 24H43" stroke="#000000" stroke-width="4"
-                                                          stroke-linecap="round"
-                                                          stroke-linejoin="round"/>
-                                                    <path d="M21 38H43" stroke="#000000" stroke-width="4"
-                                                          stroke-linecap="round"
-                                                          stroke-linejoin="round"/>
-                                                    <path d="M21 10H43" stroke="#000000" stroke-width="4"
-                                                          stroke-linecap="round"
-                                                          stroke-linejoin="round"/>
-                                                </svg>
-                                            </i>
-                                            مشخصات</a>
-                                    </div>
-                                </div>
-                                <div class="ah-tab-content-wrapper product-info px-4 dt-sl"
-                                     style="padding-left: 20px !important;padding-right: 20px !important;">
-                                    <div class="ah-tab-content dt-sl" data-ah-tab-active="true">
-                                        <div class="section-title text-sm-title title-wide no-after-title-wide mb-0 dt-sl">
-                                            <h2>نقد و بررسی</h2>
-                                        </div>
-                                        <div class="product-title dt-sl">
-                                            <h1>
-                                                {{.PRODUCT.product.Title}}
-                                            </h1>
-                                            <h3>{{.PRODUCT.product.Brand.Title}}</h3>
-                                        </div>
-                                        <div class="description-product dt-sl mt-3 mb-3">
-                                            <div class="container">
-                                                <p>{{.PRODUCT.product.Description}}</p>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="ah-tab-content params dt-sl">
-                                        <div class="section-title text-sm-title title-wide no-after-title-wide mb-0 dt-sl">
-                                            <h2>مشخصات </h2>
-                                        </div>
-                                        <div class="product-title dt-sl mb-3">
-                                            <h1>
-                                                {{.PRODUCT.product.Title}}
-                                            </h1>
-                                            <h3>{{.PRODUCT.product.Brand.Title}}</h3>
-                                        </div>
-                                        <section>
-                                            <ul class="params-list">
-                                                {{range .PRODUCT.product.Features.Data}}
-                                                    <li>
-                                                        <div class="params-list-key">
-                                                            <span class="d-block">{{.Title}}</span>
-                                                        </div>
-                                                        <div class="params-list-value">
-                                                        <span class="d-block">
-                                                            {{.Value}}
-                                                        </span>
-                                                        </div>
-                                                    </li>
-                                                {{end}}
-                                            </ul>
-                                        </section>
-                                    </div>
-
-                                </div>
-                            </section>
-                            <!-- End tabs -->
-                        </div>
-                        <!-- End Product -->
-                        <!-- Start Product-Slider -->
-                        {{if .RECOMMENDATIONS}}
-                            <section class="slider-section dt-sl mb-5">
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <div class="section-title text-sm-title title-wide no-after-title-wide">
-                                            <h2>خریداران این محصول، محصولات زیر را هم خریده‌اند</h2>
-                                        </div>
-                                    </div>
-
-                                    <!-- Start Product-Slider -->
-                                    <div class="col-12">
-                                        <div class="product-carousel carousel-lg owl-carousel owl-theme">
-                                            {{range $rec:=.RECOMMENDATIONS}}
-                                                <div class="item">
-                                                    <div class="product-card mb-3">
-                                                        <div class="product-head">
-                                                            <div class="rating-stars">
-
-                                                            </div>
-                                                            {{if $rec.Product.Discount}}
-                                                                <div class="discount">
-                                                                    <span>{{$rec.Product.Discount}}%</span>
-                                                                </div>
-                                                            {{end}}
-                                                        </div>
-                                                        <a class="product-thumb"
-                                                           href="/product/{{$rec.Product.Sku}}/{{$rec.Product.Slug}}">
-                                                            {{range $index, $img := $rec.Product.Images.Data}}
-                                                                {{if eq $index 0}}
-                                                                    <img src="/../../uploads/media/products/{{$img.OriginalPath}}"
-                                                                         alt="{{$rec.Product.Title}}">
-                                                                {{end}}
-                                                            {{end}}
-
-                                                        </a>
-                                                        <div class="product-card-body">
-                                                            <h5 class="product-title">
-                                                                <a href="/product/{{$rec.Product.Sku}}/{{$rec.Product.Slug}}">{{$rec.Product.Title}}</a>
-                                                            </h5>
-                                                            <a class="product-meta"
-                                                               href="/search/{{$rec.Product.Category.Slug}}"> {{$rec.Product.Category.Title}}</a>
-                                                            <span class="product-price">
-                                                                {{$rec.Product.SalePrice}}
-                                                                تومان
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            {{end}}
-
-                                        </div>
-                                    </div>
-                                    <!-- End Product-Slider -->
-
-                                </div>
-                            </section>
-                        {{end}}
-                        <!-- End Product-Slider -->
-                    </div>
-                {{else}}
-                    <div class="container main-container">
-                        <p class="text-info">{{.PrimaryMessage}}</p>
-                    </div>
-                {{end}}
-            </main>
-            <!--------------------------------- Main Content -->
-
-            <!-------------------------- Mobile Footer Menu Section-->
-            {{template "mobile_footer_menu_tmpl" .}}
-            <!-------------------------- Mobile Footer menu Section-->
-
-            <!-------------------------------- Footer Section -->
-            <footer class="main-footer dt-sl">
-                <div class="back-to-top">
-                    <!--<a href="#">
-                        <span class="icon">
-                        <i class="mdi mdi-chevron-up"></i>
-                        </span>
-                        <span>بازگشت به بالا</span>
-                    </a>-->
-                </div>
-                <div class="container main-container">
-                    <div class="footer-services">
-                        <div class="row">
-                            <div class="service-item col">
-                                <a href="#" target="_blank">
-                                    <img src="/assets/shop/img/svg/delivery.svg">
-                                </a>
-                                <p>تحویل اکسپرس</p>
-                            </div>
-                            <div class="service-item col">
-                                <a href="#" target="_blank">
-                                    <img src="/assets/shop/img/svg/contact-us.svg">
-                                </a>
-                                <p>پشتیبانی 24 ساعته</p>
-                            </div>
-                            <div class="service-item col">
-                                <a href="#" target="_blank">
-                                    <img src="/assets/shop/img/svg/payment-terms.svg">
-                                </a>
-                                <p>پرداخت درمحل</p>
-                            </div>
-                            <div class="service-item col">
-                                <a href="#" target="_blank">
-                                    <img src="/assets/shop/img/svg/return-policy.svg">
-                                </a>
-                                <p>۷ روز ضمانت بازگشت</p>
-                            </div>
-                            <div class="service-item col">
-                                <a href="#" target="_blank">
-                                    <img src="/assets/shop/img/svg/origin-guarantee.svg">
-                                </a>
-                                <p>ضمانت اصل بودن کالا</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-widgets">
-                        <div class="row">
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <div class="widget-menu widget card">
-                                    <header class="card-header">
-                                        <h3 class="card-title">راهنمای خرید از دیجی پرس</h3>
-                                    </header>
-                                    <ul class="footer-menu">
-                                        <li>
-                                            <a href="#">نحوه ثبت سفارش</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">رویه ارسال سفارش</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">شیوه‌های پرداخت</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <div class="widget-menu widget card">
-                                    <header class="card-header">
-                                        <h3 class="card-title">خدمات مشتریان</h3>
-                                    </header>
-                                    <ul class="footer-menu">
-                                        <li>
-                                            <a href="#">پاسخ به پرسش‌های متداول</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">رویه‌های بازگرداندن کالا</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">شرایط استفاده</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">حریم خصوصی</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <div class="widget-menu widget card">
-                                    <header class="card-header">
-                                        <h3 class="card-title">با دیجی پرس</h3>
-                                    </header>
-                                    <ul class="footer-menu">
-                                        <li>
-                                            <a href="#">فروش در دیجی پرس</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">همکاری با سازمان‌ها</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">فرصت‌های شغلی</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">تماس با دیجی پرس</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">درباره دیجی پرس</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <div class="newsletter">
-                                    <p>از تخفیف‌ها و جدیدترین‌های فروشگاه باخبر شوید:</p>
-                                    <form action="" class="mt-3">
-                                        <input type="email" class="form-control"
-                                               placeholder="آدرس ایمیل خود را وارد کنید...">
-                                        <input type="submit" class="btn btn-primary" value="ارسال">
-                                    </form>
-                                </div>
-                                <div class="socials">
-                                    <p>ما را در شبکه های اجتماعی دنبال کنید.</p>
-                                    <div class="footer-social">
-                                        <ul class="text-center mt-2">
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fab fa-instagram"></i>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fab fa-telegram"></i>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fab fa-facebook"></i>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fab fa-twitter"></i>
+                                                    </i>
                                                 </a>
                                             </li>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="info">
-                        <div class="row">
-                            <div class="col-12 text-right">
-                                <span>هفت روز هفته ، 24 ساعت شبانه‌روز پاسخگوی شما هستیم.</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="description">
-                    <div class="container main-container">
-                        <div class="row">
-                            <div class="site-description col-12 col-lg-7">
-                                <h1 class="site-title">فروشگاه اینترنتی دیجی پرس، بررسی، انتخاب و خرید آنلاین</h1>
-                                <p> دیجی پرس به عنوان یکی از قدیمی‌ترین فروشگاه های اینترنتی با بیش از یک دهه تجربه، با
-                                    پایبندی به سه اصل کلیدی، پرداخت در محل، 7 روز ضمانت بازگشت کالا و تضمین اصل‌بودن
-                                    کالا،
-                                    موفق شده تا همگام با فروشگاه‌های معتبر جهان، به بزرگ‌ترین فروشگاه اینترنتی ایران
-                                    تبدیل
-                                    شود. به محض ورود به دیجی پرس با یک سایت پر از کالا رو به رو می‌شوید! هر آنچه که نیاز
-                                    دارید و به ذهن شما خطور می‌کند در اینجا پیدا خواهید کرد. </p>
-                            </div>
-                            <div class="symbol col-12 col-lg-5">
-                                <a href="#" target="_blank">
-                                    <img src="/assets/shop/img/enamad/symbol-01.png" alt="">
-                                </a>
-                                <a href="#" target="_blank">
-                                    <img src="/assets/shop/img/enamad/symbol-02.png" alt="">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="copyright">
-                    <div class="container main-container">
-                        <p> استفاده از مطالب فروشگاه اینترنتی دیجی پرس فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع
-                            است.
-                            کلیه حقوق این سایت متعلق به شرکت نوآوران فن آوازه (فروشگاه آنلاین دیجی پرس) می‌باشد. </p>
-                    </div>
+                            <!-- Product Info -->
+                            <div class="col-lg-8 col-md-6 py-2">
+                                <div class="product-info dt-sl">
+                                    <div class="product-title dt-sl mb-3">
+                                        <h1>
+                                            {{.PRODUCT.product.Title}}
+                                        </h1>
+                                        <h3>{{.PRODUCT.product.Brand.Title}}</h3>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="product-params dt-sl">
+                                                {{if .PRODUCT.product.Features}}
+                                                    <ul data-title="ویژگی‌های محصول">
+                                                        {{range .PRODUCT.product.Features.Data}}
+                                                            <li>
+                                                                <span>{{.Title}}:</span>
+                                                                <span>{{.Value}}</span>
+                                                            </li>
+                                                        {{end}}
+                                                    </ul>
+                                                {{end}}
+                                                <div class="sum-more">
+                                                <span class="show-more btn-link-border">
+                                                    + موارد بیشتر
+                                                </span>
+                                                    <span class="show-less btn-link-border">
+                                                    - بستن
+                                                </span>
+                                                </div>
+                                            </div>
+                                            <div class="product-variant dt-sl">
+                                                <div>
+                                                    {{if eq (len .PRODUCT.inventories) 1}}
+                                                        {{range $key,$item:=.PRODUCT.inventories}}
+                                                            <input type="hidden" name="inventory_id"
+                                                                   value="{{$item.InventoryID}}">
+                                                            {{if lt $item.Quantity 5}}
+                                                                <b>موجودی</b>:
+                                                                {{$item.Quantity}}
+                                                                عدد
+                                                            {{end}}
+                                                        {{end}}
+                                                    {{else}}
+                                                        <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
+                                                            <h2>انتخاب :</h2>
+                                                        </div>
+                                                        <select name="inventory_id" class="custom-select">
+                                                            {{range $item:=.PRODUCT.inventories}}
+                                                                {{$qty:=$item.Quantity}}
+                                                                {{$inventory_id:=$item.InventoryID}}
+                                                                {{if eq (len $item.Attributes) 1}}
+                                                                    {{range $item.Attributes}}
+                                                                        <option value="{{$inventory_id}}" class="">
+                                                                            {{.AttributeTitle}}
+                                                                            {{.AttributeValueTitle}}
+                                                                            {{if gt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
+                                                                        </option>
+                                                                    {{end}}
 
-                </div>
-            </footer>
-            <!-------------------------------- Footer Section -->
+                                                                {{else}}
+                                                                    {{$composite:=""}}
+                                                                    {{range .Attributes}}
+                                                                        {{$composite = printf "%s%s:%s  " $composite .AttributeTitle .AttributeValueTitle}} <!-- افزودن هر ویژگی به رشته قبلی -->
+                                                                    {{end}}
+                                                                    <option value="{{.InventoryID}}">{{$composite}}
+                                                                        {{if gt $qty 5 }}
+                                                                            |موجودی:{{.Quantity}}
+                                                                            عدد
+                                                                        {{end}}
+                                                                    </option>
+                                                                {{end}}
+                                                            {{end}}
+                                                        </select>
+                                                    {{end}}
+                                                </div>
+                                            </div>
 
-            <!----------------------------- Go To Top Section -->
-            {{template "go_to_top_tmpl" .}}
-            <!------------------------------ Go To Top Section -->
-        </div>
-    </form>
+                                            <div class="section-title text-sm-title title-wide no-after-title-wide mb-0 dt-sl">
+                                                <br>
+                                                <h2>کد محصول:{{.PRODUCT.product.Sku}}</h2>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+
+                                            <div class="product-summary">
+                                                <nav id="stack-menu">
+                                                    <ul>
+
+                                                        <li>
+                                                            <a>
+                                                                <i class="far fa-shield-check"></i>
+                                                                گارانتی ۱۸ ماهه دیجی پرس
+                                                            </a>
+                                                        </li>
+                                                        <li>
+
+                                                        </li>
+                                                    </ul>
+                                                    <div class="product-seller-row product-seller-row--price">
+                                                        <div class="product-seller-price-info">
+                                                            <div class="product-seller-price-prev">
+                                                                {{.PRODUCT.product.OriginalPrice}}
+                                                            </div>
+                                                            <div class="product-seller-price-off">
+                                                                {{.PRODUCT.product.Discount}}%
+                                                            </div>
+                                                        </div>
+                                                        <div class="product-seller-price-real">
+                                                            <div class="product-seller-price-raw">
+                                                                {{.PRODUCT.product.SalePrice}}
+                                                            </div>
+                                                            تومان
+                                                        </div>
+                                                    </div>
+                                                    <div class="product-seller-row product-seller-row--add-to-cart">
+                                                        {{$productIDVar:=.PRODUCT.product.ID}}
+                                                        {{$found:=false}}
+                                                        {{range $CartItem:=.AUTH.Cart.CartItem.Data}}
+                                                            {{if eq .ProductID $productIDVar}}
+                                                                {{$found = true}}
+                                                            {{end}}
+                                                        {{end}}
+                                                        {{if $found}}
+                                                            <a href="/checkout/cart"
+                                                               class="btn-add-to-cart bg-success  btn-add-to-cart--full-width">مشاهده
+                                                                سبد خرید
+                                                            </a>
+                                                        {{else}}
+                                                            <form action="/add-to-cart" method="post">
+                                                                <input type="hidden" name="product_id"
+                                                                       value="{{.PRODUCT._id}}">
+                                                                <button type="submit"
+                                                                        class="btn-add-to-cart btn-add-to-cart--full-width">
+                                                                    <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
+                                                                </button>
+                                                            </form>
+                                                        {{end}}
+                                                    </div>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="mb-add-to-cart-btn-wrapper">
+                            <a href="#" class="mb-add-to-cart-btn">افزودن به سبد خرید</a>
+                        </div> -->
+                    </div>
+                    <!-- sellers -->
+                    <div class="product-sellers shadow-around mb-5" id="product-seller-all">
+                        <div class="product-seller">
+                            <div class="product-seller-col">
+                                <div class="product-seller-title">
+                                    <div class="icon">
+                                        <i class="fas fa-store-alt"></i>
+                                    </div>
+                                    <div class="detail">
+                                        <div class="name">دیجی پرس <span
+                                                    class="badge badge-light rounded-pill">برگزیده</span>
+                                        </div>
+                                        <div class="rating">
+                                            <span class="value">۹۰٪</span>
+                                            <span class="label">رضایت خریداران</span>
+                                            <span class="divider">|</span>
+                                            <span class="label">عملکرد</span>
+                                            <span class="value">عالی</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-seller-col">
+                                <div class="product-seller-conditions">
+                                    <div class="product-seller-info">
+                                        <i class="fad fa-truck-container"></i>
+                                        <span>ارسال از دیجی پرس</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-seller-col">
+                                <div class="product-seller-guarantee">
+                                    <div class="product-seller-info">
+                                        <i class="fad fa-shield-check"></i>
+                                        <span>گارانتی ۱۸ ماهه دیجی پرس</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-seller-col">
+                                <div class="product-seller-price-action">
+                                    <div class="product-seller-price">۵,00۰,۰۰۰<span class="currency">تومان</span>
+                                    </div>
+                                    <div class="product-seller-action"><a href="#" class="btn btn-outline-danger">افزودن
+                                            به
+                                            سبد</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-seller">
+                            <div class="product-seller-col">
+                                <div class="product-seller-title">
+                                    <div class="icon">
+                                        <i class="fas fa-store-alt"></i>
+                                    </div>
+                                    <div class="detail">
+                                        <div class="name">دیجی پرس <span
+                                                    class="badge badge-light rounded-pill">برگزیده</span>
+                                        </div>
+                                        <div class="rating">
+                                            <span class="value">۹۰٪</span>
+                                            <span class="label">رضایت خریداران</span>
+                                            <span class="divider">|</span>
+                                            <span class="label">عملکرد</span>
+                                            <span class="value">عالی</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-seller-col">
+                                <div class="product-seller-conditions">
+                                    <div class="product-seller-info">
+                                        <i class="fad fa-truck-container"></i>
+                                        <span>ارسال از دیجی پرس</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-seller-col">
+                                <div class="product-seller-guarantee">
+                                    <div class="product-seller-info">
+                                        <i class="fad fa-shield-check"></i>
+                                        <span>گارانتی ۱۸ ماهه دیجی پرس</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-seller-col">
+                                <div class="product-seller-price-action">
+                                    <div class="product-seller-price">۵,00۰,۰۰۰<span class="currency">تومان</span>
+                                    </div>
+                                    <div class="product-seller-action"><a href="#" class="btn btn-outline-danger">افزودن
+                                            به
+                                            سبد</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dt-sn mb-5 px-0 dt-sl pt-0">
+                        <!-- Start tabs -->
+                        <section class="tabs-product-info mb-3 dt-sl">
+                            <div class="ah-tab-wrapper border-bottom dt-sl">
+                                <div class="ah-tab dt-sl">
+                                    <a class="ah-tab-item" data-ah-tab-active="true" href="">
+                                        <i>
+                                            <svg width="23px" height="23px" viewBox="0 0 128 128"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 aria-hidden="true" role="img" class="iconify iconify--noto"
+                                                 preserveAspectRatio="xMidYMid meet">
+                                                <g opacity=".8" fill="#90caf9">
+                                                    <path d="M52.44 53.27c-1.03-1.71-3.17-5.28-18.55-5.69c-10.54-.36-16.68.93-18.81 3.97c-.93 1.46-1.85 5-.95 13.57c1.56 14.33 8.76 14.71 17.89 15.18l.69.04c.99.05 1.92.08 2.8.08c12.94 0 15.2-5.65 16.86-13.48c1.48-6.67 1.51-11.26.07-13.67z">
+                                                    </path>
+                                                    <path d="M112.7 51.51c-2.1-3.01-8.24-4.29-18.78-3.93c-15.39.42-17.53 3.98-18.56 5.69c-1.44 2.41-1.42 7 .08 13.64c1.67 7.85 3.92 13.49 16.86 13.49c.88 0 1.82-.03 2.8-.08l.69-.04c9.12-.47 16.33-.85 17.89-15.18c.89-8.55-.03-12.09-.98-13.59z">
+                                                    </path>
+                                                </g>
+                                                <path d="M123.8 47.84s-1-1.7-19.03-3.41c-18.93-1.8-28.35 2-32.25 4.41c-.7.3-1.9.6-3.31.5h-.3c-1.9-.1-3.61-.2-5.61-.2h-.1c-1.1 0-3.51.1-5.21.2c-.8.1-1.5 0-2.1-.2c-3.61-2.4-13.02-6.61-32.75-4.71C5.1 46.14 4.1 47.84 4.1 47.84L4 54.65s2.7.8 4.41 2.9c1.7 2.1 2.5 14.12 5.41 19.73c4.4 8.72 26.14 6.52 26.14 6.52s8.91.7 13.22-6.81c3.71-6.41 5.21-15.43 5.61-17.63c.9-.9 2.6-2 5.11-2.1c2.8 0 4.61 1.4 5.41 2.4c.4 2.7 1.9 11.22 5.51 17.33c4.31 7.51 13.22 6.81 13.22 6.81s21.74 2.2 26.14-6.51c2.8-5.61 3.61-17.63 5.41-19.73c1.7-2.2 4.41-2.9 4.41-2.9l-.2-6.82zM51.38 66.71c-1.7 8.01-3.91 13.42-18.63 12.62c-9.52-.5-16.13-.5-17.63-14.32c-.9-8.61.1-11.82.8-12.92c.7-1 3.21-4.01 17.93-3.51c14.72.4 16.83 3.71 17.73 5.21c.9 1.5 1.6 4.91-.2 12.92zm61.3-1.7c-1.5 13.82-8.11 13.82-17.63 14.32c-14.72.8-16.93-4.61-18.63-12.62c-1.8-8.01-1.1-11.42-.2-12.92c.9-1.5 3.01-4.81 17.73-5.21c14.72-.5 17.23 2.5 17.93 3.51c.7 1.1 1.7 4.3.8 12.92z"
+                                                      fill="#804833">
+                                                </path>
+                                                <path d="M26.82 52.22c4.33-.84 5.79 1.26 5.37 3.14c-.77 3.47-4.11 1.62-9 4.6c-2.06 1.26-2.9 2.16-3.66 2.13c-.73-.03-1.36-.78-1.01-2.2c.63-2.58 1.68-6.39 8.3-7.67z"
+                                                      opacity=".7" fill="#ffffff">
+                                                </path>
+                                                <path d="M83.66 53.21c1.77-.99 6.74-1.88 7.27.73c.54 2.69-1.99 3.43-3.78 4.04c-4.23 1.44-4.93 3.49-5.81 4.05c-.59.37-2.33 1.21-2.14-1.34c.22-3.24 1.28-5.69 4.46-7.48z"
+                                                      opacity=".7" fill="#ffffff">
+                                                </path>
+                                            </svg>
+                                        </i>نقد و بررسی</a>
+                                    <a class="ah-tab-item" href="">
+                                        <i>
+                                            <svg width="18px" height="18px" viewBox="0 0 48 48" fill="none"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M9 42C11.2091 42 13 40.2091 13 38C13 35.7909 11.2091 34 9 34C6.79086 34 5 35.7909 5 38C5 40.2091 6.79086 42 9 42Z"
+                                                      fill="#2F88FF" stroke="#000000" stroke-width="4"
+                                                      stroke-linejoin="round"/>
+                                                <path d="M9 14C11.2091 14 13 12.2092 13 10C13 7.79086 11.2091 6 9 6C6.79086 6 5 7.79086 5 10C5 12.2092 6.79086 14 9 14Z"
+                                                      fill="#2F88FF" stroke="#000000" stroke-width="4"
+                                                      stroke-linejoin="round"/>
+                                                <path d="M9 28C11.2091 28 13 26.2092 13 24C13 21.7908 11.2091 20 9 20C6.79086 20 5 21.7908 5 24C5 26.2092 6.79086 28 9 28Z"
+                                                      fill="#2F88FF" stroke="#000000" stroke-width="4"
+                                                      stroke-linejoin="round"/>
+                                                <path d="M21 24H43" stroke="#000000" stroke-width="4"
+                                                      stroke-linecap="round"
+                                                      stroke-linejoin="round"/>
+                                                <path d="M21 38H43" stroke="#000000" stroke-width="4"
+                                                      stroke-linecap="round"
+                                                      stroke-linejoin="round"/>
+                                                <path d="M21 10H43" stroke="#000000" stroke-width="4"
+                                                      stroke-linecap="round"
+                                                      stroke-linejoin="round"/>
+                                            </svg>
+                                        </i>
+                                        مشخصات</a>
+                                </div>
+                            </div>
+                            <div class="ah-tab-content-wrapper product-info px-4 dt-sl"
+                                 style="padding-left: 20px !important;padding-right: 20px !important;">
+                                <div class="ah-tab-content dt-sl" data-ah-tab-active="true">
+                                    <div class="section-title text-sm-title title-wide no-after-title-wide mb-0 dt-sl">
+                                        <h2>نقد و بررسی</h2>
+                                    </div>
+                                    <div class="product-title dt-sl">
+                                        <h1>
+                                            {{.PRODUCT.product.Title}}
+                                        </h1>
+                                        <h3>{{.PRODUCT.product.Brand.Title}}</h3>
+                                    </div>
+                                    <div class="description-product dt-sl mt-3 mb-3">
+                                        <div class="container">
+                                            <p>{{.PRODUCT.product.Description}}</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ah-tab-content params dt-sl">
+                                    <div class="section-title text-sm-title title-wide no-after-title-wide mb-0 dt-sl">
+                                        <h2>مشخصات </h2>
+                                    </div>
+                                    <div class="product-title dt-sl mb-3">
+                                        <h1>
+                                            {{.PRODUCT.product.Title}}
+                                        </h1>
+                                        <h3>{{.PRODUCT.product.Brand.Title}}</h3>
+                                    </div>
+                                    <section>
+                                        <ul class="params-list">
+                                            {{range .PRODUCT.product.Features.Data}}
+                                                <li>
+                                                    <div class="params-list-key">
+                                                        <span class="d-block">{{.Title}}</span>
+                                                    </div>
+                                                    <div class="params-list-value">
+                                                        <span class="d-block">
+                                                            {{.Value}}
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            {{end}}
+                                        </ul>
+                                    </section>
+                                </div>
+
+                            </div>
+                        </section>
+                        <!-- End tabs -->
+                    </div>
+                    <!-- End Product -->
+                    <!-- Start Product-Slider -->
+                    {{if .RECOMMENDATIONS}}
+                        <section class="slider-section dt-sl mb-5">
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="section-title text-sm-title title-wide no-after-title-wide">
+                                        <h2>خریداران این محصول، محصولات زیر را هم خریده‌اند</h2>
+                                    </div>
+                                </div>
+
+                                <!-- Start Product-Slider -->
+                                <div class="col-12">
+                                    <div class="product-carousel carousel-lg owl-carousel owl-theme">
+                                        {{range $rec:=.RECOMMENDATIONS}}
+                                            <div class="item">
+                                                <div class="product-card mb-3">
+                                                    <div class="product-head">
+                                                        <div class="rating-stars">
+
+                                                        </div>
+                                                        {{if $rec.Product.Discount}}
+                                                            <div class="discount">
+                                                                <span>{{$rec.Product.Discount}}%</span>
+                                                            </div>
+                                                        {{end}}
+                                                    </div>
+                                                    <a class="product-thumb"
+                                                       href="/product/{{$rec.Product.Sku}}/{{$rec.Product.Slug}}">
+                                                        {{range $index, $img := $rec.Product.Images.Data}}
+                                                            {{if eq $index 0}}
+                                                                <img src="/../../uploads/media/products/{{$img.OriginalPath}}"
+                                                                     alt="{{$rec.Product.Title}}">
+                                                            {{end}}
+                                                        {{end}}
+
+                                                    </a>
+                                                    <div class="product-card-body">
+                                                        <h5 class="product-title">
+                                                            <a href="/product/{{$rec.Product.Sku}}/{{$rec.Product.Slug}}">{{$rec.Product.Title}}</a>
+                                                        </h5>
+                                                        <a class="product-meta"
+                                                           href="/search/{{$rec.Product.Category.Slug}}"> {{$rec.Product.Category.Title}}</a>
+                                                        <span class="product-price">
+                                                                {{$rec.Product.SalePrice}}
+                                                                تومان
+                                                            </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        {{end}}
+
+                                    </div>
+                                </div>
+                                <!-- End Product-Slider -->
+
+                            </div>
+                        </section>
+                    {{end}}
+                    <!-- End Product-Slider -->
+                </div>
+            {{else}}
+                <div class="container main-container">
+                    <p class="text-info">{{.PrimaryMessage}}</p>
+                </div>
+            {{end}}
+        </main>
+        <!--------------------------------- Main Content -->
+
+        <!-------------------------- Mobile Footer Menu Section-->
+        {{template "mobile_footer_menu_tmpl" .}}
+        <!-------------------------- Mobile Footer menu Section-->
+
+        <!-------------------------------- Footer Section -->
+        <footer class="main-footer dt-sl">
+            <div class="back-to-top">
+                <!--<a href="#">
+                    <span class="icon">
+                    <i class="mdi mdi-chevron-up"></i>
+                    </span>
+                    <span>بازگشت به بالا</span>
+                </a>-->
+            </div>
+            <div class="container main-container">
+                <div class="footer-services">
+                    <div class="row">
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/delivery.svg">
+                            </a>
+                            <p>تحویل اکسپرس</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/contact-us.svg">
+                            </a>
+                            <p>پشتیبانی 24 ساعته</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/payment-terms.svg">
+                            </a>
+                            <p>پرداخت درمحل</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/return-policy.svg">
+                            </a>
+                            <p>۷ روز ضمانت بازگشت</p>
+                        </div>
+                        <div class="service-item col">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/svg/origin-guarantee.svg">
+                            </a>
+                            <p>ضمانت اصل بودن کالا</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-widgets">
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">راهنمای خرید از دیجی پرس</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">نحوه ثبت سفارش</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">رویه ارسال سفارش</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">شیوه‌های پرداخت</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">خدمات مشتریان</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">پاسخ به پرسش‌های متداول</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">رویه‌های بازگرداندن کالا</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">شرایط استفاده</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">حریم خصوصی</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="widget-menu widget card">
+                                <header class="card-header">
+                                    <h3 class="card-title">با دیجی پرس</h3>
+                                </header>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="#">فروش در دیجی پرس</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">همکاری با سازمان‌ها</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">فرصت‌های شغلی</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">تماس با دیجی پرس</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">درباره دیجی پرس</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="newsletter">
+                                <p>از تخفیف‌ها و جدیدترین‌های فروشگاه باخبر شوید:</p>
+                                <form action="" class="mt-3">
+                                    <input type="email" class="form-control"
+                                           placeholder="آدرس ایمیل خود را وارد کنید...">
+                                    <input type="submit" class="btn btn-primary" value="ارسال">
+                                </form>
+                            </div>
+                            <div class="socials">
+                                <p>ما را در شبکه های اجتماعی دنبال کنید.</p>
+                                <div class="footer-social">
+                                    <ul class="text-center mt-2">
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-instagram"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-telegram"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-facebook"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fab fa-twitter"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info">
+                    <div class="row">
+                        <div class="col-12 text-right">
+                            <span>هفت روز هفته ، 24 ساعت شبانه‌روز پاسخگوی شما هستیم.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="description">
+                <div class="container main-container">
+                    <div class="row">
+                        <div class="site-description col-12 col-lg-7">
+                            <h1 class="site-title">فروشگاه اینترنتی دیجی پرس، بررسی، انتخاب و خرید آنلاین</h1>
+                            <p> دیجی پرس به عنوان یکی از قدیمی‌ترین فروشگاه های اینترنتی با بیش از یک دهه تجربه، با
+                                پایبندی به سه اصل کلیدی، پرداخت در محل، 7 روز ضمانت بازگشت کالا و تضمین اصل‌بودن
+                                کالا،
+                                موفق شده تا همگام با فروشگاه‌های معتبر جهان، به بزرگ‌ترین فروشگاه اینترنتی ایران
+                                تبدیل
+                                شود. به محض ورود به دیجی پرس با یک سایت پر از کالا رو به رو می‌شوید! هر آنچه که نیاز
+                                دارید و به ذهن شما خطور می‌کند در اینجا پیدا خواهید کرد. </p>
+                        </div>
+                        <div class="symbol col-12 col-lg-5">
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/enamad/symbol-01.png" alt="">
+                            </a>
+                            <a href="#" target="_blank">
+                                <img src="/assets/shop/img/enamad/symbol-02.png" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <div class="container main-container">
+                    <p> استفاده از مطالب فروشگاه اینترنتی دیجی پرس فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع
+                        است.
+                        کلیه حقوق این سایت متعلق به شرکت نوآوران فن آوازه (فروشگاه آنلاین دیجی پرس) می‌باشد. </p>
+                </div>
+
+            </div>
+        </footer>
+        <!-------------------------------- Footer Section -->
+
+        <!----------------------------- Go To Top Section -->
+        {{template "go_to_top_tmpl" .}}
+        <!------------------------------ Go To Top Section -->
+    </div>
+
     <!-- Core JS Files -->
     <script src="/assets/shop/js/vendor/jquery.min.js"></script>
     <script src="/assets/shop/js/vendor/popper.min.js"></script>
@@ -811,6 +812,7 @@
     <script src="/assets/shop/js/js-product/js-product.js"></script>
     <!-- my custom JS File -->
     <script src="/assets/shop/js/mylink/my-link.js"></script>
+    <script src="/assets/shop/js/tseaerch/tsearch.js"></script>
     </body>
     </html>
 {{end}}
