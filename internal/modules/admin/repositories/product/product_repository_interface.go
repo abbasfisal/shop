@@ -31,4 +31,5 @@ type ProductRepositoryInterface interface {
 	EditFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) error
 	GetAllMongoProduct(c context.Context) ([]bson.M, error)
 	InsertRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) error
+	GetAllRecommendation(c *gin.Context, productID int) ([]bson.M, error)
 }

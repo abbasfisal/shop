@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"shop/internal/database/mongodb"
@@ -68,4 +69,51 @@ func (p *ProductRepository) InsertRecommendation(c *gin.Context, productID int, 
 
 	log.Println("--- successfully upsert recommendation")
 	return nil
+}
+
+func (p *ProductRepository) GetAllRecommendation(c *gin.Context, productID int) ([]bson.M, error) {
+
+	//select product document in recommendations index(table) by product_id
+	collection := mongodb.GetCollection(mongodb.RecommendationCollection)
+	var product bson.M
+	err := collection.FindOne(c, bson.M{"product_id": productID}).Decode(&product)
+	if err != nil {
+		return nil, err
+	}
+
+	// convert to bson.A
+	recommendations, ok := product["product_recommendations"].(bson.A)
+	if !ok || len(recommendations) == 0 {
+		return nil, nil
+	}
+
+	// because we stored product ids in string format we have to convert to ObjectID
+	// to work properly our Find query
+	var objectIDs []primitive.ObjectID
+	for _, id := range recommendations {
+		strID, ok := id.(string)
+		if !ok {
+			continue
+		}
+		objID, err := primitive.ObjectIDFromHex(strID)
+		if err != nil {
+			continue
+		}
+		objectIDs = append(objectIDs, objID)
+	}
+
+	//Find products by recommendation IDS
+	productColl := mongodb.GetCollection(mongodb.ProductsCollection)
+	cursor, err := productColl.Find(c, bson.M{"_id": bson.M{"$in": objectIDs}})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(c)
+
+	var recommendedProducts []bson.M
+	if err = cursor.All(c, &recommendedProducts); err != nil {
+		return nil, err
+	}
+
+	return recommendedProducts, nil
 }

@@ -740,13 +740,16 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 		return
 	}
 
+	recommendations, _ := a.productSrv.FetchAllRecommendation(c, pID)
+
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_edit_product",
 		gin.H{
-			"TITLE":       "ویرایش محصول",
-			"PRODUCT":     productShow,
-			"AllProducts": allProductsInMongo, // products in collection products in mongodb
-			"CATEGORIES":  categories,
-			"BRANDS":      brands,
+			"TITLE":           "ویرایش محصول",
+			"PRODUCT":         productShow,
+			"AllProducts":     allProductsInMongo, // products in collection products in mongodb
+			"CATEGORIES":      categories,
+			"BRANDS":          brands,
+			"RECOMMENDATIONS": recommendations,
 		},
 	)
 	return

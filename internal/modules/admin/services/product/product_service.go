@@ -246,7 +246,16 @@ func (p *ProductService) AddRecommendation(c *gin.Context, productID int, produc
 	err := p.repo.InsertRecommendation(c, productID, productRecommendationIDs)
 	if err != nil {
 		log.Println("--- AddRecommendation err: ", err)
-		return custom_error.CustomError{}
+		return custom_error.HandleError(err, custom_error.RecordNotFound)
 	}
 	return custom_error.CustomError{}
+}
+
+func (p *ProductService) FetchAllRecommendation(c *gin.Context, productID int) ([]bson.M, custom_error.CustomError) {
+	recommendations, err := p.repo.GetAllRecommendation(c, productID)
+	log.Println("--- fetch all recommendations : ", len(recommendations), " | err:", err)
+	if err != nil {
+		return nil, custom_error.HandleError(err, custom_error.RecordNotFound)
+	}
+	return recommendations, custom_error.CustomError{}
 }

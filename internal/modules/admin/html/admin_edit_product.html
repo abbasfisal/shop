@@ -162,6 +162,50 @@
                                 </tr>
                                 <tr>
                                     <td></td>
+                                    <td>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <select class="form-group-lg" name="recommendations"
+                                                        multiple="multiple">
+                                                    <option value="">انتخاب کنید</option>
+                                                    {{range $product:=.AllProducts}}
+
+                                                        {{if gt ( len $.RECOMMENDATIONS) 0}}
+                                                            {{range $rProduct:=$.RECOMMENDATIONS}}
+                                                                {{if eq $rProduct.product.id $product.product.id }}
+                                                                    <option selected value="{{$product.id}}">
+                                                                        {{$product.product.title}}
+                                                                    </option>
+                                                                {{else}}
+                                                                    <option value="{{$product.id}}">
+                                                                        {{$product.product.title}}
+                                                                    </option>
+                                                                {{end}}
+                                                            {{end}}
+                                                        {{else}}
+                                                            <option value="{{$product.id}}">{{$product.product.title}}</option>
+                                                        {{end}}
+                                                    {{end}}
+
+
+                                                </select>
+
+
+                                            </div>
+
+                                        </div>
+                                        <b>
+                                            محصولات پیشنهاد شده:
+                                        </b>
+                                        <ul class="form-group-lg">
+                                            {{range .RECOMMENDATIONS}}
+                                                <li> {{.product.title}}</li>
+                                            {{end}}
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
                                     <td><input
                                                 class="btn  btn-primary btn-lg"
                                                 type="submit" value="بروزرسانی"></td>

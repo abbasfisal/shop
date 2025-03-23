@@ -32,4 +32,5 @@ type ProductServiceInterface interface {
 	FetchFeature(c *gin.Context, productID int, featureID int) (*responses.Feature, custom_error.CustomError)
 	UpdateFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) custom_error.CustomError
 	AddRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) custom_error.CustomError
+	FetchAllRecommendation(c *gin.Context, productID int) ([]bson.M, custom_error.CustomError)
 }
