@@ -19,7 +19,8 @@ var (
 // collection names
 
 const (
-	ProductsCollection = "products"
+	ProductsCollection       = "products"
+	RecommendationCollection = "recommendations" //product recommendations
 )
 
 func Connect() {
