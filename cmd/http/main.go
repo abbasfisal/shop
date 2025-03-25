@@ -69,7 +69,7 @@ func main() {
 		mongodb.Disconnect()
 		dependencies.AsynqClient.Close()
 
-		log.Println("[Shutdown complete] All resources released. good by ;) ")
+		logging.Log.Info("gracefully Shutdown complete ,All resources released")
 
 	}
 }
@@ -90,21 +90,6 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em
 	if err := r.Run(addr); err != nil {
 		logging.GlobalLog.FatalF("[Server start failed]: %v", err)
 	}
-}
-
-// setupLog store logs in file and print in stdOut
-func setupLog() {
-
-	fileWriter := &lumberjack.Logger{
-		Filename:   "../../storage/logs/shop.log",
-		MaxSize:    10, //MB
-		MaxAge:     10, //day
-		MaxBackups: 5,
-		LocalTime:  false,
-		Compress:   true,
-	}
-	multi := io.MultiWriter(os.Stdout, fileWriter)
-	log.SetOutput(multi)
 }
 
 func setupSessions(r *gin.Engine) {
