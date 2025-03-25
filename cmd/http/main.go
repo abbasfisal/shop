@@ -9,7 +9,6 @@ import (
 	"github.com/natefinch/lumberjack"
 	"github.com/spf13/viper"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -99,10 +98,16 @@ func setupSessions(r *gin.Engine) {
 
 func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies, em *events.EventManager) {
 
-	r.LoadHTMLGlob("../../internal/**/**/**/*.html")
-	r.Static("/uploads", "../../uploads")
-	r.Static("/assets", "../../assets")
-	r.StaticFile("/favicon.ico", "../../assets/shop/img/seller-logo.png")
+	wd, _ := os.Getwd()
+	rootPath, err := filepath.Abs(filepath.Join(wd, "..", ".."))
+	if err != nil {
+		logging.Log.WithFields(logrus.Fields{"function": "setupRoutes"}).WithError(err).Fatal("absolute path error")
+	}
+
+	r.LoadHTMLGlob(filepath.Join(rootPath, "internal", "**", "**", "**", "*.html"))          // real path=> ../../internal/**/**/**/*.html
+	r.Static("/uploads", filepath.Join(rootPath, "uploads"))                                 // real path=> ../../uploads
+	r.Static("/assets", filepath.Join(rootPath, "assets"))                                   // real path =>../../assets
+	r.StaticFile("/favicon.ico", filepath.Join(rootPath, "assets/shop/img/seller-logo.png")) //real path="../../assets/shop/img/seller-logo.png"
 
 	AdminRoutes.SetAdminRoutes(r, dep)
 	PublicRoutes.SetPublic(r, dep, em)
