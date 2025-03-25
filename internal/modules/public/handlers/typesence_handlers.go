@@ -69,17 +69,6 @@ func (p PublicHandler) SearchProductByTypesence(c *gin.Context) {
 }
 
 func (p PublicHandler) ShowTypeSenceForm(c *gin.Context) {
-
-	search, err := p.dep.TypeSenceClient.Collection("products").Documents().Search(c.Request.Context(), &api.SearchCollectionParams{
-		Q: pointer.String("*"),
-	})
-	c.JSON(200, gin.H{
-		"err":  err,
-		"data": search,
-	})
-
-	return
-
 	html.CustomerRender(c, http.StatusFound, "tsearch",
 		gin.H{
 			"title": "search",
