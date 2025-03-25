@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/typesense/typesense-go/v3/typesense"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -36,6 +37,7 @@ type Dependencies struct {
 	MongoClient     *mongo.Client
 	Storage         *util.Storage
 	TypeSenceClient *typesense.Client
+	Log             *logrus.Logger
 }
 
 func Initialize() (*Dependencies, error) {
@@ -54,12 +56,10 @@ func Initialize() (*Dependencies, error) {
 			return
 		}
 
-		cache.InitRedisClient() // redis connect
-		mongodb.Connect()       // mongodb connect
-		mysql.Connect()         // mysql connect
-
-		// initialize logger
-		initializeLogger()
+		cache.InitRedisClient()   // redis connect
+		mongodb.Connect()         // mongodb connect
+		mysql.Connect()           // mysql connect
+		typesenceclient.Connect() // initialize typesence
 
 		// initialize Asynq
 		asynqClient, err := initializeAsynqClient()
@@ -67,9 +67,6 @@ func Initialize() (*Dependencies, error) {
 			initErr = err
 			return
 		}
-
-		// initialize typesence
-		typesenceclient.Connect()
 
 		dep = &Dependencies{
 			I18nBundle:  bundle,
@@ -82,6 +79,7 @@ func Initialize() (*Dependencies, error) {
 			//	EventManager: events.NewEventManager(&eventManagerDep),
 
 			TypeSenceClient: typesenceclient.GetTClient(),
+			Log:             logging.InitLogrus(),
 		}
 
 	})
@@ -120,8 +118,4 @@ func loadTranslation() (*i18n.Bundle, error) {
 func initializeAsynqClient() (*asynq.Client, error) {
 	opt := asynq.RedisClientOpt{Addr: fmt.Sprintf("%s:%s", viper.GetString("REDIS_DB"), viper.GetString("REDIS_PORT"))}
 	return asynq.NewClient(opt), nil
-}
-
-func initializeLogger() {
-	logging.GlobalLog = logging.NewZapLogger()
 }
