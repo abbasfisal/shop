@@ -6,13 +6,14 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/natefinch/lumberjack"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"shop/cmd/commands"
 	"shop/cmd/job/scheduler"
 	"shop/cmd/job/worker"
@@ -44,8 +45,6 @@ func main() {
 		MongoClient: dependencies.MongoClient,
 	}
 	em := events.NewEventManager(&eventManagerDep)
-
-	setupLog()
 
 	// graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
