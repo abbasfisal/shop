@@ -62,11 +62,57 @@ services:
 
 
 
+  alloy:
+    image: grafana/alloy:v1.7.4
+    volumes:
+      - ./alloy.config:/etc/alloy/config.alloy
+      - ./logs:/var/log/myapp
+    ports:
+      - "12345:12345"  # Expose Alloy metrics
+    networks:
+      - loki-grafana
+    depends_on:
+      - loki
 
+  loki:
+    image: grafana/loki:3.0.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki-grafana
+  #    restart: unless-stopped
+
+  grafana:
+    user: root
+    image: grafana/grafana:11.0.0
+    environment:
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_FEATURE_TOGGLES_ENABLE=accessControlOnCall
+      - GF_INSTALL_PLUGINS=grafana-lokiexplore-app
+    ports:
+      - "3000:3000/tcp"
+    volumes:
+      - ./grafana:/etc/grafana/provisioning
+      - ./grafana-data:/var/lib/grafana
+    networks:
+      - loki-grafana
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+networks:
+  loki-grafana:
+    driver: bridge
 
 volumes:
   dbdata_dev:
   mongodb_data_dev:
   redis_data_dev:
   minio_data_dev:
+  alloy-data:
+  loki-data:
+  grafana-data:
 
