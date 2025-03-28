@@ -522,7 +522,7 @@ func (a *AdminHandler) CreateProduct(c *gin.Context) {
 	}
 
 	html.Render(c, http.StatusFound, "modules/admin/html/admin_create_product", gin.H{
-		"TITLE":      "ایجاد محصول",
+		"TITLE":      "ایجاد محصول | توجه: دسته بندی روت انتخاب نشود!",
 		"CATEGORIES": categories,
 		"BRANDS":     brands.Data,
 	})
@@ -1202,8 +1202,9 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		return
 	}
 	html.Render(c, http.StatusFound, "edit-gallery-product", gin.H{
-		"TITLE":   "ویرایش تصاویر محصول",
-		"PRODUCT": productShow,
+		"TITLE":      "ویرایش تصاویر محصول",
+		"PRODUCT":    productShow,
+		"MEDIA_PATH": util.GetProductStoragePath(),
 	})
 	return
 }
