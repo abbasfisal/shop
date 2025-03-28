@@ -94,10 +94,15 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		Product: entities.P{
 			ID: int64(product.ID),
 			Category: entities.C{
-				ID:       int64(product.Category.ID),
-				ParentID: int64(*product.Category.ParentID),
-				Title:    product.Category.Title,
-				Slug:     product.Category.Slug,
+				ID: int64(product.Category.ID),
+				ParentID: func() int64 {
+					if product.Category.ParentID == nil {
+						return 0
+					}
+					return int64(*product.Category.ParentID)
+				}(),
+				Title: product.Category.Title,
+				Slug:  product.Category.Slug,
 			},
 			CategoryID: int64(product.CategoryID),
 			Brand: entities.B{
