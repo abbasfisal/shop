@@ -132,6 +132,7 @@ func (p PublicHandler) SingleProduct(c *gin.Context) {
 			"PRODUCT":         product,
 			"RECOMMENDATIONS": recommendations,
 			"PrimaryMessage":  primaryMessage,
+			"MEDIA_PATH":      util.GetProductStoragePath(),
 		})
 	return
 }
