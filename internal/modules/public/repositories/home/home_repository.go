@@ -352,6 +352,7 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 	}
 
 	if pErr := paginateQuery(h.dep.DB).
+		Preload("Category").
 		Preload("ProductImages").
 		Where("category_id=?", category.ID).
 		Find(&products).Error; pErr != nil {
