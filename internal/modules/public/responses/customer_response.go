@@ -1,8 +1,8 @@
 package responses
 
 import (
-	"github.com/spf13/viper"
 	"shop/internal/entities"
+	"shop/internal/pkg/util"
 )
 
 type Customer struct {
@@ -122,6 +122,7 @@ func toCartItems(cartItemEntities []entities.CartItem) CartItem {
 }
 
 func toCartItem(cartItem entities.CartItem) Item {
+
 	return Item{
 		ID:            cartItem.ID,
 		CustomerID:    cartItem.CustomerID,
@@ -133,7 +134,7 @@ func toCartItem(cartItem entities.CartItem) Item {
 		SalePrice:     cartItem.SalePrice,
 		ProductSku:    cartItem.ProductSku,
 		ProductTitle:  cartItem.ProductTitle,
-		ProductImage:  viper.GetString("Upload.Products") + cartItem.ProductImage, // ترکیب مسیر تصویر با پیکربندی
+		ProductImage:  util.GetProductStoragePath() + cartItem.ProductImage,
 		ProductSlug:   cartItem.ProductSlug,
 	}
 }
