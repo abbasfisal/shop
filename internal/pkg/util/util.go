@@ -112,7 +112,7 @@ func StructToMap(yourStruct interface{}) map[string]interface{} {
 }
 
 func AllowImageExtensions() []string {
-	return []string{".jpg", ".png", ".jpeg"}
+	return []string{".jpg", ".png", ".jpeg", ".mp4"}
 }
 
 func ValidateIRMobile(mobile string) bool {
@@ -175,6 +175,10 @@ func ConvertSliceIfNotNil[T any, R any](input []*T, convertFunc func(*T) R) []R 
 func StringToUint(s string) uint {
 	i, _ := strconv.ParseUint(s, 10, 64)
 	return uint(i)
+}
+
+func HasSuffix(s, suffix string) bool {
+	return len(s) >= len(suffix) && s[len(s)-len(suffix):] == suffix
 }
 
 // Trace will log file, line, function name, and message (error or string)
