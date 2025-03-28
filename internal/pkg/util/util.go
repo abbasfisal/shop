@@ -9,6 +9,7 @@ import (
 	"log"
 	"math"
 	"math/big"
+	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -196,4 +197,14 @@ func Trace(input interface{}) {
 	default:
 		log.Printf("[File]: %s | [Line]: %d | [Function]: %s | [Unknown Type]: %v\n", file, line, funcName, v)
 	}
+}
+
+// GetProductStoragePath if key value set to active then address will be bucket address else address will be server address
+func GetProductStoragePath() string {
+	if os.Getenv("STORAGE_STATUS") == "active" {
+		return fmt.Sprintf("https://%s.parspack.net/uploads/media/products/", os.Getenv("STORAGE_BUCKET_NAME"))
+	}
+
+	return "/uploads/media/products/"
+
 }
