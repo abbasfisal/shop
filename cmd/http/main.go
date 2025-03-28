@@ -78,6 +78,7 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em
 
 	r.SetFuncMap(template.FuncMap{
 		"stringToUint": util.StringToUint,
+		"hasSuffix":    util.HasSuffix,
 	})
 
 	setupSessions(r)
@@ -86,7 +87,7 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em
 	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
 	log.Printf("[start server ]: http://%s\n", addr)
 	if err := r.Run(addr); err != nil {
-		logging.GlobalLog.FatalF("[Server start failed]: %v", err)
+		log.Fatalln("[Server start failed]: ", err)
 	}
 }
 
