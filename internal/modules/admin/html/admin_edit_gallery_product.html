@@ -89,9 +89,17 @@
                         </form>
 
                         {{range .PRODUCT.Images.Data}}
-                            <a href="/{{.FullPath}}" target="_blank">سایز اصلی</a> |
+                            <a href="{{$.MEDIA_PATH}}{{.OriginalPath}}" target="_blank">سایز اصلی</a> |
                             <a href="/admins/products/images/{{.ID}}/delete">حذف</a>
-                            <img src="/{{.FullPath}}" width="450px" alt="">
+
+                            {{if hasSuffix .OriginalPath ".mp4"}}
+                                <video width="25%" height="" controls>
+                                    <source src="{{$.MEDIA_PATH}}{{.OriginalPath}}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {{else}}
+                                <img src="{{$.MEDIA_PATH}}{{.OriginalPath}}" width="25%" alt="">
+                            {{end}}
                             <br>
                             <br>
                         {{end}}
