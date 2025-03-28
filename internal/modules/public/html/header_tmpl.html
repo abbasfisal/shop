@@ -117,11 +117,11 @@
                                             <ul class="do-nice-scroll">
                                                 <li class="cart-item">
                                                     <span class="d-flex align-items-center mb-2">
-                                                    <a href="#">
-                                                        <img src="{{$item.ProductImage}}" alt="">
+                                                    <a href="/product/{{$item.ProductSku}}/{{$item.ProductSlug}}">
+                                                        <img src="{{$item.ProductImage}}" alt="{{$item.ProductTitle}}">
                                                     </a>
                                                         <span>
-                                                            <a href="#">
+                                                            <a href="/product/{{$item.ProductSku}}/{{$item.ProductSlug}}">
                                                                 <span class="title-item">{{$item.ProductTitle}}</span>
                                                             </a>
                                                         </span>
