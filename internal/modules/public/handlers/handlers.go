@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"os"
 	"shop/internal/modules/public/services/home"
 	"shop/internal/pkg/bootstrap"
 	"shop/internal/pkg/custom_error"
@@ -82,10 +83,18 @@ func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 		}
 	}
 
+	mediaPath := ""
+	if os.Getenv("STORAGE_STATUS") == "active" {
+		mediaPath = fmt.Sprintf("https://%s.parspack.net/uploads/media/products/", os.Getenv("STORAGE_BUCKET_NAME"))
+	} else {
+		mediaPath = "/uploads/media/products/"
+	}
+
 	html.CustomerRender(c, http.StatusFound, "search",
 		gin.H{
 			"TITLE":          "search",
 			"PAGINATION":     productPagination,
+			"MEDIA_PATH":     mediaPath,
 			"PrimaryMessage": custom_error.RecordNotFound,
 		},
 	)

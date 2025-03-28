@@ -316,6 +316,7 @@
                                     <div class="ah-tab-content dt-sl" data-ah-tab-active="true">
                                         <div class="row mb-3 mx-0 px-res-0">
                                             {{range .PAGINATION.Rows.Data}}
+                                                {{$title:=.Title}}
                                                 <div class="col-lg-3 col-md-4 col-sm-6 col-12 px-10 mb-1 px-res-0">
                                                     <div class="product-card mb-2 mx-res-0">
                                                         {{if gt .Discount 40}}
@@ -334,11 +335,8 @@
                                                         </div>
 
                                                         <a class="product-thumb" href="/product/{{.Sku}}/{{.Slug}}">
-                                                            {{range $index,$item:=.Images.Data }}
-                                                                {{if eq $index 0}}
-                                                                    <img src="/{{$item.FullPath}}"
-                                                                         alt="Product Thumbnail">
-                                                                {{end}}
+                                                            {{with index .Images.Data 0 }}
+                                                                <img src="{{$.MEDIA_PATH}}{{.OriginalPath}}" alt="{{$title}}">
                                                             {{end}}
                                                         </a>
                                                         <div class="product-card-body">
