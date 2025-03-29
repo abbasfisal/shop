@@ -1,0 +1,111 @@
+{{define "create_banner"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                    </div><!-- /.col -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10">
+                        <form action="/admins/banners/" method="post" enctype="multipart/form-data">
+                            <table class="table table-hover">
+                                <tr>
+                                    <td>نوع</td>
+                                    <td>
+                                        <select class="form-control " name="type" id="">
+                                            <option value="1">Main slider (1780px * 909px)</option>
+                                            <option value="2">Left Side Banner (856px * 428px)</option>
+                                            <option value="3">Widget 2 (828px * 328 px)</option>
+                                            <option value="4">Long Horizontal Banner (1656px * 210px)</option>
+                                        </select>
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.type}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>اولویت</td>
+                                    <td>
+                                        <input type="number" name="priority" class="form-control">
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.priority}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>لینک</td>
+                                    <td><input type="text" name="link"
+                                               class="form-control"
+                                               value="{{range .OLDS.link}}{{.}}{{end}}"></td>
+                                    <td class="text-danger">{{ .ERRORS.link}}</td>
+                                </tr>
+                                <tr>
+                                    <td>وضعیت</td>
+                                    <td>
+                                        <input type="checkbox" name="status" class="form-control form-check">
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.status}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>اپلود عکس</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" name="image" class="custom-file-input"
+                                                       id="exampleInputFile">
+                                                <label class="custom-file-label" for="exampleInputFile">انتخاب
+                                                    عکس</label>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="">Upload</span>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                    <td class="text-danger">{{.ERRORS.image}}</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><input class="btn  btn-primary btn-lg" type="submit" value="ایجاد"></td>
+                                    <td class="text-info border-white">
+                                        {{if .MESSAGE}} {{.MESSAGE}} {{end}}
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </form>
+                    </div>
+                    <!-- /.col-md-6 -->
+
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}
+

@@ -38,6 +38,7 @@ const (
 	StoreImageOnDiskFailed  string = "خطا در ذخیره عکس بر روی هارددیسک"
 	IDIsNotCorrect          string = "شناسه صحیح نمی باشد"
 	IRMobileIsInvalid              = "شماره موبایل معتبر نیست"
+	SliderTypeIsNotValid    string = "نوع اسلایدر معتبر نیست"
 	//OTP
 
 	OTPRequestTooSoon = "باید ۴ دقیقه صبر کنید برای دریافت کد جدید"

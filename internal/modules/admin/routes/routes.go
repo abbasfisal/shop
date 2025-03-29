@@ -13,6 +13,7 @@ import (
 	attributeRepository "shop/internal/modules/admin/repositories/attribute"
 	attributeValueRepository "shop/internal/modules/admin/repositories/attribute_value"
 	authRepository "shop/internal/modules/admin/repositories/auth"
+	bannerRepository "shop/internal/modules/admin/repositories/banner"
 	brandRepository "shop/internal/modules/admin/repositories/brand"
 	categoryRepository "shop/internal/modules/admin/repositories/category"
 	customerRepository "shop/internal/modules/admin/repositories/customer"
@@ -22,6 +23,7 @@ import (
 	"shop/internal/modules/admin/services/attribute"
 	attributeValue "shop/internal/modules/admin/services/attribute_value"
 	"shop/internal/modules/admin/services/auth"
+	"shop/internal/modules/admin/services/banner"
 	"shop/internal/modules/admin/services/brand"
 	"shop/internal/modules/admin/services/category"
 	"shop/internal/modules/admin/services/customer"
@@ -59,7 +61,9 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
 	dashboardSrv := dashboard.NewDashboardService(dashboardRepository.NewDashboardRepository(mysql.Get()))
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, dep)
+	bannerSrv := banner.NewBannerService(bannerRepository.NewBannerRepository(mysql.Get()))
+
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, bannerSrv, dep)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest)
@@ -160,6 +164,10 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.GET("/admins/orders", adminHlr.IndexOrders)
 		authGrp.GET("/admins/orders/:id/details", adminHlr.ShowOrder)
 		authGrp.POST("/admins/orders/:id/update-status", adminHlr.EditOrder)
+
+		//banner
+		authGrp.GET("/admins/banners/create", adminHlr.CreateBanner)
+		authGrp.POST("/admins/banners", adminHlr.StoreBanner)
 
 	}
 
