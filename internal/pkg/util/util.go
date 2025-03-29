@@ -112,7 +112,7 @@ func StructToMap(yourStruct interface{}) map[string]interface{} {
 }
 
 func AllowImageExtensions() []string {
-	return []string{".jpg", ".png", ".jpeg", ".mp4"}
+	return []string{".jpg", ".png", ".jpeg", ".webp", ".mp4"}
 }
 
 func ValidateIRMobile(mobile string) bool {
