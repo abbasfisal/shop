@@ -78,7 +78,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
 		//----- asynq monitor panel
 		h := asynqmon.New(asynqmon.Options{
-			RootPath:     "/monitoring",
+			RootPath:     "/admins/monitoring",
 			RedisConnOpt: asynq.RedisClientOpt{Addr: fmt.Sprintf(":%s", os.Getenv("REDIS_PORT"))},
 		})
 		authGrp.Any(h.RootPath()+"/*any", gin.WrapH(h))
