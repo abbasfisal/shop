@@ -19,6 +19,7 @@ upload:
   categories: "../../uploads/media/categories/"
   products: "../../uploads/media/products/"
   brands: "../../uploads/media/brands/"
+  banners: "../../uploads/media/banners/"
 
 kavenegar:
   api_key: ""
