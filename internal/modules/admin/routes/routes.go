@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
 	"github.com/hibiken/asynqmon"
+	"golang.org/x/time/rate"
 	"os"
 	"shop/internal/database/mongodb"
 	"shop/internal/database/mysql"
@@ -31,6 +32,7 @@ import (
 	order "shop/internal/modules/admin/services/order"
 	"shop/internal/modules/admin/services/product"
 	"shop/internal/pkg/bootstrap"
+	"time"
 )
 
 func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
@@ -65,8 +67,11 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
 	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, bannerSrv, dep)
 
+	// rate limiter
+	limiter := middlewares.NewRateLimiter(rate.Every(time.Second), 5)
+
 	guestGrp := r.Group("/")
-	guestGrp.Use(middlewares.IsGuest)
+	guestGrp.Use(middlewares.IsGuest, limiter.Middleware())
 	{
 		guestGrp.GET("/admins/login", adminHlr.ShowLogin)
 		guestGrp.POST("/admins/login", adminHlr.PostLogin)
