@@ -15,6 +15,11 @@ var up bool
 var down bool
 var steps int
 
+// migrate command example:
+//go run . migrate --up
+//go run . migrate --down
+//go run . migrate --down --steps=x
+
 func init() {
 	migrationCmd.Flags().BoolVar(&up, "up", false, "Apply migration (upgrade)")
 	migrationCmd.Flags().BoolVar(&down, "down", false, "Rollback migration (downgrade)")
