@@ -14,7 +14,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"shop/cmd/commands"
 	"shop/cmd/job/scheduler"
 	"shop/cmd/job/worker"
 	"shop/internal/database/mongodb"
@@ -49,8 +48,6 @@ func main() {
 	// graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-
-	commands.Execute() // run cobra commands
 
 	go worker.RunWorker(ctx, dependencies, em)       // run Asynq worker
 	go scheduler.RunScheduler(ctx, dependencies, em) // run Asynq Schedule
