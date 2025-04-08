@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 	"shop/internal/events"
 	"shop/internal/middlewares"
 	PublicHandler "shop/internal/modules/public/handlers"
@@ -10,6 +11,7 @@ import (
 	"shop/internal/modules/public/repositories/home_mongo"
 	"shop/internal/modules/public/services/home"
 	"shop/internal/pkg/bootstrap"
+	"time"
 )
 
 func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.EventManager) {
@@ -21,8 +23,12 @@ func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.
 	homeSrv := home.NewHomeService(dep, repo, MongoHomeRepo, eventManager)
 
 	//--- [Global Middleware]
+	publicLimiter := middlewares.NewRateLimiter(rate.Every(time.Minute), 60)
+	limiter := middlewares.NewRateLimiter(rate.Every(time.Minute), 5) // use for specific routes
+
 	r.Use(CustomerMiddlewares.LoadMenu(homeSrv)) //load menu by LoadMenu middleware
 	r.Use(CustomerMiddlewares.CheckUserAuth())   //set `auth` key in context if user was existed in database
+	r.Use(publicLimiter.Middleware())
 	//----
 
 	publicHdl := PublicHandler.NewPublicHandler(homeSrv, dep)
@@ -37,7 +43,7 @@ func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.
 
 	publicAuthGrp := r.RouterGroup
 	customerRoute := r.RouterGroup
-	customerRoute.Use(CustomerMiddlewares.CheckCustomerSessionID())
+	customerRoute.Use(limiter.Middleware(), CustomerMiddlewares.CheckCustomerSessionID())
 	{
 		customerRoute.GET("/login", publicHdl.ShowLogin)
 		customerRoute.POST("/login", publicHdl.PostLogin)

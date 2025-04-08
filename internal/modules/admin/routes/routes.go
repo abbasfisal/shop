@@ -68,7 +68,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, bannerSrv, dep)
 
 	// rate limiter
-	limiter := middlewares.NewRateLimiter(rate.Every(time.Second), 5)
+	limiter := middlewares.NewRateLimiter(rate.Every(time.Minute), 5)
 
 	guestGrp := r.Group("/")
 	guestGrp.Use(middlewares.IsGuest, limiter.Middleware())
