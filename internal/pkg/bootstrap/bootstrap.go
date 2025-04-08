@@ -44,7 +44,7 @@ func Initialize() (*Dependencies, error) {
 	once.Do(func() {
 
 		// load .env file
-		if err := loadConfig(); err != nil {
+		if err := LoadConfig(); err != nil {
 			initErr = err
 			return
 		}
@@ -86,7 +86,7 @@ func Initialize() (*Dependencies, error) {
 	return dep, initErr
 }
 
-func loadConfig() error {
+func LoadConfig() error {
 
 	if err := godotenv.Load("../../.env"); err != nil {
 		return fmt.Errorf("[x] [bootstrap.go][line:86][loadConfig] failed to load .env file :%w", err)
