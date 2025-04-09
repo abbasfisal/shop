@@ -646,6 +646,38 @@
     <script src="/assets/shop/js/js-search/js-search.js"></script>
 
     <!-- my custom JS File -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const priceSelectors = [
+                ".product-seller-price-prev",
+                ".product-seller-price-raw",
+                ".product-price"
+            ];
+
+            priceSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach(el => {
+                    let target = el;
+
+                    // اگه داخلش تگ del وجود داشت، فقط متن del رو تغییر بده
+                    const del = el.querySelector("del");
+                    if (del) {
+                        target = del;
+                    }
+
+                    // استخراج متن عددی (بدون تومان و چیزای اضافی)
+                    const text = target.innerText.trim();
+                    const isToman = text.includes("تومان");
+                    const num = parseInt(text.replace(/[^\d]/g, ""));
+
+                    if (!isNaN(num)) {
+                        const formatted = num.toLocaleString("en-US");
+                        target.innerText = isToman ? `${formatted} تومان` : formatted;
+                    }
+                });
+            });
+        });
+    </script>
+
     <script src="/assets/shop/js/mylink/my-link.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch_small.js"></script>

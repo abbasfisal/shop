@@ -65,6 +65,18 @@
                         <div class="row">
                             <!-- Product Gallery-->
                             <div class="col-lg-4 col-md-6 ps-relative">
+                                <div class="product-timeout position-relative pt-5 mb-3" data-rtl="true">
+{{/*                                    <div class="promotion-badge" data-rtl="true">*/}}
+{{/*                                        فروش ویژه*/}}
+{{/*                                    </div>*/}}
+                                    <div class="countdown-timer" countdown="" data-date="10 24 2025 20:20:20">
+                                        <span data-days="">2</span>:
+                                        <span data-hours="">12</span>:
+                                        <span data-minutes="">30</span>:
+                                        <span data-seconds="">2</span>
+                                    </div>
+                                </div>
+
                                 <div class="product-gallery">
                                     <div class="product-carousel owl-carousel" data-slider-id="1">
                                         {{range .PRODUCT.product.Images.Data}}
@@ -267,7 +279,12 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
-
+                                            <div class="product-guaranteed" data-rtl="true">
+                                                <i class="fas fa-badge-check"></i>
+                                                <p data-rtl="true">
+                                                    بیش از 20 نفر از خریداران این محصول را پیشنهاد داده‌اند
+                                                </p>
+                                            </div>
                                             <div class="product-summary">
                                                 <nav id="stack-menu">
                                                     <ul>
@@ -828,6 +845,23 @@
     <!-- Main JS File -->
     <script src="/assets/shop/js/js-product/js-product.js"></script>
     <!-- my custom JS File -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const formatElements = [
+                ".product-seller-price-prev",
+                ".product-seller-price-raw"
+            ];
+
+            formatElements.forEach(selector => {
+                document.querySelectorAll(selector).forEach(function (el) {
+                    const num = parseInt(el.innerText.replace(/\D/g, ""));
+                    if (!isNaN(num)) {
+                        el.innerText = num.toLocaleString("en-US");
+                    }
+                });
+            });
+        });
+    </script>
     <script src="/assets/shop/js/mylink/my-link.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch_small.js"></script>
