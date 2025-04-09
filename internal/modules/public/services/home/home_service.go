@@ -177,7 +177,6 @@ func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryRespons
 func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.MongoProductRecommendation, custom_error.CustomError) {
 
 	mongoProduct, rec, err := h.mongoRepo.GetProduct(c, productSku, productSlug)
-	log.Println("---- recommendation count :", len(rec))
 	if err == nil {
 		log.Println("--- mongo success --- ")
 		return mongoProduct, rec, custom_error.CustomError{}
