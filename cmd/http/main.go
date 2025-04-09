@@ -81,7 +81,7 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em
 	setupSessions(r)
 	setupRoutes(ctx, r, dependencies, em)
 
-	addr := fmt.Sprintf("%s:%s", viper.GetString("App.Host"), viper.GetString("App.Port"))
+	addr := fmt.Sprintf("%s:%s", os.Getenv("APP_HOST"), os.Getenv("APP_PORT"))
 	log.Printf("[start server ]: http://%s\n", addr)
 	if err := r.Run(addr); err != nil {
 		log.Fatalln("[Server start failed]: ", err)
