@@ -151,15 +151,17 @@ func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryRespons
 		//marsh repository response
 		categoryJsonResponse, err := json.Marshal(categoryResponses)
 		if err != nil {
-			fmt.Println("--- category marshal error :", categoryJsonResponse)
+			fmt.Println("--- category marshal error :", string(categoryJsonResponse))
+			return categoryResponses, err
 		} else {
-			fmt.Println("--- category marshal success :", categoryJsonResponse)
+			fmt.Println("--- category marshal success :", string(categoryJsonResponse))
 		}
 
 		//store marshaled data into cache
 		cacheSetErr := cache.Set(c, "menu", string(categoryJsonResponse), -1)
 		if err != nil {
 			fmt.Println("---- cache set menu key error: ", cacheSetErr)
+			return categoryResponses, err
 		}
 
 	} else {
@@ -169,6 +171,7 @@ func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryRespons
 		unmarshalErr := json.Unmarshal([]byte(menu), &categoryResponses)
 		if unmarshalErr != nil {
 			fmt.Println("---- unmarshal category response err :", unmarshalErr)
+			return categoryResponses, unmarshalErr
 		}
 	}
 	return categoryResponses, nil

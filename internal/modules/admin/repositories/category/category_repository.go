@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"shop/internal/entities"
 	"shop/internal/modules/admin/requests"
+	"shop/internal/pkg/cache"
 	"strings"
 )
 
@@ -45,6 +46,11 @@ func (cr *CategoryRepository) FindBy(ctx context.Context, columnName string, val
 
 func (cr *CategoryRepository) Store(ctx context.Context, category *entities.Category) (*entities.Category, error) {
 	err := cr.db.WithContext(ctx).Create(&category).Error
+
+	if err == nil {
+		cache.Delete(ctx, "menu")
+	}
+
 	return category, err
 }
 
@@ -52,6 +58,7 @@ func (cr *CategoryRepository) Update(c *gin.Context, categoryID int, req *reques
 	var category entities.Category
 
 	err := cr.db.WithContext(c).First(&category, categoryID).Error
+
 	if err != nil {
 		return &category, err
 	}
@@ -85,6 +92,10 @@ func (cr *CategoryRepository) Update(c *gin.Context, categoryID int, req *reques
 			}
 			return true
 		}()).Error
+
+	if err == nil {
+		cache.Delete(c, "menu")
+	}
 
 	return &category, err
 }
