@@ -5,6 +5,7 @@
             font-weight: bold;
         }
     </style>
+    <script src="/assets/shop/js/price/price.js"></script>
 
     <header class="page-header dt-sl">
         <div class="top-page-header">
@@ -110,7 +111,6 @@
                             </a>
                             {{if gt ( .AUTH.Cart.CartItem.TotalSalePrice) 0}}
                                 <ul>
-
                                     {{$totalSalePrice:=.AUTH.Cart.CartItem.TotalSalePrice}}
                                     {{range $item:=.AUTH.Cart.CartItem.Data}}
                                         <li class="cart-items">
