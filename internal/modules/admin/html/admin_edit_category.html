@@ -40,21 +40,20 @@
                                 <td>  {{if eq .CATEGORY.ParentID nil}} {{end}}سطح</td>
                                 <td>
                                     <select class="form-control" name="category_id" id="">
+                                        <!-- گزینه‌ی روت -->
+                                        <option value="0" {{if eq $.CATEGORY.ParentID nil}} selected{{end}}>روت</option>
 
-                                        <option value="0" {{if eq .CATEGORY.ParentID nil}} selected{{end}}>روت
-                                        </option>
-
+                                        <!-- لیست دسته‌بندی‌ها -->
                                         {{range .CATEGORIES.Data}}
-                                        <option
-                                                value="{{.ID}}"
-                                                {{if and ( ne $.CATEGORY.ParentID nil) (eq .ID $.CATEGORY.ParentIDID)}}
-                                                    selected
-                                                {{end}}
-                                        >
-                                            {{.Title}} {{if eq .ParentID nil}} [روت] {{end}}
-                                        </option>
+                                            <option
+                                                    value="{{.ID}}"
+                                                    {{if and (ne $.CATEGORY.ParentID nil) (eq (printf "%v" .ID) (printf "%v" $.CATEGORY.ParentID))}} selected{{end}}
+                                            >
+                                                {{.Title}} {{if eq .ParentID nil}} [روت] {{end}}
+                                            </option>
                                         {{end}}
                                     </select>
+
                                 </td>
                             </tr>
                             <tr>
