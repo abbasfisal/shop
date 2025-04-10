@@ -260,16 +260,17 @@
                                                         <span>
                                                             مبلغ کل ({{.AUTH.Cart.CartItem.TotalItemCount}} کالا)
                                                         </span>
-                                                        <span>
+                                                        <span class="summery-total-original-price">
                                                             {{.AUTH.Cart.CartItem.TotalOriginalPrice}}
                                                             تومان
                                                         </span>
                                                     </li>
                                                     <li class="checkout-summary-discount">
                                                         <span>سود شما از خرید</span>
-                                                        <span>
-                                                            <span>(۱٪)</span>
+                                                        <span class="summary-discount-total-profile-price">
+                                                            {{/*<span>(۱٪)</span>*/}}
                                                             {{.AUTH.Cart.CartItem.TotalProfitPrice}}
+
                                                         تومان
                                                         </span>
                                                     </li>
@@ -294,7 +295,6 @@
                                                         <span class="checkout-summary-price-value-amount">
                                                             {{.AUTH.Cart.CartItem.TotalSalePrice}}
                                                         </span>
-                                                        تومان
                                                     </div>
                                                     <a href="#" class="mb-2 d-block">
                                                         <form action="/checkout/shipping" method="get">
@@ -671,6 +671,25 @@
     <!-- Main JS File -->
     <script src="/assets/shop/js/js-cart/js-cart.js"></script>
     <!-- my custom JS File -->
+    <script>
+        function formatPriceElements(selector) {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                const numText = el.textContent.replace(/[^\d]/g, ''); // فقط عدد
+                if (numText) {
+                    const formatted = Number(numText).toLocaleString('en-US');
+                    el.textContent = formatted + ' تومان';
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            formatPriceElements('.item-price');
+            formatPriceElements('.summery-total-original-price');
+            formatPriceElements('.summary-discount-total-profile-price');
+            formatPriceElements('.checkout-summary-price-value-amount');
+        });
+    </script>
     <script src="/assets/shop/js/mylink/my-link.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch_small.js"></script>
