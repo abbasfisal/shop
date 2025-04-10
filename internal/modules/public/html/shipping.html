@@ -94,7 +94,7 @@
                                                             {{if .MESSAGE}}
                                                                 <div class="text-center p-2 ">
                                                                     <b class="text-danger fa-1x">
-                                                                         {{.MESSAGE}}
+                                                                        {{.MESSAGE}}
                                                                     </b>
                                                                 </div>
                                                                 <br>
@@ -272,7 +272,7 @@
                                                                 <a class="product-thumb"
                                                                    target="_blank"
                                                                    href="/product/{{$item.ProductSku}}/{{$item.ProductSlug}}">
-                                                                    <img src="/{{$item.ProductImage}}"
+                                                                    <img src="{{$item.ProductImage}}"
                                                                          alt="{{$item.ProductTitle}}">
                                                                 </a>
                                                                 <div class="product-card-body">
@@ -306,15 +306,22 @@
                         <div class="widget-post1 dt-sn dt-sn--box border mb-2">
                             <ul class="checkout-summary-summary">
                                 <li>
-                                    <span>مبلغ کل ({{.AUTH.Cart.CartItem.TotalItemCount}} کالا)</span><span>
-                                        {{.AUTH.Cart.CartItem.TotalSalePrice}}
-                                        تومان
+                                    <span>
+                                                            مبلغ کل ({{.AUTH.Cart.CartItem.TotalItemCount}} کالا)
                                     </span>
+                                    <span class="summery-total-original-price">
+                                        {{.AUTH.Cart.CartItem.TotalOriginalPrice}}
+                                            تومان
+                                    </span>
+
                                 </li>
                                 <li class="checkout-summary-discount">
-                                    <span>سود شما از خرید</span><span><span></span>
+                                    <span>سود شما از خرید</span>
+                                    <span class="summary-discount-total-profile-price">
+                                                            {{/*<span>(۱٪)</span>*/}}
                                         {{.AUTH.Cart.CartItem.TotalProfitPrice}}
-                                        تومان</span>
+                                                        تومان
+                                    </span>
                                 </li>
                                 <li>
                                     <span>هزینه ارسال<span class="help-sn" data-toggle="tooltip" data-html="true"
@@ -334,7 +341,6 @@
                                     <span class="checkout-summary-price-value-amount">
                                         {{.AUTH.Cart.CartItem.TotalSalePrice}}
                                     </span>
-                                    تومان
                                 </div>
 
                                 <form action="/checkout/payment" method="post">
@@ -607,6 +613,25 @@
     <script src="/assets/shop/js/js-shopping/js-shopping.js"></script>
 
     <!-- my custom JS File -->
+    <script>
+        function formatPriceElements(selector) {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                const numText = el.textContent.replace(/[^\d]/g, ''); // فقط عدد
+                if (numText) {
+                    const formatted = Number(numText).toLocaleString('en-US');
+                    el.textContent = formatted + ' تومان';
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            formatPriceElements('.item-price');
+            formatPriceElements('.summery-total-original-price');
+            formatPriceElements('.summary-discount-total-profile-price');
+            formatPriceElements('.checkout-summary-price-value-amount');
+        });
+    </script>
     <script src="/assets/shop/js/mylink/my-link.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch.js"></script>
     <script src="/assets/shop/js/tseaerch/tsearch_small.js"></script>
