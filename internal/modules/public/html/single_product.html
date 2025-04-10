@@ -66,9 +66,9 @@
                             <!-- Product Gallery-->
                             <div class="col-lg-4 col-md-6 ps-relative">
                                 <div class="product-timeout position-relative pt-5 mb-3" data-rtl="true">
-{{/*                                    <div class="promotion-badge" data-rtl="true">*/}}
-{{/*                                        فروش ویژه*/}}
-{{/*                                    </div>*/}}
+                                    {{/*                                    <div class="promotion-badge" data-rtl="true">*/}}
+                                    {{/*                                        فروش ویژه*/}}
+                                    {{/*                                    </div>*/}}
                                     <div class="countdown-timer" countdown="" data-date="10 24 2025 20:20:20">
                                         <span data-days="">2</span>:
                                         <span data-hours="">12</span>:
@@ -99,7 +99,7 @@
                                                 {{if not ( hasSuffix .OriginalPath ".mp4" )}}
                                                     <li class="owl-thumb-item {{if eq $index 0 }} active{{end}}">
                                                         <a href="">
-                                                            <img  src="{{$.MEDIA_PATH}}{{$titem.OriginalPath}}"
+                                                            <img src="{{$.MEDIA_PATH}}{{$titem.OriginalPath}}"
                                                                  alt="{{$title}}">
                                                         </a>
                                                     </li>
@@ -332,6 +332,12 @@
                                                             <form action="/add-to-cart" method="post">
                                                                 <input type="hidden" name="product_id"
                                                                        value="{{.PRODUCT._id}}">
+
+                                                                {{range $key,$item:=.PRODUCT.inventories}}
+                                                                    <input type="hidden" name="inventory_id"
+                                                                           value="{{$item.InventoryID}}">
+                                                                {{end}}
+
                                                                 <button type="submit"
                                                                         class="btn-add-to-cart btn-add-to-cart--full-width">
                                                                     <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
