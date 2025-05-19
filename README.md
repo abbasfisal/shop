@@ -23,6 +23,14 @@ Before starting, ensure you have:
   cp .env.example .env
   ```
 
+- change go env proxy to avoid getting 403 error 
+  ```bash
+  go env -w GOPROXY=https://goproxy.io,direct
+  ```
+- download project dependencies
+  ```bash
+  go mod download
+  ```
 ---
 
 ## 🛠️ Setup and Run
