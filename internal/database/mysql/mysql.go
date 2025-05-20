@@ -30,7 +30,7 @@ func Connect() {
 		db = db.Debug()
 	}
 
-	fmt.Println("\n [mysql] connected to mysql database successfully ")
+	fmt.Println("\n[mysql] connected to mysql database successfully ")
 }
 
 func Get() *gorm.DB {
