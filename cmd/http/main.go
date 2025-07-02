@@ -96,12 +96,12 @@ func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies
 
 	wd, _ := os.Getwd()
 
-	rs := filepath.Join(wd, "internal", "**", "**", "**", "*.html")
+	r.LoadHTMLGlob(filepath.Join(wd, "internal", "**", "**", "**", "*.html")) // real path=> ../../internal/**/**/**/*.html
 
-	r.LoadHTMLGlob(rs)                                                                 // real path=> ../../internal/**/**/**/*.html
-	r.Static("/uploads", filepath.Join(rs, "uploads"))                                 // real path=> ../../uploads
-	r.Static("/assets", filepath.Join(rs, "assets"))                                   // real path =>../../assets
-	r.StaticFile("/favicon.ico", filepath.Join(rs, "assets/shop/img/seller-logo.png")) //real path="../../assets/shop/img/seller-logo.png"
+	r.Static("/uploads", filepath.Join(wd, "uploads"))
+	r.Static("/assets", filepath.Join(wd, "assets"))
+
+	r.StaticFile("/favicon.ico", filepath.Join(wd, "assets", "shop", "img", "seller-logo.png"))
 
 	AdminRoutes.SetAdminRoutes(r, dep)
 	PublicRoutes.SetPublic(r, dep, em)
