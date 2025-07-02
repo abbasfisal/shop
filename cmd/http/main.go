@@ -6,7 +6,6 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"html/template"
 	"log"
@@ -51,7 +50,8 @@ func main() {
 
 	go worker.RunWorker(ctx, dependencies, em)       // run Asynq worker
 	go scheduler.RunScheduler(ctx, dependencies, em) // run Asynq Schedule
-	go RunHttpServer(ctx, dependencies, em)          // run http server
+
+	go RunHttpServer(ctx, dependencies, em) // run http server
 
 	select {
 	case <-ctx.Done():
@@ -77,7 +77,6 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em
 		"stringToUint": util.StringToUint,
 		"hasSuffix":    util.HasSuffix,
 	})
-
 	setupSessions(r)
 	setupRoutes(ctx, r, dependencies, em)
 
@@ -96,15 +95,13 @@ func setupSessions(r *gin.Engine) {
 func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies, em *events.EventManager) {
 
 	wd, _ := os.Getwd()
-	rootPath, err := filepath.Abs(filepath.Join(wd, "..", ".."))
-	if err != nil {
-		logging.Log.WithFields(logrus.Fields{"function": "setupRoutes"}).WithError(err).Fatal("absolute path error")
-	}
 
-	r.LoadHTMLGlob(filepath.Join(rootPath, "internal", "**", "**", "**", "*.html"))          // real path=> ../../internal/**/**/**/*.html
-	r.Static("/uploads", filepath.Join(rootPath, "uploads"))                                 // real path=> ../../uploads
-	r.Static("/assets", filepath.Join(rootPath, "assets"))                                   // real path =>../../assets
-	r.StaticFile("/favicon.ico", filepath.Join(rootPath, "assets/shop/img/seller-logo.png")) //real path="../../assets/shop/img/seller-logo.png"
+	rs := filepath.Join(wd, "internal", "**", "**", "**", "*.html")
+
+	r.LoadHTMLGlob(rs)                                                                 // real path=> ../../internal/**/**/**/*.html
+	r.Static("/uploads", filepath.Join(rs, "uploads"))                                 // real path=> ../../uploads
+	r.Static("/assets", filepath.Join(rs, "assets"))                                   // real path =>../../assets
+	r.StaticFile("/favicon.ico", filepath.Join(rs, "assets/shop/img/seller-logo.png")) //real path="../../assets/shop/img/seller-logo.png"
 
 	AdminRoutes.SetAdminRoutes(r, dep)
 	PublicRoutes.SetPublic(r, dep, em)
