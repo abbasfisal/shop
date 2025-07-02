@@ -7,10 +7,13 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"os"
+	"path/filepath"
 	"shop/internal/database/mysql"
 	"shop/internal/entities"
+	"shop/internal/pkg/bootstrap"
 )
 
+var gorm bool
 var up bool
 var down bool
 var steps int
@@ -21,6 +24,9 @@ var steps int
 //go run . migrate --down --steps=x
 
 func init() {
+
+	migrationCmd.Flags().BoolVar(&gorm, "gorm", false, "migrate with gorm using Models")
+
 	migrationCmd.Flags().BoolVar(&up, "up", false, "Apply migration (upgrade)")
 	migrationCmd.Flags().BoolVar(&down, "down", false, "Rollback migration (downgrade)")
 	migrationCmd.Flags().IntVar(&steps, "steps", 1, "Number of migrations to rollback (default: 1 for --down)") // Added flag
@@ -64,14 +70,21 @@ func doMigrate() {
 		migrateType = migrate.Down
 		maxSteps = steps
 
+	} else if gorm {
+		fmt.Println("migrate with gorm using Models")
+
+		migrate1()
+
 	} else {
-		fmt.Println("Please specify a valid flag: -up or -down")
+		fmt.Println("Please specify a valid flag: -up or -down -gorm")
 		os.Exit(1)
 
 	}
 
+	wd, _ := os.Getwd()
+
 	migrations := &migrate.FileMigrationSource{
-		Dir: "../../internal/database/mysql/migrations",
+		Dir: filepath.Join(wd, "internal/database/mysql/migrations"),
 	}
 
 	n, err := migrate.ExecMax(db, "mysql", migrations, migrateType, maxSteps)
@@ -116,6 +129,12 @@ func migratex() {
 	os.Exit(1)
 }
 func migrate1() {
+	//در مواقعی که اولین بار میخواهیم پروژه رو در محیط اجرا کنیم و تمام مایگریشن ها رو میخاهیم که اجرا بشه با این دستور میریم جلو
+	//
+	_, errs := bootstrap.Initialize()
+	if errs != nil {
+		log.Fatalln("err:", errs)
+	}
 
 	db := mysql.Get()
 	db.Exec("SET foreign_key_checks = 0")
