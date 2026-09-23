@@ -8,12 +8,13 @@ app:
   otp_expiration_time: 4 #4 minute
 
 db:
-  driver: mysql
-  port: 3306
+  driver: postgres
+  port: 5432
   name: shop_go
   host: 127.0.0.1
-  username: root
-  password: root
+  username: postgres
+  password: postgres
+  sslmode: disable
 
 upload:
   categories: "public/uploads/media/categories/"

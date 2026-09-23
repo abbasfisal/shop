@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	customerResponse "shop/application/dto/web"
 	"shop/domain/entities"
-	"shop/infrastructure/database/mysql"
+	"shop/infrastructure/database/postgres"
 	adminAuthRepo "shop/infrastructure/repositories/auth"
 	customerAuthRepo "shop/infrastructure/repositories/customer_auth"
 	"shop/pkg/sessions"
@@ -19,7 +19,7 @@ func Auth(c *gin.Context) *entities.User {
 		return &entities.User{}
 	}
 
-	repo := adminAuthRepo.NewAuthenticateRepository(mysql.Get())
+	repo := adminAuthRepo.NewAuthenticateRepository(postgres.Get())
 	userID, _ := strconv.Atoi(authID)
 	user, _ := repo.FindByUserID(c, uint(userID))
 
@@ -33,7 +33,7 @@ func CustomerAuth(c *gin.Context) customerResponse.Customer {
 		return customerResponse.Customer{}
 	}
 
-	repo := customerAuthRepo.NewAuthenticateRepository(mysql.Get())
+	repo := customerAuthRepo.NewAuthenticateRepository(postgres.Get())
 	customer, err := repo.FindCustomerBySessionID(c, sessionID)
 	if err != nil {
 		return customerResponse.Customer{}

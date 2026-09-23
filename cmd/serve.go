@@ -16,7 +16,7 @@ import (
 	"path/filepath"
 	"shop/bootstrap"
 	"shop/infrastructure/database/mongodb"
-	"shop/infrastructure/database/mysql"
+	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/events"
 	AdminRoutes "shop/interfaces/http/routes"
 	PublicRoutes "shop/interfaces/http/routes"
@@ -59,7 +59,7 @@ func RunServe() {
 
 		<-time.After(time.Second) // shut down after 5 second
 
-		mysql.Close()
+		postgres.Close()
 		mongodb.Disconnect()
 		dependencies.AsynqClient.Close()
 

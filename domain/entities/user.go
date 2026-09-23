@@ -8,7 +8,7 @@ type User struct {
 	LastName    string `gorm:"type:varchar(50);not null"`
 	PhoneNumber string `gorm:"type:varchar(11);not null"`
 	Password    string
-	Type        string `gorm:"type:enum('admin','client');not null;default:'client'"`
+	Type        string `gorm:"type:varchar(10);not null;default:'client'"`
 
 	//Address Address //fk (1:1)
 	//Cart  Cart //fk

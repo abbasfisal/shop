@@ -4,7 +4,7 @@ run:
 	@go run . serve
 
 migrate:
-	@go run . migrate --gorm
+	@go run . migrate
 
 seed:
 	@go run . seed
@@ -31,25 +31,19 @@ date:
 
 
 migration-up:
-	@sql-migrate up -env=production -config=infrastructure/database/mysql/dbconfig.yml
-
+	@go run . migrate
 
 migration-down:
-	@sql-migrate down -env=production -config=infrastructure/database/mysql/dbconfig.yml -limit=1
+	@go run . migrate:rollback
 
 migration-status:
-	@sql-migrate status -env=production -config=infrastructure/database/mysql/dbconfig.yml
+	@go run . migrate:status
 
+migration-reset:
+	@go run . migrate:reset
 
-#doc: https://github.com/golang-migrate/migrate
-#generate dbconfig.yml
-# this dbconfig.yml file is necessary when you want use sql-migrator pkg to migration-up and down
-generate-sql-migrator-dbconfig:
-	@echo "production:\
-           \n  dialect: mysql\
-           \n  datasource: ${MYSQL_USER}:${MYSQL_PASSWORD}@(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DB}?parseTime=true\
-           \n  dir: infrastructure/database/mysql/migrations #migration director\
-           \n  table: migrations" > infrastructure/database/mysql/dbconfig.yml
+make-migration:
+	@go run . make:migration NAME=$(NAME)
 
 
 # start schedule system using asynq pkg

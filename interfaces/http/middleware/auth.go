@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"shop/infrastructure/database/mysql"
+	"shop/infrastructure/database/postgres"
 	adminAuthRepo "shop/infrastructure/repositories/auth"
 	"shop/pkg/sessions"
 	"strconv"
@@ -23,7 +23,7 @@ func IsAdmin(c *gin.Context) {
 		return
 	}
 
-	repo := adminAuthRepo.NewAuthenticateRepository(mysql.Get())
+	repo := adminAuthRepo.NewAuthenticateRepository(postgres.Get())
 
 	user, err := repo.FindByUserID(c, uint(userID))
 

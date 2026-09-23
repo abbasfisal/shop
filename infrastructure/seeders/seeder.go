@@ -1,4 +1,4 @@
-package seeder
+package seeders
 
 import (
 	"context"
@@ -6,13 +6,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"shop/domain/entities"
-	"shop/infrastructure/database/mysql"
+	"shop/infrastructure/database/postgres"
 	productRepo "shop/infrastructure/repositories/product"
 	"strconv"
 )
 
 func Seed() {
-	db := mysql.Get()
+	db := postgres.Get()
 
 	hashPass, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 

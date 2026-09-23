@@ -16,7 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"shop/infrastructure/database/mongodb"
-	"shop/infrastructure/database/mysql"
+	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/database/typesenceclient"
 	"shop/pkg/cache"
 	"shop/pkg/logging"
@@ -59,7 +59,7 @@ func Initialize() (*Dependencies, error) {
 
 		cache.InitRedisClient()   // redis connect
 		mongodb.Connect()         // mongodb connect
-		mysql.Connect()           // mysql connect
+		postgres.Connect()           // mysql connect
 		typesenceclient.Connect() // initialize typesence
 
 		// initialize Asynq
@@ -72,7 +72,7 @@ func Initialize() (*Dependencies, error) {
 		dep = &Dependencies{
 			I18nBundle:  bundle,
 			AsynqClient: asynqClient,
-			DB:          mysql.Get(),
+			DB:          postgres.Get(),
 			RedisClient: cache.NewRedisClient(),
 			MongoClient: mongodb.Get(),
 			Storage: util.NewStorage(os.Getenv("STORAGE_BUCKET_NAME"), os.Getenv("STORAGE_ENDPOINT_URL"),

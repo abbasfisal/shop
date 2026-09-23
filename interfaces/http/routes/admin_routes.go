@@ -19,7 +19,7 @@ import (
 	"shop/application/usecases/product"
 	"shop/bootstrap"
 	"shop/infrastructure/database/mongodb"
-	"shop/infrastructure/database/mysql"
+	"shop/infrastructure/database/postgres"
 	attributeRepository "shop/infrastructure/repositories/attribute"
 	attributeValueRepository "shop/infrastructure/repositories/attribute_value"
 	authRepository "shop/infrastructure/repositories/auth"
@@ -37,33 +37,33 @@ import (
 
 func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
-	authRepo := authRepository.NewAuthenticateRepository(mysql.Get())
+	authRepo := authRepository.NewAuthenticateRepository(postgres.Get())
 	authSrv := auth.NewAuthenticateService(authRepo)
 
-	categoryRepo := categoryRepository.NewCategoryRepository(mysql.Get())
+	categoryRepo := categoryRepository.NewCategoryRepository(postgres.Get())
 	categorySrv := category.NewCategoryService(categoryRepo)
 
-	productRepo := productRepository.NewProductRepository(mysql.Get(), mongodb.Get())
+	productRepo := productRepository.NewProductRepository(postgres.Get(), mongodb.Get())
 	productSrv := product.NewProductService(productRepo)
 
-	attributeRep := attributeRepository.NewAttributeRepository(mysql.Get())
+	attributeRep := attributeRepository.NewAttributeRepository(postgres.Get())
 	attributeSrv := attribute.NewAttributeService(attributeRep)
 
-	attributeValueRepo := attributeValueRepository.NewAttributeRepository(mysql.Get())
+	attributeValueRepo := attributeValueRepository.NewAttributeRepository(postgres.Get())
 	attributeValueSrv := attributeValue.NewAttributeValueService(attributeValueRepo)
 
-	brandRepo := brandRepository.NewBrandRepository(mysql.Get())
+	brandRepo := brandRepository.NewBrandRepository(postgres.Get())
 	brandSrv := brand.NewBrandService(brandRepo)
 
-	customerRepo := customerRepository.NewCustomerRepository(mysql.Get())
+	customerRepo := customerRepository.NewCustomerRepository(postgres.Get())
 	customerSrv := customer.NewCustomerService(customerRepo)
 
-	orderRepo := orderRepository.NewOrderRepository(mysql.Get(), mongodb.Get())
+	orderRepo := orderRepository.NewOrderRepository(postgres.Get(), mongodb.Get())
 	orderSrv := order.NewOrderService(orderRepo)
 
-	dashboardSrv := dashboard.NewDashboardService(dashboardRepository.NewDashboardRepository(mysql.Get()))
+	dashboardSrv := dashboard.NewDashboardService(dashboardRepository.NewDashboardRepository(postgres.Get()))
 
-	bannerSrv := banner.NewBannerService(bannerRepository.NewBannerRepository(mysql.Get()))
+	bannerSrv := banner.NewBannerService(bannerRepository.NewBannerRepository(postgres.Get()))
 
 	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, bannerSrv, dep)
 

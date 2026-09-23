@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"os"
-	"shop/infrastructure/database/mysql/seeder"
+	"shop/infrastructure/database/postgres"
+	"shop/infrastructure/seeders"
 )
 
 func init() {
@@ -12,9 +12,9 @@ func init() {
 
 var seedCmd = &cobra.Command{
 	Use:   "seed",
-	Short: "Seed  Tables",
+	Short: "Seed database tables",
 	Run: func(cmd *cobra.Command, args []string) {
-		seeder.Seed()
-		os.Exit(1)
+		postgres.Connect()
+		seeders.Seed()
 	},
 }
