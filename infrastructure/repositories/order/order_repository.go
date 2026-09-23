@@ -3,7 +3,6 @@ package order
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	"shop/application/dto/admin"
 	"shop/domain/entities"
@@ -16,15 +15,11 @@ import (
 )
 
 type OrderRepository struct {
-	db          *gorm.DB
-	mongoClient *mongo.Client
+	db *gorm.DB
 }
 
-func NewOrderRepository(db *gorm.DB, mongoClient *mongo.Client) repositories.OrderRepositoryInterface {
-	return &OrderRepository{
-		db:          db,
-		mongoClient: mongoClient,
-	}
+func NewOrderRepository(db *gorm.DB) repositories.OrderRepositoryInterface {
+	return &OrderRepository{db: db}
 }
 
 func (oRepo *OrderRepository) GetOrders(c *gin.Context) (pagination.Pagination, error) {

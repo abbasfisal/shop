@@ -250,7 +250,7 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 	}
 
 	// get product data by repo
-	productShow, allProductsInMongo, pErr := a.productSrv.Show(c, "id", pID)
+	productShow, allProductBriefs, pErr := a.productSrv.Show(c, "id", pID)
 
 	if pErr.Code == 404 {
 		c.Redirect(http.StatusFound, "/admins/products")
@@ -289,7 +289,7 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 		gin.H{
 			"TITLE":           "ویرایش محصول",
 			"PRODUCT":         productShow,
-			"AllProducts":     allProductsInMongo, // products in collection products in mongodb
+			"AllProducts":     allProductBriefs, // lightweight product summaries for recommendation picker
 			"CATEGORIES":      categories,
 			"BRANDS":          brands,
 			"RECOMMENDATIONS": recommendations,

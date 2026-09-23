@@ -16,7 +16,7 @@ func (p *ProductRepository) InsertFeature(c *gin.Context, productID int, req *re
 		return err
 	}
 
-	_ = SyncMongo(c, p.db, uint(productID))
+	_ = SyncReadModel(c, p.db, uint(productID))
 
 	return nil
 }
@@ -26,7 +26,7 @@ func (p *ProductRepository) DeleteFeature(c *gin.Context, productID int, feature
 		return err
 	}
 
-	_ = SyncMongo(c, p.db, uint(productID))
+	_ = SyncReadModel(c, p.db, uint(productID))
 
 	return nil
 }
@@ -49,7 +49,7 @@ func (p *ProductRepository) EditFeature(c *gin.Context, productID int, featureID
 		return err
 	}
 
-	_ = SyncMongo(c, p.db, uint(productID))
+	_ = SyncReadModel(c, p.db, uint(productID))
 
 	return nil
 }

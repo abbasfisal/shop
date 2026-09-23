@@ -21,7 +21,7 @@ func (p *ProductRepository) DeleteImage(c *gin.Context, imageID int) error {
 		return delImgErr
 	}
 
-	_ = SyncMongo(c, p.db, productImage.ProductID)
+	_ = SyncReadModel(c, p.db, productImage.ProductID)
 
 	return nil
 }
@@ -40,6 +40,6 @@ func (p *ProductRepository) StoreImages(c *gin.Context, productID int, imageStor
 		return storeImgErr
 	}
 
-	_ = SyncMongo(c, p.db, uint(productID))
+	_ = SyncReadModel(c, p.db, uint(productID))
 	return nil
 }

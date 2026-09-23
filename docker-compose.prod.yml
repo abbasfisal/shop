@@ -17,17 +17,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
 
 
-  mongodb:
-    image: mongo:8.0.0-rc6-jammy
-    ports:
-      - "${MONGO_PORT:-27017}:27017"
-    env_file:
-      - .env.production
-    volumes:
-      - mongodb_data_prod:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
 
 
   redis:
@@ -118,7 +107,6 @@ networks:
 
 volumes:
   dbdata_prod:
-  mongodb_data_prod:
   redis_data_prod:
   typesense_data:
   minio_data_prod:

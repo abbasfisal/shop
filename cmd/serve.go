@@ -15,7 +15,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"shop/bootstrap"
-	"shop/infrastructure/database/mongodb"
 	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/events"
 	AdminRoutes "shop/interfaces/http/routes"
@@ -39,7 +38,6 @@ func RunServe() {
 		AsynqClient: dependencies.AsynqClient,
 		DB:          dependencies.DB,
 		RedisClient: dependencies.RedisClient,
-		MongoClient: dependencies.MongoClient,
 	}
 	em := events.NewEventManager(&eventManagerDep)
 
@@ -60,7 +58,6 @@ func RunServe() {
 		<-time.After(time.Second) // shut down after 5 second
 
 		postgres.Close()
-		mongodb.Disconnect()
 		dependencies.AsynqClient.Close()
 
 		logging.Log.Info("gracefully Shutdown complete ,All resources released")

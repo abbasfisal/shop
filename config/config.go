@@ -9,15 +9,12 @@ import (
 type Config struct {
 	App     App
 	DB      DB
-	MongoDB MongoDB
 	Redis   Redis
 	Upload  Upload
 }
 type App struct {
 }
 type DB struct {
-}
-type MongoDB struct {
 }
 type Redis struct {
 }

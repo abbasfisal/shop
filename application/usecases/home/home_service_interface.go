@@ -3,7 +3,6 @@ package home
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"shop/application/dto/admin"
 	CustomerResp "shop/application/dto/web"
 	"shop/domain/domain_err"
@@ -27,11 +26,11 @@ type HomeServiceInterface interface {
 	ProcessCustomerAuthentication(c *gin.Context, mobile string) (CustomerResp.CustomerSession, domain_err.CustomError)
 	LogOut(c *gin.Context) bool
 	UpdateProfile(c *gin.Context, req *requests.CustomerProfileRequest) domain_err.CustomError
-	GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.MongoProductRecommendation, domain_err.CustomError)
+	GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.RecommendedProduct, domain_err.CustomError)
 
 	//------cart
 
-	AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest)
+	AddToCart(c *gin.Context, productID uint, req requests.AddToCartRequest)
 	CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) error
 	CartItemDecrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool
 	RemoveCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) bool

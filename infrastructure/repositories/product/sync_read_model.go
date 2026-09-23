@@ -2,22 +2,22 @@ package product
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"gorm.io/gorm"
 	"log"
 	"math"
+
+	"github.com/spf13/viper"
+	"gorm.io/gorm"
 	"shop/domain/entities"
-	"shop/infrastructure/database/mongodb"
 	"shop/pkg/util"
 )
 
-// SyncMongo وظیفه ذخیره محصول و روابطش و نیز ذخیره موجودی انبار رو در استراکت دلخواه در مونگو دیبی به عهده داره
-func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
-
-	// بارگذاری اطلاعات محصول
+// SyncReadModel builds the flattened product document (product + category + brand
+// + images + features + inventories with attributes) and persists it into
+// products.read_model (JSONB). It replaces the old MongoDB-based SyncMongo.
+// After the JSONB write it upserts the product into Typesense.
+func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 	var product entities.Product
 	productErr := db.WithContext(c).
 		Preload("Category").
@@ -27,13 +27,11 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		Where("id=?", productID).
 		First(&product).
 		Error
-
 	if productErr != nil {
-		fmt.Println("--- mongo product error:", productErr)
+		fmt.Println("--- read model build error:", productErr)
 		return productErr
 	}
 
-	// تعریف ساختار مورد نیاز برای انبارها و ویژگی‌ها
 	type InventoryWithAttributes struct {
 		InventoryID                 uint
 		Quantity                    uint
@@ -44,7 +42,6 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		ProductInventoryAttributeID uint
 	}
 
-	// بارگذاری موجودی‌ها
 	var inventories []InventoryWithAttributes
 	serr := db.
 		WithContext(c).
@@ -57,17 +54,14 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		Where("product_inventories.product_id = ? AND product_inventories.deleted_at IS NULL", product.ID).
 		Scan(&inventories).
 		Error
-
 	if serr != nil {
-		log.Println("--- mongo scan error:", serr)
+		log.Println("--- read model inventory scan error:", serr)
 		return serr
 	}
 
-	// آماده‌سازی برای ذخیره در MongoDB
-	inventoryMap := make(map[string]entities.Inventory) // prepare product inventory
-
+	inventoryMap := make(map[string]entities.Inventory)
 	for _, inventory := range inventories {
-		key := fmt.Sprintf("%d", inventory.InventoryID) //convert int to string
+		key := fmt.Sprintf("%d", inventory.InventoryID)
 		if _, exists := inventoryMap[key]; !exists {
 			inventoryMap[key] = entities.Inventory{
 				InventoryID: int64(inventory.InventoryID),
@@ -75,9 +69,6 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 				Attributes:  []entities.InventoryAttributes{},
 			}
 		}
-
-		//بعضی محصولات attribute ندارند و فقط موجودی دارند
-		// prepare attributes array for inventories field (note : some products has no any attributes they just have inventory_id and quantity )
 		inv := inventoryMap[key]
 		inv.Attributes = append(inv.Attributes, entities.InventoryAttributes{
 			AttributeID:                 int64(inventory.AttributeID),
@@ -89,20 +80,21 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 		inventoryMap[key] = inv
 	}
 
-	// تبدیل محصول به ساختار MongoProduct
-	mongoProduct := entities.MongoProduct{
+	discount := int64(0)
+	if product.OriginalPrice > 0 {
+		originalPrice := float64(product.OriginalPrice)
+		salePrice := float64(product.SalePrice)
+		discount = int64(math.Round(((originalPrice - salePrice) / originalPrice) * 100))
+	}
+
+	readModel := entities.ProductReadModel{
 		Product: entities.P{
 			ID: int64(product.ID),
 			Category: entities.C{
-				ID: int64(product.Category.ID),
-				ParentID: func() int64 {
-					if product.Category.ParentID == nil {
-						return 0
-					}
-					return int64(*product.Category.ParentID)
-				}(),
-				Title: product.Category.Title,
-				Slug:  product.Category.Slug,
+				ID:       int64(product.Category.ID),
+				ParentID: derefUintToInt64(product.Category.ParentID),
+				Title:    product.Category.Title,
+				Slug:     product.Category.Slug,
 			},
 			CategoryID: int64(product.CategoryID),
 			Brand: entities.B{
@@ -117,47 +109,48 @@ func SyncMongo(c context.Context, db *gorm.DB, productID uint) error {
 			Status:        product.Status,
 			OriginalPrice: int64(product.OriginalPrice),
 			SalePrice:     int64(product.SalePrice),
-			Discount: func() int64 {
-				originalPrice := float64(product.OriginalPrice)
-				salePrice := float64(product.SalePrice)
-				dis := ((originalPrice - salePrice) / originalPrice) * 100
-
-				return int64(math.Round(dis))
-			}(),
-			Description: product.Description,
-			Images:      entities.Img{Data: transformImages(product.ProductImages)},
-			Features:    entities.F{Data: transformFeatures(product.Features)},
-			CreatedAt:   product.CreatedAt,
-			UpdatedAt:   product.UpdatedAt,
+			Discount:      discount,
+			Description:   product.Description,
+			Images:        entities.Img{Data: transformImages(product.ProductImages)},
+			Features:      entities.F{Data: transformFeatures(product.Features)},
+			CreatedAt:     product.CreatedAt,
+			UpdatedAt:     product.UpdatedAt,
 		},
 		Inventories: inventoryMap,
 	}
 
-	// چک کردن وجود محصول در MongoDB
-	productsCollection := mongodb.GetCollection(mongodb.ProductsCollection)
-	filter := bson.M{"product.id": mongoProduct.Product.ID}
-	update := bson.M{"$set": mongoProduct}
-
-	// تلاش برای آپدیت محصول در صورت وجود، در غیر این صورت ایجاد محصول جدید
-	opts := options.Update().SetUpsert(true)
-	_, err := productsCollection.UpdateOne(c, filter, update, opts)
+	doc, err := json.Marshal(readModel)
 	if err != nil {
-		log.Println("--- product insert/update err ", err)
+		log.Println("--- read model marshal error:", err)
 		return err
 	}
 
-	// upsert product in typesence
-	go func() {
-		util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
-			ID:    fmt.Sprintf("%d", product.ID),
-			Title: product.Title,
-			Slug:  product.Slug,
-			Sku:   product.Sku,
-		})
-	}()
+	if err := db.WithContext(c).
+		Model(&entities.Product{}).
+		Where("id = ?", productID).
+		Update("read_model", doc).
+		Error; err != nil {
+		log.Println("--- update read_model error:", err)
+		return err
+	}
 
-	log.Println("-- upsert product in mongoDB successfully")
+	// upsert product in typesense
+	go util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
+		ID:    fmt.Sprintf("%d", product.ID),
+		Title: product.Title,
+		Slug:  product.Slug,
+		Sku:   product.Sku,
+	})
+
+	log.Println("-- update product read_model (jsonb) successfully, product id:", productID)
 	return nil
+}
+
+func derefUintToInt64(p *uint) int64 {
+	if p == nil {
+		return 0
+	}
+	return int64(*p)
 }
 
 func transformImages(images []*entities.ProductImages) []entities.ImgData {

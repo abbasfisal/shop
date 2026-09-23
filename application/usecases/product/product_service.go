@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
 	"log"
 	"shop/application/dto/admin"
@@ -37,27 +35,20 @@ func (p *ProductService) Index(ctx context.Context) (*responses.Products, domain
 	return responses.ToProducts(products), domain_err.CustomError{}
 }
 
-func (p *ProductService) Show(ctx context.Context, columnName string, value any) (*responses.Product, []bson.M, domain_err.CustomError) {
+func (p *ProductService) Show(ctx context.Context, columnName string, value any) (*responses.Product, []map[string]interface{}, domain_err.CustomError) {
 
 	pResult, err := p.repo.FindBy(ctx, columnName, value)
 	if err != nil {
 		return nil, nil, domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
 
-	mongoProduct, err := p.repo.GetAllMongoProduct(ctx)
-	log.Println("--- get all mongo product :", len(mongoProduct), " | err:", err)
+	briefs, err := p.repo.GetAllProductBriefs(ctx)
+	log.Println("--- get all product briefs :", len(briefs), " | err:", err)
 	if err != nil {
-		return nil, nil, domain_err.CustomError{}
-	} else {
-		//add id field which is string not object
-		for i := range mongoProduct {
-			if objID, ok := mongoProduct[i]["_id"].(primitive.ObjectID); ok {
-				mongoProduct[i]["id"] = objID.Hex()
-			}
-		}
+		return nil, nil, domain_err.HandleError(err, domain_err.SomethingWrongHappened)
 	}
 
-	return responses.ToProduct(pResult), mongoProduct, domain_err.CustomError{}
+	return responses.ToProduct(pResult), briefs, domain_err.CustomError{}
 }
 
 func (p *ProductService) Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, domain_err.CustomError) {
@@ -251,7 +242,7 @@ func (p *ProductService) AddRecommendation(c *gin.Context, productID int, produc
 	return domain_err.CustomError{}
 }
 
-func (p *ProductService) FetchAllRecommendation(c *gin.Context, productID int) ([]bson.M, domain_err.CustomError) {
+func (p *ProductService) FetchAllRecommendation(c *gin.Context, productID int) ([]map[string]interface{}, domain_err.CustomError) {
 	recommendations, err := p.repo.GetAllRecommendation(c, productID)
 	log.Println("--- fetch all recommendations : ", len(recommendations), " | err:", err)
 	if err != nil {

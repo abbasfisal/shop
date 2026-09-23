@@ -18,7 +18,6 @@ import (
 	order "shop/application/usecases/order"
 	"shop/application/usecases/product"
 	"shop/bootstrap"
-	"shop/infrastructure/database/mongodb"
 	"shop/infrastructure/database/postgres"
 	attributeRepository "shop/infrastructure/repositories/attribute"
 	attributeValueRepository "shop/infrastructure/repositories/attribute_value"
@@ -43,7 +42,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 	categoryRepo := categoryRepository.NewCategoryRepository(postgres.Get())
 	categorySrv := category.NewCategoryService(categoryRepo)
 
-	productRepo := productRepository.NewProductRepository(postgres.Get(), mongodb.Get())
+	productRepo := productRepository.NewProductRepository(postgres.Get())
 	productSrv := product.NewProductService(productRepo)
 
 	attributeRep := attributeRepository.NewAttributeRepository(postgres.Get())
@@ -58,7 +57,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 	customerRepo := customerRepository.NewCustomerRepository(postgres.Get())
 	customerSrv := customer.NewCustomerService(customerRepo)
 
-	orderRepo := orderRepository.NewOrderRepository(postgres.Get(), mongodb.Get())
+	orderRepo := orderRepository.NewOrderRepository(postgres.Get())
 	orderSrv := order.NewOrderService(orderRepo)
 
 	dashboardSrv := dashboard.NewDashboardService(dashboardRepository.NewDashboardRepository(postgres.Get()))

@@ -7,7 +7,6 @@ import (
 	"shop/bootstrap"
 	"shop/infrastructure/events"
 	mysqlRepo "shop/infrastructure/repositories/home"
-	"shop/infrastructure/repositories/home_mongo"
 	PublicHandler "shop/interfaces/http/handlers/web"
 	"shop/interfaces/http/middleware"
 	"time"
@@ -16,10 +15,9 @@ import (
 func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.EventManager) {
 	// note: we need to access to the eventManager in everywhere like repo , service
 	repo := mysqlRepo.NewHomeRepository(dep, eventManager)
-	MongoHomeRepo := home_mongo.NewMongoRepository() // we don't pass dep , eventManager bcz it's not necessary
 
 	//home service
-	homeSrv := home.NewHomeService(dep, repo, MongoHomeRepo, eventManager)
+	homeSrv := home.NewHomeService(dep, repo, eventManager)
 
 	//--- [Global Middleware]
 	publicLimiter := middleware.NewRateLimiter(rate.Every(time.Minute), 60)

@@ -1,6 +1,9 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
+)
 
 type Product struct {
 	gorm.Model
@@ -13,6 +16,9 @@ type Product struct {
 	OriginalPrice uint
 	SalePrice     uint
 	Description   string
+
+	// flattened read model (JSONB) - replaces the old MongoDB products collection
+	ReadModel datatypes.JSON `json:"-" gorm:"type:jsonb;default:'{}'"`
 
 	//--------------relations
 	///////////////////////////////////

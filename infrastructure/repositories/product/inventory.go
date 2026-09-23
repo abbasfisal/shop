@@ -69,7 +69,7 @@ func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int,
 		return nil, txErr
 	}
 
-	_ = SyncMongo(c, p.db, uint(productID))
+	_ = SyncReadModel(c, p.db, uint(productID))
 
 	return &inventory, nil
 }
@@ -87,7 +87,7 @@ func (p *ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInve
 		return piaErr
 	}
 
-	_ = SyncMongo(c, p.db, productInventoryAttribute.ProductID)
+	_ = SyncReadModel(c, p.db, productInventoryAttribute.ProductID)
 
 	return nil
 }
@@ -124,7 +124,7 @@ func (p *ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) err
 		return txErr
 	}
 
-	_ = SyncMongo(c, p.db, productID)
+	_ = SyncReadModel(c, p.db, productID)
 
 	return nil
 }
@@ -169,7 +169,7 @@ func (p *ProductRepository) AppendAttributesToInventory(c *gin.Context, inventor
 		return txErr
 	}
 
-	_ = SyncMongo(c, p.db, productInventory.ProductID)
+	_ = SyncReadModel(c, p.db, productInventory.ProductID)
 
 	return nil
 }
@@ -184,7 +184,7 @@ func (p *ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID 
 		return updateErr
 	}
 
-	_ = SyncMongo(c, p.db, inventory.ProductID)
+	_ = SyncReadModel(c, p.db, inventory.ProductID)
 
 	return nil
 }

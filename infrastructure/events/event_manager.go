@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	"sync"
 )
@@ -29,7 +28,6 @@ type EventManagerDep struct {
 	AsynqClient *asynq.Client
 	DB          *gorm.DB
 	RedisClient *redis.Client
-	MongoClient *mongo.Client
 }
 
 func NewEventManager(dep *EventManagerDep) *EventManager {

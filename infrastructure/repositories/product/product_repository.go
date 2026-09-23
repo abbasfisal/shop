@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/domain/repositories"
@@ -13,15 +12,11 @@ import (
 )
 
 type ProductRepository struct {
-	db          *gorm.DB
-	mongoClient *mongo.Client
+	db *gorm.DB
 }
 
-func NewProductRepository(db *gorm.DB, mongoClient *mongo.Client) repositories.ProductRepositoryInterface {
-	return &ProductRepository{
-		db:          db,
-		mongoClient: mongoClient,
-	}
+func NewProductRepository(db *gorm.DB) repositories.ProductRepositoryInterface {
+	return &ProductRepository{db: db}
 }
 
 func (p *ProductRepository) GetAll(ctx context.Context) ([]*entities.Product, error) {
@@ -55,7 +50,7 @@ func (p *ProductRepository) Store(ctx context.Context, product *entities.Product
 	err := p.db.WithContext(ctx).Create(&product).Error
 
 	if err == nil {
-		_ = SyncMongo(ctx, p.db, product.ID)
+		_ = SyncReadModel(ctx, p.db, product.ID)
 	}
 	return product, err
 }
@@ -88,7 +83,7 @@ func (p *ProductRepository) Update(c *gin.Context, productID int, req *requests.
 		return nil, pErr
 	}
 
-	_ = SyncMongo(c, p.db, uint(productID))
+	_ = SyncReadModel(c, p.db, uint(productID))
 
 	return &product, nil
 }

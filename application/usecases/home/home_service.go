@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"os"
 	"shop/application/dto/admin"
@@ -27,17 +26,15 @@ import (
 )
 
 type HomeService struct {
-	dep       *bootstrap.Dependencies
-	repo      repositories.HomeRepositoryInterface
-	mongoRepo repositories.MongoHomeRepositoryInterface
+	dep  *bootstrap.Dependencies
+	repo repositories.HomeRepositoryInterface
 }
 
-func NewHomeService(dep *bootstrap.Dependencies, repo repositories.HomeRepositoryInterface, mongoRepo repositories.MongoHomeRepositoryInterface, eventManager *events.EventManager) HomeServiceInterface {
+func NewHomeService(dep *bootstrap.Dependencies, repo repositories.HomeRepositoryInterface, eventManager *events.EventManager) HomeServiceInterface {
 
 	return &HomeService{
-		dep:       dep,
-		repo:      repo,
-		mongoRepo: mongoRepo,
+		dep:  dep,
+		repo: repo,
 	}
 }
 
@@ -176,32 +173,20 @@ func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryRespons
 	return categoryResponses, nil
 }
 
-func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.MongoProductRecommendation, domain_err.CustomError) {
+func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.RecommendedProduct, domain_err.CustomError) {
 
-	mongoProduct, rec, err := h.mongoRepo.GetProduct(c, productSku, productSlug)
-	if err == nil {
-		log.Println("--- mongo success --- ")
-		return mongoProduct, rec, domain_err.CustomError{}
-	} else {
-		log.Println("--- mongo product get err: ", err)
-	}
-
-	product, err := h.repo.GetProduct(c, productSku, productSlug)
+	product, recommendations, err := h.repo.GetProduct(c, productSku, productSlug)
 	if err != nil {
 		return nil, nil, domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
 
-	p := responses.ToProduct(product["product"].(*entities.Product))
-	product["product"] = p
-
-	return product, rec, domain_err.CustomError{}
+	return product, recommendations, domain_err.CustomError{}
 }
 
-func (h *HomeService) AddToCart(c *gin.Context, productObjectID primitive.ObjectID, req requests.AddToCartRequest) {
-	mongoProduct, err := h.mongoRepo.GetProductByObjectID(c, productObjectID, req)
-
+func (h *HomeService) AddToCart(c *gin.Context, productID uint, req requests.AddToCartRequest) {
+	prod, err := h.repo.GetProductByID(c, productID)
 	if err != nil {
-		fmt.Println("error not found doc ")
+		fmt.Println("[error]-[AddToCart]: product not found, id:", productID)
 		return
 	}
 
@@ -211,9 +196,9 @@ func (h *HomeService) AddToCart(c *gin.Context, productObjectID primitive.Object
 		return
 	}
 
-	h.repo.InsertCart(c, user, mongoProduct, req)
+	h.repo.InsertCart(c, user, prod, req)
 
-	fmt.Println("succ find :title", mongoProduct.ID)
+	fmt.Println("succ find :title", prod.Title)
 }
 
 func (h *HomeService) CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) error {

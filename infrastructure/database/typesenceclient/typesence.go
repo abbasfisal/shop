@@ -34,7 +34,10 @@ func Connect() {
 
 	typesenceHealth, tErr := tClient.Health(context.TODO(), time.Second)
 	if tErr != nil {
-		log.Fatal("Typesense health check failed: ", tErr)
+		// typesense is optional at boot: search degrades gracefully and
+		// product upserts skip until the engine is reachable again.
+		log.Println("[typesense] health check failed (search unavailable): ", tErr)
+		return
 	}
 
 	log.Println("Typesense health check passed: ", typesenceHealth)

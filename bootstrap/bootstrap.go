@@ -9,13 +9,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/typesense/typesense-go/v3/typesense"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 	"gorm.io/gorm"
 	"os"
 	"path/filepath"
-	"shop/infrastructure/database/mongodb"
 	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/database/typesenceclient"
 	"shop/pkg/cache"
@@ -35,7 +33,6 @@ type Dependencies struct {
 	AsynqClient     *asynq.Client
 	DB              *gorm.DB
 	RedisClient     *redis.Client
-	MongoClient     *mongo.Client
 	Storage         *util.Storage
 	TypeSenceClient *typesense.Client
 	Log             *logrus.Logger
@@ -58,7 +55,6 @@ func Initialize() (*Dependencies, error) {
 		}
 
 		cache.InitRedisClient()   // redis connect
-		mongodb.Connect()         // mongodb connect
 		postgres.Connect()           // mysql connect
 		typesenceclient.Connect() // initialize typesence
 
@@ -74,7 +70,6 @@ func Initialize() (*Dependencies, error) {
 			AsynqClient: asynqClient,
 			DB:          postgres.Get(),
 			RedisClient: cache.NewRedisClient(),
-			MongoClient: mongodb.Get(),
 			Storage: util.NewStorage(os.Getenv("STORAGE_BUCKET_NAME"), os.Getenv("STORAGE_ENDPOINT_URL"),
 				os.Getenv("STORAGE_ACEESS_KEY"), os.Getenv("STORAGE_SECRET_KEY")),
 			//	EventManager: events.NewEventManager(&eventManagerDep),

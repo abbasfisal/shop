@@ -68,7 +68,7 @@ func (p *ProductRepository) StoreAttributeValues(ctx *gin.Context, productID int
 			AttributeValueTitle: parts[7],
 		})
 	}
-	_ = SyncMongo(ctx, p.db, uint(productID))
+	_ = SyncReadModel(ctx, p.db, uint(productID))
 	return nil
 }
 

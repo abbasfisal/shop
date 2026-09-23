@@ -18,7 +18,6 @@ func main() {
 		AsynqClient: dep.AsynqClient,
 		DB:          dep.DB,
 		RedisClient: dep.RedisClient,
-		MongoClient: dep.MongoClient,
 	}
 	em := NewEventManager(&evntDep)
 

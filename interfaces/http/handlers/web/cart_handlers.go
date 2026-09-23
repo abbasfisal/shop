@@ -4,7 +4,6 @@ import (
 	errors2 "errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/interfaces/http/requests/web"
@@ -25,15 +24,16 @@ func (p PublicHandler) AddToCart(c *gin.Context) {
 		})
 		return
 	}
-	//validation objectID
-	productObjectID, err := primitive.ObjectIDFromHex(req.ProductID)
+
+	// product_id is now the numeric product id (no more MongoDB ObjectID)
+	productID, err := strconv.ParseUint(req.ProductID, 10, 64)
 	if err != nil {
 		fmt.Println("[error]-[AddToCart]:", err)
 		c.Redirect(http.StatusFound, c.Request.Referer())
 		return
 	}
 
-	p.homeSrv.AddToCart(c, productObjectID, req)
+	p.homeSrv.AddToCart(c, uint(productID), req)
 	c.Redirect(http.StatusFound, c.Request.Referer())
 	return
 }

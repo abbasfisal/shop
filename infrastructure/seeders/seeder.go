@@ -48,7 +48,7 @@ func Seed() {
 	//db.Create(&productInventory)
 	//db.Create(&productInventoryAttribute)
 
-	insertProductInMongo(db)
+	insertProductReadModels(db)
 
 	fmt.Println("\\\\\\\\\\\\\\  ~~~~[Seed] tables successfully~~~~ \\\\\\\\\\\\\\")
 }
@@ -1010,19 +1010,19 @@ func fakeBrands() []entities.Brand {
 }
 
 // ------------+
-func insertProductInMongo(db *gorm.DB) {
+func insertProductReadModels(db *gorm.DB) {
 	var products []entities.Product
 	if err := db.Find(&products).Error; err != nil {
-		fmt.Println("~~~ [failed] get all products ~~~")
+		fmt.Println("~~~ [failed] get all products for read model sync ~~~")
 	} else {
 
 		for _, pItem := range products {
-			err := productRepo.SyncMongo(context.Background(), db, pItem.ID)
+			err := productRepo.SyncReadModel(context.Background(), db, pItem.ID)
 			if err != nil {
-				fmt.Printf("~~~~ [syncMongo] failed for product id %d ~~~~ error: %s\n", pItem.ID, err.Error())
+				fmt.Printf("~~~~ [syncReadModel] failed for product id %d ~~~~ error: %s\n", pItem.ID, err.Error())
 				return
 			} else {
-				fmt.Printf("~~~~ [syncMongo] success for product id %d ~~~~\n", pItem.ID)
+				fmt.Printf("~~~~ [syncReadModel] success for product id %d ~~~~\n", pItem.ID)
 			}
 		}
 

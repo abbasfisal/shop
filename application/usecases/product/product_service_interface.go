@@ -3,7 +3,6 @@ package product
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/interfaces/http/requests/admin"
@@ -11,7 +10,7 @@ import (
 
 type ProductServiceInterface interface {
 	Index(ctx context.Context) (*responses.Products, domain_err.CustomError)
-	Show(ctx context.Context, columnName string, value any) (*responses.Product, []bson.M, domain_err.CustomError)
+	Show(ctx context.Context, columnName string, value any) (*responses.Product, []map[string]interface{}, domain_err.CustomError)
 	Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, domain_err.CustomError)
 	CheckSkuIsUnique(ctx context.Context, sku string) (bool, domain_err.CustomError)
 	FetchByProductID(c *gin.Context, productID int) (*responses.Product, domain_err.CustomError)
@@ -32,5 +31,5 @@ type ProductServiceInterface interface {
 	FetchFeature(c *gin.Context, productID int, featureID int) (*responses.Feature, domain_err.CustomError)
 	UpdateFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) domain_err.CustomError
 	AddRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) domain_err.CustomError
-	FetchAllRecommendation(c *gin.Context, productID int) ([]bson.M, domain_err.CustomError)
+	FetchAllRecommendation(c *gin.Context, productID int) ([]map[string]interface{}, domain_err.CustomError)
 }

@@ -69,77 +69,117 @@ func (h *HomeRepository) GetCategories(ctx context.Context, limit int) ([]*entit
 
 	return categories, err
 }
-func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, error) {
 
-	type InventoryWithAttributes struct {
-		InventoryID                 uint
-		Quantity                    uint
-		AttributeID                 uint
-		AttributeTitle              string
-		AttributeValueID            uint
-		AttributeValueTitle         string
-		ProductInventoryAttributeID uint
-	}
-
-	var product entities.Product
-	aerr := h.dep.DB.WithContext(c).
-		Preload("Category").
-		Preload("Brand").
-		Preload("ProductImages").
-		Preload("Features").
-		Where("sku=? and slug=? and status=true", productSku, productSlug).
-		First(&product).Error
-
-	if aerr != nil {
-		return map[string]interface{}{}, aerr
-	}
-
-	var inventories []InventoryWithAttributes
-
-	result := make(map[string]interface{})
-
-	serr := h.dep.DB.
-		WithContext(c).
-		Table("product_inventories").
-		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, product_inventory_attributes.id AS product_inventory_attribute_id").
-		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id AND product_inventory_attributes.deleted_at IS NULL").
-		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id AND product_attributes.deleted_at IS NULL").
-		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
-		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
-		Where("product_inventories.product_id = ? and product_inventories.deleted_at IS NULL", product.ID).
-		Scan(&inventories).
+// GetProduct loads the storefront single-product payload from products.read_model (JSONB)
+// plus the product's recommendations. The returned map keeps the exact shape the
+// single_product.html template expects: _id / product / inventories.
+func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.RecommendedProduct, error) {
+	var prod entities.Product
+	err := h.dep.DB.WithContext(c).
+		Select("id, read_model").
+		Where("sku = ? AND slug = ? AND status = true", productSku, productSlug).
+		First(&prod).
 		Error
-
-	if serr != nil {
-		return map[string]interface{}{}, serr
-	}
-
-	inventoryMap := make(map[uint]map[string]interface{})
-	for _, inventory := range inventories {
-		if _, exists := inventoryMap[inventory.InventoryID]; !exists {
-			inventoryMap[inventory.InventoryID] = map[string]interface{}{
-				"quantity":     inventory.Quantity,
-				"inventory_id": inventory.InventoryID,
-				"attributes":   []map[string]interface{}{},
-			}
+	if err != nil {
+		// return the raw error so the service layer maps gorm.ErrRecordNotFound to 404
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("product-slug : ", productSlug, " | SKU :", productSku, " not found.")
 		}
-
-		attributes := inventoryMap[inventory.InventoryID]["attributes"].([]map[string]interface{})
-		attributes = append(attributes, map[string]interface{}{
-			"attribute_id":                   inventory.AttributeID,
-			"attribute_title":                inventory.AttributeTitle,
-			"attribute_value_id":             inventory.AttributeValueID,
-			"attribute_value_title":          inventory.AttributeValueTitle,
-			"product_inventory_attribute_id": inventory.ProductInventoryAttributeID,
-		})
-		inventoryMap[inventory.InventoryID]["attributes"] = attributes
+		return nil, nil, err
 	}
 
-	result["product"] = product
-	result["inventories"] = inventoryMap
+	readModel, err := h.loadReadModel(c, &prod)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return result, nil
+	result := map[string]interface{}{
+		"_id":         strconv.FormatUint(uint64(prod.ID), 10),
+		"product":     readModel.Product,
+		"inventories": readModel.Inventories,
+	}
+
+	recommendations := h.loadRecommendations(c, prod.ID)
+	return result, recommendations, nil
 }
+
+// loadReadModel returns the stored JSONB read model; for legacy rows without one
+// it rebuilds (and persists) the model on the fly.
+func (h *HomeRepository) loadReadModel(c *gin.Context, prod *entities.Product) (*entities.ProductReadModel, error) {
+	if len(prod.ReadModel) > 0 && string(prod.ReadModel) != "{}" {
+		var rm entities.ProductReadModel
+		if err := json.Unmarshal(prod.ReadModel, &rm); err == nil && rm.Product.ID != 0 {
+			return &rm, nil
+		}
+	}
+
+	// legacy row: build the read model now and persist it
+	if err := product.SyncReadModel(c, h.dep.DB, prod.ID); err != nil {
+		return nil, err
+	}
+	var refreshed entities.Product
+	if err := h.dep.DB.WithContext(c).Select("id, read_model").First(&refreshed, prod.ID).Error; err != nil {
+		return nil, err
+	}
+	var rm entities.ProductReadModel
+	if err := json.Unmarshal(refreshed.ReadModel, &rm); err != nil {
+		return nil, err
+	}
+	return &rm, nil
+}
+
+// loadRecommendations reads product_recommendations and builds the storefront
+// recommendation list (single_product.html: $rec.Product.*).
+func (h *HomeRepository) loadRecommendations(c *gin.Context, productID uint) []entities.RecommendedProduct {
+	var recs []entities.ProductRecommendation
+	if err := h.dep.DB.WithContext(c).
+		Where("product_id = ?", productID).
+		Find(&recs).
+		Error; err != nil || len(recs) == 0 {
+		return nil
+	}
+
+	ids := make([]uint, 0, len(recs))
+	for _, r := range recs {
+		ids = append(ids, r.RecommendedProductID)
+	}
+
+	var products []entities.Product
+	if err := h.dep.DB.WithContext(c).
+		Select("id, read_model").
+		Where("id IN ?", ids).
+		Find(&products).
+		Error; err != nil {
+		return nil
+	}
+
+	out := make([]entities.RecommendedProduct, 0, len(products))
+	for i := range products {
+		var rm entities.ProductReadModel
+		if len(products[i].ReadModel) == 0 {
+			continue
+		}
+		if err := json.Unmarshal(products[i].ReadModel, &rm); err != nil || rm.Product.ID == 0 {
+			continue
+		}
+		out = append(out, entities.RecommendedProduct{Product: rm.Product})
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
+}
+
+// GetProductByID loads a product (with images) for cart operations.
+func (h *HomeRepository) GetProductByID(c *gin.Context, productID uint) (*entities.Product, error) {
+	var prod entities.Product
+	err := h.dep.DB.WithContext(c).
+		Preload("ProductImages").
+		First(&prod, productID).
+		Error
+	return &prod, err
+}
+
 func (h *HomeRepository) GetProductsBy(ctx context.Context, columnName string, value any) ([]*entities.Product, error) {
 	var products []*entities.Product
 	condition := fmt.Sprintf("%s = ?", columnName)
@@ -364,13 +404,18 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 
 	return pg, nil
 }
-func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest) {
+func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product *entities.Product, req requests.AddToCartRequest) {
 	maxQuantity := uint8(2)
 	//todo: set max quantity in config
 	//todo:check inventories stock_reserved before insert
 	//todo:check product count in the cart
 	//todo: after change cart to order, we will delete cart and cartItems
 	var cart entities.Cart
+
+	imagePath := ""
+	if len(product.ProductImages) > 0 {
+		imagePath = product.ProductImages[0].Path
+	}
 
 	//todo:check cart status
 	err := h.dep.DB.
@@ -388,15 +433,15 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 			CartItems: []entities.CartItem{
 				{
 					CustomerID:    user.ID,
-					ProductID:     uint(product.Product.ID),
+					ProductID:     product.ID,
 					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 					Quantity:      1,
-					OriginalPrice: uint(product.Product.OriginalPrice),
-					SalePrice:     uint(product.Product.SalePrice),
-					ProductSku:    product.Product.Sku,
-					ProductTitle:  product.Product.Title,
-					ProductImage:  product.Product.Images.Data[0].OriginalPath,
-					ProductSlug:   product.Product.Slug,
+					OriginalPrice: product.OriginalPrice,
+					SalePrice:     product.SalePrice,
+					ProductSku:    product.Sku,
+					ProductTitle:  product.Title,
+					ProductImage:  imagePath,
+					ProductSlug:   product.Slug,
 				},
 			},
 		}
@@ -408,9 +453,15 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 		itemExist := false
 		for i, cartItem := range cart.CartItems {
 
-			if cartItem.ProductID == uint(product.Product.ID) && cartItem.InventoryID == req.InventoryID {
+			if cartItem.ProductID == product.ID && cartItem.InventoryID == req.InventoryID {
 				if cart.CartItems[i].Quantity < maxQuantity {
 					cart.CartItems[i].Quantity += 1
+					// persist the incremented child explicitly: Save(&cart) does not
+					// cascade updates to loaded has-many associations
+					if uErr := h.dep.DB.Save(&cart.CartItems[i]).Error; uErr != nil {
+						fmt.Println("[InsertCart]-[increment]-err:", uErr)
+						return
+					}
 				} else {
 					return
 				}
@@ -425,15 +476,15 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 			CartItems := []entities.CartItem{
 				{
 					CustomerID:    user.ID,
-					ProductID:     uint(product.Product.ID),
+					ProductID:     product.ID,
 					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 					Quantity:      1,
-					OriginalPrice: uint(product.Product.OriginalPrice),
-					SalePrice:     uint(product.Product.SalePrice),
-					ProductSku:    product.Product.Sku,
-					ProductTitle:  product.Product.Title,
-					ProductImage:  product.Product.Images.Data[0].OriginalPath,
-					ProductSlug:   product.Product.Slug,
+					OriginalPrice: product.OriginalPrice,
+					SalePrice:     product.SalePrice,
+					ProductSku:    product.Sku,
+					ProductTitle:  product.Title,
+					ProductImage:  imagePath,
+					ProductSlug:   product.Slug,
 				},
 			}
 			h.dep.DB.Model(&cart).Association("CartItems").Append(&CartItems)
@@ -443,8 +494,8 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 		h.dep.DB.Save(&cart)
 
 	}
-
 }
+
 func (h *HomeRepository) IncreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error {
 	log.Printf("data : %+v \n", req)
 
@@ -884,7 +935,7 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 		} else {
 
 			// if there is no any error we update sync mongo db
-			syncMongoErr := product.SyncMongo(c, h.dep.DB, orderItem.ProductID)
+			syncMongoErr := product.SyncReadModel(c, h.dep.DB, orderItem.ProductID)
 			if syncMongoErr != nil {
 				util.Trace(syncMongoErr)
 			}

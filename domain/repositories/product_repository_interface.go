@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"shop/domain/entities"
 	"shop/interfaces/http/requests/admin"
 )
@@ -29,7 +28,9 @@ type ProductRepositoryInterface interface {
 	DeleteFeature(c *gin.Context, productID int, featureID int) error
 	GetFeatureBy(c *gin.Context, productID int, featureID int) (*entities.Feature, error)
 	EditFeature(c *gin.Context, productID int, featureID int, req *requests.UpdateProductFeatureRequest) error
-	GetAllMongoProduct(c context.Context) ([]bson.M, error)
+	// GetAllProductBriefs returns lightweight product summaries for the admin
+	// recommendation picker (shape consumed by admin_edit_product.html).
+	GetAllProductBriefs(c context.Context) ([]map[string]interface{}, error)
 	InsertRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) error
-	GetAllRecommendation(c *gin.Context, productID int) ([]bson.M, error)
+	GetAllRecommendation(c *gin.Context, productID int) ([]map[string]interface{}, error)
 }

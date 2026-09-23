@@ -29,7 +29,13 @@ func UpsertInTypesence(c context.Context, product UpsertTypesenceProduct) {
 		Sku:   product.Sku,
 	}
 
-	_, err := typesenceclient.GetTClient().
+	client := typesenceclient.GetTClient()
+	if client == nil {
+		log.Println("--- typesense client not initialized, skip product upsert")
+		return
+	}
+
+	_, err := client.
 		Collection("products").
 		Documents().Upsert(c, doc, &api.DocumentIndexParameters{})
 

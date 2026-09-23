@@ -14,7 +14,8 @@ type HomeRepositoryInterface interface {
 	GetRandomProducts(ctx context.Context, limit int) ([]*entities.Product, error)
 	GetLatestProducts(ctx context.Context, limit int) ([]*entities.Product, error)
 	GetCategories(ctx context.Context, limit int) ([]*entities.Category, error)
-	GetProduct(c *gin.Context, productSku, productSlug string) (map[string]interface{}, error)
+	GetProduct(c *gin.Context, productSku, productSlug string) (map[string]interface{}, []entities.RecommendedProduct, error)
+	GetProductByID(c *gin.Context, productID uint) (*entities.Product, error)
 	GetProductsBy(ctx context.Context, columnName string, value any) ([]*entities.Product, error)
 	GetCategoryBy(ctx context.Context, columnName string, value any) (*entities.Category, error)
 	NewOtp(ctx context.Context, mobile string) (*entities.OTP, domain_err.CustomError)
@@ -24,7 +25,7 @@ type HomeRepositoryInterface interface {
 	UpdateProfile(c *gin.Context, req *requests.CustomerProfileRequest) error
 	GetMenu(ctx context.Context) ([]*entities.Category, error)
 	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
-	InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest)
+	InsertCart(c *gin.Context, user responses.Customer, product *entities.Product, req requests.AddToCartRequest)
 	IncreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error
 	DecreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error
 	DeleteCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) error
