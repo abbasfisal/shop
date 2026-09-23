@@ -16,10 +16,6 @@ func RunScheduler(ctx context.Context, dep *bootstrap.Dependencies, em *events.E
 
 	schedule := asynq.NewScheduler(asynq.RedisClientOpt{Addr: fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOSTNAME"), os.Getenv("REDIS_PORT"))}, &asynq.SchedulerOpts{})
 
-	if err := schedule.Ping(); err != nil {
-		log.Fatal("[x] scheduler ping failed:", err)
-	}
-
 	registerSchedules(schedule, dep)
 
 	err := schedule.Run()

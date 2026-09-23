@@ -28,12 +28,6 @@ func RunWorker(ctx context.Context, dep *bootstrap.Dependencies, em *events.Even
 			},
 		)
 
-	errs := server.Ping()
-	if errs != nil {
-		log.Fatal("------[ping err:]", errs)
-		return
-	}
-
 	//mux server
 	mux := asynq.NewServeMux()
 	//mux.HandleFunc(publicJob.TypeSendWelcomeSMS, publicJob.HandleTaskSendWelcomeSMS)
