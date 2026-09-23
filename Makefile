@@ -29,6 +29,14 @@ production_server_down:
 date:
 	@date +%Y%m%d%H%M%S
 
+# unit tests always run; integration tests run when TEST_DATABASE_URL is set
+# e.g. TEST_DATABASE_URL=postgres://shop@127.0.0.1:5433/go_shop_dev?sslmode=disable make test
+test:
+	@go test ./...
+
+test-cover:
+	@go test ./... -cover
+
 
 migration-up:
 	@go run . migrate

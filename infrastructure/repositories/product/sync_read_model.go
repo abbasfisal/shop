@@ -134,13 +134,40 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 		return err
 	}
 
-	// upsert product in typesense
-	go util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
-		ID:    fmt.Sprintf("%d", product.ID),
-		Title: product.Title,
-		Slug:  product.Slug,
-		Sku:   product.Sku,
-	})
+	// sync the rich document into typesense: upsert while published,
+	// delete while unpublished (realtime search stays consistent)
+	idStr := fmt.Sprintf("%d", product.ID)
+	if !product.Status {
+		go util.DeleteInTypesence(c, idStr)
+	} else {
+		var totalStock int64
+		for _, inv := range inventoryMap {
+			totalStock += inv.Quantity
+		}
+		categoryTitle := ""
+		if product.Category != nil {
+			categoryTitle = product.Category.Title
+		}
+		brandTitle := ""
+		if product.Brand != nil {
+			brandTitle = product.Brand.Title
+		}
+		go util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
+			ID:            idStr,
+			Title:         product.Title,
+			Slug:          product.Slug,
+			Sku:           product.Sku,
+			Description:   product.Description,
+			Category:      categoryTitle,
+			Brand:         brandTitle,
+			OriginalPrice: int64(product.OriginalPrice),
+			SalePrice:     int64(product.SalePrice),
+			Discount:      discount,
+			Stock:         totalStock,
+			InStock:       totalStock > 0,
+			Status:        product.Status,
+		})
+	}
 
 	log.Println("-- update product read_model (jsonb) successfully, product id:", productID)
 	return nil

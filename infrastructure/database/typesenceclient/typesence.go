@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/typesense/typesense-go/v3/typesense"
-	"github.com/typesense/typesense-go/v3/typesense/api"
 	"log"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/typesense/typesense-go/v3/typesense"
+	"github.com/typesense/typesense-go/v3/typesense/api"
 )
 
 var (
@@ -47,20 +47,34 @@ func GetTClient() *typesense.Client {
 	return tClient
 }
 
-func CreateSchema(client *typesense.Client) error {
+func boolPtr(b bool) *bool { return &b }
 
+// ProductsCollection is the Typesense collection that mirrors the shop catalog.
+const ProductsCollection = "products"
+
+// CreateSchema creates the rich products collection schema (title/sku search,
+// category/brand facets, price/stock fields for realtime search UI).
+func CreateSchema(client *typesense.Client) error {
+	facet := boolPtr(true)
 	create, err := client.Collections().Create(context.TODO(), &api.CollectionSchema{
-		Name: "products",
+		Name: ProductsCollection,
 		Fields: []api.Field{
 			{Name: "id", Type: "string"},
 			{Name: "title", Type: "string"},
 			{Name: "slug", Type: "string"},
 			{Name: "sku", Type: "string"},
+			{Name: "description", Type: "string"},
+			{Name: "category", Type: "string", Facet: facet},
+			{Name: "brand", Type: "string", Facet: facet},
+			{Name: "original_price", Type: "int32"},
+			{Name: "sale_price", Type: "int32"},
+			{Name: "discount", Type: "int32"},
+			{Name: "stock", Type: "int32"},
+			{Name: "in_stock", Type: "bool", Facet: facet},
+			{Name: "status", Type: "bool", Facet: facet},
 		},
 		TokenSeparators: &[]string{" ", "-", ".", ",", ":"},
 	})
-
-	createSampleDocument(client)
 
 	if err != nil {
 		var httpErr *typesense.HTTPError
@@ -83,28 +97,14 @@ func CreateSchema(client *typesense.Client) error {
 	return nil
 }
 
-func createSampleDocument(client *typesense.Client) {
-	//create a doc just for testing
-	if false {
-
-		p := struct {
-			ID    string `json:"id,omitempty"`
-			Title string `json:"title,omitempty"`
-			Slug  string `json:"slug,omitempty"`
-			SKU   string `json:"sku,omitempty"`
-			Price int    `json:"price,omitempty"`
-		}{
-			ID:    uuid.New().String(),
-			Title: "کتاب شب های برره محسن چاوشی ۳۰ 9898",
-			Slug:  "کتاب-شب-های-برره-محسن-چاوشی-۳۰-9898",
-			SKU:   "sku888",
-			Price: 5000,
+// RecreateSchema drops the products collection (if present) and creates the
+// current schema again — used by `search:reindex --recreate` after schema changes.
+func RecreateSchema(client *typesense.Client) error {
+	if _, err := client.Collection(ProductsCollection).Delete(context.TODO()); err != nil {
+		var httpErr *typesense.HTTPError
+		if !errors.As(err, &httpErr) || httpErr.Status != 404 {
+			log.Println("[typesense] drop collection failed: ", err)
 		}
-		createDoc, err := client.Collection("products").Documents().
-			Create(context.Background(), p, &api.DocumentIndexParameters{})
-		if err != nil {
-			log.Fatal("create doc failed:", err)
-		}
-		log.Println("succ create doc:", createDoc)
 	}
+	return CreateSchema(client)
 }
