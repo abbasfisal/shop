@@ -138,7 +138,7 @@ func ToCustomerOrderItem(oItem *entities.OrderItem) *CustomerOrderItem {
 		ProductSku:           oItem.Product.Sku,
 		ProductSlug:          oItem.Product.Slug,
 
-		OrderItemAttributes: ToOrderItemAttributes(oItem.Product.ProductInventoryAttributes),
+		OrderItemAttributes: ToOrderItemAttributes(oItem.Product.VariantAttributeValues),
 	}
 }
 
@@ -158,16 +158,19 @@ type OrderItemAttribute struct {
 	Value string
 }
 
-func ToOrderItemAttribute(oItemAttribute *entities.ProductAttribute) *OrderItemAttribute {
+func ToOrderItemAttribute(attributeValue *entities.AttributeValue) *OrderItemAttribute {
 	return &OrderItemAttribute{
-		Title: oItemAttribute.AttributeTitle,
-		Value: oItemAttribute.AttributeValueTitle,
+		Title: attributeValue.AttributeTitle,
+		Value: attributeValue.Value,
 	}
 }
-func ToOrderItemAttributes(itemAttributes []*entities.ProductInventoryAttribute) *OrderItemAttributes {
+func ToOrderItemAttributes(vavs []*entities.VariantAttributeValue) *OrderItemAttributes {
 	var orderItemAttributes OrderItemAttributes
-	for _, attribute := range itemAttributes {
-		orderItemAttributes.Data = append(orderItemAttributes.Data, *ToOrderItemAttribute(attribute.ProductAttribute))
+	for _, vav := range vavs {
+		if vav.AttributeValue == nil {
+			continue
+		}
+		orderItemAttributes.Data = append(orderItemAttributes.Data, *ToOrderItemAttribute(vav.AttributeValue))
 	}
 	return &orderItemAttributes
 }

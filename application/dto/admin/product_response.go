@@ -19,13 +19,12 @@ type Product struct {
 	Discount      uint
 
 	//relation
-	Category                   *Category
-	Brand                      *Brand
-	Images                     *ImageProducts
-	ProductAttributes          *ProductAttributes
-	ProductInventories         *ProductInventories
-	ProductInventoryAttributes *ProductInventoryAttributes
-	Features                   *Features
+	Category           *Category
+	Brand              *Brand
+	Images             *ImageProducts
+	ProductAttributes  *ProductAttributes
+	ProductInventories *ProductInventories
+	Features           *Features
 }
 
 type Products struct {
@@ -65,12 +64,8 @@ func ToProduct(p *entities.Product) *Product {
 		product.Features = ToFeatures(p.Features)
 	}
 
-	if p.ProductInventoryAttributes != nil {
-		product.ProductInventoryAttributes = ToProductInventoryAttributes(p.ProductInventoryAttributes)
-	}
-
-	if p.ProductInventories != nil {
-		product.ProductInventories = ToProductInventories(p.ProductInventories)
+	if p.ProductVariants != nil {
+		product.ProductInventories = ToProductInventories(p.ProductVariants)
 	}
 	if p.ProductAttributes != nil {
 		product.ProductAttributes = ToProductAttributes(p.ProductAttributes)

@@ -125,7 +125,7 @@ func ToAdminOrderItem(oItem *entities.OrderItem) *AdminOrderItem {
 		ProductSalePrice:     oItem.SalePrice,
 		ProductSku:           oItem.Product.Sku,
 
-		OrderItemAttributes: *ToOrderItemAttributes(oItem.Product.ProductInventoryAttributes),
+		OrderItemAttributes: *ToOrderItemAttributes(oItem.Product.VariantAttributeValues),
 	}
 }
 
@@ -145,16 +145,19 @@ type OrderItemAttribute struct {
 	Value string
 }
 
-func ToOrderItemAttribute(oItemAttribute *entities.ProductAttribute) *OrderItemAttribute {
+func ToOrderItemAttribute(attributeValue *entities.AttributeValue) *OrderItemAttribute {
 	return &OrderItemAttribute{
-		Title: oItemAttribute.AttributeTitle,
-		Value: oItemAttribute.AttributeValueTitle,
+		Title: attributeValue.AttributeTitle,
+		Value: attributeValue.Value,
 	}
 }
-func ToOrderItemAttributes(oItemAttributes []*entities.ProductInventoryAttribute) *OrderItemAttributes {
+func ToOrderItemAttributes(vavs []*entities.VariantAttributeValue) *OrderItemAttributes {
 	var a OrderItemAttributes
-	for _, i2 := range oItemAttributes {
-		a.Data = append(a.Data, *ToOrderItemAttribute(i2.ProductAttribute))
+	for _, vav := range vavs {
+		if vav.AttributeValue == nil {
+			continue
+		}
+		a.Data = append(a.Data, *ToOrderItemAttribute(vav.AttributeValue))
 	}
 	return &a
 }

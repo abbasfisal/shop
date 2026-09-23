@@ -92,14 +92,11 @@ func (oRepo *OrderRepository) FindOrderBy(c *gin.Context, orderID int) (*entitie
 	}
 
 	if err := oRepo.db.WithContext(c).
-		Preload("OrderItems.Product.ProductInventoryAttributes",
-			"product_inventory_attributes.product_id IN (?) AND product_inventory_attributes.product_inventory_id IN (?)",
+		Preload("OrderItems.Product.VariantAttributeValues",
+			"variant_attribute_values.product_id IN (?) AND variant_attribute_values.variant_id IN (?)",
 			productIDs, inventoryIDs,
 		).
-		Preload("OrderItems.Product.ProductInventoryAttributes.ProductAttribute",
-			"product_attributes.product_id IN (?)",
-			productIDs,
-		).
+		Preload("OrderItems.Product.VariantAttributeValues.AttributeValue").
 		Preload("Payment").
 		First(&order, orderID).Error; err != nil {
 		return nil, nil, err

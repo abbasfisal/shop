@@ -20,15 +20,25 @@ type Product struct {
 	// flattened read model (JSONB) - replaces the old MongoDB products collection
 	ReadModel datatypes.JSON `json:"-" gorm:"type:jsonb;default:'{}'"`
 
+	// aggregate cache refreshed by PricingService (Laravel pattern)
+	ProductType    string         `gorm:"column:product_type;type:varchar(16);default:'simple'"`
+	MinPrice       uint           `gorm:"default:0"`
+	MaxPrice       uint           `gorm:"default:0"`
+	TotalStock     uint           `gorm:"default:0"`
+	TotalReserved  uint           `gorm:"default:0"`
+	AvailableStock uint           `gorm:"default:0"`
+	InStock        bool           `gorm:"default:false"`
+	VariantsCount  int            `gorm:"default:0"`
+	AttributesJSON datatypes.JSON `gorm:"column:attributes_json;type:jsonb;default:'{}'"`
+
 	//--------------relations
 	///////////////////////////////////
 
-	Category                   *Category                    `gorm:"foreignKey:CategoryID"`
-	Brand                      *Brand                       `gorm:"foreignKey:BrandID"`
-	ProductImages              []*ProductImages             `gorm:"foreignKey:ProductID"`
-	ProductAttributes          []*ProductAttribute          `gorm:"foreignKye:ProductID"`
-	ProductInventories         []*ProductInventory          `gorm:"foreignKey:ProductID"`
-	ProductInventoryAttributes []*ProductInventoryAttribute `gorm:"foreignKey:ProductID"`
-	Features                   []*Feature                   `gorm:"foreignKey:ProductID"`
-	///Carts                      []Cart                      `gorm:"foreignKey:ProductID"`
+	Category               *Category                `gorm:"foreignKey:CategoryID"`
+	Brand                  *Brand                   `gorm:"foreignKey:BrandID"`
+	ProductImages          []*ProductImages         `gorm:"foreignKey:ProductID"`
+	ProductAttributes      []*ProductAttribute      `gorm:"foreignKey:ProductID"`
+	ProductVariants        []*ProductVariant        `gorm:"foreignKey:ProductID"`
+	VariantAttributeValues []*VariantAttributeValue `gorm:"foreignKey:ProductID"`
+	Features               []*Feature               `gorm:"foreignKey:ProductID"`
 }

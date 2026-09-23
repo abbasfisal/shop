@@ -77,9 +77,9 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/3.webp",
 				},
 			},
-			ProductInventories: []*entities.ProductInventory{
+			ProductVariants: []*entities.ProductVariant{
 				{
-					Quantity: 150,
+					Stock: 150,
 				},
 			},
 			Features: []*entities.Feature{
@@ -142,9 +142,9 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/3.webp",
 				},
 			},
-			ProductInventories: []*entities.ProductInventory{
+			ProductVariants: []*entities.ProductVariant{
 				{
-					Quantity: 150,
+					Stock: 150,
 				},
 			},
 			Features: []*entities.Feature{
@@ -203,9 +203,9 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/33.webp",
 				},
 			},
-			ProductInventories: []*entities.ProductInventory{
+			ProductVariants: []*entities.ProductVariant{
 				{
-					Quantity: 200,
+					Stock: 200,
 				},
 			},
 			Features: []*entities.Feature{
@@ -268,9 +268,9 @@ func fakeProducts() []entities.Product {
 					Path: "2024/09/27/333.webp",
 				},
 			},
-			ProductInventories: []*entities.ProductInventory{
+			ProductVariants: []*entities.ProductVariant{
 				{
-					Quantity: 200,
+					Stock: 200,
 				},
 			},
 			Features: []*entities.Feature{
@@ -359,35 +359,26 @@ func fakeProducts() []entities.Product {
 					AttributeValueTitle: "xl",
 				},
 			},
-			ProductInventories: []*entities.ProductInventory{
+			//one variant per size combo, each linked to its attribute value
+			//(AttributeValueID 2=m, 3=l, 4=xl from fakeAttributeAndValues)
+			ProductVariants: []*entities.ProductVariant{
 				{
-					//ProductID: 4,
-					Quantity: 25,
+					Stock: 25,
+					VariantAttributeValues: []*entities.VariantAttributeValue{
+						{AttributeValueID: 2}, //medium
+					},
 				},
 				{
-					//ProductID: 4,
-					Quantity: 50,
+					Stock: 50,
+					VariantAttributeValues: []*entities.VariantAttributeValue{
+						{AttributeValueID: 3}, //large
+					},
 				},
 				{
-					//ProductID: 4,
-					Quantity: 75,
-				},
-			},
-			ProductInventoryAttributes: []*entities.ProductInventoryAttribute{
-				{
-					ProductID:          204,
-					ProductInventoryID: 204,
-					ProductAttributeID: 1, //medium
-				},
-				{
-					ProductID:          204,
-					ProductInventoryID: 205,
-					ProductAttributeID: 2, //large
-				},
-				{
-					ProductID:          204,
-					ProductInventoryID: 206,
-					ProductAttributeID: 3, //x-large
+					Stock: 75,
+					VariantAttributeValues: []*entities.VariantAttributeValue{
+						{AttributeValueID: 4}, //x-large
+					},
 				},
 			},
 			Features: []*entities.Feature{
@@ -428,6 +419,7 @@ func fakeAttributeAndValues() []entities.Attribute {
 		{
 			Model: gorm.Model{},
 			Title: "سایز",
+			Code:  "size",
 
 			AttributeValues: []*entities.AttributeValue{
 				{
@@ -465,6 +457,7 @@ func fakeAttributeAndValues() []entities.Attribute {
 		{
 			Model: gorm.Model{},
 			Title: "رنگ",
+			Code:  "color",
 			AttributeValues: []*entities.AttributeValue{
 				{
 					Model:          gorm.Model{},
@@ -1023,6 +1016,9 @@ func insertProductReadModels(db *gorm.DB) {
 				return
 			} else {
 				fmt.Printf("~~~~ [syncReadModel] success for product id %d ~~~~\n", pItem.ID)
+			}
+			if pErr := productRepo.RefreshProductAggregates(context.Background(), db, pItem.ID); pErr != nil {
+				fmt.Printf("~~~~ [pricing] refresh failed for product id %d ~~~~ error: %s\n", pItem.ID, pErr.Error())
 			}
 		}
 

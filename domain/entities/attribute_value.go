@@ -7,6 +7,7 @@ type AttributeValue struct {
 	AttributeID    uint
 	AttributeTitle string
 	Value          string
+	SortOrder      int `gorm:"default:0"`
 
 	//relation
 	Attribute Attribute `gorm:"foreignKey:AttributeID"`

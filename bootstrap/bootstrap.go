@@ -55,7 +55,7 @@ func Initialize() (*Dependencies, error) {
 		}
 
 		cache.InitRedisClient()   // redis connect
-		postgres.Connect()           // mysql connect
+		postgres.Connect()        // mysql connect
 		typesenceclient.Connect() // initialize typesence
 
 		// initialize Asynq

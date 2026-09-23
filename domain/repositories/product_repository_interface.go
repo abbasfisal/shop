@@ -15,15 +15,17 @@ type ProductRepositoryInterface interface {
 	GetRootAttributes(ctx *gin.Context, productID int) ([]*entities.Attribute, error)
 	StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error
 	GetProductAndAttributes(ctx *gin.Context, productID int) (map[string]interface{}, error)
-	StoreProductInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) (*entities.ProductInventory, error)
+	StoreProductInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) (*entities.ProductVariant, error)
 	GetImage(c *gin.Context, imageID int) (*entities.ProductImages, error)
 	DeleteImage(c *gin.Context, imageID int) error
 	StoreImages(c *gin.Context, productID int, imageStoredPath []string) error
 	Update(c *gin.Context, productID int, req *requests.UpdateProductRequest) (*entities.Product, error)
-	DeleteInventoryAttribute(c *gin.Context, inventoryID int) error
-	DeleteInventory(c *gin.Context, inventoryID int) error
-	AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) error
-	UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) error
+	// inventory/variant mutations return the affected product id so the
+	// application layer can refresh pricing aggregates afterwards
+	DeleteInventoryAttribute(c *gin.Context, variantAttributeValueID int) (uint, error)
+	DeleteInventory(c *gin.Context, variantID int) (uint, error)
+	AppendAttributesToInventory(c *gin.Context, variantID int, attributes []string) (uint, error)
+	UpdateInventoryQuantity(c *gin.Context, variantID int, quantity uint) (uint, error)
 	InsertFeature(c *gin.Context, productID int, req *requests.CreateProductFeatureRequest) error
 	DeleteFeature(c *gin.Context, productID int, featureID int) error
 	GetFeatureBy(c *gin.Context, productID int, featureID int) (*entities.Feature, error)
@@ -33,4 +35,7 @@ type ProductRepositoryInterface interface {
 	GetAllProductBriefs(c context.Context) ([]map[string]interface{}, error)
 	InsertRecommendation(c *gin.Context, productID int, productRecommendationIDs []string) error
 	GetAllRecommendation(c *gin.Context, productID int) ([]map[string]interface{}, error)
+	// RefreshProductAggregates recomputes min/max price, stock totals,
+	// in_stock, variants_count, product_type and attributes_json (JSONB).
+	RefreshProductAggregates(ctx context.Context, productID uint) error
 }

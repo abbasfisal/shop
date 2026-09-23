@@ -528,7 +528,7 @@ func (h *HomeRepository) IncreaseCartItemCount(c *gin.Context, req *requests.Inc
 	}
 
 	//check inventory
-	var productInventory entities.ProductInventory
+	var productInventory entities.ProductVariant
 	err := h.dep.DB.WithContext(c).
 		Where("id = ? AND product_id = ?", req.InventoryID, req.ProductID).
 		First(&productInventory).Error
@@ -537,7 +537,7 @@ func (h *HomeRepository) IncreaseCartItemCount(c *gin.Context, req *requests.Inc
 		fmt.Println("----5")
 		return errors.New(domain_err.SomethingWrongHappened)
 	}
-	realQty := productInventory.Quantity - productInventory.ReservedStock
+	realQty := productInventory.Stock - productInventory.ReservedStock
 	fmt.Println("----6 : real qty:", realQty)
 
 	// 2<3 || 3<3+1
@@ -665,6 +665,7 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 	lockKeys := make([]string, 0)
 
 	//check qty and reserve it
+	touchedProducts := make(map[uint]struct{})
 	for _, cartItem := range customer.Cart.CartItem.Data {
 
 		// generate keys to store in redis -> e.g. key "lock:inventory:203"
@@ -689,7 +690,7 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 			return nil, inventoryID, lockErr
 		}
 
-		var pInventory entities.ProductInventory
+		var pInventory entities.ProductVariant
 
 		// find specific inventory
 		findErr := retryWithBackoff(3, 100*time.Millisecond,
@@ -708,7 +709,7 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 		}
 
 		// real inventory quantity
-		realQty := pInventory.Quantity - pInventory.ReservedStock
+		realQty := pInventory.Stock - pInventory.ReservedStock
 
 		// out of stock
 		if realQty < uint(cartItem.Quantity) {
@@ -735,6 +736,7 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 			return nil, pInventory.ID, updateInventoryReservedStock
 		}
 
+		touchedProducts[pInventory.ProductID] = struct{}{}
 	}
 
 	//convert address struct to json to store in order
@@ -819,6 +821,13 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 
 	tx.Commit()
 
+	//reserved stock changed — refresh pricing aggregates after commit
+	for pid := range touchedProducts {
+		if pricingErr := product.RefreshProductAggregates(c, h.dep.DB, pid); pricingErr != nil {
+			util.Trace(pricingErr)
+		}
+	}
+
 	return &order, inventoryID, nil
 }
 
@@ -872,6 +881,7 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 
 	//decrees product inventory quantity and product inventory reserved stock
 	lockKeys := make([]string, 0)
+	touchedProducts := make(map[uint]struct{})
 
 	for _, orderItem := range order.OrderItems {
 		lockKey := fmt.Sprintf("lock:inventory:%d", orderItem.InventoryID)
@@ -893,7 +903,7 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 		}
 
 		log.Println("----- x 3")
-		var productInventory entities.ProductInventory
+		var productInventory entities.ProductVariant
 		findProductInventoryErr :=
 			retryWithBackoff(3, 100*time.Millisecond,
 				func() error {
@@ -912,7 +922,7 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 
 		if verified {
 			log.Println("----- x 5")
-			productInventory.Quantity -= orderItem.Quantity
+			productInventory.Stock -= orderItem.Quantity
 			productInventory.ReservedStock -= orderItem.Quantity
 		} else {
 			log.Println("----- x 6")
@@ -934,18 +944,24 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 			return order, false, domain_err.New(updateProductInventoryErr.Error(), domain_err.UpdateProductInventoryFaileds, domain_err.UpdateProductInventoryFailed)
 		} else {
 
-			// if there is no any error we update sync mongo db
-			syncMongoErr := product.SyncReadModel(c, h.dep.DB, orderItem.ProductID)
-			if syncMongoErr != nil {
-				util.Trace(syncMongoErr)
-			}
-
+			// stock changed for this product — refresh happens after commit
+			touchedProducts[orderItem.ProductID] = struct{}{}
 		}
 		log.Println("----- x 8")
 	}
 	defer releaseLocks(c, h.dep.RedisClient, lockKeys)
 	tx.Commit()
 	log.Println("----- x 9")
+
+	//refresh read model + pricing aggregates once the stock change is committed
+	for pid := range touchedProducts {
+		if syncErr := product.SyncReadModel(c, h.dep.DB, pid); syncErr != nil {
+			util.Trace(syncErr)
+		}
+		if pricingErr := product.RefreshProductAggregates(c, h.dep.DB, pid); pricingErr != nil {
+			util.Trace(pricingErr)
+		}
+	}
 
 	return order, true, domain_err.CustomError{}
 
@@ -1069,14 +1085,11 @@ func (h *HomeRepository) GetOrder(c *gin.Context, orderNumber string) (*entities
 	}
 
 	if err := h.dep.DB.WithContext(c).
-		Preload("OrderItems.Product.ProductInventoryAttributes",
-			"product_inventory_attributes.product_id IN (?) AND product_inventory_attributes.product_inventory_id IN (?)",
+		Preload("OrderItems.Product.VariantAttributeValues",
+			"variant_attribute_values.product_id IN (?) AND variant_attribute_values.variant_id IN (?)",
 			productIDs, inventoryIDs,
 		).
-		Preload("OrderItems.Product.ProductInventoryAttributes.ProductAttribute",
-			"product_attributes.product_id IN (?)",
-			productIDs,
-		).
+		Preload("OrderItems.Product.VariantAttributeValues.AttributeValue").
 		Preload("Payment").
 		Where("order_number=? AND customer_id = ?", orderNumber, customer.ID).
 		First(&order).Error; err != nil {

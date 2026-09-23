@@ -13,18 +13,18 @@ type ProductInventories struct {
 	Data []ProductInventory
 }
 
-func ToProductInventory(pi *entities.ProductInventory) *ProductInventory {
+func ToProductInventory(pv *entities.ProductVariant) *ProductInventory {
 	return &ProductInventory{
-		ID:        pi.ID,
-		ProductID: pi.ProductID,
-		Quantity:  pi.Quantity,
+		ID:        pv.ID,
+		ProductID: pv.ProductID,
+		Quantity:  pv.Stock,
 	}
 }
 
-func ToProductInventories(pis []*entities.ProductInventory) *ProductInventories {
+func ToProductInventories(variants []*entities.ProductVariant) *ProductInventories {
 	var pResponse ProductInventories
-	for _, p := range pis {
-		pResponse.Data = append(pResponse.Data, *ToProductInventory(p))
+	for _, pv := range variants {
+		pResponse.Data = append(pResponse.Data, *ToProductInventory(pv))
 	}
 	return &pResponse
 }

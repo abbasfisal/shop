@@ -31,7 +31,7 @@ func (p *ProductRepository) FindBy(ctx context.Context, columnName string, value
 	err := p.db.
 		WithContext(ctx).
 		Preload("Category").Preload("Brand").
-		Preload("ProductAttributes").Preload("ProductInventories").
+		Preload("ProductAttributes").Preload("ProductVariants").Preload("VariantAttributeValues.AttributeValue").
 		Preload("ProductImages").Preload("Features").
 		First(&product, condition, value).
 		Error

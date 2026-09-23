@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"shop/application/dto/admin"
+	"shop/application/usecases/pricing"
 	"shop/domain/domain_err"
 	"shop/domain/entities"
 	"shop/domain/repositories"
@@ -15,11 +16,20 @@ import (
 )
 
 type ProductService struct {
-	repo repositories.ProductRepositoryInterface
+	repo    repositories.ProductRepositoryInterface
+	pricing *pricing.PricingService
 }
 
-func NewProductService(repo repositories.ProductRepositoryInterface) ProductServiceInterface {
-	return &ProductService{repo: repo}
+func NewProductService(repo repositories.ProductRepositoryInterface, pricingSvc *pricing.PricingService) ProductServiceInterface {
+	return &ProductService{repo: repo, pricing: pricingSvc}
+}
+
+// refreshPricing recompute the product aggregate cache after a variant change
+// (golden rule: call PricingService after every variant change).
+func (p *ProductService) refreshPricing(ctx context.Context, productID uint) {
+	if err := p.pricing.RefreshProductAggregates(ctx, productID); err != nil {
+		log.Println("[pricing] refresh aggregates failed, product:", productID, "err:", err)
+	}
 }
 
 //-----------------------------------------
@@ -135,10 +145,11 @@ func (p *ProductService) FetchProductAttributes(c *gin.Context, productID int) (
 }
 
 func (p *ProductService) CreateInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) domain_err.CustomError {
-	_, err := p.repo.StoreProductInventory(c, productID, req)
+	variant, err := p.repo.StoreProductInventory(c, productID, req)
 	if err != nil {
 		return domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
+	p.refreshPricing(c, variant.ProductID)
 	return domain_err.CustomError{}
 }
 
@@ -169,35 +180,43 @@ func (p *ProductService) Update(c *gin.Context, productID int, req *requests.Upd
 	if err != nil {
 		return domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
+	p.refreshPricing(c, uint(productID))
 	return domain_err.CustomError{}
 }
 
-// DeleteInventoryAttribute delete record form product_inventory_attributes table
+// DeleteInventoryAttribute removes a variant_attribute_values link (legacy URL kept)
 func (p *ProductService) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) domain_err.CustomError {
-	err := p.repo.DeleteInventoryAttribute(c, productInventoryAttributeID)
+	productID, err := p.repo.DeleteInventoryAttribute(c, productInventoryAttributeID)
 	if err != nil {
 		return domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
+	p.refreshPricing(c, productID)
 	return domain_err.CustomError{}
 }
 
 func (p *ProductService) DeleteInventory(c *gin.Context, inventoryID int) domain_err.CustomError {
-	if err := p.repo.DeleteInventory(c, inventoryID); err != nil {
+	productID, err := p.repo.DeleteInventory(c, inventoryID)
+	if err != nil {
 		return domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
+	p.refreshPricing(c, productID)
 	return domain_err.CustomError{}
 }
 
 func (p *ProductService) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) domain_err.CustomError {
-	if err := p.repo.AppendAttributesToInventory(c, inventoryID, attributes); err != nil {
+	productID, err := p.repo.AppendAttributesToInventory(c, inventoryID, attributes)
+	if err != nil {
 		return domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
+	p.refreshPricing(c, productID)
 	return domain_err.CustomError{}
 }
 func (p *ProductService) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) domain_err.CustomError {
-	if err := p.repo.UpdateInventoryQuantity(c, inventoryID, quantity); err != nil {
+	productID, err := p.repo.UpdateInventoryQuantity(c, inventoryID, quantity)
+	if err != nil {
 		return domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
+	p.refreshPricing(c, productID)
 	return domain_err.CustomError{}
 }
 

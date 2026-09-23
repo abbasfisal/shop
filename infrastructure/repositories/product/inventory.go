@@ -8,16 +8,19 @@ import (
 	"shop/interfaces/http/requests/admin"
 )
 
-func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) (*entities.ProductInventory, error) {
+// StoreProductInventory creates a product variant (stock row) and links the
+// selected product attribute-values to it via variant_attribute_values.
+// The HTML inventory form only posts productAttributes + quantity; prices are
+// left NULL so the variant inherits the product price (see PricingService).
+func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) (*entities.ProductVariant, error) {
 
-	var inventory entities.ProductInventory
+	var variant entities.ProductVariant
 
-	//start transaction
 	txErr := p.db.WithContext(c).Transaction(func(tx *gorm.DB) error {
 		var productAttributes []entities.ProductAttribute
 
 		//fetch product-attributes
-		//len(req.ProductAttributes)<=0  یعنی برای محصول ویژگی -مقدار نمیخواهیم بذاریم و صرفا میخواهیم موجودی بذاریم
+		//len(req.ProductAttributes)<=0 means: stock-only variant without attributes
 		if len(req.ProductAttributes) > 0 {
 			if err := tx.WithContext(c).Where("id IN ? ", req.ProductAttributes).Find(&productAttributes).Error; err != nil {
 				return err
@@ -28,35 +31,25 @@ func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int,
 			}
 		}
 
-		inventory = entities.ProductInventory{
+		variant = entities.ProductVariant{
 			ProductID: uint(productID),
-			Quantity:  req.Quantity,
+			Stock:     req.Quantity,
+			Status:    entities.VariantStatusActive,
 		}
 
-		//todo: باید چک کنی که چندتا موجودی بدون اتریبیوت ذخیره شده تا بتونی روی ایجاد چندین موجودی بدون ویژگی کنترل داشته باشی
-		//var count int64
-		//if err := tx.Where("product_id = ?", productID).Count(&count).Error; err != nil {
-		//	return err
-		//}
-		//if count > 1 {
-		//	return &domain_err.DuplicateProductInventory{ProductID: uint(productID)}
-		//}
-
-		//store inventory
-		if iErr := tx.WithContext(c).Create(&inventory).Error; iErr != nil {
+		if iErr := tx.WithContext(c).Create(&variant).Error; iErr != nil {
 			return iErr
 		}
 
-		//store product-attribute in product-inventory-attribute table
-		//len(req.ProductAttributes)<=0  یعنی برای محصول ویژگی -مقدار نمیخواهیم بذاریم و صرفا میخواهیم موجودی بذاریم
+		//link selected attribute values to the new variant
 		if len(req.ProductAttributes) > 0 {
 			for _, attr := range productAttributes {
-				inventoryAttr := entities.ProductInventoryAttribute{
-					ProductID:          uint(productID),
-					ProductInventoryID: inventory.ID,
-					ProductAttributeID: attr.ID,
+				vav := entities.VariantAttributeValue{
+					ProductID:        uint(productID),
+					VariantID:        variant.ID,
+					AttributeValueID: attr.AttributeValueID,
 				}
-				if err := tx.Create(&inventoryAttr).Error; err != nil {
+				if err := tx.Create(&vav).Error; err != nil {
 					return err
 				}
 			}
@@ -65,100 +58,111 @@ func (p *ProductRepository) StoreProductInventory(c *gin.Context, productID int,
 	})
 
 	if txErr != nil {
-		fmt.Println("---- create inventory product err: ", txErr)
+		fmt.Println("---- create product variant err: ", txErr)
 		return nil, txErr
 	}
 
 	_ = SyncReadModel(c, p.db, uint(productID))
 
-	return &inventory, nil
+	return &variant, nil
 }
 
-func (p *ProductRepository) DeleteInventoryAttribute(c *gin.Context, productInventoryAttributeID int) error {
-
-	//find
-	var productInventoryAttribute entities.ProductInventoryAttribute
-	if err := p.db.First(&productInventoryAttribute, productInventoryAttributeID).Error; err != nil {
-		return err
+// DeleteInventoryAttribute removes one variant <-> attribute_value link.
+// Returns the affected product id for pricing refresh.
+func (p *ProductRepository) DeleteInventoryAttribute(c *gin.Context, variantAttributeValueID int) (uint, error) {
+	var vav entities.VariantAttributeValue
+	if err := p.db.WithContext(c).First(&vav, variantAttributeValueID).Error; err != nil {
+		return 0, err
 	}
 
-	//delete from product_inventory_attributes table
-	if piaErr := p.db.WithContext(c).Unscoped().Delete(&productInventoryAttribute).Error; piaErr != nil {
-		return piaErr
+	//hard delete so the UNIQUE(variant_id, attribute_value_id) slot can be reused
+	if piaErr := p.db.WithContext(c).Unscoped().Delete(&vav).Error; piaErr != nil {
+		return 0, piaErr
 	}
 
-	_ = SyncReadModel(c, p.db, productInventoryAttribute.ProductID)
+	_ = SyncReadModel(c, p.db, vav.ProductID)
 
-	return nil
+	return vav.ProductID, nil
 }
 
-func (p *ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) error {
-
+// DeleteInventory soft-deletes a variant and hard-deletes its attribute links.
+// Returns the affected product id for pricing refresh.
+func (p *ProductRepository) DeleteInventory(c *gin.Context, inventoryID int) (uint, error) {
 	var productID uint
 
 	txErr := p.db.WithContext(c).Transaction(func(tx *gorm.DB) error {
+		var variant entities.ProductVariant
 
-		var inventory entities.ProductInventory
-
-		//find inventory
-		if iErr := p.db.WithContext(c).First(&inventory, inventoryID).Error; iErr != nil {
+		if iErr := tx.WithContext(c).First(&variant, inventoryID).Error; iErr != nil {
 			return iErr
 		}
 
-		productID = inventory.ProductID
+		productID = variant.ProductID
 
-		//delete all product-attribute inventory
-		var productInventoryAttributes []entities.ProductInventoryAttribute
-		if deleteErr := p.db.Where("product_inventory_id = ? ", inventory.ID).Delete(&productInventoryAttributes).Error; deleteErr != nil {
+		//hard-delete attribute links (frees the UNIQUE slot)
+		if deleteErr := tx.Where("variant_id = ?", variant.ID).
+			Unscoped().
+			Delete(&entities.VariantAttributeValue{}).Error; deleteErr != nil {
 			return deleteErr
 		}
 
-		//delete inventory
-		if iDelete := p.db.WithContext(c).Delete(&inventory).Error; iDelete != nil {
+		if iDelete := tx.WithContext(c).Delete(&variant).Error; iDelete != nil {
 			return iDelete
 		}
 		return nil
 	})
 
 	if txErr != nil {
-		return txErr
+		return 0, txErr
 	}
 
 	_ = SyncReadModel(c, p.db, productID)
 
-	return nil
+	return productID, nil
 }
 
-func (p *ProductRepository) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) error {
+// AppendAttributesToInventory links additional attribute values to a variant.
+// Returns the affected product id for pricing refresh.
+func (p *ProductRepository) AppendAttributesToInventory(c *gin.Context, inventoryID int, attributes []string) (uint, error) {
+	var variant entities.ProductVariant
 
-	var productInventory entities.ProductInventory
-
-	//find productInventory
-	if err := p.db.WithContext(c).First(&productInventory, inventoryID).Error; err != nil {
-		return err
+	if err := p.db.WithContext(c).First(&variant, inventoryID).Error; err != nil {
+		return 0, err
 	}
 
-	//start transaction
 	txErr := p.db.WithContext(c).Transaction(func(tx *gorm.DB) error {
 		var productAttributes []entities.ProductAttribute
 
-		//fetch product-attributes
-		if err := p.db.WithContext(c).Where("id IN ? ", attributes).Find(&productAttributes).Error; err != nil {
+		if err := tx.WithContext(c).Where("id IN ? ", attributes).Find(&productAttributes).Error; err != nil {
 			return err
 		}
-		//check len retrieved product-attribute
 		if len(productAttributes) != len(attributes) {
 			return gorm.ErrRecordNotFound
 		}
 
-		//store product-attribute in product-inventory-attribute table
+		//existing links (UNIQUE constraint would reject duplicates)
+		var existing []uint
+		if err := tx.Model(&entities.VariantAttributeValue{}).
+			Where("variant_id = ?", variant.ID).
+			Pluck("attribute_value_id", &existing).
+			Error; err != nil {
+			return err
+		}
+		exists := make(map[uint]struct{}, len(existing))
+		for _, id := range existing {
+			exists[id] = struct{}{}
+		}
+
 		for _, attr := range productAttributes {
-			inventoryAttr := entities.ProductInventoryAttribute{
-				ProductID:          productInventory.ProductID,
-				ProductInventoryID: uint(inventoryID),
-				ProductAttributeID: attr.ID,
+			if _, ok := exists[attr.AttributeValueID]; ok {
+				continue
 			}
-			if err := tx.Create(&inventoryAttr).Error; err != nil {
+			vav := entities.VariantAttributeValue{
+				ProductID:        variant.ProductID,
+				VariantID:        variant.ID,
+				AttributeValueID: attr.AttributeValueID,
+			}
+			if err := tx.Create(&vav).Error; err != nil {
 				return err
 			}
 		}
@@ -166,25 +170,27 @@ func (p *ProductRepository) AppendAttributesToInventory(c *gin.Context, inventor
 	})
 
 	if txErr != nil {
-		return txErr
+		return 0, txErr
 	}
 
-	_ = SyncReadModel(c, p.db, productInventory.ProductID)
+	_ = SyncReadModel(c, p.db, variant.ProductID)
 
-	return nil
+	return variant.ProductID, nil
 }
 
-func (p *ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) error {
-	var inventory entities.ProductInventory
-	if iErr := p.db.WithContext(c).First(&inventory, inventoryID).Error; iErr != nil {
-		return iErr
+// UpdateInventoryQuantity updates the variant stock.
+// Returns the affected product id for pricing refresh.
+func (p *ProductRepository) UpdateInventoryQuantity(c *gin.Context, inventoryID int, quantity uint) (uint, error) {
+	var variant entities.ProductVariant
+	if iErr := p.db.WithContext(c).First(&variant, inventoryID).Error; iErr != nil {
+		return 0, iErr
 	}
 
-	if updateErr := p.db.WithContext(c).Model(&inventory).Update("quantity", quantity).Error; updateErr != nil {
-		return updateErr
+	if updateErr := p.db.WithContext(c).Model(&variant).Update("stock", quantity).Error; updateErr != nil {
+		return 0, updateErr
 	}
 
-	_ = SyncReadModel(c, p.db, inventory.ProductID)
+	_ = SyncReadModel(c, p.db, variant.ProductID)
 
-	return nil
+	return variant.ProductID, nil
 }

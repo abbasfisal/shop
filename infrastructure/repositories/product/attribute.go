@@ -95,14 +95,14 @@ func (p *ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID 
 	result := make(map[string]interface{})
 
 	serr := p.db.WithContext(ctx).
-		Table("product_inventories").
-		Select("product_inventories.id AS inventory_id, product_inventories.quantity, product_attributes.attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, product_inventory_attributes.id AS product_inventory_attribute_id").
-		Joins("LEFT JOIN product_inventory_attributes ON product_inventories.id = product_inventory_attributes.product_inventory_id AND product_inventory_attributes.deleted_at IS NULL").
-		Joins("LEFT JOIN product_attributes ON product_inventory_attributes.product_attribute_id = product_attributes.id AND product_attributes.deleted_at IS NULL").
-		Joins("LEFT JOIN attributes ON product_attributes.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
-		Joins("LEFT JOIN attribute_values ON product_attributes.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
-		Where("product_inventories.product_id = ? and product_inventories.deleted_at IS NULL", productID).
-		Scan(&inventories).Error
+		Table("product_variants").
+		Select("product_variants.id AS inventory_id, product_variants.stock AS quantity, attributes.id AS attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, variant_attribute_values.id AS product_inventory_attribute_id").
+		Joins("LEFT JOIN variant_attribute_values ON product_variants.id = variant_attribute_values.variant_id AND variant_attribute_values.deleted_at IS NULL").
+		Joins("LEFT JOIN attribute_values ON variant_attribute_values.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
+		Joins("LEFT JOIN attributes ON attribute_values.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
+		Where("product_variants.product_id = ? and product_variants.deleted_at IS NULL", productID).
+		Scan(&inventories).
+		Error
 
 	if serr != nil {
 		return map[string]interface{}{}, serr

@@ -7,10 +7,10 @@ import (
 )
 
 type Config struct {
-	App     App
-	DB      DB
-	Redis   Redis
-	Upload  Upload
+	App    App
+	DB     DB
+	Redis  Redis
+	Upload Upload
 }
 type App struct {
 }

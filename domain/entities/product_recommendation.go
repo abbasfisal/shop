@@ -5,9 +5,9 @@ import "time"
 // ProductRecommendation is a row in product_recommendations (replaces the MongoDB
 // recommendations collection). Hard deletes keep the UNIQUE constraint reusable.
 type ProductRecommendation struct {
-	ID                   uint      `gorm:"primaryKey"`
-	ProductID            uint      `gorm:"not null;index"`
-	RecommendedProductID uint      `gorm:"not null"`
+	ID                   uint `gorm:"primaryKey"`
+	ProductID            uint `gorm:"not null;index"`
+	RecommendedProductID uint `gorm:"not null"`
 	CreatedAt            time.Time
 	UpdatedAt            time.Time
 }
