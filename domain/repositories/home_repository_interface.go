@@ -1,0 +1,40 @@
+package repositories
+
+import (
+	"context"
+	"github.com/gin-gonic/gin"
+	"shop/application/dto/web"
+	"shop/domain/domain_err"
+	"shop/domain/entities"
+	"shop/interfaces/http/requests/web"
+	"shop/pkg/pagination"
+)
+
+type HomeRepositoryInterface interface {
+	GetRandomProducts(ctx context.Context, limit int) ([]*entities.Product, error)
+	GetLatestProducts(ctx context.Context, limit int) ([]*entities.Product, error)
+	GetCategories(ctx context.Context, limit int) ([]*entities.Category, error)
+	GetProduct(c *gin.Context, productSku, productSlug string) (map[string]interface{}, error)
+	GetProductsBy(ctx context.Context, columnName string, value any) ([]*entities.Product, error)
+	GetCategoryBy(ctx context.Context, columnName string, value any) (*entities.Category, error)
+	NewOtp(ctx context.Context, mobile string) (*entities.OTP, domain_err.CustomError)
+	VerifyOtp(c *gin.Context, mobile string, req *requests.CustomerVerifyRequest) (*entities.OTP, error)
+	ProcessCustomerAuthenticate(c *gin.Context, mobile string) (entities.Session, error)
+	LogOut(c *gin.Context) error
+	UpdateProfile(c *gin.Context, req *requests.CustomerProfileRequest) error
+	GetMenu(ctx context.Context) ([]*entities.Category, error)
+	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
+	InsertCart(c *gin.Context, user responses.Customer, product entities.MongoProduct, req requests.AddToCartRequest)
+	IncreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error
+	DecreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error
+	DeleteCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) error
+	CreateOrUpdateAddress(c *gin.Context, req *requests.StoreAddressRequest) error
+	// GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
+	GenerateOrderFromCart(c *gin.Context) (orderModel *entities.Order, inventoryID uint, GenerateOrderErr error)
+
+	OrderPaidSuccessfully(c *gin.Context, order *entities.Order, refID string, verified bool) (*entities.Order, bool, domain_err.CustomError)
+	CreatePayment(c *gin.Context, payment *entities.Payment) error
+	GetPayment(c *gin.Context, authority string) (*entities.Order, entities.Customer, error)
+	GetPaginatedOrders(c *gin.Context) (pagination.Pagination, error)
+	GetOrder(c *gin.Context, orderNumber string) (*entities.Order, error)
+}

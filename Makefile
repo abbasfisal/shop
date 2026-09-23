@@ -1,13 +1,13 @@
 include .env
 
 run:
-	@go run cmd/http/main.go
+	@go run . serve
 
 migrate:
-	@go run cmd/http/main.go migrate
+	@go run . migrate --gorm
 
 seed:
-	@go run cmd/http/main.go seed
+	@go run . seed
 
 #run dev server docker compose with specific env file up
 dev_server_up:
@@ -31,14 +31,14 @@ date:
 
 
 migration-up:
-	@sql-migrate up -env=production -config=internal/database/mysql/dbconfig.yml
+	@sql-migrate up -env=production -config=infrastructure/database/mysql/dbconfig.yml
 
 
 migration-down:
-	@sql-migrate down -env=production -config=internal/database/mysql/dbconfig.yml -limit=1
+	@sql-migrate down -env=production -config=infrastructure/database/mysql/dbconfig.yml -limit=1
 
 migration-status:
-	@sql-migrate status -env=production -config=internal/database/mysql/dbconfig.yml
+	@sql-migrate status -env=production -config=infrastructure/database/mysql/dbconfig.yml
 
 
 #doc: https://github.com/golang-migrate/migrate
@@ -48,18 +48,18 @@ generate-sql-migrator-dbconfig:
 	@echo "production:\
            \n  dialect: mysql\
            \n  datasource: ${MYSQL_USER}:${MYSQL_PASSWORD}@(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DB}?parseTime=true\
-           \n  dir: internal/database/mysql/migrations #migration director\
-           \n  table: migrations" > internal/database/mysql/dbconfig.yml
+           \n  dir: infrastructure/database/mysql/migrations #migration director\
+           \n  table: migrations" > infrastructure/database/mysql/dbconfig.yml
 
 
 # start schedule system using asynq pkg
 start-schedule:
-	@go run ./cmd/job/scheduler/main.go
+	@go run . scheduler
 
 
 # start worker which is responsible to execute tasks
 start-worker:
-	@go run ./cmd/job/worker/main.go
+	@go run . worker
 
 
 # start minio server

@@ -10,7 +10,7 @@ tmp/*
 cmd/http/storage/*
 
 #shop assets
-/assets/shop/css/main.css
+/public/shop/css/main.css
 #end shop assets
 
 /internal/database/mysql/dbconfig.yml

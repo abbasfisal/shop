@@ -1,0 +1,48 @@
+package order
+
+import (
+	"github.com/gin-gonic/gin"
+	"shop/application/dto/admin"
+	"shop/domain/repositories"
+	"shop/interfaces/http/requests/admin"
+	"shop/pkg/pagination"
+)
+
+type OrderService struct {
+	repo repositories.OrderRepositoryInterface
+}
+
+func NewOrderService(repo repositories.OrderRepositoryInterface) OrderServiceInterface {
+	return &OrderService{repo: repo}
+}
+
+func (o OrderService) GetOrderPaginate(c *gin.Context) (pagination.Pagination, error) {
+
+	orderList, err := o.repo.GetOrders(c)
+	if err != nil || orderList.Rows == nil {
+		return pagination.Pagination{}, err
+	}
+
+	return orderList, nil
+}
+
+func (o OrderService) GetOrderBy(c *gin.Context, orderID int) (*responses.OrderDetail, error) {
+	orderEntity, customerEntity, err := o.repo.FindOrderBy(c, orderID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return responses.ToOrderDetail(orderEntity, customerEntity), nil
+}
+
+func (o OrderService) ChangeOrderStatus(c *gin.Context, orderID int, req *requests.UpdateOrderStatus) error {
+	_, err := o.repo.UpdateOrderStatusAndNote(c, orderID, req)
+	if err != nil {
+		return err
+	}
+	return nil
+
+	//todo: send sms when changing order status
+	//responses.AdminOrderStatusMap(orderEntity.OrderStatus)
+}

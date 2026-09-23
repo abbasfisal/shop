@@ -16,10 +16,10 @@ db:
   password: root
 
 upload:
-  categories: "../../uploads/media/categories/"
-  products: "../../uploads/media/products/"
-  brands: "../../uploads/media/brands/"
-  banners: "../../uploads/media/banners/"
+  categories: "public/uploads/media/categories/"
+  products: "public/uploads/media/products/"
+  brands: "public/uploads/media/brands/"
+  banners: "public/uploads/media/banners/"
 
 kavenegar:
   api_key: ""
