@@ -239,50 +239,33 @@
                                                                 {{end}}
                                                             {{end}}
                                                         {{else}}
-                                                            <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
-                                                                <h2>انتخاب :</h2>
-                                                            </div>
-                                                            <select name="inventory_id" id="inventoryPicker" class="custom-select">
-                                                                {{range $item:=.PRODUCT.inventories}}
-                                                                    {{$qty:=$item.Quantity}}
-                                                                    {{$inventory_id:=$item.InventoryID}}
-                                                                    {{if eq (len $item.Attributes) 1}}
-                                                                        {{range $item.Attributes}}
-                                                                            <option value="{{$inventory_id}}" class=""
-                                                                                    data-price="{{$item.Price}}"
-                                                                                    data-sale="{{$item.SalePrice}}"
-                                                                                    data-effective="{{$item.EffectivePrice}}"
-                                                                                    data-percent="{{$item.DiscountPercent}}"
-                                                                                    data-has-discount="{{if $item.HasDiscount}}1{{else}}0{{end}}"
-                                                                                    data-stock="{{$item.Available}}">
-                                                                                {{.AttributeTitle}}
-                                                                                {{.AttributeValueTitle}}
-                                                                                {{if lt $item.Available 1}} | ناموجود{{else if gt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
-                                                                            </option>
+                                                            <input type="hidden" id="variantsData" value="{{.VARIANTS_JSON}}">
+                                                            {{range $g := .VARIANT_GROUPS}}
+                                                                <div class="variant-group" data-attr-id="{{$g.AttributeID}}">
+                                                                    <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
+                                                                        <h2>{{$g.Title}}: <b class="variant-selected-name" id="variantSel-{{$g.AttributeID}}"></b></h2>
+                                                                    </div>
+                                                                    <div class="variant-options{{if $g.IsColor}} variant-colors{{end}}">
+                                                                        {{range $g.Values}}
+                                                                            <button type="button"
+                                                                                    class="variant-pill{{if $g.IsColor}} variant-swatch{{end}}"
+                                                                                    data-attr-id="{{$g.AttributeID}}"
+                                                                                    data-value-id="{{.ID}}"
+                                                                                    data-value-name="{{.Title}}"
+                                                                                    title="{{.Title}}">
+                                                                                {{if $g.IsColor}}
+                                                                                    <span class="swatch-dot" style="background:{{if .Hex}}{{.Hex}}{{else}}#cbd5e1{{end}};">
+                                                                                        <span class="swatch-check">✓</span>
+                                                                                    </span>
+                                                                                {{else}}
+                                                                                    {{.Title}}
+                                                                                {{end}}
+                                                                            </button>
                                                                         {{end}}
-
-                                                                    {{else}}
-                                                                        {{$composite:=""}}
-                                                                        {{range .Attributes}}
-                                                                            {{$composite = printf "%s%s:%s  " $composite .AttributeTitle .AttributeValueTitle}} <!-- افزودن هر ویژگی به رشته قبلی -->
-                                                                        {{end}}
-                                                                        <option value="{{.InventoryID}}"
-                                                                                data-price="{{$item.Price}}"
-                                                                                data-sale="{{$item.SalePrice}}"
-                                                                                data-effective="{{$item.EffectivePrice}}"
-                                                                                data-percent="{{$item.DiscountPercent}}"
-                                                                                data-has-discount="{{if $item.HasDiscount}}1{{else}}0{{end}}"
-                                                                                data-stock="{{$item.Available}}">{{$composite}}
-                                                                            {{if lt $item.Available 1}}
-                                                                                | ناموجود
-                                                                            {{else if gt $qty 5 }}
-                                                                                |موجودی:{{.Quantity}}
-                                                                                عدد
-                                                                            {{end}}
-                                                                        </option>
-                                                                    {{end}}
-                                                                {{end}}
-                                                            </select>
+                                                                    </div>
+                                                                </div>
+                                                            {{end}}
+                                                            <div class="variant-stock" id="stockBox"></div>
                                                         {{end}}
                                                     {{end}}
                                                 </div>
@@ -369,7 +352,7 @@
                                                                 <input type="hidden" name="inventory_id" id="cartInventoryId"
                                                                        value="{{$firstInventoryId}}">
 
-                                                                <button type="submit"
+                                                                <button type="submit" id="addToCartBtn"
                                                                         class="btn-add-to-cart btn-add-to-cart--full-width">
                                                                     <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
                                                                 </button>
@@ -693,36 +676,122 @@
     <script src="/assets/shop/plugin/iran-map/iranmap.js"></script>
     <!-- Main JS File -->
     <script src="/assets/shop/js/js-product/js-product.js"></script>
-    <!-- variant picker: keep the cart input + price block in sync -->
+    <!-- variant picker: swatches/boxes keep the cart input + price block in sync -->
     <script>
         (function () {
-            const picker = document.getElementById('inventoryPicker');
             const hidden = document.getElementById('cartInventoryId');
             const pricePrev = document.getElementById('pricePrev');
             const priceReal = document.getElementById('priceReal');
             const priceOff = document.getElementById('priceOff');
+            const stockBox = document.getElementById('stockBox');
+            const dataEl = document.getElementById('variantsData');
+            const addBtn = document.getElementById('addToCartBtn');
             if (!hidden) return;
 
             const fmt = n => Number(n).toLocaleString('en-US');
+            let VARIANTS = [];
+            try { VARIANTS = JSON.parse((dataEl && dataEl.value) || '[]'); }
+            catch (e) { VARIANTS = []; }
 
-            function apply(option) {
-                if (!option) return;
-                if (option.value) hidden.value = option.value;
-                const price = option.dataset.price;
-                const effective = option.dataset.effective;
-                const hasDiscount = option.dataset.hasDiscount === '1';
-                const percent = parseInt(option.dataset.percent || '0', 10) || 0;
-                if (pricePrev && price) pricePrev.innerText = fmt(price);
-                if (priceReal && effective) priceReal.innerText = fmt(effective);
-                if (priceOff) priceOff.innerText = (hasDiscount && percent > 0) ? percent + '%' : '';
+            const selected = {}; // attrId (string) -> valueId (number)
+            let interacted = false;
+
+            function selectedIds() {
+                return Object.keys(selected).map(k => Number(selected[k]));
             }
 
-            if (picker) {
-                apply(picker.selectedOptions[0]);
-                picker.addEventListener('change', function () {
-                    apply(picker.selectedOptions[0]);
+            // exact combination match (Laravel-style): same cardinality and
+            // every selected value contained in the variant
+            function findVariant() {
+                const ids = selectedIds();
+                if (!ids.length) return null;
+                return VARIANTS.find(v => {
+                    const vids = v.value_ids || [];
+                    return vids.length === ids.length &&
+                        ids.every(id => vids.indexOf(id) !== -1);
+                }) || null;
+            }
+
+            // an option stays enabled while some in-stock variant carries it
+            // together with every other current selection
+            function isEnabled(attrId, valueId) {
+                const others = {};
+                Object.keys(selected).forEach(k => {
+                    if (k !== String(attrId)) others[k] = selected[k];
+                });
+                return VARIANTS.some(v => {
+                    if ((v.available || 0) <= 0) return false;
+                    const vids = v.value_ids || [];
+                    if (vids.indexOf(Number(valueId)) === -1) return false;
+                    return Object.keys(others).every(k => vids.indexOf(Number(others[k])) !== -1);
                 });
             }
+
+            function refreshOptions() {
+                document.querySelectorAll('.variant-pill').forEach(btn => {
+                    const attrId = btn.dataset.attrId;
+                    const valueId = Number(btn.dataset.valueId);
+                    const isSel = selected[attrId] === valueId;
+                    btn.classList.toggle('selected', isSel);
+                    btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+                    btn.disabled = isSel ? false : !isEnabled(attrId, valueId);
+                });
+                document.querySelectorAll('.variant-selected-name').forEach(el => {
+                    const attrId = el.id.replace('variantSel-', '');
+                    const btn = document.querySelector('.variant-pill.selected[data-attr-id="' + attrId + '"]');
+                    el.textContent = btn ? btn.dataset.valueName : '';
+                });
+            }
+
+            function renderStock(v) {
+                if (!stockBox) return;
+                if (!v) { stockBox.innerHTML = ''; return; }
+                const s = Number(v.available || 0);
+                if (s <= 0) stockBox.innerHTML = '<span class="stock-no">✗ ناموجود</span>';
+                else if (s <= 3) stockBox.innerHTML = '<span class="stock-low">🔥 تنها ' + s + ' عدد در انبار باقی مانده</span>';
+                else stockBox.innerHTML = '<span class="stock-ok">✓ موجود در انبار</span>';
+            }
+
+            function renderButton(v) {
+                if (!addBtn) return;
+                if (!v || (v.available || 0) <= 0) {
+                    addBtn.disabled = true;
+                    hidden.value = '';
+                    return;
+                }
+                addBtn.disabled = false;
+                hidden.value = v.id;
+            }
+
+            function update() {
+                const v = findVariant();
+                if (!v) {
+                    if (interacted && priceReal) priceReal.innerText = 'ویژگی‌ها را انتخاب کنید';
+                    if (priceOff) priceOff.innerText = '';
+                    renderStock(null);
+                    renderButton(null);
+                    return;
+                }
+                if (pricePrev && v.price) pricePrev.innerText = fmt(v.price);
+                if (priceReal && v.effective != null) priceReal.innerText = fmt(v.effective);
+                if (priceOff) priceOff.innerText = (v.has_discount && v.percent > 0) ? v.percent + '%' : '';
+                renderStock(v);
+                renderButton(v);
+            }
+
+            document.querySelectorAll('.variant-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    interacted = true;
+                    const attrId = btn.dataset.attrId;
+                    const valueId = Number(btn.dataset.valueId);
+                    if (selected[attrId] === valueId) delete selected[attrId];
+                    else selected[attrId] = valueId;
+                    refreshOptions();
+                    update();
+                });
+            });
+
+            refreshOptions();
         })();
     </script>
     <!-- my custom JS File -->

@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	errors2 "errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"sort"
+	"strconv"
 	"time"
 
 	responses "shop/application/dto/admin"
@@ -163,14 +166,130 @@ func (p PublicHandler) SingleProduct(c *gin.Context) {
 		}
 	}
 
+	groups, variantsJSON := buildVariantPickerData(product)
+
 	response.CustomerRender(c, http.StatusFound, "single_product",
 		gin.H{
 			"PRODUCT":         product,
 			"RECOMMENDATIONS": recommendations,
 			"PrimaryMessage":  primaryMessage,
 			"MEDIA_PATH":      util.GetProductStoragePath(),
+			"VARIANT_GROUPS":  groups,
+			"VARIANTS_JSON":   variantsJSON,
 		})
 	return
+}
+
+// VariantGroupValue is one selectable value inside a variant group.
+type VariantGroupValue struct {
+	ID    int64  `json:"id"`
+	Title string `json:"title"`
+	Hex   string `json:"hex"`
+}
+
+// VariantGroup is one attribute (e.g. رنگ) with its distinct values,
+// rendered as swatches (color) or boxes (everything else).
+type VariantGroup struct {
+	AttributeID int64               `json:"attribute_id"`
+	Title       string              `json:"title"`
+	IsColor     bool                `json:"is_color"`
+	Values      []VariantGroupValue `json:"values"`
+}
+
+// variantJSON is one sellable combination for the picker script.
+type variantJSON struct {
+	ID          int64   `json:"id"`
+	ValueIDs    []int64 `json:"value_ids"`
+	Effective   int64   `json:"effective"`
+	Price       int64   `json:"price"`
+	Percent     int64   `json:"percent"`
+	HasDiscount bool    `json:"has_discount"`
+	Available   int64   `json:"available"`
+}
+
+// buildVariantPickerData groups the read-model inventories by attribute
+// (deterministic order) and serializes the combinations for the picker
+// script. Stock-only rows (no attribute links) contribute combinations
+// but no groups.
+func buildVariantPickerData(product map[string]interface{}) ([]VariantGroup, string) {
+	var inventories map[string]entities.Inventory
+	if raw, ok := product["inventories"]; ok {
+		inventories, _ = raw.(map[string]entities.Inventory)
+	}
+
+	// numeric inventory ids, ascending (map order is random)
+	ids := make([]int64, 0, len(inventories))
+	for key := range inventories {
+		if id, err := strconv.ParseInt(key, 10, 64); err == nil {
+			ids = append(ids, id)
+		}
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+
+	groups := map[int64]*VariantGroup{}
+	groupOrder := []int64{}
+	variants := make([]variantJSON, 0, len(ids))
+
+	for _, id := range ids {
+		inv := inventories[strconv.FormatInt(id, 10)]
+		valueIDs := make([]int64, 0, len(inv.Attributes))
+		for _, attr := range inv.Attributes {
+			if attr.AttributeID == 0 && attr.AttributeValueID == 0 {
+				continue
+			}
+			valueIDs = append(valueIDs, attr.AttributeValueID)
+
+			g, ok := groups[attr.AttributeID]
+			if !ok {
+				g = &VariantGroup{
+					AttributeID: attr.AttributeID,
+					Title:       attr.AttributeTitle,
+					IsColor:     attr.IsColor,
+				}
+				groups[attr.AttributeID] = g
+				groupOrder = append(groupOrder, attr.AttributeID)
+			}
+			if attr.IsColor {
+				g.IsColor = true
+			}
+			seen := false
+			for _, v := range g.Values {
+				if v.ID == attr.AttributeValueID {
+					seen = true
+					break
+				}
+			}
+			if seen {
+				continue
+			}
+			hex := ""
+			if attr.IsColor {
+				hex = attr.ColorHex
+			}
+			g.Values = append(g.Values, VariantGroupValue{
+				ID:    attr.AttributeValueID,
+				Title: attr.AttributeValueTitle,
+				Hex:   hex,
+			})
+		}
+
+		variants = append(variants, variantJSON{
+			ID:          inv.InventoryID,
+			ValueIDs:    valueIDs,
+			Effective:   inv.EffectivePrice,
+			Price:       inv.Price,
+			Percent:     inv.DiscountPercent,
+			HasDiscount: inv.HasDiscount,
+			Available:   inv.Available,
+		})
+	}
+
+	out := make([]VariantGroup, 0, len(groupOrder))
+	for _, attrID := range groupOrder {
+		out = append(out, *groups[attrID])
+	}
+	payload, _ := json.Marshal(variants)
+	return out, string(payload)
 }
 
 func (p PublicHandler) Shipping(c *gin.Context) {

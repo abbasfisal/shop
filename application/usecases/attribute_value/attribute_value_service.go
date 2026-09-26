@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"shop/application/dto/admin"
 	"shop/domain/domain_err"
-	"shop/domain/entities"
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
 )
@@ -24,10 +23,7 @@ func NewAttributeValueService(repo repositories.AttributeValueRepositoryInterfac
 
 func (av *AttributeValueService) Create(ctx context.Context, req *requests.CreateAttributeValueRequest) (*responses.AttributeValue, domain_err.CustomError) {
 
-	newAttrValue, err := av.repo.Store(ctx, &entities.AttributeValue{
-		AttributeID: req.AttributeID,
-		Value:       req.Value,
-	})
+	newAttrValue, err := av.repo.Store(ctx, req)
 
 	if err != nil {
 		return nil, domain_err.HandleError(err, domain_err.RecordNotFound)

@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"regexp"
+	"strings"
 
 	"github.com/spf13/viper"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/pkg/util"
@@ -42,8 +45,10 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 		Status                      string
 		AttributeID                 uint
 		AttributeTitle              string
+		AttributeInputType          string
 		AttributeValueID            uint
 		AttributeValueTitle         string
+		AttributeValueMeta          datatypes.JSON
 		ProductInventoryAttributeID uint
 	}
 
@@ -51,7 +56,7 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 	serr := db.
 		WithContext(c).
 		Table("product_variants").
-		Select("product_variants.id AS inventory_id, product_variants.stock AS quantity, product_variants.reserved_stock, product_variants.price, product_variants.sale_price, product_variants.discount_price, product_variants.status, attributes.id AS attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, variant_attribute_values.id AS product_inventory_attribute_id").
+		Select("product_variants.id AS inventory_id, product_variants.stock AS quantity, product_variants.reserved_stock, product_variants.price, product_variants.sale_price, product_variants.discount_price, product_variants.status, attributes.id AS attribute_id, attributes.title AS attribute_title, attributes.input_type AS attribute_input_type, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, attribute_values.meta AS attribute_value_meta, variant_attribute_values.id AS product_inventory_attribute_id").
 		Joins("LEFT JOIN variant_attribute_values ON product_variants.id = variant_attribute_values.variant_id AND variant_attribute_values.deleted_at IS NULL").
 		Joins("LEFT JOIN attribute_values ON variant_attribute_values.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
 		Joins("LEFT JOIN attributes ON attribute_values.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
@@ -77,6 +82,8 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 			AttributeValueID:            int64(inventory.AttributeValueID),
 			AttributeValueTitle:         inventory.AttributeValueTitle,
 			ProductInventoryAttributeID: int64(inventory.ProductInventoryAttributeID),
+			IsColor:                     inventory.AttributeInputType == entities.AttributeInputColor,
+			ColorHex:                    attributeValueHex(inventory.AttributeValueMeta),
 		})
 		inventoryMap[key] = inv
 	}
@@ -219,8 +226,10 @@ func variantInventory(row struct {
 	Status                      string
 	AttributeID                 uint
 	AttributeTitle              string
+	AttributeInputType          string
 	AttributeValueID            uint
 	AttributeValueTitle         string
+	AttributeValueMeta          datatypes.JSON
 	ProductInventoryAttributeID uint
 }, product entities.Product) entities.Inventory {
 	price := int64(product.OriginalPrice)
@@ -263,6 +272,23 @@ func variantInventory(row struct {
 		Status:          row.Status,
 		Available:       available,
 	}
+}
+
+// attributeValueHex extracts a validated #rrggbb from a meta JSONB value.
+func attributeValueHex(meta datatypes.JSON) string {
+	if len(meta) == 0 {
+		return ""
+	}
+	var m map[string]string
+	if err := json.Unmarshal(meta, &m); err != nil {
+		return ""
+	}
+	hex := strings.TrimSpace(m["hex"])
+	matched, _ := regexp.MatchString(`^#[0-9a-fA-F]{6}$`, hex)
+	if !matched {
+		return ""
+	}
+	return hex
 }
 
 func derefUint(v *uint) uint {

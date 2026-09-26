@@ -148,7 +148,8 @@ func (a *AdminHandler) UpdateAttribute(c *gin.Context) {
 	}
 
 	//don't need to update
-	if oldAttribute.Title == strings.TrimSpace(req.Title) {
+	if oldAttribute.Title == strings.TrimSpace(req.Title) &&
+		oldAttribute.InputType == req.NormalizedInputType() {
 		sessions.Set(c, "message", custom_messages.AttributeUpdatedSuccessfully)
 		c.Redirect(http.StatusFound, "/admins/attributes")
 		return

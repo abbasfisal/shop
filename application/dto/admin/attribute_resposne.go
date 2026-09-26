@@ -7,6 +7,8 @@ type Attribute struct {
 	Title           string
 	Code            string
 	SortOrder       int
+	InputType       string
+	InputTypeLabel  string
 	AttributeValues *AttributeValues
 }
 
@@ -15,11 +17,17 @@ type Attributes struct {
 }
 
 func ToAttribute(attr *entities.Attribute) *Attribute {
+	inputType := attr.InputType
+	if inputType == "" {
+		inputType = entities.AttributeInputText
+	}
 	return &Attribute{
 		ID:              attr.ID,
 		Title:           attr.Title,
 		Code:            attr.Code,
 		SortOrder:       attr.SortOrder,
+		InputType:       inputType,
+		InputTypeLabel:  entities.AttributeInputTypeLabel(inputType),
 		AttributeValues: ToAttributeValues(attr.AttributeValues),
 	}
 }

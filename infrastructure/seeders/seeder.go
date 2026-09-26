@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/infrastructure/database/postgres"
@@ -482,27 +483,31 @@ func fakeAttributeAndValues() []entities.Attribute {
 			},
 		},
 		{
-			Model: gorm.Model{},
-			Title: "رنگ",
-			Code:  "color",
+			Model:     gorm.Model{},
+			Title:     "رنگ",
+			Code:      "color",
+			InputType: entities.AttributeInputColor,
 			AttributeValues: []*entities.AttributeValue{
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
 					AttributeTitle: "رنگ",
 					Value:          "آبی",
+					Meta:           datatypes.JSON([]byte(`{"hex": "#2563eb"}`)),
 				},
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
 					AttributeTitle: "رنگ",
 					Value:          "قرمز",
+					Meta:           datatypes.JSON([]byte(`{"hex": "#dc2626"}`)),
 				},
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
 					AttributeTitle: "رنگ",
 					Value:          "بنفش",
+					Meta:           datatypes.JSON([]byte(`{"hex": "#7c3aed"}`)),
 				},
 			},
 		},

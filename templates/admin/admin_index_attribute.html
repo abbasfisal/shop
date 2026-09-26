@@ -38,12 +38,14 @@
                                 <tr>
                                     <td>ID</td>
                                     <td>عنوان</td>
+                                    <td>نوع ورودی</td>
                                     <td>عملیات</td>
                                 </tr>
                                 {{range .ATTRIBUTES.Data}}
                                     <tr>
                                         <td>{{.ID}}</td>
                                         <td>{{.Title}}</td>
+                                        <td>{{if eq .InputType "color"}}<span class="badge badge-info">رنگ</span>{{else}}<span class="badge badge-secondary">متن</span>{{end}}</td>
 
                                         <td>
                                             <a href="/admins/attributes/{{.ID}}/edit">

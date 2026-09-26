@@ -61,5 +61,8 @@ func (ar *AttributeRepository) Update(c *gin.Context, attributeID int, req *requ
 		return err
 	}
 
-	return ar.db.Model(&att).Update("title", strings.TrimSpace(req.Title)).Error
+	return ar.db.Model(&att).Updates(map[string]interface{}{
+		"title":      strings.TrimSpace(req.Title),
+		"input_type": req.NormalizedInputType(),
+	}).Error
 }

@@ -91,4 +91,7 @@ type InventoryAttributes struct {
 	AttributeValueID            int64  `json:"attribute_value_id"`
 	AttributeValueTitle         string `json:"attribute_value_title"`
 	ProductInventoryAttributeID int64  `json:"product_inventory_attribute_id"`
+	// dynamic value presentation: color attributes paint swatches
+	IsColor  bool   `json:"is_color"`
+	ColorHex string `json:"color_hex"`
 }

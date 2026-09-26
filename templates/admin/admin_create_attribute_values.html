@@ -34,7 +34,7 @@
                                         <select class="form-control" name="attribute_id" id="attribute">
                                             <option data value="0">انتخاب کنید</option>
                                             {{range .ATTRIBUTES.Data}}
-                                                <option value="{{.ID}}">{{.Title}}</option>
+                                                <option value="{{.ID}}" data-input-type="{{.InputType}}">{{.Title}}</option>
                                             {{end}}
                                         </select>
                                         <span class="text-danger">{{ .ERRORS.attribute_id}}</span>
@@ -46,6 +46,20 @@
                                                class="form-control"
                                                value="{{range .OLDS.value}}{{.}}{{end}}"></td>
                                     <td class="text-danger">{{ .ERRORS.value}}</td>
+                                </tr>
+                                <tr id="colorRow" style="display:none;">
+                                    <td>کد رنگ</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <input type="color" id="colorPicker" class="form-control"
+                                                   style="max-width:80px; height:38px; padding:2px;" value="#7c3aed">
+                                            <input type="text" name="color_hex" id="colorHex" dir="ltr"
+                                                   class="form-control mr-2" placeholder="#rrggbb"
+                                                   value="{{range .OLDS.color_hex}}{{.}}{{end}}">
+                                        </div>
+                                        <small class="text-muted">در فروشگاه به‌صورت دایره رنگی نمایش داده می‌شود</small>
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.color_hex}}</td>
                                 </tr>
                                 <tr>
                                     <td></td>
@@ -70,30 +84,33 @@
     {{template "footer" .}}
 
     <script>
-        $(document).ready(function () {
-            $('#parent-category').change(function () {
-                var parentId = $(this).val();
-
-                if (parentId) {
-                    $.ajax({
-                        url: '/admins/get-attributes/' + parentId,
-                        type: 'GET',
-                        success: function (response) {
-                            $('#attribute').empty();
-                            $('#attribute').append('<option value="">انتخاب کنید</option>');
-                            $.each(response.Data, function (index, attribute) {
-                                $('#attribute').append('<option value="' + attribute.ID + '">' + attribute.Title + '</option>');
-                            });
-                        },
-                        error: function (error) {
-                            console.log("Error fetching attributes:", error);
-                        }
-                    });
-                } else {
-                    $('#attribute').empty();
-                    $('#attribute').append('<option value="">انتخاب کنید</option>');
-                }
-            });
+        function syncColorInputs(fromPicker) {
+            var picker = document.getElementById('colorPicker');
+            var hex = document.getElementById('colorHex');
+            if (!picker || !hex) return;
+            if (fromPicker) {
+                hex.value = picker.value;
+            } else if (/^#[0-9a-fA-F]{6}$/.test(hex.value.trim())) {
+                picker.value = hex.value.trim();
+            }
+        }
+        function toggleColorRow() {
+            var sel = document.getElementById('attribute');
+            var row = document.getElementById('colorRow');
+            if (!sel || !row) return;
+            var opt = sel.options[sel.selectedIndex];
+            var isColor = opt && opt.dataset && opt.dataset.inputType === 'color';
+            row.style.display = isColor ? '' : 'none';
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var sel = document.getElementById('attribute');
+            var picker = document.getElementById('colorPicker');
+            var hex = document.getElementById('colorHex');
+            if (sel) sel.addEventListener('change', toggleColorRow);
+            if (picker) picker.addEventListener('input', function () { syncColorInputs(true); });
+            if (hex) hex.addEventListener('input', function () { syncColorInputs(false); });
+            toggleColorRow();
+            syncColorInputs(false);
         });
     </script>
 {{end}}

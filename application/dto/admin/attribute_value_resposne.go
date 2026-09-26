@@ -7,6 +7,7 @@ type AttributeValue struct {
 	AttributeID    uint
 	AttributeTitle string
 	Title          string
+	ColorHex       string
 }
 
 type AttributeValues struct {
@@ -19,6 +20,7 @@ func ToAttributeValue(attr *entities.AttributeValue) *AttributeValue {
 		AttributeID:    attr.AttributeID,
 		AttributeTitle: attr.AttributeTitle,
 		Title:          attr.Value,
+		ColorHex:       attr.ColorHex(),
 	}
 }
 
