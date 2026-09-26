@@ -85,13 +85,15 @@ func fakeProducts() []entities.Product {
 	var p []entities.Product
 	for i := 1; i <= 200; i++ {
 		p = append(p, entities.Product{
-			CategoryID:    49, //عطر و ادکلن زنانه
-			BrandID:       3,  //Ballerina
-			Title:         "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر" + strconv.Itoa(i*2),
-			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl" + strconv.Itoa(i*2),
-			Sku:           "sku1000" + strconv.Itoa(i*2),
-			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 822_000,
+			CategoryID: 49, //عطر و ادکلن زنانه
+			BrandID:    3,  //Ballerina
+			Title:      "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر" + strconv.Itoa(i*2),
+			Slug:       "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl" + strconv.Itoa(i*2),
+			Sku:        "sku1000" + strconv.Itoa(i*2),
+			Status:     entities.ProductStatusPublished,
+			// OriginalPrice = admin-only purchase cost (خرید از عمده‌فروش)؛
+			// SalePrice = selling price to the customer (بدون تخفیف در سیدر).
+			OriginalPrice: 280_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
 			ProductImages: []*entities.ProductImages{
@@ -156,7 +158,7 @@ func fakeProducts() []entities.Product {
 			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl",
 			Sku:           "sku1000",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 822_000,
+			OriginalPrice: 280_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
 			ProductImages: []*entities.ProductImages{
@@ -217,7 +219,7 @@ func fakeProducts() []entities.Product {
 			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-پویزن-poisson",
 			Sku:           "sku1001",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 780_000,
+			OriginalPrice: 280_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson عطری است زنانه با رایحه ای شیرین و گرم که مکمل شخصیت زنانه است و به شما احساس منحصر به فرد و جذاب می دهد. با بسته‌بندی و طراحی لوکس شیشه، این عطر بهترین کیفیت را در اختیار شما قرار می‌دهد.",
 			ProductImages: []*entities.ProductImages{
@@ -282,7 +284,7 @@ func fakeProducts() []entities.Product {
 			Slug:          "ادو-پرفیوم-زنانه-بایلندو-مدل-اکلت-eclatto",
 			Sku:           "sku1002",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 815_000,
+			OriginalPrice: 380_000,
 			SalePrice:     477_600,
 			Description:   "ادو پرفیوم زنانه بایلندو مدل d’ Eclatto قصیده ای فریبنده برای ظرافت زنانگی است،‌ جاییکه ترکیب مست کننده میوه ها، لمس مخملی گل پائونیا، و با حضور باشکوه سرو گرد هم می آیند.تا نقش و نگار طلسم کننده ای از جذابیت و اعتماد به نفس را بیافریند.",
 			ProductImages: []*entities.ProductImages{
@@ -345,7 +347,7 @@ func fakeProducts() []entities.Product {
 			Slug:          "شلوار-مردانه-مدل-بنگال-کمربند-دار",
 			Sku:           "sku2000",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 280_000,
+			OriginalPrice: 190_000,
 			SalePrice:     238_000,
 			Description:   "شلوار از پارچه ی به اصطلاح بنگال تولید شده است،پارچه ی کتان بنگال پارچه ای با ظرافت بالا همراه با کشسانی نسبی مناسب می باشد که زیبایی دو چندانی در پوشیدن شلوار به شما می دهد پس اگر دنبال شلوار ضخیم میگردید ما پارچه ی بنگال را توصیه نمیکنیم.قد شلوار صد سانتی متر است،پاچه ی شلوار پاکتی است و در قسمت پاچه و کمربند مارک فلزی کار شده است،قسمت پشت کمر کش کار شده است و در جلوی کار طراحی کمربندی زیبا که شمارا از بستن کمربند بی نیاز میکند و راحتی دو چندانی را به ارمغان خواهد آورد.شلوار دارای دو جیب در بغل و یک جیب کوچک در پشت است،یک ساسون در پای چپ و یک ساسون در روی پای راست به ظاهر کلاسیکی شلوار می افزاید.رنگ شلوار مشکی است و مهمترین ویژگی آن استایل جذب و قابلیت پوشیدن با کفش کالج و تیپ رسمی و همینطور قابلیت پوشیدن با کفش اسپرت و تیپ اسپرت را دارد.",
 

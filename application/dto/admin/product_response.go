@@ -58,18 +58,17 @@ func ToProducts(products []*entities.Product) *Products {
 
 func ToProduct(p *entities.Product) *Product {
 	var product = Product{
-		ID:            p.ID,
-		CategoryID:    p.CategoryID,
-		BrandID:       p.BrandID,
-		Title:         p.Title,
-		Slug:          p.Slug,
-		Sku:           p.Sku,
-		Status:        p.Status,
-		StatusText:    entities.ProductStatusLabel(p.Status),
-		OriginalPrice: p.OriginalPrice,
-		SalePrice:     p.SalePrice,
-		Description:   p.Description,
-		ExpiresAt:     p.ExpiresAt,
+		ID:          p.ID,
+		CategoryID:  p.CategoryID,
+		BrandID:     p.BrandID,
+		Title:       p.Title,
+		Slug:        p.Slug,
+		Sku:         p.Sku,
+		Status:      p.Status,
+		StatusText:  entities.ProductStatusLabel(p.Status),
+		SalePrice:   p.SalePrice,
+		Description: p.Description,
+		ExpiresAt:   p.ExpiresAt,
 
 		ProductType:    p.ProductType,
 		MinPrice:       p.MinPrice,
@@ -82,10 +81,15 @@ func ToProduct(p *entities.Product) *Product {
 
 		EffectivePrice: EffectivePriceOf(p),
 
-		// golden rule: the discount is measured against the price the
-		// customer actually pays (effective), not the nominal sale price —
-		// otherwise a variant-level تخفیف shows a wrong (lower) percent.
-		Discount: DiscountPercentOf(p.OriginalPrice, EffectivePriceOf(p)),
+		// storefront semantics: OriginalPrice exposed here is the crossed-out
+		// sale base (p.SalePrice), NOT the admin-only purchase cost
+		// (p.OriginalPrice). Discount is measured sale-base vs effective:
+		// sale=200000 + discount(effective)=150000 → 25%.
+		OriginalPrice: p.SalePrice,
+
+		// golden rule: the discount is measured against the sale base,
+		// otherwise a variant-level تخفیف shows a wrong percent.
+		Discount: DiscountPercentOf(p.SalePrice, EffectivePriceOf(p)),
 	}
 
 	if p.Features != nil {

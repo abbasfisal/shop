@@ -78,6 +78,8 @@ func ToSliderProduct(link *entities.SliderProduct) SliderProduct {
 		out.Sku = view.Sku
 		out.Slug = view.Slug
 		out.InStock = view.InStock
+		// crossed-out base = sale base (view.OriginalPrice is already the
+		// sale base after the ToProduct fix; purchase cost never reaches here)
 		out.OriginalPrice = view.OriginalPrice
 		out.DiscountPercent = view.Discount
 

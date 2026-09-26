@@ -28,7 +28,7 @@ type ProductInventory struct {
 	Available uint
 	Sku       string
 
-	Price           uint
+	Price           uint // admin-only purchase cost (never shown to customer)
 	SalePrice       uint
 	DiscountPrice   *uint
 	EffectivePrice  uint
@@ -52,29 +52,32 @@ type ProductInventories struct {
 }
 
 // ToProductInventory maps one variant with its pricing/status helpers.
-// fallbackOriginal/fallbackSale are the parent product prices — a NULL variant
-// price column inherits them (see PricingService).
+// fallbackSale is the parent product sale base — a NULL variant sale_price
+// inherits it. pv.Price (purchase cost) is admin-only: it is kept in
+// ProductInventory.Price for the admin panel but NEVER drives the storefront
+// badge — discount % is always measured sale-base vs effective.
 func ToProductInventory(pv *entities.ProductVariant, fallbackOriginal, fallbackSale uint) *ProductInventory {
-	original := fallbackOriginal
+	cost := fallbackOriginal
 	if pv.Price != nil {
-		original = *pv.Price
+		cost = *pv.Price
 	}
+	_ = cost
 	sale := fallbackSale
 	if pv.SalePrice != nil {
 		sale = *pv.SalePrice
 	}
 
 	// golden rule: discount counts only when > 0 and < effective sale price.
-	// The badge percent is measured against the crossed-out list price
-	// (original), consistent with the storefront display.
+	// The badge percent is measured against the crossed-out sale base,
+	// consistent with the storefront display.
 	effective := sale
 	hasDiscount := false
 	discountPercent := 0
 	if pv.DiscountPrice != nil && *pv.DiscountPrice > 0 && *pv.DiscountPrice < sale {
 		effective = *pv.DiscountPrice
 		hasDiscount = true
-		if original > 0 && effective < original {
-			discountPercent = int(math.Round(float64(original-effective) / float64(original) * 100))
+		if sale > 0 && effective < sale {
+			discountPercent = int(math.Round(float64(sale-effective) / float64(sale) * 100))
 		}
 	}
 
@@ -85,7 +88,7 @@ func ToProductInventory(pv *entities.ProductVariant, fallbackOriginal, fallbackS
 		Reserved:  pv.ReservedStock,
 		Available: availableOf(pv),
 
-		Price:           original,
+		Price:           cost,
 		SalePrice:       sale,
 		DiscountPrice:   pv.DiscountPrice,
 		EffectivePrice:  effective,

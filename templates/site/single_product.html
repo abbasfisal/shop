@@ -299,21 +299,20 @@
                                                     </ul>
                                                     {{$rm := .PRODUCT.product}}
                                                     {{$invCount := len .PRODUCT.inventories}}
+                                                    {{$singleSellable := true}}
+                                                    {{if eq $invCount 1}}{{range $key,$item:=.PRODUCT.inventories}}{{if lt $item.Available 1}}{{$singleSellable = false}}{{end}}{{end}}{{end}}
+                                                    {{$showOff := false}}
+                                                    {{if gt $invCount 1}}
+                                                        {{if gt $rm.Discount 0}}{{$showOff = true}}{{end}}
+                                                    {{else if eq $invCount 0}}
+                                                        {{if gt $rm.Discount 0}}{{$showOff = true}}{{end}}
+                                                    {{else}}
+                                                        {{range $key,$item:=.PRODUCT.inventories}}{{if and $item.HasDiscount (gt $item.DiscountPercent 0)}}{{$showOff = true}}{{end}}{{end}}
+                                                    {{end}}
                                                     <div class="product-seller-row product-seller-row--price">
                                                         <div class="product-seller-price-info">
-                                                            <div class="product-seller-price-prev" id="pricePrev">
-                                                                {{$rm.OriginalPrice}}
-                                                            </div>
-                                                            <div class="product-seller-price-off" id="priceOff">
-                                                                {{if gt $invCount 1}}
-                                                                    {{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}
-                                                                {{else}}
-                                                                    {{range $key,$item:=.PRODUCT.inventories}}
-                                                                        {{if and $item.HasDiscount (gt $item.DiscountPercent 0)}}{{$item.DiscountPercent}}%{{else if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}
-                                                                    {{end}}
-                                                                    {{if eq $invCount 0}}{{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}{{end}}
-                                                                {{end}}
-                                                            </div>
+                                                            <div class="product-seller-price-prev" id="pricePrev">{{if gt $invCount 1}}{{if gt $rm.Discount 0}}{{$rm.OriginalPrice}}{{end}}{{else}}{{range $key,$item:=.PRODUCT.inventories}}{{if $item.HasDiscount}}{{$item.SalePrice}}{{end}}{{end}}{{end}}</div>
+                                                            {{if $showOff}}<div class="product-seller-price-off" id="priceOff">{{if gt $invCount 1}}{{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}{{else}}{{range $key,$item:=.PRODUCT.inventories}}{{if and $item.HasDiscount (gt $item.DiscountPercent 0)}}{{$item.DiscountPercent}}%{{end}}{{end}}{{if eq $invCount 0}}{{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}{{end}}{{end}}</div>{{end}}
                                                         </div>
                                                         <div class="product-seller-price-real">
                                                             <div class="product-seller-price-raw" id="priceReal">
@@ -335,6 +334,7 @@
                                                         {{end}}
                                                         <input type="hidden" id="cartInventoryIds"
                                                                value="{{.CART_INVENTORY_IDS_JSON}}">
+                                                        {{if $singleSellable}}
                                                         <form action="/add-to-cart" method="post" id="addToCartForm">
                                                             <input type="hidden" name="product_id"
                                                                    value="{{.PRODUCT._id}}">
@@ -362,6 +362,12 @@
                                                            class="btn-add-to-cart bg-success btn-add-to-cart--full-width"
                                                            style="display:none">مشاهده سبد خرید
                                                         </a>
+                                                        {{else}}
+                                                        <div class="btn-add-to-cart btn-add-to-cart--full-width"
+                                                             style="background:#9e9e9e;border-color:#9e9e9e;pointer-events:none;text-align:center;">
+                                                            <span class="btn-add-to-cart-txt">ناموجود</span>
+                                                        </div>
+                                                        {{end}}
                                                     </div>
                                                 </nav>
                                             </div>
@@ -875,9 +881,16 @@
                     renderInCart(null);
                     return;
                 }
-                if (pricePrev && v.price) pricePrev.innerText = fmt(v.price);
+                // crossed-out base + badge only for a real discount —
+                // otherwise a plain price, exactly like the index cards
+                if (v.has_discount && v.percent > 0 && v.price) {
+                    if (pricePrev) { pricePrev.innerText = fmt(v.price); pricePrev.style.display = ''; }
+                    if (priceOff) { priceOff.innerText = v.percent + '%'; priceOff.style.display = ''; }
+                } else {
+                    if (pricePrev) { pricePrev.innerText = ''; pricePrev.style.display = 'none'; }
+                    if (priceOff) { priceOff.innerText = ''; priceOff.style.display = 'none'; }
+                }
                 if (priceReal && v.effective != null) priceReal.innerText = fmt(v.effective);
-                if (priceOff) priceOff.innerText = (v.has_discount && v.percent > 0) ? v.percent + '%' : '';
                 renderStock(v);
                 renderButton(v);
                 renderInCart(v);

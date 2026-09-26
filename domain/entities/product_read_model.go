@@ -11,18 +11,21 @@ type ProductReadModel struct {
 
 // P is the flattened product projection consumed by the storefront templates.
 type P struct {
-	ID            int64  `json:"id"`
-	Category      C      `json:"Category"`
-	CategoryID    int64  `json:"category_id"`
-	Brand         B      `json:"Brand"`
-	BrandID       int64  `json:"brand_id"`
-	Title         string `json:"title"`
-	Slug          string `json:"slug"`
-	Sku           string `json:"sku"`
-	Status        string `json:"status"`
-	OriginalPrice int64  `json:"original_price"`
-	SalePrice     int64  `json:"sale_price"`
-	Discount      int64  `json:"Discount"`
+	ID         int64  `json:"id"`
+	Category   C      `json:"Category"`
+	CategoryID int64  `json:"category_id"`
+	Brand      B      `json:"Brand"`
+	BrandID    int64  `json:"brand_id"`
+	Title      string `json:"title"`
+	Slug       string `json:"slug"`
+	Sku        string `json:"sku"`
+	Status     string `json:"status"`
+	// OriginalPrice is the storefront crossed-out base = sale base
+	// (products.sale_price); the purchase cost (products.original_price /
+	// variant.price) is admin-only and never stored here.
+	OriginalPrice int64 `json:"original_price"`
+	SalePrice     int64 `json:"sale_price"`
+	Discount      int64 `json:"Discount"`
 	// PricingService aggregates mirrored for the storefront (effective price
 	// display: "از MinPrice", single-inventory pages, recommendations).
 	MinPrice    int64     `json:"min_price"`
@@ -73,10 +76,11 @@ type Inventory struct {
 	Quantity    int64                 `json:"quantity"`
 	Attributes  []InventoryAttributes `json:"attributes"`
 
-	// per-variant pricing (Laravel ProductVariant) — NULL variant columns
-	// already resolved against the product price here
-	Price           int64  `json:"price"`          // crossed-out list price
-	SalePrice       int64  `json:"sale_price"`     // normal price
+	// per-variant pricing — NULL variant sale columns already resolved
+	// against products.sale_price here. Price is the crossed-out sale base,
+	// NOT the purchase cost (variant.price is admin-only and never exposed).
+	Price           int64  `json:"price"`          // crossed-out sale base
+	SalePrice       int64  `json:"sale_price"`     // normal sale price
 	DiscountPrice   int64  `json:"discount_price"` // 0 when none
 	HasDiscount     bool   `json:"has_discount"`
 	DiscountPercent int64  `json:"discount_percent"`

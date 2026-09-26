@@ -701,34 +701,33 @@ func retryWithBackoff(attempts int, delay time.Duration, operation func() error)
 
 // GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
 // cartPrices resolves the cart item prices for the selected variant:
-// original = the crossed-out list price, sale = the price the customer pays
+// original = the crossed-out sale base, sale = the price the customer pays
 // (discount_price wins when it is a real discount — golden rule #3).
-// NULL variant price columns inherit the parent product price.
+// variant.price / products.original_price are the admin-only purchase cost
+// and are NEVER used here. NULL variant sale_price inherits products.sale_price.
 func (h *HomeRepository) cartPrices(c *gin.Context, product *entities.Product, inventoryID uint) (uint, uint) {
-	originalPrice := product.OriginalPrice
+	saleBase := product.SalePrice
 	salePrice := product.SalePrice
 
 	if inventoryID == 0 {
-		return originalPrice, salePrice
+		return saleBase, salePrice
 	}
 
 	var variant entities.ProductVariant
 	if err := h.dep.DB.WithContext(c).
 		Where("id = ? AND product_id = ?", inventoryID, product.ID).
 		First(&variant).Error; err != nil {
-		return originalPrice, salePrice
+		return saleBase, salePrice
 	}
 
-	if variant.Price != nil {
-		originalPrice = *variant.Price
-	}
 	if variant.SalePrice != nil {
+		saleBase = *variant.SalePrice
 		salePrice = *variant.SalePrice
 	}
 	if variant.DiscountPrice != nil && *variant.DiscountPrice > 0 && *variant.DiscountPrice < salePrice {
 		salePrice = *variant.DiscountPrice
 	}
-	return originalPrice, salePrice
+	return saleBase, salePrice
 }
 
 // resolveVariant loads the exact variant a cart/order line refers to.

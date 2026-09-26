@@ -88,16 +88,20 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 		inventoryMap[key] = inv
 	}
 
-	// golden rule: the storefront discount is measured against the price the
-	// customer actually pays (aggregate minimum when variants exist), not the
-	// nominal product sale price.
+	// pricing semantics (user-confirmed): product_variants.price is the admin-only
+	// purchase cost (خرید از عمده‌فروش) and must NEVER reach the storefront.
+	// The crossed-out list price is the sale base (products.sale_price /
+	// variant.sale_price); the customer pays discount_price when it is a real
+	// discount (0 < discount < sale), otherwise the sale base.
+	// golden rule: the storefront discount is measured against the sale base,
+	// not the purchase cost.
 	effectiveSale := int64(product.SalePrice)
 	if product.MinPrice > 0 {
 		effectiveSale = int64(product.MinPrice)
 	}
 	discount := int64(0)
-	if product.OriginalPrice > 0 && effectiveSale > 0 && effectiveSale < int64(product.OriginalPrice) {
-		discount = int64(math.Round((float64(product.OriginalPrice) - float64(effectiveSale)) / float64(product.OriginalPrice) * 100))
+	if saleBase := int64(product.SalePrice); saleBase > 0 && effectiveSale > 0 && effectiveSale < saleBase {
+		discount = int64(math.Round((float64(saleBase) - float64(effectiveSale)) / float64(saleBase) * 100))
 	}
 
 	readModel := entities.ProductReadModel{
@@ -115,12 +119,15 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 				Title: product.Brand.Title,
 				Slug:  product.Brand.Slug,
 			},
-			BrandID:       int64(product.BrandID),
-			Title:         product.Title,
-			Slug:          product.Slug,
-			Sku:           product.Sku,
-			Status:        product.Status,
-			OriginalPrice: int64(product.OriginalPrice),
+			BrandID: int64(product.BrandID),
+			Title:   product.Title,
+			Slug:    product.Slug,
+			Sku:     product.Sku,
+			Status:  product.Status,
+			// OriginalPrice here is the storefront crossed-out base = sale
+			// base, NOT the purchase cost (products.original_price is
+			// admin-only and must not leak to templates/Typesense).
+			OriginalPrice: int64(product.SalePrice),
 			SalePrice:     int64(product.SalePrice),
 			Discount:      discount,
 			MinPrice:      int64(product.MinPrice),
@@ -174,15 +181,8 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 		if product.MinPrice > 0 {
 			salePrice = product.MinPrice
 		}
-		// discount % against the effective selling price
+		// discount % against the sale base (never against purchase cost)
 		saleDiscount := discount
-		if product.OriginalPrice > 0 && salePrice != product.SalePrice {
-			pct := (float64(product.OriginalPrice) - float64(salePrice)) / float64(product.OriginalPrice) * 100
-			if pct < 0 {
-				pct = 0
-			}
-			saleDiscount = int64(math.Round(pct))
-		}
 
 		categoryTitle := ""
 		if product.Category != nil {
@@ -193,14 +193,15 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 			brandTitle = product.Brand.Title
 		}
 		go util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
-			ID:            idStr,
-			Title:         product.Title,
-			Slug:          product.Slug,
-			Sku:           product.Sku,
-			Description:   product.Description,
-			Category:      categoryTitle,
-			Brand:         brandTitle,
-			OriginalPrice: int64(product.OriginalPrice),
+			ID:          idStr,
+			Title:       product.Title,
+			Slug:        product.Slug,
+			Sku:         product.Sku,
+			Description: product.Description,
+			Category:    categoryTitle,
+			Brand:       brandTitle,
+			// Typesense crossed-out base = sale base (admin cost excluded)
+			OriginalPrice: int64(product.SalePrice),
 			SalePrice:     int64(salePrice),
 			Discount:      int64(saleDiscount),
 			Stock:         totalStock,
@@ -214,8 +215,11 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 }
 
 // variantInventory resolves one variant's pricing/status for the read model:
-// NULL price columns inherit the product price, discount counts only when it
-// is greater than zero and lower than the sale price (golden rule #3).
+// variant.price (purchase cost) is admin-only and ignored here; NULL
+// sale_price inherits products.sale_price, discount counts only when it
+// is greater than zero and lower than the sale base (golden rule #3).
+// Inventory.Price is the crossed-out sale base (NOT the cost) so the
+// picker/JS never sees the purchase price.
 func variantInventory(row struct {
 	InventoryID                 uint
 	Quantity                    uint
@@ -232,25 +236,22 @@ func variantInventory(row struct {
 	AttributeValueMeta          datatypes.JSON
 	ProductInventoryAttributeID uint
 }, product entities.Product) entities.Inventory {
-	price := int64(product.OriginalPrice)
-	if row.Price != nil {
-		price = int64(*row.Price)
-	}
 	sale := int64(product.SalePrice)
 	if row.SalePrice != nil {
 		sale = int64(*row.SalePrice)
 	}
+	price := sale
 
 	effective := sale
 	hasDiscount := false
-	// the badge percent is measured against the crossed-out list price (price),
+	// the badge percent is measured against the crossed-out sale base,
 	// consistent with the storefront display next to it
 	var discountPercent int64
 	if row.DiscountPrice != nil && *row.DiscountPrice > 0 && int64(*row.DiscountPrice) < sale {
 		effective = int64(*row.DiscountPrice)
 		hasDiscount = true
-		if price > 0 && effective < price {
-			discountPercent = int64(math.Round(float64(price-effective) / float64(price) * 100))
+		if sale > 0 && effective < sale {
+			discountPercent = int64(math.Round(float64(sale-effective) / float64(sale) * 100))
 		}
 	}
 

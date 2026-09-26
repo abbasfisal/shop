@@ -53,9 +53,9 @@ func SeedDemoShop(db *gorm.DB) {
 // ------------------------------------------------------------
 
 type demoVariant struct {
-	Price         *uint // nil → inherit products.original_price
-	SalePrice     *uint // nil → inherit products.sale_price
-	DiscountPrice *uint
+	Price         *uint // nil → inherit products.original_price (admin-only purchase cost)
+	SalePrice     *uint // nil → inherit products.sale_price (selling price)
+	DiscountPrice *uint // discounted selling price; counts only when 0 < discount < sale
 	Stock         uint
 	Status        string
 	ExpiresAt     *time.Time
@@ -94,11 +94,11 @@ func demoProducts(now time.Time) []demoProduct {
 			CategorySlug:  "category-men-tee-shirts",
 			BrandSlug:     "zara",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 450_000,
-			SalePrice:     390_000,
+			OriginalPrice: 300_000, // purchase cost (admin-only)
+			SalePrice:     390_000, // selling price
 			Images:        []string{"1.webp", "2.webp"},
 			Variants: []demoVariant{
-				// NULL price columns → inherit the product price (golden rule)
+				// NULL sale columns → inherit the product sale price (golden rule)
 				{DiscountPrice: uintPtr(350_000), Stock: 25, Status: entities.VariantStatusActive},
 			},
 		},
@@ -112,7 +112,7 @@ func demoProducts(now time.Time) []demoProduct {
 			CategorySlug:  "category-men-trousers-jumpsuits",
 			BrandSlug:     "iran",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 900_000,
+			OriginalPrice: 620_000, // purchase cost (admin-only)
 			SalePrice:     780_000,
 			Images:        []string{"3.webp"},
 			Variants: []demoVariant{
@@ -129,7 +129,7 @@ func demoProducts(now time.Time) []demoProduct {
 			CategorySlug:  "category-men-accessories",
 			BrandSlug:     "zara",
 			Status:        entities.ProductStatusDraft,
-			OriginalPrice: 1_200_000,
+			OriginalPrice: 840_000, // purchase cost (admin-only)
 			SalePrice:     1_050_000,
 			Images:        []string{"11.webp"},
 			Variants: []demoVariant{
@@ -146,7 +146,7 @@ func demoProducts(now time.Time) []demoProduct {
 			CategorySlug:  "category-men-sweatshirts",
 			BrandSlug:     "bailando",
 			Status:        entities.ProductStatusArchived,
-			OriginalPrice: 2_500_000,
+			OriginalPrice: 1_600_000, // purchase cost (admin-only)
 			SalePrice:     1_980_000,
 			ExpiresAt:     past,
 			Images:        []string{"22.webp"},
@@ -164,19 +164,19 @@ func demoProducts(now time.Time) []demoProduct {
 			CategorySlug:  "category-men-tee-shirts",
 			BrandSlug:     "bailando",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 3_200_000,
+			OriginalPrice: 2_400_000, // purchase cost (admin-only)
 			SalePrice:     2_900_000,
 			Images:        []string{"33.webp", "111.webp", "222.webp"},
 			Variants: []demoVariant{
-				{Price: uintPtr(3_200_000), SalePrice: uintPtr(2_900_000),
+				{Price: uintPtr(2_400_000), SalePrice: uintPtr(2_900_000),
 					DiscountPrice: uintPtr(2_610_000), Stock: 8, Status: entities.VariantStatusActive,
 					Values: []string{"size:s", "color:آبی"}},
-				{Price: uintPtr(3_200_000), SalePrice: uintPtr(2_900_000), Stock: 5,
+				{Price: uintPtr(2_400_000), SalePrice: uintPtr(2_900_000), Stock: 5,
 					Status: entities.VariantStatusActive, Values: []string{"size:m", "color:آبی"}},
-				{Price: uintPtr(3_400_000), SalePrice: uintPtr(3_050_000),
+				{Price: uintPtr(2_500_000), SalePrice: uintPtr(3_050_000),
 					DiscountPrice: uintPtr(2_800_000), Stock: 0, Status: entities.VariantStatusActive,
 					Values: []string{"size:s", "color:قرمز"}}, // ناموجود
-				{Price: uintPtr(3_400_000), SalePrice: uintPtr(3_050_000), Stock: 4,
+				{Price: uintPtr(2_500_000), SalePrice: uintPtr(3_050_000), Stock: 4,
 					Status: entities.VariantStatusInactive, Values: []string{"size:l", "color:قرمز"}},
 			},
 		},
@@ -190,7 +190,7 @@ func demoProducts(now time.Time) []demoProduct {
 			CategorySlug:  "category-women-shirts",
 			BrandSlug:     "woody-sence",
 			Status:        entities.ProductStatusPublished,
-			OriginalPrice: 1_750_000,
+			OriginalPrice: 1_250_000, // purchase cost (admin-only)
 			SalePrice:     1_590_000,
 			ExpiresAt:     future,
 			Images:        []string{"1.webp", "3.webp"},
@@ -211,7 +211,7 @@ func demoProducts(now time.Time) []demoProduct {
 			CategorySlug:  "category-men-hoodies",
 			BrandSlug:     "iran",
 			Status:        entities.ProductStatusDraft,
-			OriginalPrice: 1_100_000,
+			OriginalPrice: 790_000, // purchase cost (admin-only)
 			SalePrice:     990_000,
 			Images:        []string{"11.webp", "22.webp"},
 			Variants: []demoVariant{

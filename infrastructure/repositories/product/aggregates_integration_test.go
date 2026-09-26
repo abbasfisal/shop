@@ -61,13 +61,15 @@ func TestRefreshProductAggregates(t *testing.T) {
 	}
 
 	prod := entities.Product{
-		CategoryID:    cat.ID,
-		BrandID:       brand.ID,
-		Title:         "agg-test-" + suffix,
-		Slug:          "agg-test-" + suffix,
-		Sku:           "agg-" + suffix,
-		Status:        entities.ProductStatusPublished,
-		OriginalPrice: 120,
+		CategoryID: cat.ID,
+		BrandID:    brand.ID,
+		Title:      "agg-test-" + suffix,
+		Slug:       "agg-test-" + suffix,
+		Sku:        "agg-" + suffix,
+		Status:     entities.ProductStatusPublished,
+		// OriginalPrice = admin-only purchase cost (must be < sale);
+		// aggregates/discounts only use sale/discount prices.
+		OriginalPrice: 60,
 		SalePrice:     80,
 	}
 	if err := tx.Create(&prod).Error; err != nil {
@@ -177,7 +179,7 @@ func TestSyncReadModelAndStorefrontGetProduct(t *testing.T) {
 		Slug:          "read-model-" + suffix,
 		Sku:           "rm-" + suffix,
 		Status:        entities.ProductStatusPublished,
-		OriginalPrice: 500,
+		OriginalPrice: 300, // admin-only purchase cost
 		SalePrice:     400,
 	}
 	if err := tx.Create(&prod).Error; err != nil {
@@ -238,6 +240,8 @@ func uintPtr(v uint) *uint { return &v }
 // TestSyncReadModelEffectivePrice is the regression test for the storefront
 // showing the nominal sale price (900) instead of the variant-level
 // discounted price (700) — the DEMO-SIMPLE-01 case.
+// Pricing semantics: discount % is measured sale-base vs effective
+// ((900-700)/900 = 22%), never against the admin-only purchase cost.
 func TestSyncReadModelEffectivePrice(t *testing.T) {
 	db := testDB(t)
 	ctx := context.Background()
@@ -262,7 +266,7 @@ func TestSyncReadModelEffectivePrice(t *testing.T) {
 		Slug:          "eff-test-" + suffix,
 		Sku:           "eff-" + suffix,
 		Status:        entities.ProductStatusPublished,
-		OriginalPrice: 1000,
+		OriginalPrice: 700, // admin-only purchase cost
 		SalePrice:     900,
 	}
 	if err := tx.Create(&prod).Error; err != nil {
@@ -297,16 +301,23 @@ func TestSyncReadModelEffectivePrice(t *testing.T) {
 	if rm.Product.MinPrice != 700 || rm.Product.MaxPrice != 700 {
 		t.Errorf("min/max: want 700/700 got %d/%d", rm.Product.MinPrice, rm.Product.MaxPrice)
 	}
-	// (1000-700)/1000 = 30% — a nominal computation would report 10%
-	if rm.Product.Discount != 30 {
-		t.Errorf("discount: want 30 got %d", rm.Product.Discount)
+	// (900-700)/900 = 22% — measured against the sale base, not the cost
+	if rm.Product.Discount != 22 {
+		t.Errorf("discount: want 22 got %d", rm.Product.Discount)
+	}
+	// crossed-out base in the read model is the sale base (900), never the cost
+	if rm.Product.OriginalPrice != 900 {
+		t.Errorf("original_price: want sale base 900 got %d", rm.Product.OriginalPrice)
 	}
 
 	inv, ok := rm.Inventories[fmt.Sprintf("%d", v.ID)]
 	if !ok {
 		t.Fatalf("inventory %d missing from read model", v.ID)
 	}
-	if inv.EffectivePrice != 700 || !inv.HasDiscount || inv.DiscountPercent != 30 {
+	if inv.EffectivePrice != 700 || !inv.HasDiscount || inv.DiscountPercent != 22 {
 		t.Errorf("inventory pricing mismatch: %+v", inv)
+	}
+	if inv.Price != 900 || inv.SalePrice != 900 {
+		t.Errorf("inventory crossed-out base: want 900/900 got %d/%d", inv.Price, inv.SalePrice)
 	}
 }

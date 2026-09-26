@@ -14,14 +14,21 @@ const (
 
 // ProductVariant is one sellable combination of a product (Laravel ProductVariant
 // pattern): its own stock, reservation and optional per-variant prices.
-// A NULL price field means "inherit the parent product's price" — the existing
-// storefront inventory form only manages stock, so overrides are applied via
-// code/seed/API while aggregates always resolve the effective price.
+//
+// Pricing semantics (user-confirmed):
+//   - Price         = admin-only purchase cost (قیمت خرید از عمده‌فروش)؛
+//     NEVER shown to the customer (فقط ادمین).
+//   - SalePrice     = selling price to the customer (قیمت فروش)؛
+//     NULL = inherit products.sale_price.
+//   - DiscountPrice = discounted selling price (قیمت با تخفیف)؛ counts only
+//     when > 0 and < effective sale price. Example:
+//     sale_price=200000 + discount_price=150000 → customer
+//     pays 150000; without discount only sale_price is set.
 type ProductVariant struct {
 	gorm.Model
 	ProductID     uint
 	Sku           *string    `gorm:"unique"`
-	Price         *uint      // buy/list price; NULL = inherit products.original_price
+	Price         *uint      // purchase cost (admin-only); never exposed to storefront
 	SalePrice     *uint      // NULL = inherit products.sale_price
 	DiscountPrice *uint      // counts only when > 0 and < effective sale price
 	Stock         uint       `gorm:"default:0"`
