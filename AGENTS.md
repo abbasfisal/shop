@@ -50,3 +50,24 @@ interfaces (http/worker) → application (usecases/dto/pricing) → infrastructu
 
 - Unit tests run everywhere (`make test`).
 - Integration tests **skip** unless `TEST_DATABASE_URL` is set and schema is migrated (`go run . migrate` first). They use transaction rollback — no cleanup needed.
+
+## graphify
+
+A knowledge graph of this repo lives in `graphify-out/` (1,315 nodes · 2,422 edges · 115 communities). Scope: Go source + `templates/` — `public/` and images are excluded.
+
+**Use it before grepping.** For any question about how something works, who calls what, or how data flows across layers, run the query first:
+
+```
+graphify query "<question>"          # BFS, broad context (default)
+graphify query "<question>" --dfs    # DFS, trace one path
+graphify path "AuthMiddleware" "Database"
+graphify explain "SyncReadModel"
+```
+
+A scoped subgraph is almost always smaller and more relevant than reading `GRAPH_REPORT.md` — save that file for broad architecture context only. Quote `source_location` when citing a specific fact.
+
+**After editing code**, the `post-commit` git hook re-extracts changed files and rebuilds `graph.json` + `GRAPH_REPORT.md` automatically (AST only — template/doc changes need `/graphify --update`). `post-checkout` rebuilds after branch switches, and `graph.json` has a registered merge driver so parallel branch edits merge rather than conflict.
+
+**Known gap:** the graph has no edges linking `templates/*.html` to the Go handlers that render them — import-path nodes are dropped at build time. For handler↔template contracts, read the template and the handler directly.
+
+Rebuild from scratch: `/graphify .` (or `graphify extract --force`). Incremental: `graphify update`.
