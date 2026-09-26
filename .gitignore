@@ -14,3 +14,7 @@ cmd/http/storage/*
 #end shop assets
 
 /internal/database/mysql/dbconfig.yml
+
+/vendor/
+/node_modules/
+.phpunit.result.cache
