@@ -159,6 +159,16 @@
     <script src="/assets/shop/js/tseaerch/tsearch_small.js"></script>
 
     <script>
+        /* page loader — this page has no theme JS (js-home-1 / js-search),
+           so hide the preloader ourselves (same behaviour as those files). */
+        (function ($) {
+            if (!$) return;
+            var hide = function () { $(".page-loader").fadeOut(300); };
+            $(window).on("load", hide);
+            $(hide);            // DOM ready
+            setTimeout(hide, 1500); // safety net when an asset never loads
+        })(window.jQuery);
+
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".product-price").forEach(el => {
                 const text = el.innerText.trim();

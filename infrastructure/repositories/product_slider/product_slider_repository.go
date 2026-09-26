@@ -158,11 +158,11 @@ func (r *ProductSliderRepository) ActiveSliders(ctx context.Context) ([]*entitie
 	var sliders []*entities.ProductSlider
 	err := r.db.WithContext(ctx).
 		Preload("Category").
-		// soft-delete scope already covers slider_products; order + cap
-		// the curated set at MaxSliderProducts
+		// NOTE: no LIMIT here — GORM applies a preload Limit to the single
+		// "slider_id IN (...)" query, i.e. across ALL sliders (each slider only
+		// got a slice of the 10 rows). The cap is applied per slider below.
 		Preload("Products", func(db *gorm.DB) *gorm.DB {
-			return db.Order("sort_order ASC, id ASC").
-				Limit(entities.MaxSliderProducts)
+			return db.Order("sort_order ASC, id ASC")
 		}).
 		Preload("Products.Product").
 		Preload("Products.Product.ProductImages").
@@ -174,54 +174,91 @@ func (r *ProductSliderRepository) ActiveSliders(ctx context.Context) ([]*entitie
 	if err != nil {
 		return nil, err
 	}
+
+	// cap every slider at MaxSliderProducts (spec: حداکثر ۱۰ محصول)
+	for _, slider := range sliders {
+		if len(slider.Products) > entities.MaxSliderProducts {
+			slider.Products = slider.Products[:entities.MaxSliderProducts]
+		}
+	}
 	return sliders, nil
 }
 
-// Catalog builds the «مشاهده همه» page:
+// Catalog builds the «مشاهده همه» page of one slider:
 //   - slider scoped to a category → every published product of that category
-//     (the curated set is a subset of it)
-//   - otherwise → the slider's own products
+//     and its children (a parent category like «لباس مردانه» has no direct
+//     products, only its sub-categories do)
+//   - otherwise, or when the category scope is empty → the slider's own
+//     curated products, so the button never dead-ends
 func (r *ProductSliderRepository) Catalog(c *gin.Context, slider *entities.ProductSlider) (pagination.Pagination, error) {
 	pg := pagination.Pagination{
 		Limit: pageLimit(c),
 		Page:  pageNumber(c),
 	}
 
-	// curated slider without a category scope: the whole set fits in one page
-	if slider.CategoryID == nil {
-		products := make([]*entities.Product, 0, len(slider.Products))
-		for _, link := range slider.Products {
-			if link.Product != nil {
-				products = append(products, link.Product)
-			}
+	if slider.CategoryID != nil {
+		if page, ok := r.categoryCatalog(c, pg, *slider.CategoryID); ok {
+			return page, nil
 		}
-		pg.TotalRows = int64(len(products))
-		pg.TotalPages = 1
-		pg.Page = 1
-		pg.CurrentLink = "?page="
-		pg.Rows = responses.ToProducts(products)
-		return pg, nil
 	}
+	return curatedCatalog(pg, slider), nil
+}
 
-	condition := fmt.Sprintf("category_id = %d AND status = '%s'",
-		*slider.CategoryID, entities.ProductStatusPublished)
+// curatedCatalog returns the slider's own products (they always fit in one
+// page — the set is capped at entities.MaxSliderProducts).
+func curatedCatalog(pg pagination.Pagination, slider *entities.ProductSlider) pagination.Pagination {
+	products := make([]*entities.Product, 0, len(slider.Products))
+	for _, link := range slider.Products {
+		if link.Product != nil {
+			products = append(products, link.Product)
+		}
+	}
+	pg.TotalRows = int64(len(products))
+	pg.TotalPages = 1
+	pg.Page = 1
+	pg.CurrentLink = "?page="
+	pg.PrevLink, pg.NextLink = "", ""
+	pg.TotalPagesArr = nil
+	pg.Rows = responses.ToProducts(products)
+	return pg
+}
+
+// categoryCatalog returns the published products of a category subtree.
+// ok=false means the scope is empty (the caller falls back to the curated set).
+func (r *ProductSliderRepository) categoryCatalog(c *gin.Context, pg pagination.Pagination, categoryID uint) (pagination.Pagination, bool) {
+	subtree := categorySubtreeSQL(categoryID)
+	condition := fmt.Sprintf("category_id IN (%s) AND status = '%s'",
+		subtree, entities.ProductStatusPublished)
 
 	var products []*entities.Product
 	paginateQuery, exist := pagination.Paginate(c, condition, &products, &pg, r.db)
 	if !exist {
-		return pg, gorm.ErrRecordNotFound
+		return pg, false
 	}
 	if err := paginateQuery(r.db).
 		Preload("Category").
 		Preload("ProductImages").
-		Where("category_id = ? AND status = ?", *slider.CategoryID, entities.ProductStatusPublished).
+		Where(fmt.Sprintf("category_id IN (%s) AND status = ?", subtree), entities.ProductStatusPublished).
 		Order("id DESC").
 		Find(&products).Error; err != nil {
-		return pg, err
+		return pg, false
 	}
 
 	pg.Rows = responses.ToProducts(products)
-	return pg, nil
+	return pg, true
+}
+
+// categorySubtreeSQL is the recursive CTE that collects a category and all of
+// its descendants (id is a uint, inlined into the SQL on purpose because
+// pagination.Paginate only accepts a condition string).
+func categorySubtreeSQL(categoryID uint) string {
+	return fmt.Sprintf(`WITH RECURSIVE category_tree AS (
+    SELECT id FROM categories WHERE id = %d
+    UNION ALL
+    SELECT c.id FROM categories c
+             JOIN category_tree t ON c.parent_id = t.id
+    WHERE c.deleted_at IS NULL
+) SELECT id FROM category_tree`, categoryID)
 }
 
 // --- small helpers -------------------------------------------------------
