@@ -24,6 +24,10 @@ const (
 	ProductCreatedSuccessfully          = "محصول با موفقیت ایجاد گردید"
 	ProductInventoryCreatedSuccessfully = "موجودی محصول با موفقیت ایجاد گردید"
 
+	//promotion banners
+	SuccessfullyCreatedBanner = "بنر پروموشن با موفقیت ایجاد شد"
+	SuccessfullyUpdatedBanner = "بنر پروموشن با موفقیت بروزرسانی شد"
+
 	SelectOne          = "لطفا یکی از گزینه های موجود را انتخاب کنید"
 	DeleteSuccessfully = "با موفقیت حذف گردید"
 

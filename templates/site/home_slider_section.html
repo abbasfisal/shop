@@ -1,0 +1,48 @@
+{{define "home_slider_section"}}
+    {{if .Products}}
+        <section class="slider-section dt-sl mb-5">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="section-title text-sm-title title-wide no-after-title-wide">
+                        <h2>{{.Title}}</h2>
+                        <a href="{{.CatalogURL}}">مشاهده همه</a>
+                    </div>
+                </div>
+
+                <div class="col-12 px-res-0">
+                    <div class="product-carousel carousel-md owl-carousel owl-theme">
+                        {{range .Products}}
+                            <div class="item">
+                                <div class="product-card">
+                                    <div class="product-head">
+                                        <div class="rating-stars"></div>
+                                        <div class="discount">
+                                            {{if gt .DiscountPercent 0}}
+                                                <span>{{.DiscountPercent}}%</span>
+                                            {{end}}
+                                        </div>
+                                    </div>
+                                    <a class="product-thumb" href="{{.ProductURL}}">
+                                        {{if .Image}}<img src="{{$.MediaPath}}{{.Image}}" alt="{{.Title}}">{{end}}
+                                    </a>
+                                    <div class="product-card-body">
+                                        <h5 class="product-title">
+                                            <a href="{{.ProductURL}}">{{.Title}}</a>
+                                        </h5>
+                                        <span class="product-price">{{.Price}} تومان</span>
+                                        {{if gt .OriginalPrice .Price}}
+                                            <span class="product-price"><del>{{.OriginalPrice}} تومان</del></span>
+                                        {{end}}
+                                        {{if not .InStock}}
+                                            <span class="product-price text-danger">ناموجود</span>
+                                        {{end}}
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {{end}}
+{{end}}

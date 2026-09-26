@@ -2,17 +2,24 @@ package responses
 
 import "shop/domain/entities"
 
-// Banner is the admin list view of a banner (labelled type + status).
+// Banner is the admin list view of a promotion banner.
 type Banner struct {
-	ID         uint
-	Type       uint
-	TypeLabel  string
-	Link       string
-	Priority   uint
-	Status     bool
-	StatusText string
-	Image      string
-	CreatedAt  string
+	ID          uint
+	Title       string
+	Layout      string
+	LayoutLabel string
+	Link        string
+	Status      bool
+	StatusText  string
+	StartsAt    string
+	EndsAt      string
+	Schedule    string
+	SortOrder   int
+	Priority    uint
+	Type        uint
+	TypeLabel   string
+	Image       string
+	CreatedAt   string
 }
 
 type Banners struct {
@@ -24,16 +31,40 @@ func ToBanner(b *entities.Banner) *Banner {
 	if b.Status {
 		statusText = "فعال"
 	}
+	startsAt, endsAt := "", ""
+	if b.StartsAt != nil {
+		startsAt = b.StartsAt.Format("2006-01-02")
+	}
+	if b.EndsAt != nil {
+		endsAt = b.EndsAt.Format("2006-01-02")
+	}
+	schedule := "بدون محدودیت"
+	switch {
+	case startsAt != "" && endsAt != "":
+		schedule = startsAt + " تا " + endsAt
+	case startsAt != "":
+		schedule = "از " + startsAt
+	case endsAt != "":
+		schedule = "تا " + endsAt
+	}
+
 	return &Banner{
-		ID:         b.ID,
-		Type:       b.Type,
-		TypeLabel:  entities.BannerTypeLabel(b.Type),
-		Link:       b.Link,
-		Priority:   b.Priority,
-		Status:     b.Status,
-		StatusText: statusText,
-		Image:      b.Image,
-		CreatedAt:  b.CreatedAt.Format("2006-01-02 15:04"),
+		ID:          b.ID,
+		Title:       b.Title,
+		Layout:      b.Layout,
+		LayoutLabel: entities.BannerLayoutLabel(b.Layout),
+		Link:        b.Link,
+		Status:      b.Status,
+		StatusText:  statusText,
+		StartsAt:    startsAt,
+		EndsAt:      endsAt,
+		Schedule:    schedule,
+		SortOrder:   b.SortOrder,
+		Priority:    b.Priority,
+		Type:        b.Type,
+		TypeLabel:   entities.BannerTypeLabel(b.Type),
+		Image:       b.Image,
+		CreatedAt:   b.CreatedAt.Format("2006-01-02 15:04"),
 	}
 }
 

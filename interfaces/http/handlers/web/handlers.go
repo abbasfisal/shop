@@ -8,23 +8,38 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"time"
+
+	responses "shop/application/dto/admin"
+	"shop/application/usecases/banner"
 	"shop/application/usecases/home"
+	sliders "shop/application/usecases/product_slider"
 	"shop/bootstrap"
 	"shop/domain/domain_err"
+	"shop/domain/entities"
 	"shop/interfaces/http/response"
 	"shop/pkg/helpers"
 	"shop/pkg/util"
 )
 
 type PublicHandler struct {
-	homeSrv home.HomeServiceInterface
-	dep     *bootstrap.Dependencies
+	homeSrv    home.HomeServiceInterface
+	bannerSrv  *banner.BannerService
+	slidersSrv *sliders.ProductSliderService
+	dep        *bootstrap.Dependencies
 }
 
-func NewPublicHandler(homeSrv home.HomeServiceInterface, dep *bootstrap.Dependencies) PublicHandler {
+func NewPublicHandler(
+	homeSrv home.HomeServiceInterface,
+	bannerSrv *banner.BannerService,
+	slidersSrv *sliders.ProductSliderService,
+	dep *bootstrap.Dependencies,
+) PublicHandler {
 	return PublicHandler{
-		homeSrv: homeSrv,
-		dep:     dep,
+		homeSrv:    homeSrv,
+		bannerSrv:  bannerSrv,
+		slidersSrv: slidersSrv,
+		dep:        dep,
 	}
 }
 
@@ -95,21 +110,38 @@ func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 
 }
 
+// HomePage renders the storefront home: promotion banners (2-up / 4-up) and
+// the curated product sliders, each pinned to its homepage slot.
 func (p PublicHandler) HomePage(c *gin.Context) {
-	//menu, err := p.homeSrv.GetMenu(c)
-	//if err != nil {
-	//	response.Error500(c)
-	//	return
-	//}
-	//row-header
-	//row-newest
-	//row-random
-	//row-banners
-	//row-by-category
-	//
+	bannersTwo := responses.Banners{}
+	bannersFour := responses.Banners{}
+	if active, err := p.bannerSrv.Active(c); err == nil {
+		for _, b := range responses.ToBanners(active).Data {
+			if b.Layout == entities.BannerLayoutFour {
+				bannersFour.Data = append(bannersFour.Data, b)
+			} else {
+				bannersTwo.Data = append(bannersTwo.Data, b)
+			}
+		}
+	}
+
+	slidersByPosition := map[string][]responses.ProductSlider{}
+	if active, err := p.slidersSrv.ActiveSliders(c); err == nil {
+		for position, views := range responses.SlidersByPosition(active) {
+			for i := range views {
+				views[i].MediaPath = util.GetProductStoragePath()
+			}
+			slidersByPosition[position] = views
+		}
+	}
 
 	response.CustomerRender(c, 200, "home", gin.H{
-		"TITLE": "صفحه اصلی فروشگاه",
+		"TITLE":        "صفحه اصلی فروشگاه",
+		"BANNERS_TWO":  bannersTwo,
+		"BANNERS_FOUR": bannersFour,
+		"SLIDERS":      slidersByPosition,
+		"BANNER_PATH":  util.GetBannerStoragePath(),
+		"MEDIA_PATH":   util.GetProductStoragePath(),
 	})
 }
 
@@ -202,5 +234,36 @@ func (p PublicHandler) ShowOrderDetails(c *gin.Context) {
 		"DATA":   order,
 		"ACTIVE": "orders",
 	})
+	return
+}
+
+// SliderCatalog is the «مشاهده همه» page of a product slider: every product
+// the slider points at (or its whole category scope) with pagination.
+func (p PublicHandler) SliderCatalog(c *gin.Context) {
+	slider, err := p.slidersSrv.BySlug(c, c.Param("slug"))
+	if err != nil || !slider.IsVisibleNow(time.Now()) {
+		response.CustomerRender(c, http.StatusNotFound, "404", gin.H{
+			"TITLE": "صفحه یافت نشد",
+		})
+		return
+	}
+
+	page, pageErr := p.slidersSrv.Catalog(c, slider)
+	view := responses.ToSlider(slider)
+
+	data := gin.H{
+		"TITLE":       view.Title,
+		"SLIDER":      view,
+		"MEDIA_PATH":  util.GetProductStoragePath(),
+		"BANNER_PATH": util.GetBannerStoragePath(),
+	}
+	if pageErr != nil {
+		data["PRIMARY_MESSAGE"] = "محصولی در این بخش یافت نشد"
+		data["PAGINATION"] = nil
+	} else {
+		data["PAGINATION"] = page
+	}
+
+	response.CustomerRender(c, http.StatusOK, "catalog", data)
 	return
 }

@@ -78,6 +78,12 @@ func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em
 		"stringToUint": util.StringToUint,
 		"hasSuffix":    util.HasSuffix,
 		// dateValue formats a *time.Time for <input type="date"> (YYYY-MM-DD)
+		// sub: small integer subtraction for template counters
+		"sub": func(a, b interface{}) int {
+			ai, _ := a.(int)
+			bi, _ := b.(int)
+			return ai - bi
+		},
 		"dateValue": func(t *time.Time) string {
 			if t == nil {
 				return ""

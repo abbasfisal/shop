@@ -59,26 +59,6 @@ func oldVariantsJSON(c *gin.Context) string {
 	return string(out)
 }
 
-// oldFields flattens the flashed old input to one value per key — used by the
-// create/edit templates for <select> / <radio> state after a failed post.
-func oldFields(c *gin.Context) map[string]string {
-	raw := sessions.GET(c, "olds")
-	out := map[string]string{}
-	if raw == "" {
-		return out
-	}
-	var form map[string][]string
-	if err := json.Unmarshal([]byte(raw), &form); err != nil {
-		return out
-	}
-	for key, vals := range form {
-		if len(vals) > 0 {
-			out[key] = vals[0]
-		}
-	}
-	return out
-}
-
 // productListQuery reads the admin list filters (q, status, category_id,
 // in_stock, attr[<code>][] and sort) out of the query string.
 func productListQuery(c *gin.Context) requests.ProductListQuery {
@@ -205,7 +185,6 @@ func (a *AdminHandler) CreateProduct(c *gin.Context) {
 		"TITLE":       "ایجاد محصول | توجه: دسته بندی روت انتخاب نشود!",
 		"CATEGORIES":  categories,
 		"BRANDS":      brands.Data,
-		"OLD":         oldFields(c),
 		"OLDVARIANTS": oldVariantsJSON(c),
 	})
 	return
@@ -405,7 +384,6 @@ func (a *AdminHandler) EditProduct(c *gin.Context) {
 			"CATEGORIES":      categories,
 			"BRANDS":          brands.Data,
 			"RECOMMENDATIONS": recommendations,
-			"OLD":             oldFields(c),
 			"OLDVARIANTS":     oldVariantsJSON(c),
 			"INV":             firstVariant,
 		},

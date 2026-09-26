@@ -1,4 +1,4 @@
-{{define "create_banner"}}
+{{define "admin_create_slider"}}
     {{template "head" .}}
     <!-- navbar -->
     {{template "navbar" .}}
@@ -26,7 +26,7 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-10">
+                    <div class="col-lg-11">
 
                         {{if .ERRORS}}
                             <div class="alert alert-danger">
@@ -38,7 +38,7 @@
                             </div>
                         {{end}}
 
-                        {{template "banner_form" .}}
+                        {{template "slider_form" .}}
 
                     </div>
                 </div>

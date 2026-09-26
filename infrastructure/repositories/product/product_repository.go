@@ -58,7 +58,10 @@ func (p *ProductRepository) FindByID(ctx context.Context, ID int) (*entities.Pro
 func (p *ProductRepository) GetList(ctx context.Context, q requests.ProductListQuery) ([]*entities.Product, error) {
 	var products []*entities.Product
 
-	db := p.db.WithContext(ctx).Preload("Category").Preload("Brand")
+	db := p.db.WithContext(ctx).
+		Preload("Category").
+		Preload("Brand").
+		Preload("ProductImages")
 
 	if search := strings.TrimSpace(q.Q); search != "" {
 		like := "%" + escapeLike(search) + "%"

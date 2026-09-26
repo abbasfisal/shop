@@ -1,4 +1,4 @@
-{{define "admin_index_banner"}}
+{{define "admin_index_slider"}}
     {{template "head" .}}
     <!-- navbar -->
     {{template "navbar" .}}
@@ -28,13 +28,13 @@
                 <div class="row">
                     <div class="col-lg-12">
 
-                        <a href="/admins/banners/create" class="btn btn-info float-right">
-                            <i class="fa fa-plus"></i> ایجاد بنر پروموشن
+                        <a href="/admins/sliders/create" class="btn btn-info float-right">
+                            <i class="fa fa-plus"></i> ایجاد اسلایدر
                         </a>
                         <div class="clearfix"></div>
                         <br>
 
-                        {{if .BANNERS.Data}}
+                        {{if .SLIDERS.Data}}
                             <div class="card">
                                 <div class="card-body table-responsive p-0">
                                     <table class="table table-hover text-nowrap mb-0">
@@ -42,49 +42,53 @@
                                         <tr>
                                             <th>#</th>
                                             <th>عنوان</th>
-                                            <th>چیدمان</th>
-                                            <th>بازه نمایش</th>
+                                            <th>جایگاه</th>
                                             <th>وضعیت</th>
-                                            <th>اولویت</th>
-                                            <th>لینک</th>
-                                            <th>تصویر</th>
+                                            <th>بازه نمایش</th>
+                                            <th>کاتالوگ</th>
+                                            <th>محصولات</th>
                                             <th>عملیات</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {{range .BANNERS.Data}}
+                                        {{range .SLIDERS.Data}}
                                             <tr>
                                                 <td>{{.ID}}</td>
-                                                <td><b>{{.Title}}</b></td>
                                                 <td>
-                                                    {{if eq .Layout "four"}}
-                                                        <span class="badge badge-info">{{.LayoutLabel}}</span>
+                                                    <b>{{.Title}}</b>
+                                                    <br>
+                                                    <small class="text-muted">/{{.Slug}}</small>
+                                                </td>
+                                                <td><span class="badge badge-dark">{{.PositionLabel}}</span></td>
+                                                <td>
+                                                    {{if eq .Status "published"}}
+                                                        <span class="badge badge-success">{{.StatusText}}</span>
+                                                    {{else if eq .Status "archived"}}
+                                                        <span class="badge badge-dark">{{.StatusText}}</span>
                                                     {{else}}
-                                                        <span class="badge badge-primary">{{.LayoutLabel}}</span>
+                                                        <span class="badge badge-warning">{{.StatusText}}</span>
                                                     {{end}}
                                                 </td>
                                                 <td>{{.Schedule}}</td>
+                                                <td>{{if .CategoryTitle}}{{.CategoryTitle}}{{else}}—{{end}}</td>
                                                 <td>
-                                                    {{if .Status}}
-                                                        <span class="badge badge-success">{{.StatusText}}</span>
-                                                    {{else}}
-                                                        <span class="badge badge-secondary">{{.StatusText}}</span>
+                                                    <span class="badge badge-info">{{.ProductsCount}} محصول</span>
+                                                    {{range $i, $p := .Products}}
+                                                        {{if lt $i 3}}
+                                                            <br><small>{{$p.Title}}</small>
+                                                        {{end}}
                                                     {{end}}
-                                                </td>
-                                                <td>{{.SortOrder}}</td>
-                                                <td>{{if .Link}}<a href="{{.Link}}" target="_blank">{{.Link}}</a>{{else}}—{{end}}</td>
-                                                <td>
-                                                    {{if .Image}}
-                                                        <img src="{{$.MEDIA_PATH}}{{.Image}}" alt="banner" height="40">
-                                                    {{else}}
-                                                        —
+                                                    {{if gt .ProductsCount 3}}
+                                                        <br><small class="text-muted">و {{sub .ProductsCount 3}} مورد دیگر...</small>
                                                     {{end}}
                                                 </td>
                                                 <td>
-                                                    <a href="/admins/banners/{{.ID}}/edit"
+                                                    <a href="{{.CatalogURL}}" target="_blank"
+                                                       class="btn btn-sm btn-outline-secondary">صفحه کاتالوگ</a>
+                                                    <a href="/admins/sliders/{{.ID}}/edit"
                                                        class="btn btn-sm btn-outline-primary">ویرایش</a>
-                                                    <form action="/admins/banners/{{.ID}}/delete" method="post"
-                                                          style="display:inline" onsubmit="return confirm('این بنر حذف شود؟')">
+                                                    <form action="/admins/sliders/{{.ID}}/delete" method="post"
+                                                          style="display:inline" onsubmit="return confirm('این اسلایدر حذف شود؟')">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger">حذف</button>
                                                     </form>
                                                 </td>
@@ -96,7 +100,7 @@
                             </div>
                         {{else}}
                             <div class="text-center text-muted p-5 bg-white border rounded">
-                                بنری ثبت نشده است.
+                                اسلایدری ثبت نشده است.
                             </div>
                         {{end}}
 

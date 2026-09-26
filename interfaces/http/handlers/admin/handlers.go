@@ -19,6 +19,7 @@ import (
 	"shop/application/usecases/dashboard"
 	"shop/application/usecases/order"
 	"shop/application/usecases/product"
+	sliders "shop/application/usecases/product_slider"
 	"shop/bootstrap"
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
@@ -43,6 +44,7 @@ type AdminHandler struct {
 	orderSrv         order.OrderServiceInterface
 	DashboardService *dashboard.DashboardService
 	bannerSrv        *banner.BannerService
+	slidersSrv       *sliders.ProductSliderService
 
 	dep *bootstrap.Dependencies
 }
@@ -58,6 +60,7 @@ func NewAdminHandler(
 	orderSrv order.OrderServiceInterface,
 	dashboardSrv *dashboard.DashboardService,
 	bannerSrv *banner.BannerService,
+	slidersSrv *sliders.ProductSliderService,
 
 	dep *bootstrap.Dependencies,
 ) *AdminHandler {
@@ -72,6 +75,7 @@ func NewAdminHandler(
 		orderSrv:         orderSrv,
 		DashboardService: dashboardSrv,
 		bannerSrv:        bannerSrv,
+		slidersSrv:       slidersSrv,
 
 		dep: dep,
 	}

@@ -137,3 +137,9 @@ func Numeric(v string) bool {
 	_, err := strconv.ParseUint(v, 10, 64)
 	return err == nil
 }
+
+// strconvParseUint is a tiny helper shared by the admin form parsers.
+func strconvParseUint(v string) (uint, error) {
+	n, err := strconv.ParseUint(v, 10, 64)
+	return uint(n), err
+}
