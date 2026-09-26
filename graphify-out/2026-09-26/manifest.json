@@ -5405,8 +5405,8 @@
     "semantic_hash": ""
   },
   "infrastructure/repositories/product_slider/product_slider_repository.go": {
-    "mtime": 1790409912.1720867,
-    "ast_hash": "f328668818991c52f732039a7fe4010f",
+    "mtime": 1790411587.373206,
+    "ast_hash": "ca2f9b4c4f1143eb2d032aa03e4636e2",
     "semantic_hash": ""
   },
   "interfaces/http/handlers/admin/product_slider_handler.go": {
@@ -5450,8 +5450,8 @@
     "semantic_hash": ""
   },
   "templates/site/catalog.html": {
-    "mtime": 1790409985.9804933,
-    "ast_hash": "647436d9aa3f664543f07d861b085d2d",
+    "mtime": 1790411491.9346426,
+    "ast_hash": "657ce43c8a41a230d8b26df492895ab5",
     "semantic_hash": ""
   },
   "templates/site/home_slider_section.html": {
