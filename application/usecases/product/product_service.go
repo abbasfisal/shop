@@ -180,6 +180,15 @@ func (p *ProductService) AddAttributeValues(c *gin.Context, productID int, attri
 	return domain_err.CustomError{}
 }
 
+// DeleteProductAttribute removes a legacy product_attributes row (the
+// delete link of the add-attributes page).
+func (p *ProductService) DeleteProductAttribute(c *gin.Context, productAttributeID int) domain_err.CustomError {
+	if _, err := p.repo.DeleteProductAttribute(c, productAttributeID); err != nil {
+		return domain_err.HandleError(err, domain_err.RecordNotFound)
+	}
+	return domain_err.CustomError{}
+}
+
 func (p *ProductService) FetchProductAttributes(c *gin.Context, productID int) (map[string]interface{}, domain_err.CustomError) {
 	//fetch product and its attribute and also inventories
 	pResult, err := p.repo.GetProductAndAttributes(c, productID)

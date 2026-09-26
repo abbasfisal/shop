@@ -38,3 +38,17 @@ func (b BannerRepository) Insert(c *gin.Context, req requests.CreateBannerReques
 	}
 	return nil
 }
+
+// GetAll returns every banner ordered by priority then newest first
+// (admin banner index).
+func (b BannerRepository) GetAll(c *gin.Context) ([]*entities.Banner, error) {
+	var banners []*entities.Banner
+	err := b.db.WithContext(c).
+		Order("priority ASC, id DESC").
+		Find(&banners).Error
+	if err != nil {
+		logging.Log.WithError(err).WithFields(logrus.Fields{"method": "GetAll", "file": "banner_repository"})
+		return nil, err
+	}
+	return banners, nil
+}

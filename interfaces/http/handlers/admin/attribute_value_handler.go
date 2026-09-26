@@ -17,7 +17,7 @@ import (
 func (a *AdminHandler) CreateAttributeValues(c *gin.Context) {
 
 	attributes, _ := a.attributeSrv.Index(c)
-	response.Render(c, http.StatusFound, "admin_create_attribute_values", gin.H{
+	response.Render(c, http.StatusOK, "admin_create_attribute_values", gin.H{
 		"TITLE":      "create new attribute-values",
 		"ATTRIBUTES": attributes,
 	})

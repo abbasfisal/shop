@@ -148,6 +148,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/products/:id/add-images", adminHlr.UploadProductImages)
 
 		//product-attribute
+		authGrp.GET("/admins/products-attributes/:id/delete", adminHlr.DeleteProductAttribute)
 		authGrp.GET("/admins/products/:id/add-attributes", adminHlr.ProductsAddAttributes)
 		authGrp.POST("/admins/products/:id/add-attributes", adminHlr.StoreProductsAddAttributes)
 		//product-inventory
@@ -163,6 +164,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/brands/create", adminHlr.StoreBrand)
 		authGrp.GET("/admins/brands/:id", adminHlr.ShowBrand)
 		authGrp.GET("/admins/brands/:id/edit", adminHlr.EditBrand)
+		authGrp.GET("/admins/brands/:id/products", adminHlr.BrandProducts)
 		authGrp.POST("/admins/brands/:id/edit", adminHlr.UpdateBrand)
 
 		//customer
@@ -174,6 +176,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/orders/:id/update-status", adminHlr.EditOrder)
 
 		//banner
+		authGrp.GET("/admins/banners", adminHlr.IndexBanner)
 		authGrp.GET("/admins/banners/create", adminHlr.CreateBanner)
 		authGrp.POST("/admins/banners", adminHlr.StoreBanner)
 

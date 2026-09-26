@@ -15,7 +15,7 @@
                     <div class="col-sm-6">
                         <h1 class="m-0 text-dark">{{.TITLE}}</h1>
                         <br>
-                        <span class="badge-info p-2">{{.PRIMARY_MESSAGE}}</span>
+                        {{if .PRIMARY_MESSAGE}}<span class="badge-info p-2">{{.PRIMARY_MESSAGE}}</span>{{end}}
                     </div><!-- /.col -->
 
                 </div><!-- /.row -->
@@ -33,6 +33,12 @@
                         {{if .MESSAGE}} <span class="text-info p-5">{{.MESSAGE}}</span> {{end}}
                         <br>
                         <br>
+                        {{if not .PAGINATION}}
+                            <div class="text-center text-muted p-5 bg-white border rounded">
+                                {{if .PRIMARY_MESSAGE}}{{.PRIMARY_MESSAGE}}{{else}}سفارشی موجود نیست{{end}}
+                            </div>
+                        {{end}}
+                        {{if .PAGINATION}}
                         <div class="card" style="position: relative; left: 0px; top: 0px;">
                             <div class="card-body">
                                 <table class="table table-hover">
@@ -64,8 +70,8 @@
                             <div class="">
                                 <div class="card-tools">
                                     <ul class="pagination pagination-sm">
-                                        {{if .PAGINATION.PrevLink  }}
-                                            <li class="page-item"><a href="#" class="page-link">«</a></li>
+                                        {{if .PAGINATION.PrevLink}}
+                                            <li class="page-item"><a href="{{.PAGINATION.PrevLink}}" class="page-link">« قبلی</a></li>
                                         {{end}}
 
                                         {{range $item:=.PAGINATION.TotalPagesArr}}
@@ -74,13 +80,14 @@
                                                    class="page-link {{if eq $item $.PAGINATION.Page}}badge-info{{end}}">{{.}}</a>
                                             </li>
                                         {{end}}
-                                        {{if .PAGINATION.NextLink  }}
-                                            <li class="page-item"><a href="#" class="page-link">»</a></li>
+                                        {{if .PAGINATION.NextLink}}
+                                            <li class="page-item"><a href="{{.PAGINATION.NextLink}}" class="page-link">بعدی »</a></li>
                                         {{end}}
                                     </ul>
                                 </div>
                             </div>
                         </div>
+                        {{end}}
 
                     </div>
                     <!-- /.col-md-6 -->

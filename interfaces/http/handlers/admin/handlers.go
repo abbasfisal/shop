@@ -273,7 +273,7 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		response.Error500(c)
 		return
 	}
-	response.Render(c, http.StatusFound, "edit-gallery-product", gin.H{
+	response.Render(c, http.StatusOK, "edit-gallery-product", gin.H{
 		"TITLE":      "ویرایش تصاویر محصول",
 		"PRODUCT":    productShow,
 		"MEDIA_PATH": util.GetProductStoragePath(),

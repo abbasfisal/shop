@@ -20,6 +20,8 @@ type ProductRepositoryInterface interface {
 	SyncReadModel(ctx context.Context, productID uint) error
 	GetRootAttributes(ctx *gin.Context, productID int) ([]*entities.Attribute, error)
 	StoreAttributeValues(ctx *gin.Context, productID int, attValues []string) error
+	// DeleteProductAttribute removes one legacy product_attributes row.
+	DeleteProductAttribute(c *gin.Context, productAttributeID int) (uint, error)
 	GetProductAndAttributes(ctx *gin.Context, productID int) (map[string]interface{}, error)
 	StoreProductInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) (*entities.ProductVariant, error)
 	GetImage(c *gin.Context, imageID int) (*entities.ProductImages, error)

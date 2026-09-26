@@ -70,6 +70,9 @@ func (p *ProductRepository) GetList(ctx context.Context, q requests.ProductListQ
 	if q.CategoryID > 0 {
 		db = db.Where("category_id = ?", q.CategoryID)
 	}
+	if q.BrandID > 0 {
+		db = db.Where("brand_id = ?", q.BrandID)
+	}
 	if q.InStock {
 		db = db.Where("in_stock = ?", true)
 	}

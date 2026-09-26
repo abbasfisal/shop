@@ -14,14 +14,20 @@ import (
 )
 
 func (a *AdminHandler) IndexOrders(c *gin.Context) {
+	title := "لیست سفارشات"
+	if c.Query("today") == "1" {
+		title = "سفارشات امروز"
+	}
+
 	orderPaginate, err := a.orderSrv.GetOrderPaginate(c)
 
 	if err != nil {
 		if errors2.Is(err, gorm.ErrRecordNotFound) {
-			response.Render(c, http.StatusFound, "admin_index_order", gin.H{
-				"TITLE":           "لیست سفارشات",
+			response.Render(c, http.StatusOK, "admin_index_order", gin.H{
+				"TITLE":           title,
 				"PRIMARY_MESSAGE": "سفارشی موجود نیست",
 				"PAGINATION":      nil,
+				"TODAY":           c.Query("today") == "1",
 			})
 			return
 		}
@@ -31,9 +37,10 @@ func (a *AdminHandler) IndexOrders(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "admin_index_order", gin.H{
-		"TITLE":      "لیست سفارشات",
+	response.Render(c, http.StatusOK, "admin_index_order", gin.H{
+		"TITLE":      title,
 		"PAGINATION": orderPaginate,
+		"TODAY":      c.Query("today") == "1",
 	})
 	return
 }

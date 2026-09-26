@@ -34,7 +34,7 @@ func (a *AdminHandler) PostLogin(c *gin.Context) {
 	user, loginErr := a.authSrv.Login(c.Request.Context(), &req)
 	if loginErr.Error() != "" {
 		if loginErr.Code == 404 {
-			response.Render(c, http.StatusFound, "modules/admin/html/admin_login", gin.H{
+			response.Render(c, http.StatusOK, "modules/admin/html/admin_login", gin.H{
 				"MESSAGE": loginErr.Error(),
 			})
 			return

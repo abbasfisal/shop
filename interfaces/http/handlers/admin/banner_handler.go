@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	responses "shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/domain/entities"
 	"shop/interfaces/http/requests/admin"
@@ -17,6 +18,23 @@ import (
 	"shop/pkg/util"
 	"slices"
 )
+
+// IndexBanner lists every banner (sidebar: لیست بنر ها).
+func (a *AdminHandler) IndexBanner(c *gin.Context) {
+	banners, err := a.bannerSrv.Index(c)
+	if err != nil {
+		sessions.Set(c, "message", domain_err.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, "/admins/banners/create")
+		return
+	}
+
+	response.Render(c, http.StatusOK, "admin_index_banner", gin.H{
+		"TITLE":      "لیست بنرها",
+		"BANNERS":    responses.ToBanners(banners),
+		"MEDIA_PATH": util.GetBannerStoragePath(),
+	})
+	return
+}
 
 func (a *AdminHandler) CreateBanner(c *gin.Context) {
 	response.Render(c, 200, "create_banner", gin.H{"TITLE": "ایجاد بنر"})

@@ -16,7 +16,7 @@ import (
 )
 
 func (a *AdminHandler) CreateAttribute(c *gin.Context) {
-	response.Render(c, http.StatusFound, "admin_create_attribute",
+	response.Render(c, http.StatusOK, "admin_create_attribute",
 		gin.H{
 			"TITLE": "ایجاد اتریبیوت",
 		})
@@ -98,7 +98,7 @@ func (a *AdminHandler) ShowAttribute(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "admin_show_attribute",
+	response.Render(c, http.StatusOK, "admin_show_attribute",
 		gin.H{
 			"TITLE":     "نمایش اتریبیوت",
 			"ATTRIBUTE": attributeShow,
@@ -201,6 +201,32 @@ func (a *AdminHandler) AppendAttribute(c *gin.Context) {
 	sessions.Set(c, "message", domain_err.SuccessfullyCreated)
 
 	c.Redirect(http.StatusFound, c.Request.Referer())
+	return
+}
+
+// DeleteProductAttribute removes one product↔attribute-value row of the
+// legacy add-attributes page (link: /admins/products-attributes/:id/delete).
+func (a *AdminHandler) DeleteProductAttribute(c *gin.Context) {
+	productAttributeID, convErr := strconv.Atoi(c.Param("id"))
+	back := c.Request.Referer()
+	if back == "" {
+		back = "/admins/products"
+	}
+	if convErr != nil {
+		sessions.Set(c, "message", domain_err.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, back)
+		return
+	}
+
+	dErr := a.productSrv.DeleteProductAttribute(c, productAttributeID)
+	if dErr.Code > 0 {
+		sessions.Set(c, "message", domain_err.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, back)
+		return
+	}
+
+	sessions.Set(c, "message", custom_messages.DeleteSuccessfully)
+	c.Redirect(http.StatusFound, back)
 	return
 }
 

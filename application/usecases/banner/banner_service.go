@@ -2,6 +2,7 @@ package banner
 
 import (
 	"github.com/gin-gonic/gin"
+	"shop/domain/entities"
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
 )
@@ -21,4 +22,9 @@ func (b *BannerService) Create(c *gin.Context, req requests.CreateBannerRequest)
 		return err
 	}
 	return nil
+}
+
+// Index lists every banner for the admin index page.
+func (b *BannerService) Index(c *gin.Context) ([]*entities.Banner, error) {
+	return b.repo.GetAll(c)
 }

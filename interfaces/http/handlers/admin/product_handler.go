@@ -86,6 +86,7 @@ func productListQuery(c *gin.Context) requests.ProductListQuery {
 		Q:          strings.TrimSpace(c.Query("q")),
 		Status:     strings.TrimSpace(c.Query("status")),
 		CategoryID: util.StringToUint(c.Query("category_id")),
+		BrandID:    util.StringToUint(c.Query("brand_id")),
 		InStock:    c.Query("in_stock") == "1",
 		Sort:       c.Query("sort"),
 	}
@@ -151,16 +152,22 @@ func (a *AdminHandler) IndexProduct(c *gin.Context) {
 	if attributes == nil {
 		attributes = &responses.Attributes{}
 	}
+	brands, _ := a.brandSrv.Index(c)
+	if brands == nil {
+		brands = &responses.Brands{}
+	}
 
 	response.Render(c, http.StatusOK, "modules/admin/html/admin_index_product", gin.H{
 		"TITLE":      "لیست محصولات",
 		"PRODUCTS":   products,
 		"CATEGORIES": categories,
 		"ATTRIBUTES": attributes,
+		"BRANDS":     brands,
 		"FILTER": gin.H{
 			"Q":          query.Q,
 			"Status":     query.Status,
 			"CategoryID": query.CategoryID,
+			"BrandID":    query.BrandID,
 			"InStock":    query.InStock,
 			"Sort":       query.Sort,
 		},
