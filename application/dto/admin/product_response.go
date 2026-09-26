@@ -20,6 +20,9 @@ type Product struct {
 	SalePrice     uint
 	Description   string
 	Discount      uint
+	// EffectivePrice is the customer-facing price: the PricingService minimum
+	// when the product has priced variants, otherwise the nominal sale price.
+	EffectivePrice uint
 
 	// aggregate cache (PricingService) — used by the admin list & storefront list
 	ProductType    string
@@ -77,16 +80,12 @@ func ToProduct(p *entities.Product) *Product {
 		InStock:        p.InStock,
 		VariantsCount:  p.VariantsCount,
 
-		Discount: func() uint {
-			if p.OriginalPrice == 0 {
-				return 0
-			}
-			originalPrice := float64(p.OriginalPrice)
-			salePrice := float64(p.SalePrice)
-			dis := ((originalPrice - salePrice) / originalPrice) * 100
+		EffectivePrice: EffectivePriceOf(p),
 
-			return uint(math.Round(dis))
-		}(),
+		// golden rule: the discount is measured against the price the
+		// customer actually pays (effective), not the nominal sale price —
+		// otherwise a variant-level تخفیف shows a wrong (lower) percent.
+		Discount: DiscountPercentOf(p.OriginalPrice, EffectivePriceOf(p)),
 	}
 
 	if p.Features != nil {
@@ -111,4 +110,24 @@ func ToProduct(p *entities.Product) *Product {
 	}
 
 	return &product
+}
+
+// EffectivePriceOf resolves the customer-facing price of a product:
+// the PricingService minimum when the product has priced variants,
+// otherwise the nominal sale price.
+func EffectivePriceOf(p *entities.Product) uint {
+	if p.MinPrice > 0 {
+		return p.MinPrice
+	}
+	return p.SalePrice
+}
+
+// DiscountPercentOf is the تومان discount percent of a crossed-out list
+// price against the price the customer pays (0 when there is no real
+// discount or the inputs are degenerate).
+func DiscountPercentOf(originalPrice, effectivePrice uint) uint {
+	if originalPrice == 0 || effectivePrice == 0 || effectivePrice >= originalPrice {
+		return 0
+	}
+	return uint(math.Round((float64(originalPrice) - float64(effectivePrice)) / float64(originalPrice) * 100))
 }

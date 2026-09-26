@@ -360,9 +360,9 @@
                                                             {{if and (gt .MinPrice 0) (ne .MinPrice .MaxPrice)}}
                                                                 <span class="product-price">از {{.MinPrice}} تومان </span>
                                                             {{else}}
-                                                                <span class="product-price">{{.SalePrice}} تومان </span>
+                                                                <span class="product-price">{{.EffectivePrice}} تومان </span>
                                                             {{end}}
-                                                            {{if gt .OriginalPrice .SalePrice}}
+                                                            {{if gt .OriginalPrice .EffectivePrice}}
                                                                 <span class="product-price"><del>{{.OriginalPrice}} تومان </del></span>
                                                             {{end}}
                                                             {{if not .InStock}}

@@ -1,6 +1,7 @@
 package responses
 
 import (
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -63,15 +64,17 @@ func ToProductInventory(pv *entities.ProductVariant, fallbackOriginal, fallbackS
 		sale = *pv.SalePrice
 	}
 
-	// golden rule: discount counts only when > 0 and < effective sale price
+	// golden rule: discount counts only when > 0 and < effective sale price.
+	// The badge percent is measured against the crossed-out list price
+	// (original), consistent with the storefront display.
 	effective := sale
 	hasDiscount := false
 	discountPercent := 0
 	if pv.DiscountPrice != nil && *pv.DiscountPrice > 0 && *pv.DiscountPrice < sale {
 		effective = *pv.DiscountPrice
 		hasDiscount = true
-		if sale > 0 {
-			discountPercent = int(float64(sale-*pv.DiscountPrice) / float64(sale) * 100)
+		if original > 0 && effective < original {
+			discountPercent = int(math.Round(float64(original-effective) / float64(original) * 100))
 		}
 	}
 

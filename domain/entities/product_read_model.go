@@ -11,23 +11,27 @@ type ProductReadModel struct {
 
 // P is the flattened product projection consumed by the storefront templates.
 type P struct {
-	ID            int64     `json:"id"`
-	Category      C         `json:"Category"`
-	CategoryID    int64     `json:"category_id"`
-	Brand         B         `json:"Brand"`
-	BrandID       int64     `json:"brand_id"`
-	Title         string    `json:"title"`
-	Slug          string    `json:"slug"`
-	Sku           string    `json:"sku"`
-	Status        string    `json:"status"`
-	OriginalPrice int64     `json:"original_price"`
-	SalePrice     int64     `json:"sale_price"`
-	Discount      int64     `json:"Discount"`
-	Description   string    `json:"description"`
-	Images        Img       `json:"Images"`
-	Features      F         `json:"Features"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID            int64  `json:"id"`
+	Category      C      `json:"Category"`
+	CategoryID    int64  `json:"category_id"`
+	Brand         B      `json:"Brand"`
+	BrandID       int64  `json:"brand_id"`
+	Title         string `json:"title"`
+	Slug          string `json:"slug"`
+	Sku           string `json:"sku"`
+	Status        string `json:"status"`
+	OriginalPrice int64  `json:"original_price"`
+	SalePrice     int64  `json:"sale_price"`
+	Discount      int64  `json:"Discount"`
+	// PricingService aggregates mirrored for the storefront (effective price
+	// display: "از MinPrice", single-inventory pages, recommendations).
+	MinPrice    int64     `json:"min_price"`
+	MaxPrice    int64     `json:"max_price"`
+	Description string    `json:"description"`
+	Images      Img       `json:"Images"`
+	Features    F         `json:"Features"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type C struct {

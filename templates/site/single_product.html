@@ -314,18 +314,32 @@
 
                                                         </li>
                                                     </ul>
+                                                    {{$rm := .PRODUCT.product}}
+                                                    {{$invCount := len .PRODUCT.inventories}}
                                                     <div class="product-seller-row product-seller-row--price">
                                                         <div class="product-seller-price-info">
                                                             <div class="product-seller-price-prev" id="pricePrev">
-                                                                {{.PRODUCT.product.OriginalPrice}}
+                                                                {{$rm.OriginalPrice}}
                                                             </div>
                                                             <div class="product-seller-price-off" id="priceOff">
-                                                                {{if gt .PRODUCT.product.Discount 0}}{{.PRODUCT.product.Discount}}%{{end}}
+                                                                {{if gt $invCount 1}}
+                                                                    {{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}
+                                                                {{else}}
+                                                                    {{range $key,$item:=.PRODUCT.inventories}}
+                                                                        {{if and $item.HasDiscount (gt $item.DiscountPercent 0)}}{{$item.DiscountPercent}}%{{else if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}
+                                                                    {{end}}
+                                                                    {{if eq $invCount 0}}{{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}{{end}}
+                                                                {{end}}
                                                             </div>
                                                         </div>
                                                         <div class="product-seller-price-real">
                                                             <div class="product-seller-price-raw" id="priceReal">
-                                                                {{.PRODUCT.product.SalePrice}}
+                                                                {{if gt $invCount 1}}
+                                                                    {{if and (gt $rm.MinPrice 0) (ne $rm.MinPrice $rm.MaxPrice)}}از {{$rm.MinPrice}}{{else}}{{$rm.SalePrice}}{{end}}
+                                                                {{else}}
+                                                                    {{range $key,$item:=.PRODUCT.inventories}}{{$item.EffectivePrice}}{{end}}
+                                                                    {{if eq $invCount 0}}{{$rm.SalePrice}}{{end}}
+                                                                {{end}}
                                                             </div>
                                                             تومان
                                                         </div>
@@ -618,7 +632,7 @@
                                                         <a class="product-meta"
                                                            href="/search/{{$rec.Product.Category.Slug}}"> {{$rec.Product.Category.Title}}</a>
                                                         <span class="product-price">
-                                                                {{$rec.Product.SalePrice}}
+                                                                {{if and (gt $rec.Product.MinPrice 0) (ne $rec.Product.MinPrice $rec.Product.MaxPrice)}}از {{$rec.Product.MinPrice}}{{else if gt $rec.Product.MinPrice 0}}{{$rec.Product.MinPrice}}{{else}}{{$rec.Product.SalePrice}}{{end}}
                                                                 تومان
                                                             </span>
                                                     </div>
@@ -697,10 +711,10 @@
                 const price = option.dataset.price;
                 const effective = option.dataset.effective;
                 const hasDiscount = option.dataset.hasDiscount === '1';
-                const percent = option.dataset.percent;
+                const percent = parseInt(option.dataset.percent || '0', 10) || 0;
                 if (pricePrev && price) pricePrev.innerText = fmt(price);
                 if (priceReal && effective) priceReal.innerText = fmt(effective);
-                if (priceOff) priceOff.innerText = hasDiscount && percent ? percent + '%' : '';
+                if (priceOff) priceOff.innerText = (hasDiscount && percent > 0) ? percent + '%' : '';
             }
 
             if (picker) {

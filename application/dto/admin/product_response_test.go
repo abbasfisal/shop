@@ -39,3 +39,41 @@ func TestToProductInventories_MapsStockToQuantity(t *testing.T) {
 		t.Fatalf("variant id must be preserved in dto: %+v", out.Data)
 	}
 }
+
+// TestToProduct_EffectivePriceAndDiscount verifies the storefront contract:
+// the customer-facing price is the aggregate minimum (not the nominal sale
+// price) and the discount percent is measured against it.
+func TestToProduct_EffectivePriceAndDiscount(t *testing.T) {
+	// a simple product with a variant-level discount, like DEMO-SIMPLE-01
+	p := &entities.Product{
+		Title:         "discounted",
+		OriginalPrice: 1000,
+		SalePrice:     900,
+		MinPrice:      700,
+		MaxPrice:      700,
+	}
+	out := ToProduct(p)
+	if out.EffectivePrice != 700 {
+		t.Fatalf("expected effective price 700, got %d", out.EffectivePrice)
+	}
+	// (1000-700)/1000 = 30% — not the 10% a nominal computation would give
+	if out.Discount != 30 {
+		t.Fatalf("expected discount 30, got %d", out.Discount)
+	}
+}
+
+func TestToProduct_NoVariantsKeepsNominalPrice(t *testing.T) {
+	// legacy rows (MinPrice == 0) keep the old nominal behaviour
+	p := &entities.Product{
+		Title:         "legacy",
+		OriginalPrice: 1000,
+		SalePrice:     800,
+	}
+	out := ToProduct(p)
+	if out.EffectivePrice != 800 {
+		t.Fatalf("expected effective price 800, got %d", out.EffectivePrice)
+	}
+	if out.Discount != 20 {
+		t.Fatalf("expected discount 20, got %d", out.Discount)
+	}
+}

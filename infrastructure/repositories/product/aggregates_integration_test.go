@@ -234,3 +234,79 @@ func TestAttributeAfterCreateGeneratesCode(t *testing.T) {
 }
 
 func uintPtr(v uint) *uint { return &v }
+
+// TestSyncReadModelEffectivePrice is the regression test for the storefront
+// showing the nominal sale price (900) instead of the variant-level
+// discounted price (700) — the DEMO-SIMPLE-01 case.
+func TestSyncReadModelEffectivePrice(t *testing.T) {
+	db := testDB(t)
+	ctx := context.Background()
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	suffix := fmt.Sprintf("eff%d", time.Now().UnixNano())
+
+	cat := entities.Category{Title: "eff-cat-" + suffix, Slug: "eff-cat-" + suffix, Status: true}
+	if err := tx.Create(&cat).Error; err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+	brand := entities.Brand{Title: "eff-brand-" + suffix, Slug: "eff-brand-" + suffix}
+	if err := tx.Create(&brand).Error; err != nil {
+		t.Fatalf("create brand: %v", err)
+	}
+
+	prod := entities.Product{
+		CategoryID:    cat.ID,
+		BrandID:       brand.ID,
+		Title:         "eff-test-" + suffix,
+		Slug:          "eff-test-" + suffix,
+		Sku:           "eff-" + suffix,
+		Status:        entities.ProductStatusPublished,
+		OriginalPrice: 1000,
+		SalePrice:     900,
+	}
+	if err := tx.Create(&prod).Error; err != nil {
+		t.Fatalf("create product: %v", err)
+	}
+
+	v := entities.ProductVariant{
+		ProductID: prod.ID, Stock: 5,
+		SalePrice: uintPtr(900), DiscountPrice: uintPtr(700),
+		Status: entities.VariantStatusActive,
+	}
+	if err := tx.Create(&v).Error; err != nil {
+		t.Fatalf("create variant: %v", err)
+	}
+
+	if err := RefreshProductAggregates(ctx, tx, prod.ID); err != nil {
+		t.Fatalf("pricing: %v", err)
+	}
+	if err := SyncReadModel(ctx, tx, prod.ID); err != nil {
+		t.Fatalf("sync: %v", err)
+	}
+
+	var stored entities.Product
+	if err := tx.First(&stored, prod.ID).Error; err != nil {
+		t.Fatalf("reload: %v", err)
+	}
+	var rm entities.ProductReadModel
+	if err := json.Unmarshal(stored.ReadModel, &rm); err != nil {
+		t.Fatalf("read_model invalid: %v", err)
+	}
+
+	if rm.Product.MinPrice != 700 || rm.Product.MaxPrice != 700 {
+		t.Errorf("min/max: want 700/700 got %d/%d", rm.Product.MinPrice, rm.Product.MaxPrice)
+	}
+	// (1000-700)/1000 = 30% — a nominal computation would report 10%
+	if rm.Product.Discount != 30 {
+		t.Errorf("discount: want 30 got %d", rm.Product.Discount)
+	}
+
+	inv, ok := rm.Inventories[fmt.Sprintf("%d", v.ID)]
+	if !ok {
+		t.Fatalf("inventory %d missing from read model", v.ID)
+	}
+	if inv.EffectivePrice != 700 || !inv.HasDiscount || inv.DiscountPercent != 30 {
+		t.Errorf("inventory pricing mismatch: %+v", inv)
+	}
+}

@@ -151,7 +151,7 @@
                                                     {{if and (gt $p.MinPrice 0) (ne $p.MinPrice $p.MaxPrice)}}
                                                         از {{printf "%d" $p.MinPrice}} تومان
                                                     {{else}}
-                                                        {{printf "%d" $p.SalePrice}} تومان
+                                                        {{printf "%d" $p.EffectivePrice}} تومان
                                                     {{end}}
                                                 </td>
                                                 <td>

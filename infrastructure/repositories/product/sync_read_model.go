@@ -81,11 +81,16 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 		inventoryMap[key] = inv
 	}
 
+	// golden rule: the storefront discount is measured against the price the
+	// customer actually pays (aggregate minimum when variants exist), not the
+	// nominal product sale price.
+	effectiveSale := int64(product.SalePrice)
+	if product.MinPrice > 0 {
+		effectiveSale = int64(product.MinPrice)
+	}
 	discount := int64(0)
-	if product.OriginalPrice > 0 {
-		originalPrice := float64(product.OriginalPrice)
-		salePrice := float64(product.SalePrice)
-		discount = int64(math.Round(((originalPrice - salePrice) / originalPrice) * 100))
+	if product.OriginalPrice > 0 && effectiveSale > 0 && effectiveSale < int64(product.OriginalPrice) {
+		discount = int64(math.Round((float64(product.OriginalPrice) - float64(effectiveSale)) / float64(product.OriginalPrice) * 100))
 	}
 
 	readModel := entities.ProductReadModel{
@@ -111,6 +116,8 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 			OriginalPrice: int64(product.OriginalPrice),
 			SalePrice:     int64(product.SalePrice),
 			Discount:      discount,
+			MinPrice:      int64(product.MinPrice),
+			MaxPrice:      int64(product.MaxPrice),
 			Description:   product.Description,
 			Images:        entities.Img{Data: transformImages(product.ProductImages)},
 			Features:      entities.F{Data: transformFeatures(product.Features)},
@@ -227,12 +234,14 @@ func variantInventory(row struct {
 
 	effective := sale
 	hasDiscount := false
+	// the badge percent is measured against the crossed-out list price (price),
+	// consistent with the storefront display next to it
 	var discountPercent int64
 	if row.DiscountPrice != nil && *row.DiscountPrice > 0 && int64(*row.DiscountPrice) < sale {
 		effective = int64(*row.DiscountPrice)
 		hasDiscount = true
-		if sale > 0 {
-			discountPercent = int64(math.Round(float64(sale-effective) / float64(sale) * 100))
+		if price > 0 && effective < price {
+			discountPercent = int64(math.Round(float64(price-effective) / float64(price) * 100))
 		}
 	}
 
