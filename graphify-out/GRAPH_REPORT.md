@@ -1,16 +1,16 @@
 # Graph Report - shop  (2026-09-26)
 
 ## Corpus Check
-- 563 files · ~2,799,845 words
+- 564 files · ~2,800,704 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1776 nodes · 2956 edges · 196 communities (111 shown, 85 thin omitted)
-- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 256 edges (avg confidence: 0.81)
+- 1780 nodes · 2964 edges · 199 communities (113 shown, 86 thin omitted)
+- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 257 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2681e820`
+- Built from commit: `332161a7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,24 +37,24 @@
 - SyncReadModel
 - LoadMenu
 - GetAuthUser
-- VariantRow
+- web/customer_response.go
 - Duration
 - feeKind
 - product_repository.go
 - AdminHandler
 - product_read_model.go
-- parseDate
+- OrderItem
 - OrderRepository
 - New
 - typesenceclient/typesence.go
 - util.go
 - errors.go
 - Context
-- ProductRepository
-- ProductSliderService
+- seeder.go
+- VariantRow
 - CustomError
 - AdminHandler
-- product_slider_request.go
+- ToOrderItemAttributes
 - BrandRepository
 - send_email_task.go
 - FeeRateService
@@ -86,7 +86,7 @@
 - AdminHandler
 - Categories
 - OrderItem
-- Context
+- Customer
 - HandleExampleTask
 - HandleTaskSendWelcomeSMS
 - BrandRepositoryInterface
@@ -133,7 +133,7 @@
 - ProductVariant
 - Engine
 - Brand
-- H
+- ToOrderDetail
 - T
 - CreateBannerRequest
 - UpdateProductRequest
@@ -168,7 +168,9 @@
 - ProductVariant
 - Brand
 - Category
+- Order
 - Feature
+- Context
 - ProductImages
 - Payment
 - Customer
@@ -176,6 +178,7 @@
 - OrderItem
 - Address
 - OrderItem
+- H
 - CustomerProfileRequest
 - CustomError
 - CustomerVerifyRequest
@@ -203,8 +206,6 @@
 10. `PublicHandler` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `ValidateBannerForm()` --calls--> `ValidBannerLayout()`  [INFERRED]
-  interfaces/http/requests/admin/banner_request.go → domain/entities/banner.go
 - `ValidateProductForm()` --calls--> `ValidProductStatus()`  [INFERRED]
   interfaces/http/requests/admin/product_form_validation.go → domain/entities/product.go
 - `ToAttribute()` --calls--> `AttributeInputTypeLabel()`  [INFERRED]
@@ -213,6 +214,8 @@
   application/usecases/pricing/pricing_service_test.go → domain/domain_err/custom_error.go
 - `NewZarinpal()` --calls--> `New()`  [INFERRED]
   infrastructure/payment/zarinpal/zarinpal.go → domain/domain_err/custom_error.go
+- `InitLogrus()` --calls--> `New()`  [INFERRED]
+  pkg/logging/logrus_logger.go → domain/domain_err/custom_error.go
 
 ## Import Cycles
 - None detected.
@@ -228,15 +231,15 @@
 - **Customer Authentication and Account Area (mobile login -> OTP verify -> profile/orders)** — templates_site_customer_login_customer_login, templates_site_customer_verify_phone_number_customer_verify_phone_number, templates_site_customer_login_passwordless_mobile_login, templates_site_customer_verify_phone_number_otp_code_entry, templates_site_customer_verify_phone_number_otp_resend_countdown, templates_site_customer_menu_tmpl_customer_menu_tmpl, templates_site_customer_menu_tmpl_account_navigation, templates_site_customer_profile_customer_profile, templates_site_customer_edit_profile_customer_edit_profile, templates_site_profile_orders_profile_orders, templates_site_customer_order_details_customer_order_details [INFERRED 0.85]
 - **Browse-to-Cart-to-Checkout Flow (home/search -> product+variant -> cart lines -> shipping/payment -> order result)** — templates_site_home_home, templates_site_search_search, templates_site_single_product_single_product, templates_site_single_product_variant_inventory_picker, templates_site_single_product_add_to_cart_form, templates_site_single_product_already_in_cart_state, templates_site_cart_cart, templates_site_cart_cart_line_mutation_forms, templates_site_shipping_shipping, templates_site_shipping_checkout_summary_widget, templates_site_shopping_complete_buy_shopping_complete_buy, templates_site_shopping_complete_buy_checkout_steps, templates_site_shopping_no_complete_buy_shopping_no_complete_buy, templates_site_header_tmpl_mini_cart_widget [INFERRED 0.85]
 
-## Communities (196 total, 85 thin omitted)
+## Communities (199 total, 86 thin omitted)
 
 ### Community 0 - "Product"
 Cohesion: 0.07
-Nodes (31): Banner, Banners, ToBanner(), ToBanners(), BannerLayoutLabel(), BannerTypeLabel(), Time, startOfDay() (+23 more)
+Nodes (30): Banner, Banners, ToBanner(), ToBanners(), BannerLayoutLabel(), BannerTypeLabel(), Time, startOfDay() (+22 more)
 
 ### Community 1 - "Product"
-Cohesion: 0.09
-Nodes (37): Product, ProductInventories, ProductInventory, Products, VariantAttributeValue, availableOf(), Time, ToProductInventories() (+29 more)
+Cohesion: 0.14
+Nodes (26): Product, ProductInventories, ProductInventory, Products, VariantAttributeValue, availableOf(), Time, ToProductInventories() (+18 more)
 
 ### Community 2 - "EventManager"
 Cohesion: 0.06
@@ -259,8 +262,8 @@ Cohesion: 0.11
 Nodes (45): Site 404 Not Found Page, Header-Only Error Page Shell, Site 500 Internal Error Page, Site Cart Page (define cart), Per-Product Cart Error Annotation (.ERRORS), Cart Line Quantity Mutation Forms, Customer Edit Profile Page, Account Navigation Active State (.ACTIVE) (+37 more)
 
 ### Community 7 - "admin_order_response.go"
-Cohesion: 0.10
-Nodes (32): Address, AdminOrder, AdminOrderItem, AdminOrderItems, AdminOrders, Customer, Customers, OrderDetail (+24 more)
+Cohesion: 0.25
+Nodes (14): Address, AdminOrder, AdminOrderItem, AdminOrderItems, AdminOrders, AdminOrderStatusMap(), Order, OrderItemAttributes (+6 more)
 
 ### Community 8 - "Admin Sidebar Navigation Partial (sidebar)"
 Cohesion: 0.13
@@ -268,7 +271,7 @@ Nodes (41): Admin AJAX Attribute Cascade (GET /admins/get-attributes/:id), Admin
 
 ### Community 9 - "ProductService"
 Cohesion: 0.07
-Nodes (26): ProductListQuery, Context, NewPricingService(), Context, T, TestRefreshProductAggregates_DelegatesToRepository(), TestRefreshProductAggregates_PropagatesError(), Context (+18 more)
+Nodes (28): ProductListQuery, Context, NewPricingService(), Context, T, TestRefreshProductAggregates_DelegatesToRepository(), TestRefreshProductAggregates_PropagatesError(), Context (+20 more)
 
 ### Community 10 - "AdminLTE Page Skeleton Contract (head / navbar / sidebar / footer sub-templates + content-wrapper)"
 Cohesion: 0.12
@@ -295,8 +298,8 @@ Cohesion: 0.11
 Nodes (20): BannerService, FeeRateService, HomeServiceInterface, AddToCartRequest, Context, HomeServiceInterface, T, postAddToCart() (+12 more)
 
 ### Community 16 - "customer_order_response.go"
-Cohesion: 0.10
-Nodes (35): Order, OrderItem, OrderItems, Orders, Payment, Time, OrderStatusMap(), ToOrder() (+27 more)
+Cohesion: 0.17
+Nodes (21): CustomerOrderStatusMap(), AttributeValue, Order, OrderItemAttribute, OrderItemAttributes, Time, VariantAttributeValue, ToAddress() (+13 more)
 
 ### Community 17 - "Storage"
 Cohesion: 0.09
@@ -304,11 +307,11 @@ Nodes (18): Time, ToCustomerSession(), Address, Cart, Model, Order, Customer, Mo
 
 ### Community 18 - "T"
 Cohesion: 0.05
-Nodes (41): Attribute, Attributes, AttributeValue, AttributeValues, CreateAttributeRequest, ToAttribute(), ToAttributes(), ToAttributeValue() (+33 more)
+Nodes (42): Attribute, Attributes, AttributeValue, AttributeValues, CreateAttributeRequest, ToAttribute(), ToAttributes(), ToAttributeValue() (+34 more)
 
 ### Community 19 - "SyncReadModel"
-Cohesion: 0.20
-Nodes (14): prepareProductImages(), Feature, attributeValueHex(), derefUint(), derefUintToInt64(), Context, DB, JSON (+6 more)
+Cohesion: 0.26
+Nodes (11): Feature, attributeValueHex(), derefUint(), derefUintToInt64(), Context, DB, JSON, Product (+3 more)
 
 ### Community 20 - "LoadMenu"
 Cohesion: 0.40
@@ -318,29 +321,29 @@ Nodes (3): HomeServiceInterface, HandlerFunc, LoadMenu()
 Cohesion: 0.15
 Nodes (12): CheckCustomerSessionID(), HandlerFunc, CheckUserAuth(), HandlerFunc, CustomerMustLogin(), HandlerFunc, Auth(), CustomerAuth() (+4 more)
 
-### Community 22 - "VariantRow"
-Cohesion: 0.20
-Nodes (7): VariantRow, CreateProductRequest, CreateProductRequest, UpdateProductRequest, Time, simpleRows(), UpdateProductRequest
+### Community 22 - "web/customer_response.go"
+Cohesion: 0.26
+Nodes (13): Address, Cart, CartItem, Address, toAddress(), toCart(), toCartItem(), toCartItems() (+5 more)
 
 ### Community 24 - "feeKind"
 Cohesion: 0.11
 Nodes (23): CreateFeeRateRequest, FeeRate, FeeRates, ToFeeRate(), ToFeeRates(), FeeKindLabel(), Model, Time (+15 more)
 
 ### Community 25 - "product_repository.go"
-Cohesion: 0.29
-Nodes (12): createVariantLinks(), createVariantWithLinks(), existingVariantCombos(), DB, Time, NewProductRepository(), parseVariantExpiresAt(), updateVariantColumns() (+4 more)
+Cohesion: 0.12
+Nodes (21): Attribute, Context, ProductRepository, createVariantLinks(), createVariantWithLinks(), escapeLike(), existingVariantCombos(), Context (+13 more)
 
 ### Community 26 - "AdminHandler"
 Cohesion: 0.07
 Nodes (22): CreateAttributeValueRequest, UpdateAttributeValueRequest, AttributeValue, Context, CustomError, NewAttributeValueService(), AttributeValueRepository, AttributeValueService (+14 more)
 
 ### Community 27 - "product_read_model.go"
-Cohesion: 0.30
-Nodes (11): B, C, F, FData, Img, ImgData, Inventory, InventoryAttributes (+3 more)
+Cohesion: 0.27
+Nodes (12): B, C, F, FData, Img, ImgData, Inventory, InventoryAttributes (+4 more)
 
-### Community 28 - "parseDate"
-Cohesion: 0.31
-Nodes (11): Values, rawVariantField(), ValidateProductForm(), validateSimple(), validateVariants(), Time, Values, Numeric() (+3 more)
+### Community 28 - "OrderItem"
+Cohesion: 0.36
+Nodes (11): Order, OrderItem, OrderItems, Orders, Payment, Time, OrderStatusMap(), ToOrder() (+3 more)
 
 ### Community 29 - "OrderRepository"
 Cohesion: 0.21
@@ -355,8 +358,8 @@ Cohesion: 0.29
 Nodes (10): boolPtr(), Connect(), CreateSchema(), GetTClient(), Client, RecreateSchema(), DeleteInTypesence(), Context (+2 more)
 
 ### Community 32 - "util.go"
-Cohesion: 0.06
-Nodes (34): Address, Cart, CartItem, Address, toAddress(), toCart(), toCartItem(), toCartItems() (+26 more)
+Cohesion: 0.08
+Nodes (21): checkIDAndExistence(), AdminHandler, Context, AdminHandler, Context, AllowImageExtensions(), formatWithCommas(), GenerateFilename() (+13 more)
 
 ### Community 33 - "errors.go"
 Cohesion: 0.27
@@ -366,21 +369,21 @@ Nodes (8): MyError, Add(), errorMessages(), Get(), GetErrorMessage(), NewMyError
 Cohesion: 0.24
 Nodes (5): CreateProductFeatureRequest, UpdateProductFeatureRequest, Context, Feature, ProductRepository
 
-### Community 35 - "ProductRepository"
-Cohesion: 0.32
-Nodes (6): escapeLike(), Context, Product, ProductListQuery, ProductRepository, UpdateProductRequest
+### Community 35 - "seeder.go"
+Cohesion: 0.30
+Nodes (11): baseAlreadySeeded(), fakeAttributeAndValues(), fakeBrands(), fakeCategories(), fakeProducts(), Attribute, DB, Product (+3 more)
 
-### Community 37 - "ProductSliderService"
-Cohesion: 0.24
-Nodes (6): Context, Pagination, ProductSlider, NewProductSliderService(), ProductSliderService, ProductSliderRepositoryInterface
+### Community 37 - "VariantRow"
+Cohesion: 0.07
+Nodes (33): CreateProductSliderRequest, VariantRow, Context, Pagination, ProductSlider, NewProductSliderService(), CreateProductRequest, CreateProductRequest (+25 more)
 
 ### Community 38 - "CustomError"
 Cohesion: 0.19
 Nodes (8): CreateCategoryRequest, Category, Context, Context, CategoryService, HandleError(), CustomError, DuplicateProductInventory
 
-### Community 40 - "product_slider_request.go"
-Cohesion: 0.29
-Nodes (9): CreateProductSliderRequest, Time, Values, ParseSliderProductIDs(), SliderCategoryID(), SliderDates(), SliderStatus(), ValidateProductSliderForm() (+1 more)
+### Community 40 - "ToOrderItemAttributes"
+Cohesion: 0.22
+Nodes (10): OrderItemAttribute, OrderItemAttributes, AttributeValue, OrderItemAttribute, VariantAttributeValue, T, TestToOrderItemAttributes_Empty(), TestToOrderItemAttributes_SkipsUnlinkedValues() (+2 more)
 
 ### Community 41 - "BrandRepository"
 Cohesion: 0.35
@@ -399,12 +402,12 @@ Cohesion: 0.17
 Nodes (9): NewAuthenticateService(), AuthenticateRepository, AuthenticateService, AuthenticateServiceInterface, Context, DB, User, NewAuthenticateRepository() (+1 more)
 
 ### Community 47 - "CreateBannerRequest"
-Cohesion: 0.10
-Nodes (18): CreateBannerRequest, Banner, Context, NewBannerService(), BannerRepository, BannerService, bannerValues(), Banner (+10 more)
+Cohesion: 0.09
+Nodes (19): CreateBannerRequest, Banner, Context, NewBannerService(), BannerRepository, BannerService, ValidBannerLayout(), bannerValues() (+11 more)
 
 ### Community 48 - "Render"
 Cohesion: 0.07
-Nodes (31): ProductSlider, ProductSliders, SliderPosition, SliderProduct, SliderPositions(), SlidersByPosition(), ToSlider(), ToSliderProduct() (+23 more)
+Nodes (32): ProductSlider, ProductSliders, SliderPosition, SliderProduct, SliderPositions(), SlidersByPosition(), ToSlider(), ToSliderProduct() (+24 more)
 
 ### Community 49 - "CustomerRepositoryInterface"
 Cohesion: 0.16
@@ -482,9 +485,9 @@ Nodes (4): Time, PaymentStatusMapper(), ToPayment(), Payment
 Cohesion: 0.90
 Nodes (4): Categories, Category, ToCategories(), ToCategory()
 
-### Community 72 - "Context"
-Cohesion: 0.39
-Nodes (3): Attribute, Context, ProductRepository
+### Community 72 - "Customer"
+Cohesion: 0.90
+Nodes (4): Customer, Customers, ToCustomer(), ToCustomers()
 
 ### Community 73 - "HandleExampleTask"
 Cohesion: 0.50
@@ -558,6 +561,10 @@ Nodes (3): Category, ToMenuResponse(), CategoryResponse
 Cohesion: 0.31
 Nodes (7): AttributeValue, DB, Model, Product, Time, ProductVariant, VariantAttributeValue
 
+### Community 139 - "ToOrderDetail"
+Cohesion: 0.60
+Nodes (4): OrderDetail, Customer, Order, ToOrderDetail()
+
 ### Community 157 - "NewHomeRepository"
 Cohesion: 0.24
 Nodes (9): Dependencies, EventManager, HomeRepositoryInterface, Context, T, keys(), nilGinCtx(), TestGetProduct_ReadModelContract() (+1 more)
@@ -582,6 +589,10 @@ Nodes (5): LoginRequest, User, ToUserResponse(), Context, User
 Cohesion: 0.67
 Nodes (3): ConvertGregorianToShamsi(), ConvertShamsiToGregorian(), Time
 
+### Community 175 - "Order"
+Cohesion: 0.50
+Nodes (3): Model, Payment, Order
+
 ### Community 179 - "Payment"
 Cohesion: 0.60
 Nodes (4): Payment, Time, PaymentStatusMapper(), ToPayment()
@@ -595,7 +606,7 @@ Nodes (4): Payment, Time, PaymentStatusMapper(), ToPayment()
 ## Knowledge Gaps
 - **47 isolated node(s):** `variantJSON`, `AdminHandler`, `Layout & dependency direction`, `Commands`, `Gotchas` (+42 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **85 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **86 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -605,11 +616,11 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `Admin Login Page (modules/admin/html/admin_login)` and `Admin Head Partial (head)`?**
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **Why does `NewHomeRepository()` connect `NewHomeRepository` to `T`, `FeeRateService`, `.ProcessTask`, `Order`?**
-  _High betweenness centrality (0.164) - this node is a cross-community bridge._
-- **Why does `SetPublic()` connect `FeeRateService` to `HomeService`, `NewHomeRepository`, `PublicHandler`?**
-  _High betweenness centrality (0.152) - this node is a cross-community bridge._
+  _High betweenness centrality (0.162) - this node is a cross-community bridge._
 - **Why does `New()` connect `New` to `.ProcessTask`, `CustomError`, `.Login`, `ProductService`, `ConvertGregorianToShamsi`, `ZapLogger`, `BrandService`, `Context`, `Storage`, `TestHandleError_InternalError`, `Order`?**
-  _High betweenness centrality (0.147) - this node is a cross-community bridge._
+  _High betweenness centrality (0.144) - this node is a cross-community bridge._
+- **Why does `SetPublic()` connect `FeeRateService` to `HomeService`, `NewHomeRepository`, `PublicHandler`?**
+  _High betweenness centrality (0.139) - this node is a cross-community bridge._
 - **Are the 25 inferred relationships involving `New()` (e.g. with `.ProcessTask()` and `TestRefreshProductAggregates_PropagatesError()`) actually correct?**
   _`New()` has 25 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `variantJSON`, `AdminHandler`, `Layout & dependency direction` to the rest of the system?**
