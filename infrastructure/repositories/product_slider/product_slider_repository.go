@@ -15,6 +15,7 @@ import (
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
 	"shop/pkg/pagination"
+	"shop/pkg/util"
 )
 
 type ProductSliderRepository struct {
@@ -226,7 +227,7 @@ func curatedCatalog(pg pagination.Pagination, slider *entities.ProductSlider) pa
 // categoryCatalog returns the published products of a category subtree.
 // ok=false means the scope is empty (the caller falls back to the curated set).
 func (r *ProductSliderRepository) categoryCatalog(c *gin.Context, pg pagination.Pagination, categoryID uint) (pagination.Pagination, bool) {
-	subtree := categorySubtreeSQL(categoryID)
+	subtree := util.CategorySubtreeSQL(categoryID)
 	condition := fmt.Sprintf("category_id IN (%s) AND status = '%s'",
 		subtree, entities.ProductStatusPublished)
 
@@ -246,19 +247,6 @@ func (r *ProductSliderRepository) categoryCatalog(c *gin.Context, pg pagination.
 
 	pg.Rows = responses.ToProducts(products)
 	return pg, true
-}
-
-// categorySubtreeSQL is the recursive CTE that collects a category and all of
-// its descendants (id is a uint, inlined into the SQL on purpose because
-// pagination.Paginate only accepts a condition string).
-func categorySubtreeSQL(categoryID uint) string {
-	return fmt.Sprintf(`WITH RECURSIVE category_tree AS (
-    SELECT id FROM categories WHERE id = %d
-    UNION ALL
-    SELECT c.id FROM categories c
-             JOIN category_tree t ON c.parent_id = t.id
-    WHERE c.deleted_at IS NULL
-) SELECT id FROM category_tree`, categoryID)
 }
 
 // --- small helpers -------------------------------------------------------

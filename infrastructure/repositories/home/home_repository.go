@@ -385,7 +385,11 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 	}
 
 	var products []*entities.Product
-	condition := fmt.Sprintf("category_id=%d", category.ID)
+	// parent categories own no products directly (only their children do) and
+	// drafts/archived products must never reach the storefront
+	subtree := util.CategorySubtreeSQL(category.ID)
+	condition := fmt.Sprintf("category_id IN (%s) AND status = '%s'",
+		subtree, entities.ProductStatusPublished)
 
 	paginateQuery, exist := pagination.Paginate(c, condition, &products, &pg, h.dep.DB)
 	if !exist {
@@ -395,7 +399,7 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 	if pErr := paginateQuery(h.dep.DB).
 		Preload("Category").
 		Preload("ProductImages").
-		Where("category_id=?", category.ID).
+		Where(fmt.Sprintf("category_id IN (%s) AND status = ?", subtree), entities.ProductStatusPublished).
 		Find(&products).Error; pErr != nil {
 		return pg, pErr
 	}

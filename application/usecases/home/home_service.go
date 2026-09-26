@@ -123,54 +123,55 @@ func (h *HomeService) UpdateProfile(c *gin.Context, req *requests.CustomerProfil
 	return domain_err.CustomError{}
 }
 
+// menuCacheTTL keeps the header menu fresh even when a category row is
+// written outside the repository (e.g. by the seeder, which cannot invalidate
+// the cache). Category writes still invalidate it immediately.
+const menuCacheTTL = 5 * time.Minute
+
 func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryResponse, error) {
+	if menu, ok := menuFromCache(c); ok {
+		return menu, nil
+	}
 
-	//get menu from cache
-	menu := cache.Get(c, "menu")
+	// cache miss / stale entry → read the categories from the database
+	menu, err := h.repo.GetMenu(c)
+	if err != nil {
+		return nil, err
+	}
 
-	var categoryResponses []*CustomerRes.CategoryResponse
+	categoryResponses := make([]*CustomerRes.CategoryResponse, 0, len(menu))
+	for _, category := range menu {
+		categoryResponses = append(categoryResponses, CustomerRes.ToMenuResponse(category))
+	}
 
-	if menu == "" {
-		fmt.Println("--- menu was not exist in cache ------")
-
-		//get menu from database
-		menu, err := h.repo.GetMenu(c)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, category := range menu {
-			categoryResponse := CustomerRes.ToMenuResponse(category)
-			categoryResponses = append(categoryResponses, categoryResponse)
-		}
-
-		//marsh repository response
-		categoryJsonResponse, err := json.Marshal(categoryResponses)
-		if err != nil {
-			fmt.Println("--- category marshal error :", string(categoryJsonResponse))
-			return categoryResponses, err
-		} else {
-			fmt.Println("--- category marshal success :", string(categoryJsonResponse))
-		}
-
-		//store marshaled data into cache
-		cacheSetErr := cache.Set(c, "menu", string(categoryJsonResponse), -1)
-		if err != nil {
-			fmt.Println("---- cache set menu key error: ", cacheSetErr)
-			return categoryResponses, err
-		}
-
-	} else {
-
-		fmt.Println("--- menu was exist in cache ------")
-		//menu was existed in cache
-		unmarshalErr := json.Unmarshal([]byte(menu), &categoryResponses)
-		if unmarshalErr != nil {
-			fmt.Println("---- unmarshal category response err :", unmarshalErr)
-			return categoryResponses, unmarshalErr
+	// never cache an empty menu: json.Marshal(nil slice) is the literal
+	// "null", and with a no-expiry key that value poisoned the menu forever
+	// (the header showed an empty «دسته بندی کالاها» panel).
+	if len(categoryResponses) > 0 {
+		payload, marshalErr := json.Marshal(categoryResponses)
+		if marshalErr != nil {
+			fmt.Println("---- menu marshal error :", marshalErr)
+		} else if setErr := cache.Set(c, "menu", string(payload), menuCacheTTL); setErr != nil {
+			fmt.Println("---- cache set menu key error: ", setErr)
 		}
 	}
 	return categoryResponses, nil
+}
+
+// menuFromCache returns the cached menu only when it is a usable payload.
+// "null" / "[]" / unparsable / empty entries are treated as a miss so the
+// next request rebuilds them from the database.
+func menuFromCache(c context.Context) ([]*CustomerRes.CategoryResponse, bool) {
+	raw := cache.Get(c, "menu")
+	if raw == "" || raw == "null" || raw == "[]" {
+		return nil, false
+	}
+
+	var menu []*CustomerRes.CategoryResponse
+	if err := json.Unmarshal([]byte(raw), &menu); err != nil || len(menu) == 0 {
+		return nil, false
+	}
+	return menu, true
 }
 
 func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.RecommendedProduct, domain_err.CustomError) {
