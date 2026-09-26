@@ -2,6 +2,8 @@ package responses
 
 import (
 	"math"
+	"time"
+
 	"shop/domain/entities"
 )
 
@@ -12,11 +14,23 @@ type Product struct {
 	Title         string
 	Slug          string
 	Sku           string
-	Status        bool
+	Status        string
+	StatusText    string
 	OriginalPrice uint
 	SalePrice     uint
 	Description   string
 	Discount      uint
+
+	// aggregate cache (PricingService) — used by the admin list & storefront list
+	ProductType    string
+	MinPrice       uint
+	MaxPrice       uint
+	TotalStock     uint
+	TotalReserved  uint
+	AvailableStock uint
+	InStock        bool
+	VariantsCount  int
+	ExpiresAt      *time.Time
 
 	//relation
 	Category           *Category
@@ -48,10 +62,25 @@ func ToProduct(p *entities.Product) *Product {
 		Slug:          p.Slug,
 		Sku:           p.Sku,
 		Status:        p.Status,
+		StatusText:    entities.ProductStatusLabel(p.Status),
 		OriginalPrice: p.OriginalPrice,
 		SalePrice:     p.SalePrice,
 		Description:   p.Description,
+		ExpiresAt:     p.ExpiresAt,
+
+		ProductType:    p.ProductType,
+		MinPrice:       p.MinPrice,
+		MaxPrice:       p.MaxPrice,
+		TotalStock:     p.TotalStock,
+		TotalReserved:  p.TotalReserved,
+		AvailableStock: p.AvailableStock,
+		InStock:        p.InStock,
+		VariantsCount:  p.VariantsCount,
+
 		Discount: func() uint {
+			if p.OriginalPrice == 0 {
+				return 0
+			}
 			originalPrice := float64(p.OriginalPrice)
 			salePrice := float64(p.SalePrice)
 			dis := ((originalPrice - salePrice) / originalPrice) * 100
@@ -64,9 +93,7 @@ func ToProduct(p *entities.Product) *Product {
 		product.Features = ToFeatures(p.Features)
 	}
 
-	if p.ProductVariants != nil {
-		product.ProductInventories = ToProductInventories(p.ProductVariants)
-	}
+	product.ProductInventories = ToProductInventoriesWithFallback(p.ProductVariants, p.OriginalPrice, p.SalePrice)
 	if p.ProductAttributes != nil {
 		product.ProductAttributes = ToProductAttributes(p.ProductAttributes)
 	}

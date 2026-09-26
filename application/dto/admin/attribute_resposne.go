@@ -5,6 +5,8 @@ import "shop/domain/entities"
 type Attribute struct {
 	ID              uint
 	Title           string
+	Code            string
+	SortOrder       int
 	AttributeValues *AttributeValues
 }
 
@@ -16,6 +18,8 @@ func ToAttribute(attr *entities.Attribute) *Attribute {
 	return &Attribute{
 		ID:              attr.ID,
 		Title:           attr.Title,
+		Code:            attr.Code,
+		SortOrder:       attr.SortOrder,
 		AttributeValues: ToAttributeValues(attr.AttributeValues),
 	}
 }

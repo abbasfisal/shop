@@ -114,6 +114,8 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/attributes/:id", adminHlr.UpdateAttribute)
 
 		authGrp.GET("/admins/get-attributes/:catID", adminHlr.GetAttributesByCategoryID)
+		// JSON feed for the product create/edit combination builder (ajax)
+		authGrp.GET("/admins/api/attributes", adminHlr.GetAttributesJSON)
 
 		//attribute-values
 		authGrp.GET("/admins/attribute-values", adminHlr.IndexAttributeValues)

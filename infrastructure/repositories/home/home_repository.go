@@ -52,9 +52,9 @@ func (h *HomeRepository) GetRandomProducts(ctx context.Context, limit int) ([]*e
 }
 func (h *HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]*entities.Product, error) {
 	var products []*entities.Product
-	//todo: just load data if category.status = true and product.status=true
+	//todo: just load data if category.status = true and product.status=published
 	err := h.dep.DB.WithContext(ctx).
-		Preload("Category").Where("status=?", true).
+		Preload("Category").Where("status=?", entities.ProductStatusPublished).
 		Limit(limit).Find(&products).
 		Error
 
@@ -77,7 +77,7 @@ func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSl
 	var prod entities.Product
 	err := h.dep.DB.WithContext(c).
 		Select("id, read_model").
-		Where("sku = ? AND slug = ? AND status = true", productSku, productSlug).
+		Where("sku = ? AND slug = ? AND status = ?", productSku, productSlug, entities.ProductStatusPublished).
 		First(&prod).
 		Error
 	if err != nil {
@@ -417,6 +417,9 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 		imagePath = product.ProductImages[0].Path
 	}
 
+	// prices live on the selected variant (NULL columns inherit the product)
+	originalPrice, salePrice := h.cartPrices(c, product, req.InventoryID)
+
 	//todo:check cart status
 	err := h.dep.DB.
 		WithContext(c).
@@ -436,8 +439,8 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 					ProductID:     product.ID,
 					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 					Quantity:      1,
-					OriginalPrice: product.OriginalPrice,
-					SalePrice:     product.SalePrice,
+					OriginalPrice: originalPrice,
+					SalePrice:     salePrice,
 					ProductSku:    product.Sku,
 					ProductTitle:  product.Title,
 					ProductImage:  imagePath,
@@ -479,8 +482,8 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 					ProductID:     product.ID,
 					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 					Quantity:      1,
-					OriginalPrice: product.OriginalPrice,
-					SalePrice:     product.SalePrice,
+					OriginalPrice: originalPrice,
+					SalePrice:     salePrice,
 					ProductSku:    product.Sku,
 					ProductTitle:  product.Title,
 					ProductImage:  imagePath,
@@ -652,6 +655,37 @@ func retryWithBackoff(attempts int, delay time.Duration, operation func() error)
 }
 
 // GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
+// cartPrices resolves the cart item prices for the selected variant:
+// original = the crossed-out list price, sale = the price the customer pays
+// (discount_price wins when it is a real discount — golden rule #3).
+// NULL variant price columns inherit the parent product price.
+func (h *HomeRepository) cartPrices(c *gin.Context, product *entities.Product, inventoryID uint) (uint, uint) {
+	originalPrice := product.OriginalPrice
+	salePrice := product.SalePrice
+
+	if inventoryID == 0 {
+		return originalPrice, salePrice
+	}
+
+	var variant entities.ProductVariant
+	if err := h.dep.DB.WithContext(c).
+		Where("id = ? AND product_id = ?", inventoryID, product.ID).
+		First(&variant).Error; err != nil {
+		return originalPrice, salePrice
+	}
+
+	if variant.Price != nil {
+		originalPrice = *variant.Price
+	}
+	if variant.SalePrice != nil {
+		salePrice = *variant.SalePrice
+	}
+	if variant.DiscountPrice != nil && *variant.DiscountPrice > 0 && *variant.DiscountPrice < salePrice {
+		salePrice = *variant.DiscountPrice
+	}
+	return originalPrice, salePrice
+}
+
 func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *entities.Order, inventoryID uint, GenerateOrderErr error) {
 	customer, ok := helpers.GetAuthUser(c)
 	if !ok {
@@ -953,13 +987,14 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 	tx.Commit()
 	log.Println("----- x 9")
 
-	//refresh read model + pricing aggregates once the stock change is committed
+	//refresh pricing aggregates then the read model once the stock change is
+	//committed (the Typesense document mirrors the aggregates)
 	for pid := range touchedProducts {
-		if syncErr := product.SyncReadModel(c, h.dep.DB, pid); syncErr != nil {
-			util.Trace(syncErr)
-		}
 		if pricingErr := product.RefreshProductAggregates(c, h.dep.DB, pid); pricingErr != nil {
 			util.Trace(pricingErr)
+		}
+		if syncErr := product.SyncReadModel(c, h.dep.DB, pid); syncErr != nil {
+			util.Trace(syncErr)
 		}
 	}
 

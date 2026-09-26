@@ -71,7 +71,7 @@ func CreateSchema(client *typesense.Client) error {
 			{Name: "discount", Type: "int32"},
 			{Name: "stock", Type: "int32"},
 			{Name: "in_stock", Type: "bool", Facet: facet},
-			{Name: "status", Type: "bool", Facet: facet},
+			{Name: "status", Type: "string", Facet: facet},
 		},
 		TokenSeparators: &[]string{" ", "-", ".", ",", ":"},
 	})

@@ -16,9 +16,8 @@
                     <div class="col-sm-6">
                         <h1 class="m-0 text-dark">{{.TITLE}}</h1>
                         <br>
-                        <span class="text-info">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</span>
+                        <span class="text-success">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</span>
                     </div><!-- /.col -->
-
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
         </div>
@@ -28,60 +27,157 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-12">
-                        <a href="/admins/products/create" class="btn btn-info float-right">محصول جدید</a>
-                        <br>
-                        <br>
-
-                        {{if .PRODUCTS.Data}}
-                            <table class="table-responsive align-content-center  table">
-                                <thead>
-                                <tr class="text-sm text-bold">
-                                    <td>#</td>
-                                    <td>عنوان</td>
-                                    <td>اسلاگ</td>
-                                    <td>sku</td>
-                                    <td>وضعیت</td>
-                                    <td>قیمت اصلی</td>
-                                    <td>قیمت فروش</td>
-                                    <td>دسته بندی</td>
-                                    <td>برند</td>
-                                    <td>عملیات</td>
-                                </tr>
-                                </thead>
-                                {{range .PRODUCTS.Data}}
-                                    <tr>
-                                        <td></td>
-                                        <td>{{.Title}}</td>
-                                        <td>{{.Slug}}</td>
-                                        <td>{{.Sku}}</td>
-                                        <td>
-                                            {{if eq .Status true}}
-                                                <span class="badge badge-success">فعال</span>
-                                            {{else}}
-                                                <span class="badge badge-danger">غیرفعال</span>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header"><b>فیلترها</b></div>
+                            <div class="card-body">
+                                <form method="GET" action="/admins/products" id="filterForm">
+                                    <div class="form-group">
+                                        <label>جستجو</label>
+                                        <input type="text" class="form-control" name="q" placeholder="نام یا SKU..."
+                                               value="{{.FILTER.Q}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>دسته بندی</label>
+                                        <select class="form-control" name="category_id" onchange="filterForm.submit()">
+                                            <option value="">همه</option>
+                                            {{range .CATEGORIES.Data}}
+                                                <option value="{{.ID}}" {{if eq .ID $.FILTER.CategoryID}}selected{{end}}>{{.Title}}</option>
                                             {{end}}
-                                        </td>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>وضعیت</label>
+                                        <select class="form-control" name="status" onchange="filterForm.submit()">
+                                            <option value="">همه</option>
+                                            <option value="draft" {{if eq .FILTER.Status "draft"}}selected{{end}}>پیش‌نویس</option>
+                                            <option value="published" {{if eq .FILTER.Status "published"}}selected{{end}}>منتشر شده</option>
+                                            <option value="archived" {{if eq .FILTER.Status "archived"}}selected{{end}}>بایگانی</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" name="in_stock" value="1"
+                                                   id="inStock" {{if .FILTER.InStock}}checked{{end}}
+                                                   onchange="filterForm.submit()">
+                                            <label class="custom-control-label" for="inStock">فقط کالاهای موجود</label>
+                                        </div>
+                                    </div>
 
-                                        <td>{{.OriginalPrice}}</td>
-                                        <td>{{.SalePrice}}</td>
-                                        <td><a href="/admins/categories/{{.Category.ID}}">{{.Category.Title}}</a></td>
-                                        <td>{{.Brand.Title}}</td>
-                                        <td>
-                                            <a href="/admins/products/{{.ID}}">
-                                                <i class="nav-icon text-success fa fa-eye"></i>
-                                            </a> |
-                                            <a href="/admins/products/{{.ID}}/edit">
-                                                <i class="nav-icon text-info fa fa-edit"></i>
-                                            </a>
-                                            |
-                                            <a href="/admins/products/{{.ID}}/add-attributes">add-attr</a>
-                                        </td>
-                                    </tr>
+                                    {{range .ATTRIBUTES.Data}}
+                                        {{$attr := .}}
+                                        {{if $attr.AttributeValues.Data}}
+                                            <div class="form-group">
+                                                <label>{{$attr.Title}}</label>
+                                                {{range $attr.AttributeValues.Data}}
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                               id="attr_{{$attr.ID}}_{{.ID}}"
+                                                               name="attr[{{$attr.Code}}][]"
+                                                               value="{{.ID}}"
+                                                               {{if index (index $.CHOSEN $attr.Code) .ID}}checked{{end}}
+                                                               onchange="filterForm.submit()">
+                                                        <label class="custom-control-label" for="attr_{{$attr.ID}}_{{.ID}}">{{.Title}}</label>
+                                                    </div>
+                                                {{end}}
+                                            </div>
+                                        {{end}}
+                                    {{end}}
+
+                                    <div class="form-group">
+                                        <label>ترتیب</label>
+                                        <select class="form-control" name="sort" onchange="filterForm.submit()">
+                                            <option value="newest" {{if or (eq .FILTER.Sort "") (eq .FILTER.Sort "newest")}}selected{{end}}>جدیدترین</option>
+                                            <option value="price_asc" {{if eq .FILTER.Sort "price_asc"}}selected{{end}}>ارزان‌ترین</option>
+                                            <option value="price_desc" {{if eq .FILTER.Sort "price_desc"}}selected{{end}}>گران‌ترین</option>
+                                            <option value="name" {{if eq .FILTER.Sort "name"}}selected{{end}}>نام</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-block">اعمال فیلتر</button>
+                                    <a href="/admins/products" class="btn btn-secondary btn-block">پاک کردن</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <a href="/admins/products/create" class="btn btn-info float-left">محصول جدید</a>
+                                <b>محصولات</b>
+                            </div>
+                            <div class="card-body table-responsive p-0">
+                                {{if .PRODUCTS.Data}}
+                                    <table class="table table-hover text-nowrap mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>عنوان</th>
+                                            <th>sku</th>
+                                            <th>دسته بندی</th>
+                                            <th>برند</th>
+                                            <th>قیمت</th>
+                                            <th>موجودی</th>
+                                            <th>وضعیت</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{range $i, $p := .PRODUCTS.Data}}
+                                            <tr>
+                                                <td>{{$p.ID}}</td>
+                                                <td>
+                                                    <b>{{$p.Title}}</b>
+                                                    <br>
+                                                    {{if eq $p.ProductType "variable"}}<span class="badge badge-primary">واریانت‌دار</span>{{else}}<span class="badge badge-secondary">ساده</span>{{end}}
+                                                    {{if gt $p.VariantsCount 0}}
+                                                        <span class="badge badge-info">{{$p.VariantsCount}} ترکیب</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>{{$p.Sku}}</td>
+                                                <td>{{if $p.Category}}{{$p.Category.Title}}{{else}}—{{end}}</td>
+                                                <td>{{if $p.Brand}}{{$p.Brand.Title}}{{else}}—{{end}}</td>
+                                                <td>
+                                                    {{if and (gt $p.MinPrice 0) (ne $p.MinPrice $p.MaxPrice)}}
+                                                        از {{printf "%d" $p.MinPrice}} تومان
+                                                    {{else}}
+                                                        {{printf "%d" $p.SalePrice}} تومان
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if $p.InStock}}
+                                                        <span class="text-success">✓ {{$p.AvailableStock}}</span>
+                                                    {{else}}
+                                                        <span class="text-danger">✗ ناموجود</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if eq $p.Status "published"}}
+                                                        <span class="badge badge-success">{{$p.StatusText}}</span>
+                                                    {{else if eq $p.Status "archived"}}
+                                                        <span class="badge badge-dark">{{$p.StatusText}}</span>
+                                                    {{else}}
+                                                        <span class="badge badge-warning">{{$p.StatusText}}</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    <a href="/admins/products/{{$p.ID}}" title="مشاهده" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fa fa-eye"></i>
+                                                    </a>
+                                                    <a href="/admins/products/{{$p.ID}}/edit" title="ویرایش" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                {{else}}
+                                    <div class="text-center text-muted p-5">محصولی یافت نشد.</div>
                                 {{end}}
-                            </table>
-                        {{end}}
-
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- /.row -->
@@ -94,4 +190,3 @@
     {{template "footer" .}}
 
 {{end}}
-

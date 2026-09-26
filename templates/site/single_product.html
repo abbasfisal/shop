@@ -229,9 +229,9 @@
                                                     {{if gt (len .PRODUCT.inventories) 0 }}
                                                         {{if eq (len .PRODUCT.inventories) 1}}
                                                             {{range $key,$item:=.PRODUCT.inventories}}
-                                                                <input type="hidden" name="inventory_id"
-                                                                       value="{{$item.InventoryID}}">
-                                                                {{if lt $item.Quantity 5}}
+                                                                {{if lt $item.Available 1}}
+                                                                    <span class="text-danger">ناموجود</span>
+                                                                {{else if lt $item.Quantity 5}}
                                                                     <b>موجودی</b>:
                                                                     {{$item.Quantity}}
                                                                     عدد
@@ -241,16 +241,22 @@
                                                             <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
                                                                 <h2>انتخاب :</h2>
                                                             </div>
-                                                            <select name="inventory_id" class="custom-select">
+                                                            <select name="inventory_id" id="inventoryPicker" class="custom-select">
                                                                 {{range $item:=.PRODUCT.inventories}}
                                                                     {{$qty:=$item.Quantity}}
                                                                     {{$inventory_id:=$item.InventoryID}}
                                                                     {{if eq (len $item.Attributes) 1}}
                                                                         {{range $item.Attributes}}
-                                                                            <option value="{{$inventory_id}}" class="">
+                                                                            <option value="{{$inventory_id}}" class=""
+                                                                                    data-price="{{$item.Price}}"
+                                                                                    data-sale="{{$item.SalePrice}}"
+                                                                                    data-effective="{{$item.EffectivePrice}}"
+                                                                                    data-percent="{{$item.DiscountPercent}}"
+                                                                                    data-has-discount="{{if $item.HasDiscount}}1{{else}}0{{end}}"
+                                                                                    data-stock="{{$item.Available}}">
                                                                                 {{.AttributeTitle}}
                                                                                 {{.AttributeValueTitle}}
-                                                                                {{if gt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
+                                                                                {{if lt $item.Available 1}} | ناموجود{{else if gt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
                                                                             </option>
                                                                         {{end}}
 
@@ -259,8 +265,16 @@
                                                                         {{range .Attributes}}
                                                                             {{$composite = printf "%s%s:%s  " $composite .AttributeTitle .AttributeValueTitle}} <!-- افزودن هر ویژگی به رشته قبلی -->
                                                                         {{end}}
-                                                                        <option value="{{.InventoryID}}">{{$composite}}
-                                                                            {{if gt $qty 5 }}
+                                                                        <option value="{{.InventoryID}}"
+                                                                                data-price="{{$item.Price}}"
+                                                                                data-sale="{{$item.SalePrice}}"
+                                                                                data-effective="{{$item.EffectivePrice}}"
+                                                                                data-percent="{{$item.DiscountPercent}}"
+                                                                                data-has-discount="{{if $item.HasDiscount}}1{{else}}0{{end}}"
+                                                                                data-stock="{{$item.Available}}">{{$composite}}
+                                                                            {{if lt $item.Available 1}}
+                                                                                | ناموجود
+                                                                            {{else if gt $qty 5 }}
                                                                                 |موجودی:{{.Quantity}}
                                                                                 عدد
                                                                             {{end}}
@@ -301,15 +315,15 @@
                                                     </ul>
                                                     <div class="product-seller-row product-seller-row--price">
                                                         <div class="product-seller-price-info">
-                                                            <div class="product-seller-price-prev">
+                                                            <div class="product-seller-price-prev" id="pricePrev">
                                                                 {{.PRODUCT.product.OriginalPrice}}
                                                             </div>
-                                                            <div class="product-seller-price-off">
-                                                                {{.PRODUCT.product.Discount}}%
+                                                            <div class="product-seller-price-off" id="priceOff">
+                                                                {{if gt .PRODUCT.product.Discount 0}}{{.PRODUCT.product.Discount}}%{{end}}
                                                             </div>
                                                         </div>
                                                         <div class="product-seller-price-real">
-                                                            <div class="product-seller-price-raw">
+                                                            <div class="product-seller-price-raw" id="priceReal">
                                                                 {{.PRODUCT.product.SalePrice}}
                                                             </div>
                                                             تومان
@@ -333,10 +347,12 @@
                                                                 <input type="hidden" name="product_id"
                                                                        value="{{.PRODUCT._id}}">
 
+                                                                {{$firstInventoryId := ""}}
                                                                 {{range $key,$item:=.PRODUCT.inventories}}
-                                                                    <input type="hidden" name="inventory_id"
-                                                                           value="{{$item.InventoryID}}">
+                                                                    {{if eq $firstInventoryId ""}}{{$firstInventoryId = printf "%d" $item.InventoryID}}{{end}}
                                                                 {{end}}
+                                                                <input type="hidden" name="inventory_id" id="cartInventoryId"
+                                                                       value="{{$firstInventoryId}}">
 
                                                                 <button type="submit"
                                                                         class="btn-add-to-cart btn-add-to-cart--full-width">
@@ -662,6 +678,38 @@
     <script src="/assets/shop/plugin/iran-map/iranmap.js"></script>
     <!-- Main JS File -->
     <script src="/assets/shop/js/js-product/js-product.js"></script>
+    <!-- variant picker: keep the cart input + price block in sync -->
+    <script>
+        (function () {
+            const picker = document.getElementById('inventoryPicker');
+            const hidden = document.getElementById('cartInventoryId');
+            const pricePrev = document.getElementById('pricePrev');
+            const priceReal = document.getElementById('priceReal');
+            const priceOff = document.getElementById('priceOff');
+            if (!hidden) return;
+
+            const fmt = n => Number(n).toLocaleString('en-US');
+
+            function apply(option) {
+                if (!option) return;
+                if (option.value) hidden.value = option.value;
+                const price = option.dataset.price;
+                const effective = option.dataset.effective;
+                const hasDiscount = option.dataset.hasDiscount === '1';
+                const percent = option.dataset.percent;
+                if (pricePrev && price) pricePrev.innerText = fmt(price);
+                if (priceReal && effective) priceReal.innerText = fmt(effective);
+                if (priceOff) priceOff.innerText = hasDiscount && percent ? percent + '%' : '';
+            }
+
+            if (picker) {
+                apply(picker.selectedOptions[0]);
+                picker.addEventListener('change', function () {
+                    apply(picker.selectedOptions[0]);
+                });
+            }
+        })();
+    </script>
     <!-- my custom JS File -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {

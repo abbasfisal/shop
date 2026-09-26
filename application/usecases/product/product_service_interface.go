@@ -9,7 +9,7 @@ import (
 )
 
 type ProductServiceInterface interface {
-	Index(ctx context.Context) (*responses.Products, domain_err.CustomError)
+	Index(ctx context.Context, q requests.ProductListQuery) (*responses.Products, domain_err.CustomError)
 	Show(ctx context.Context, columnName string, value any) (*responses.Product, []map[string]interface{}, domain_err.CustomError)
 	Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, domain_err.CustomError)
 	CheckSkuIsUnique(ctx context.Context, sku string) (bool, domain_err.CustomError)

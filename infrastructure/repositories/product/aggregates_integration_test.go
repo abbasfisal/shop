@@ -66,7 +66,7 @@ func TestRefreshProductAggregates(t *testing.T) {
 		Title:         "agg-test-" + suffix,
 		Slug:          "agg-test-" + suffix,
 		Sku:           "agg-" + suffix,
-		Status:        true,
+		Status:        entities.ProductStatusPublished,
 		OriginalPrice: 120,
 		SalePrice:     80,
 	}
@@ -176,7 +176,7 @@ func TestSyncReadModelAndStorefrontGetProduct(t *testing.T) {
 		Title:         "read-model-" + suffix,
 		Slug:          "read-model-" + suffix,
 		Sku:           "rm-" + suffix,
-		Status:        true,
+		Status:        entities.ProductStatusPublished,
 		OriginalPrice: 500,
 		SalePrice:     400,
 	}

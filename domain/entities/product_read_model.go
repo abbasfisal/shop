@@ -19,7 +19,7 @@ type P struct {
 	Title         string    `json:"title"`
 	Slug          string    `json:"slug"`
 	Sku           string    `json:"sku"`
-	Status        bool      `json:"status"`
+	Status        string    `json:"status"`
 	OriginalPrice int64     `json:"original_price"`
 	SalePrice     int64     `json:"sale_price"`
 	Discount      int64     `json:"Discount"`
@@ -68,6 +68,17 @@ type Inventory struct {
 	InventoryID int64                 `json:"inventory_id"`
 	Quantity    int64                 `json:"quantity"`
 	Attributes  []InventoryAttributes `json:"attributes"`
+
+	// per-variant pricing (Laravel ProductVariant) — NULL variant columns
+	// already resolved against the product price here
+	Price           int64  `json:"price"`          // crossed-out list price
+	SalePrice       int64  `json:"sale_price"`     // normal price
+	DiscountPrice   int64  `json:"discount_price"` // 0 when none
+	HasDiscount     bool   `json:"has_discount"`
+	DiscountPercent int64  `json:"discount_percent"`
+	EffectivePrice  int64  `json:"effective_price"` // what the customer pays
+	Status          string `json:"status"`          // active | inactive
+	Available       int64  `json:"available"`       // stock - reserved
 }
 
 type InventoryAttributes struct {
