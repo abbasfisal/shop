@@ -12,6 +12,7 @@ import (
 
 	responses "shop/application/dto/admin"
 	"shop/application/usecases/banner"
+	"shop/application/usecases/fee"
 	"shop/application/usecases/home"
 	sliders "shop/application/usecases/product_slider"
 	"shop/bootstrap"
@@ -26,6 +27,7 @@ type PublicHandler struct {
 	homeSrv    home.HomeServiceInterface
 	bannerSrv  *banner.BannerService
 	slidersSrv *sliders.ProductSliderService
+	feeSrv     *fee.FeeRateService
 	dep        *bootstrap.Dependencies
 }
 
@@ -33,12 +35,14 @@ func NewPublicHandler(
 	homeSrv home.HomeServiceInterface,
 	bannerSrv *banner.BannerService,
 	slidersSrv *sliders.ProductSliderService,
+	feeSrv *fee.FeeRateService,
 	dep *bootstrap.Dependencies,
 ) PublicHandler {
 	return PublicHandler{
 		homeSrv:    homeSrv,
 		bannerSrv:  bannerSrv,
 		slidersSrv: slidersSrv,
+		feeSrv:     feeSrv,
 		dep:        dep,
 	}
 }
@@ -170,7 +174,6 @@ func (p PublicHandler) SingleProduct(c *gin.Context) {
 }
 
 func (p PublicHandler) Shipping(c *gin.Context) {
-
 	customer, ok := helpers.GetAuthUser(c)
 	if ok {
 		if customer.Cart.CartItem.TotalItemCount <= 0 {
@@ -179,9 +182,19 @@ func (p PublicHandler) Shipping(c *gin.Context) {
 		}
 	}
 
+	// fee quote from the cart items total (the same rule the order stores)
+	quote := p.feeSrv.Quote(c, customer.Cart.CartItem.TotalSalePrice)
+
 	response.CustomerRender(c, http.StatusFound, "shipping",
 		gin.H{
-			"TITLE": "اطلاعات ارسال",
+			"TITLE":           "اطلاعات ارسال",
+			"SHIPPING_FEE":    quote.Shipping,
+			"PACKAGING_FEE":   quote.Packaging,
+			"SHIPPING_FREE":   quote.Free,
+			"FREE_THRESHOLD":  quote.Threshold,
+			"GRAND_TOTAL":     quote.Grand,
+			"SHIPPING_TITLE":  quote.ShipTitle,
+			"PACKAGING_TITLE": quote.PackTitle,
 		})
 	return
 }

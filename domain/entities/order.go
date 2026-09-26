@@ -12,6 +12,13 @@ type Order struct {
 	Discount           uint
 	OrderStatus        uint
 
+	// fee snapshot taken at checkout (tariffs change over time):
+	// GrandTotal = TotalSalePrice + ShippingFee + PackagingFee
+	ShippingFee  uint
+	PackagingFee uint
+	ShippingFree bool
+	GrandTotal   uint
+
 	Address string
 	Note    string
 

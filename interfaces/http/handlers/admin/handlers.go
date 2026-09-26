@@ -17,6 +17,7 @@ import (
 	"shop/application/usecases/category"
 	"shop/application/usecases/customer"
 	"shop/application/usecases/dashboard"
+	"shop/application/usecases/fee"
 	"shop/application/usecases/order"
 	"shop/application/usecases/product"
 	sliders "shop/application/usecases/product_slider"
@@ -42,6 +43,7 @@ type AdminHandler struct {
 	brandSrv         brand.BrandServiceInterface
 	customerSrv      customer.CustomerServiceInterface
 	orderSrv         order.OrderServiceInterface
+	feeSrv           *fee.FeeRateService
 	DashboardService *dashboard.DashboardService
 	bannerSrv        *banner.BannerService
 	slidersSrv       *sliders.ProductSliderService
@@ -58,6 +60,7 @@ func NewAdminHandler(
 	brandSrv brand.BrandServiceInterface,
 	customerSrv customer.CustomerServiceInterface,
 	orderSrv order.OrderServiceInterface,
+	feeSrv *fee.FeeRateService,
 	dashboardSrv *dashboard.DashboardService,
 	bannerSrv *banner.BannerService,
 	slidersSrv *sliders.ProductSliderService,
@@ -73,6 +76,7 @@ func NewAdminHandler(
 		brandSrv:         brandSrv,
 		customerSrv:      customerSrv,
 		orderSrv:         orderSrv,
+		feeSrv:           feeSrv,
 		DashboardService: dashboardSrv,
 		bannerSrv:        bannerSrv,
 		slidersSrv:       slidersSrv,

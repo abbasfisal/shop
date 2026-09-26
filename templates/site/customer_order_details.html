@@ -102,9 +102,23 @@
                                                 <span class="value  p-2" style="border: 1px solid skyblue;border-radius: 20px; ">{{.DATA.OrderStatusText}}</span>
                                             </div>
 
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title">جمع اقلام:</span>
+                                                <span class="value">{{.DATA.PrettyTotalSalePrice}} تومان </span>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <span class="title">هزینه ارسال:</span>
+                                                <span class="value">{{if .DATA.ShippingFree}}رایگان{{else}}{{.DATA.ShippingFee}} تومان {{end}}</span>
+                                            </div>
+                                            {{if gt .DATA.PackagingFee 0}}
+                                                <div class="col-md-6 col-sm-12">
+                                                    <span class="title">هزینه آماده‌سازی:</span>
+                                                    <span class="value">{{.DATA.PackagingFee}} تومان </span>
+                                                </div>
+                                            {{end}}
                                             <div class="col-12 text-center pb-0">
                                                 <span class="title">مبلغ این مرسوله:</span>
-                                                <span class="value">{{.DATA.PrettyTotalSalePrice}} تومان </span>
+                                                <span class="value">{{.DATA.PrettyGrandTotal}} تومان </span>
                                             </div>
                                         </div>
                                     </div>

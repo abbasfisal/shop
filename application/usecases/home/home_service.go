@@ -256,7 +256,8 @@ func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinp
 	description := "order id :" + order.OrderNumber
 
 	//paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), "http://vivify.ir/checkout/payment/verify", description, "", customer.Mobile)
-	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), os.Getenv("ZARINPAL_CALLBACKURL"), description, "", customer.Mobile)
+	// the customer pays the grand total: items + resolved shipping/packaging
+	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.GrandTotal), os.Getenv("ZARINPAL_CALLBACKURL"), description, "", customer.Mobile)
 	if zarinErr != nil || statusCode != 100 {
 		log.Println("[home_service]-[ProcessOrderPayment]-[New ZarinPal Payment Request Error]:", zarinErr)
 		return nil, nil, 0, domain_err.InternalServerErr
@@ -271,7 +272,7 @@ func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinp
 		Description: description,
 		PaymentURL:  paymentURL,
 		StatusCode:  statusCode,
-		Amount:      order.TotalSalePrice,
+		Amount:      order.GrandTotal,
 		RefID:       "",
 		Status:      0, //pending
 	}

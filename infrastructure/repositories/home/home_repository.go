@@ -780,6 +780,13 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 	//convert address struct to json to store in order
 	addressJson, _ := json.Marshal(customer.Address)
 
+	// fee snapshot: the active tariffs at checkout time (a new tariff row
+	// next month must not rewrite history)
+	shipRate, _ := repositories.ActiveRateForDB(c, tx, entities.FeeKindShipping, time.Now())
+	packRate, _ := repositories.ActiveRateForDB(c, tx, entities.FeeKindPackaging, time.Now())
+	shippingFee, packagingFee, grandTotal, shippingFree := entities.QuoteOrderFees(
+		customer.Cart.CartItem.TotalSalePrice, shipRate, packRate)
+
 	// prepare order entity
 	order := entities.Order{
 		CustomerID:         customer.ID,
@@ -790,6 +797,11 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 		Discount:           0,
 		OrderStatus:        entities.OrderPending, //pending
 		Address:            string(addressJson),
+
+		ShippingFee:  shippingFee,
+		PackagingFee: packagingFee,
+		ShippingFree: shippingFree,
+		GrandTotal:   grandTotal,
 	}
 
 	// store order in db

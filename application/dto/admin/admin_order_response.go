@@ -13,6 +13,10 @@ type AdminOrder struct {
 	PaymentStatus      int
 	TotalOriginalPrice uint
 	TotalSalePrice     uint
+	ShippingFee        uint
+	PackagingFee       uint
+	ShippingFree       bool
+	GrandTotal         uint
 	CreatedAt          time.Time
 	Discount           uint
 	OrderNote          string
@@ -35,6 +39,10 @@ func ToAdminOrder(o *entities.Order) *AdminOrder {
 		PaymentStatus:      o.PaymentStatus,
 		TotalOriginalPrice: o.TotalOriginalPrice,
 		TotalSalePrice:     o.TotalSalePrice,
+		ShippingFee:        o.ShippingFee,
+		PackagingFee:       o.PackagingFee,
+		ShippingFree:       o.ShippingFree,
+		GrandTotal:         o.GrandTotal,
 		CreatedAt:          o.CreatedAt,
 		Discount:           o.Discount,
 		OrderStatus:        o.OrderStatus,

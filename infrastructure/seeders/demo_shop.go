@@ -45,6 +45,7 @@ func SeedDemoShop(db *gorm.DB) {
 	seedDemoProducts(db)
 	seedPromoBanners(db)
 	seedDemoSliders(db)
+	seedFeeRates(db)
 }
 
 // ------------------------------------------------------------
@@ -576,3 +577,52 @@ func copyBannerAsset(name string) (string, error) {
 	}
 	return filepath.ToSlash(filepath.Join("seed", name)), nil
 }
+
+// ------------------------------------------------------------
+// 4. order fee tariffs (هزینه ارسال / هزینه بسته‌بندی)
+//
+// Baseline rates so checkout quotes work out of the box:
+//   - shipping 104,000 تومان, free above 1,000,000 تومان of items
+//   - packaging 23,000 تومان, no threshold
+// ------------------------------------------------------------
+
+func seedFeeRates(db *gorm.DB) {
+	specs := []struct {
+		kind      string
+		title     string
+		amount    uint
+		threshold *uint
+	}{
+		{entities.FeeKindShipping, "تعرفه ارسال پیش‌فرض", 104_000, uintPtrSeed(1_000_000)},
+		{entities.FeeKindPackaging, "تعرفه بسته‌بندی پیش‌فرض", 23_000, nil},
+	}
+
+	for _, spec := range specs {
+		var count int64
+		db.Model(&entities.FeeRate{}).
+			Where("kind = ? AND title = ?", spec.kind, spec.title).
+			Count(&count)
+		if count > 0 {
+			fmt.Printf("[seed] fee rate %-28q already seeded\n", spec.title)
+			continue
+		}
+		rate := entities.FeeRate{
+			Kind:          spec.kind,
+			Title:         spec.title,
+			Amount:        spec.amount,
+			FreeThreshold: spec.threshold,
+			Status:        true,
+		}
+		// Select forces the zero-ok columns the same way the admin panel does
+		if err := db.
+			Select("Kind", "Title", "Amount", "FreeThreshold", "StartsAt", "EndsAt", "Status").
+			Create(&rate).Error; err != nil {
+			fmt.Printf("[seed] fee rate %q failed: %v\n", spec.title, err)
+			continue
+		}
+	}
+
+	fmt.Println("[seed] fee rates ............. done (shipping 104,000 / free ≥ 1,000,000 · packaging 23,000)")
+}
+
+func uintPtrSeed(v uint) *uint { return &v }

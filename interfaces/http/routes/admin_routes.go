@@ -15,6 +15,7 @@ import (
 	"shop/application/usecases/category"
 	"shop/application/usecases/customer"
 	"shop/application/usecases/dashboard"
+	"shop/application/usecases/fee"
 	order "shop/application/usecases/order"
 	"shop/application/usecases/pricing"
 	"shop/application/usecases/product"
@@ -29,6 +30,7 @@ import (
 	categoryRepository "shop/infrastructure/repositories/category"
 	customerRepository "shop/infrastructure/repositories/customer"
 	dashboardRepository "shop/infrastructure/repositories/dashboard"
+	feeRepository "shop/infrastructure/repositories/fee"
 	orderRepository "shop/infrastructure/repositories/order"
 	productRepository "shop/infrastructure/repositories/product"
 	sliderRepository "shop/infrastructure/repositories/product_slider"
@@ -70,7 +72,9 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
 	sliderSrv := sliders.NewProductSliderService(sliderRepository.NewProductSliderRepository(postgres.Get()))
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, bannerSrv, sliderSrv, dep)
+	feeSrv := fee.NewFeeRateService(feeRepository.NewFeeRateRepository(postgres.Get()))
+
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, feeSrv, dashboardSrv, bannerSrv, sliderSrv, dep)
 
 	// rate limiter
 	limiter := middleware.NewRateLimiter(rate.Every(time.Minute), 5)
@@ -175,6 +179,17 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
 		//customer
 		authGrp.GET("/admins/customers", adminHlr.IndexCustomer)
+
+		//order fees (shipping / packaging tariffs)
+		feesGrp := authGrp.Group("/admins/fees")
+		{
+			feesGrp.GET("/:kind", adminHlr.IndexFee)
+			feesGrp.GET("/:kind/create", adminHlr.CreateFee)
+			feesGrp.POST("/:kind", adminHlr.StoreFee)
+			feesGrp.GET("/:kind/:id/edit", adminHlr.EditFee)
+			feesGrp.POST("/:kind/:id", adminHlr.UpdateFee)
+			feesGrp.POST("/:kind/:id/delete", adminHlr.DeleteFee)
+		}
 
 		//order
 		authGrp.GET("/admins/orders", adminHlr.IndexOrders)

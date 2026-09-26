@@ -15,9 +15,14 @@ type Order struct {
 	Discount           uint
 	OrderStatus        uint
 	OrderStatusText    string
-	CreatedAt          time.Time
-	OrderItems         *OrderItems
-	Payment            *Payment
+	// fee snapshot (see entities.Order): GrandTotal is what was charged
+	ShippingFee  uint
+	PackagingFee uint
+	ShippingFree bool
+	GrandTotal   uint
+	CreatedAt    time.Time
+	OrderItems   *OrderItems
+	Payment      *Payment
 }
 
 type Orders struct {
@@ -50,6 +55,10 @@ func ToOrder(o *entities.Order) *Order {
 		TotalSalePrice:     o.TotalSalePrice,
 		Discount:           o.Discount,
 		OrderStatus:        o.OrderStatus,
+		ShippingFee:        o.ShippingFee,
+		PackagingFee:       o.PackagingFee,
+		ShippingFree:       o.ShippingFree,
+		GrandTotal:         o.GrandTotal,
 		CreatedAt:          o.CreatedAt,
 		OrderStatusText:    OrderStatusMap(o.OrderStatus),
 	}

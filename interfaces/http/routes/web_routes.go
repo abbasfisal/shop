@@ -4,12 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 	bannerUseCase "shop/application/usecases/banner"
+	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
 	sliderUseCase "shop/application/usecases/product_slider"
 	"shop/bootstrap"
 	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/events"
 	bannerRepository "shop/infrastructure/repositories/banner"
+	feeRepository "shop/infrastructure/repositories/fee"
 	mysqlRepo "shop/infrastructure/repositories/home"
 	sliderRepository "shop/infrastructure/repositories/product_slider"
 	PublicHandler "shop/interfaces/http/handlers/web"
@@ -36,8 +38,9 @@ func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.
 	// promotion banners + homepage product sliders (storefront feed)
 	bannerSrv := bannerUseCase.NewBannerService(bannerRepository.NewBannerRepository(postgres.Get()))
 	sliderSrv := sliderUseCase.NewProductSliderService(sliderRepository.NewProductSliderRepository(postgres.Get()))
+	feeSrv := feeUseCase.NewFeeRateService(feeRepository.NewFeeRateRepository(postgres.Get()))
 
-	publicHdl := PublicHandler.NewPublicHandler(homeSrv, bannerSrv, sliderSrv, dep)
+	publicHdl := PublicHandler.NewPublicHandler(homeSrv, bannerSrv, sliderSrv, feeSrv, dep)
 
 	r.GET("/", publicHdl.HomePage)
 	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct) //show single product

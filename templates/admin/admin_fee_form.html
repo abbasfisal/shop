@@ -1,0 +1,72 @@
+{{define "fee_form"}}
+    {{$fee := .FEE}}
+    <form action="{{if $fee}}/admins/fees/{{$.KIND}}/{{$fee.ID}}{{else}}/admins/fees/{{$.KIND}}{{end}}"
+          method="post">
+        <div class="card">
+            <div class="card-header"><b>اطلاعات تعرفه</b></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>عنوان *</label>
+                        <input type="text" class="form-control" name="title"
+                               placeholder="مثلاً تعرفه ارسال بهمن ۱۴۰۳"
+                               value="{{if index .OLD "title"}}{{index .OLD "title"}}{{else if $fee}}{{$fee.Title}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.title}}</span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>مبلغ (تومان) *</label>
+                        <input type="number" min="0" class="form-control" name="amount"
+                               value="{{if index .OLD "amount"}}{{index .OLD "amount"}}{{else if $fee}}{{$fee.Amount}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.amount}}</span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>وضعیت *</label>
+                        {{$status := index .OLD "status"}}
+                        {{if $fee}}{{if $fee.Status}}{{$status = "1"}}{{else}}{{$status = "0"}}{{end}}{{end}}
+                        <select class="form-control" name="status">
+                            <option value="1" {{if eq $status "1"}}selected{{end}}>فعال</option>
+                            <option value="0" {{if eq $status "0"}}selected{{end}}>غیرفعال</option>
+                        </select>
+                        <span class="text-danger">{{.ERRORS.status}}</span>
+                    </div>
+                </div>
+
+                {{if eq $.KIND "shipping"}}
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>سقف ارسال رایگان (تومان)</label>
+                            <input type="number" min="0" class="form-control" name="free_threshold"
+                                   placeholder="مثلاً 1000000 — خالی یعنی بدون ارسال رایگان"
+                                   value="{{if index .OLD "free_threshold"}}{{index .OLD "free_threshold"}}{{else if $fee}}{{if gt $fee.FreeThreshold 0}}{{$fee.FreeThreshold}}{{end}}{{end}}">
+                            <small class="text-muted">سفارش‌هایی با جمع اقلام بیشتر یا مساوی این مبلغ، ارسال رایگان دارند</small>
+                            <span class="text-danger">{{.ERRORS.free_threshold}}</span>
+                        </div>
+                    </div>
+                {{end}}
+
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>شروع اعتبار (اختیاری)</label>
+                        <input type="date" class="form-control" name="starts_at"
+                               value="{{if index .OLD "starts_at"}}{{index .OLD "starts_at"}}{{else if $fee}}{{$fee.StartsAt}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.starts_at}}</span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>پایان اعتبار (اختیاری)</label>
+                        <input type="date" class="form-control" name="ends_at"
+                               value="{{if index .OLD "ends_at"}}{{index .OLD "ends_at"}}{{else if $fee}}{{$fee.EndsAt}}{{end}}">
+                        <small class="text-muted">پایان روزِ انتخاب‌شده هم لحاظ می‌شود</small>
+                        <span class="text-danger">{{.ERRORS.ends_at}}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-lg">{{if $fee}}بروزرسانی تعرفه{{else}}ذخیره تعرفه{{end}}</button>
+                        <a href="/admins/fees/{{$.KIND}}" class="btn btn-secondary btn-lg">انصراف</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{{end}}

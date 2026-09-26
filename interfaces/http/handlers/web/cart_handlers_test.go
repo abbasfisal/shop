@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	bannerUseCase "shop/application/usecases/banner"
+	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
 	sliderUseCase "shop/application/usecases/product_slider"
 	"shop/bootstrap"
@@ -35,6 +36,7 @@ func postAddToCart(t *testing.T, body string, referer string) (*fakeHomeService,
 	h := NewPublicHandler(svc,
 		bannerUseCase.NewBannerService(nil),
 		sliderUseCase.NewProductSliderService(nil),
+		feeUseCase.NewFeeRateService(nil),
 		&bootstrap.Dependencies{},
 	)
 
