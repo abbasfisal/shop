@@ -67,7 +67,12 @@ func RunServe() {
 
 func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em *events.EventManager) {
 	r := gin.Default()
-	gin.SetMode(gin.ReleaseMode)
+
+	if viper.GetBool("APP_DEBUG") == true {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	r.SetFuncMap(template.FuncMap{
 		"stringToUint": util.StringToUint,
