@@ -8,11 +8,13 @@ import (
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
 	"shop/infrastructure/sms/kavenegar"
+	"shop/interfaces/http/middleware"
 	"shop/interfaces/http/requests/web"
 	"shop/interfaces/http/response"
 	"shop/pkg/errors"
 	"shop/pkg/sessions"
 	"shop/pkg/util"
+	"strconv"
 	"time"
 )
 
@@ -174,7 +176,19 @@ func (p PublicHandler) PostVerifyOtp(c *gin.Context) {
 
 	//store session(uuid) in session
 	sessions.Set(c, "session_id", customerSession.SessionID)
-	c.Redirect(http.StatusFound, "/")
+
+	// resume whatever the visitor was doing before the login wall: the
+	// add-to-cart they posted (replayed against the new session) and the
+	// page they came from, instead of always landing on the site root.
+	intent := middleware.TakeLoginIntent(c)
+	if intent.HasPendingAddToCart() {
+		p.homeSrv.AddToCartForCustomer(c, intent.ProductID, requests.AddToCartRequest{
+			ProductID:   strconv.FormatUint(uint64(intent.ProductID), 10),
+			InventoryID: intent.InventoryID,
+		})
+	}
+
+	c.Redirect(http.StatusFound, middleware.SafeNext(intent.Next))
 	return
 }
 

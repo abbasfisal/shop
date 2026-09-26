@@ -125,6 +125,12 @@
                                                                     </div>
                                                                     <div class="item-detail">
                                                                         <ul>
+                                                                            {{range $item.Attributes}}
+                                                                                <li>
+                                                                                    <i class="far fa-tag text-muted"></i>
+                                                                                    <span>{{.Title}}: {{.Value}}</span>
+                                                                                </li>
+                                                                            {{end}}
                                                                             <li>
                                                                                 <i class="far fa-clipboard-check text-primary"></i>
                                                                                 <span>موجود در انبار</span>

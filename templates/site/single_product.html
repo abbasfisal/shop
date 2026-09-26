@@ -328,36 +328,40 @@
                                                         </div>
                                                     </div>
                                                     <div class="product-seller-row product-seller-row--add-to-cart">
-                                                        {{$productIDVar:=.PRODUCT.product.ID}}
-                                                        {{$found:=false}}
-                                                        {{range $CartItem:=.AUTH.Cart.CartItem.Data}}
-                                                            {{if eq .ProductID $productIDVar}}
-                                                                {{$found = true}}
-                                                            {{end}}
+                                                        {{if .MESSAGE}}
+                                                            <div class="alert alert-danger text-sm" role="alert">
+                                                                {{.MESSAGE}}
+                                                            </div>
                                                         {{end}}
-                                                        {{if $found}}
-                                                            <a href="/checkout/cart"
-                                                               class="btn-add-to-cart bg-success  btn-add-to-cart--full-width">مشاهده
-                                                                سبد خرید
-                                                            </a>
-                                                        {{else}}
-                                                            <form action="/add-to-cart" method="post">
-                                                                <input type="hidden" name="product_id"
-                                                                       value="{{.PRODUCT._id}}">
+                                                        <input type="hidden" id="cartInventoryIds"
+                                                               value="{{.CART_INVENTORY_IDS_JSON}}">
+                                                        <form action="/add-to-cart" method="post" id="addToCartForm">
+                                                            <input type="hidden" name="product_id"
+                                                                   value="{{.PRODUCT._id}}">
 
-                                                                {{$firstInventoryId := ""}}
+                                                            {{$firstInventoryId := ""}}
+                                                            {{range $key,$item:=.PRODUCT.inventories}}
+                                                                {{if eq $firstInventoryId ""}}
+                                                                    {{if ge $item.Available 1}}{{$firstInventoryId = printf "%d" $item.InventoryID}}{{end}}
+                                                                {{end}}
+                                                            {{end}}
+                                                            {{if eq $firstInventoryId ""}}
                                                                 {{range $key,$item:=.PRODUCT.inventories}}
                                                                     {{if eq $firstInventoryId ""}}{{$firstInventoryId = printf "%d" $item.InventoryID}}{{end}}
                                                                 {{end}}
-                                                                <input type="hidden" name="inventory_id" id="cartInventoryId"
-                                                                       value="{{$firstInventoryId}}">
+                                                            {{end}}
+                                                            <input type="hidden" name="inventory_id" id="cartInventoryId"
+                                                                   value="{{$firstInventoryId}}">
 
-                                                                <button type="submit" id="addToCartBtn"
-                                                                        class="btn-add-to-cart btn-add-to-cart--full-width">
-                                                                    <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
-                                                                </button>
-                                                            </form>
-                                                        {{end}}
+                                                            <button type="submit" id="addToCartBtn"
+                                                                    class="btn-add-to-cart btn-add-to-cart--full-width">
+                                                                <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
+                                                            </button>
+                                                        </form>
+                                                        <a href="/checkout/cart" id="viewCartLink"
+                                                           class="btn-add-to-cart bg-success btn-add-to-cart--full-width"
+                                                           style="display:none">مشاهده سبد خرید
+                                                        </a>
                                                     </div>
                                                 </nav>
                                             </div>
@@ -686,6 +690,9 @@
             const stockBox = document.getElementById('stockBox');
             const dataEl = document.getElementById('variantsData');
             const addBtn = document.getElementById('addToCartBtn');
+            const cartForm = document.getElementById('addToCartForm');
+            const viewCartLink = document.getElementById('viewCartLink');
+            const inCartEl = document.getElementById('cartInventoryIds');
             if (!hidden) return;
 
             const fmt = n => Number(n).toLocaleString('en-US');
@@ -693,11 +700,33 @@
             try { VARIANTS = JSON.parse((dataEl && dataEl.value) || '[]'); }
             catch (e) { VARIANTS = []; }
 
+            let IN_CART = [];
+            try { IN_CART = JSON.parse((inCartEl && inCartEl.value) || '[]'); }
+            catch (e) { IN_CART = []; }
+
             const selected = {}; // attrId (string) -> valueId (number)
             let interacted = false;
 
+            const groupAttrIds = () => Array.prototype.map.call(
+                document.querySelectorAll('.variant-group'),
+                g => g.getAttribute('data-attr-id'));
+
+            const valueIdsOf = v => (v && v.value_ids) || [];
+
             function selectedIds() {
                 return Object.keys(selected).map(k => Number(selected[k]));
+            }
+
+            // how many groups one combination can answer for (a group counts
+            // as covered when one of its values belongs to the variant)
+            function coversGroups(v) {
+                const vids = valueIdsOf(v);
+                return groupAttrIds().filter(attrId => {
+                    const pills = document.querySelectorAll(
+                        '.variant-pill[data-attr-id="' + attrId + '"]');
+                    return Array.prototype.some.call(pills, p =>
+                        vids.indexOf(Number(p.getAttribute('data-value-id'))) !== -1);
+                }).length;
             }
 
             // exact combination match (Laravel-style): same cardinality and
@@ -706,7 +735,7 @@
                 const ids = selectedIds();
                 if (!ids.length) return null;
                 return VARIANTS.find(v => {
-                    const vids = v.value_ids || [];
+                    const vids = valueIdsOf(v);
                     return vids.length === ids.length &&
                         ids.every(id => vids.indexOf(id) !== -1);
                 }) || null;
@@ -721,9 +750,65 @@
                 });
                 return VARIANTS.some(v => {
                     if ((v.available || 0) <= 0) return false;
-                    const vids = v.value_ids || [];
+                    const vids = valueIdsOf(v);
                     if (vids.indexOf(Number(valueId)) === -1) return false;
                     return Object.keys(others).every(k => vids.indexOf(Number(others[k])) !== -1);
+                });
+            }
+
+            // the combination the page opens with: sellable first, then the
+            // one answering for the most groups — so رنگ + سایز (+ …) all
+            // start out selected instead of empty
+            function defaultVariant() {
+                let best = null;
+                let bestScore = -1;
+                VARIANTS.forEach(v => {
+                    const score = ((v.available || 0) > 0 ? 10000 : 0) +
+                        coversGroups(v) * 100 + valueIdsOf(v).length;
+                    if (score > bestScore) { bestScore = score; best = v; }
+                });
+                return best;
+            }
+
+            // best combination for a freshly clicked value: sellable first,
+            // then the one keeping the most of the other current selections
+            function bestVariantFor(attrId, valueId) {
+                let best = null;
+                let bestScore = -1;
+                VARIANTS.forEach(v => {
+                    const vids = valueIdsOf(v);
+                    if (vids.indexOf(Number(valueId)) === -1) return;
+                    let score = ((v.available || 0) > 0 ? 10000 : 0) +
+                        coversGroups(v) * 100;
+                    Object.keys(selected).forEach(k => {
+                        if (k === String(attrId)) return;
+                        if (vids.indexOf(Number(selected[k])) !== -1) score += 10;
+                    });
+                    if (score > bestScore) { bestScore = score; best = v; }
+                });
+                return best;
+            }
+
+            // point every group at the values of one real combination
+            function applyVariant(v) {
+                const next = {};
+                valueIdsOf(v).forEach(valueId => {
+                    const btn = document.querySelector(
+                        '.variant-pill[data-value-id="' + valueId + '"]');
+                    if (btn) next[btn.getAttribute('data-attr-id')] = Number(valueId);
+                });
+                Object.keys(selected).forEach(k => delete selected[k]);
+                Object.keys(next).forEach(k => { selected[k] = next[k]; });
+            }
+
+            // safety net: never leave a group empty (an empty group means an
+            // inventory_id of 0, which the server refuses)
+            function ensureComplete() {
+                groupAttrIds().forEach(attrId => {
+                    if (selected[attrId] != null) return;
+                    const first = document.querySelector(
+                        '.variant-pill[data-attr-id="' + attrId + '"]');
+                    if (first) selected[attrId] = Number(first.getAttribute('data-value-id'));
                 });
             }
 
@@ -755,12 +840,29 @@
             function renderButton(v) {
                 if (!addBtn) return;
                 if (!v || (v.available || 0) <= 0) {
-                    addBtn.disabled = true;
-                    hidden.value = '';
+                    // stock-only products own no combination: keep the
+                    // server-rendered default instead of clearing it
+                    if (VARIANTS.length) {
+                        addBtn.disabled = true;
+                        hidden.value = '';
+                    }
                     return;
                 }
                 addBtn.disabled = false;
                 hidden.value = v.id;
+            }
+
+            // the «مشاهده سبد خرید» link replaces the form only for the very
+            // combination that is already in the cart — other variants of the
+            // same product stay addable
+            function renderInCart(v) {
+                // products without combinations (one stock row / none) carry a
+                // single cart line, so any entry counts as «already added»
+                const inCart = VARIANTS.length
+                    ? (!!v && IN_CART.indexOf(Number(v.id)) !== -1)
+                    : IN_CART.length > 0;
+                if (viewCartLink) viewCartLink.style.display = inCart ? '' : 'none';
+                if (cartForm) cartForm.style.display = inCart ? 'none' : '';
             }
 
             function update() {
@@ -770,6 +872,7 @@
                     if (priceOff) priceOff.innerText = '';
                     renderStock(null);
                     renderButton(null);
+                    renderInCart(null);
                     return;
                 }
                 if (pricePrev && v.price) pricePrev.innerText = fmt(v.price);
@@ -777,6 +880,7 @@
                 if (priceOff) priceOff.innerText = (v.has_discount && v.percent > 0) ? v.percent + '%' : '';
                 renderStock(v);
                 renderButton(v);
+                renderInCart(v);
             }
 
             document.querySelectorAll('.variant-pill').forEach(btn => {
@@ -784,14 +888,29 @@
                     interacted = true;
                     const attrId = btn.dataset.attrId;
                     const valueId = Number(btn.dataset.valueId);
-                    if (selected[attrId] === valueId) delete selected[attrId];
+                    // a selected pill never deselects itself: every group must
+                    // always answer, otherwise nothing can be added to the cart
+                    if (selected[attrId] === valueId) return;
+
+                    const v = bestVariantFor(attrId, valueId);
+                    if (v) applyVariant(v);
                     else selected[attrId] = valueId;
+                    ensureComplete();
+
                     refreshOptions();
                     update();
                 });
             });
 
-            refreshOptions();
+            if (VARIANTS.length) {
+                applyVariant(defaultVariant());
+                ensureComplete();
+                refreshOptions();
+                update();
+            } else {
+                refreshOptions();
+                renderInCart(null);
+            }
         })();
     </script>
     <!-- my custom JS File -->

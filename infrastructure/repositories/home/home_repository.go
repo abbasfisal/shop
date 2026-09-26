@@ -410,6 +410,44 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 
 	return pg, nil
 }
+
+// ResolveCartInventory validates the variant the customer wants to put in the
+// cart: products without combinations accept 0 (plain stock row), products
+// with combinations require a variant that belongs to them and is sellable.
+// Returning an error stops a bogus inventory_id (0 / another product's id)
+// from creating a cart line that no variant can ever explain.
+func (h *HomeRepository) ResolveCartInventory(c *gin.Context, productID, inventoryID uint) (uint, error) {
+	var variantCount int64
+	if err := h.dep.DB.WithContext(c).
+		Model(&entities.ProductVariant{}).
+		Where("product_id = ?", productID).
+		Count(&variantCount).Error; err != nil {
+		return 0, err
+	}
+	if variantCount == 0 {
+		return 0, nil // stock-only product: no combination to pick
+	}
+
+	if inventoryID == 0 {
+		return 0, domain_err.VariantNotSelected
+	}
+
+	var variant entities.ProductVariant
+	if err := h.dep.DB.WithContext(c).
+		Where("id = ? AND product_id = ?", inventoryID, productID).
+		First(&variant).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, domain_err.VariantNotSelected
+		}
+		return 0, err
+	}
+
+	if variant.Status != entities.VariantStatusActive || variant.Stock < 1 {
+		return 0, domain_err.OutOfStock
+	}
+	return inventoryID, nil
+}
+
 func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product *entities.Product, req requests.AddToCartRequest) {
 	maxQuantity := uint8(2)
 	//todo: set max quantity in config

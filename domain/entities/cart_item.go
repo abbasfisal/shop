@@ -17,5 +17,16 @@ type CartItem struct {
 	ProductImage string
 	ProductSlug  string
 
+	// Attributes are the labels of the selected variant («رنگ: قرمز»,
+	// «سایز: M») resolved from variant_attribute_values when the cart is
+	// loaded — not a stored column.
+	Attributes []CartItemAttribute `gorm:"-"`
+
 	//---
+}
+
+// CartItemAttribute is one attribute of the variant in the cart line.
+type CartItemAttribute struct {
+	Title string
+	Value string
 }

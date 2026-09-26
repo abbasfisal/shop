@@ -31,6 +31,10 @@ const (
 	SelectOne          = "لطفا یکی از گزینه های موجود را انتخاب کنید"
 	DeleteSuccessfully = "با موفقیت حذف گردید"
 
+	//cart
+	SelectVariantFirst    = "لطفاً تنوع محصول (مثلاً رنگ و سایز) را انتخاب کنید"
+	VariantIsNotAvailable = "این تنوع از محصول موجود نیست"
+
 	ThereIsNoAnyCategories = "هیچ کتگوری وجود ندارد / لطفا حداقل یک کتگوری ایجاد کنید"
 	ThereIsNoAnyBrand      = "هیچ برندی وجود ندارد / لطفا حداقل یک برند ایجاد کنید"
 

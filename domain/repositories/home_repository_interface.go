@@ -26,6 +26,9 @@ type HomeRepositoryInterface interface {
 	GetMenu(ctx context.Context) ([]*entities.Category, error)
 	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
 	InsertCart(c *gin.Context, user responses.Customer, product *entities.Product, req requests.AddToCartRequest)
+	// ResolveCartInventory validates the variant the customer picked for a
+	// product (stock-only products accept 0) and returns the id to store.
+	ResolveCartInventory(c *gin.Context, productID, inventoryID uint) (uint, error)
 	IncreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error
 	DecreaseCartItemCount(c *gin.Context, req *requests.IncreaseCartItemQty) error
 	DeleteCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) error

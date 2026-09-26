@@ -197,9 +197,55 @@ func (h *HomeService) AddToCart(c *gin.Context, productID uint, req requests.Add
 		return
 	}
 
-	h.repo.InsertCart(c, user, prod, req)
+	h.insertCartItem(c, user, prod, productID, req)
 
 	fmt.Println("succ find :title", prod.Title)
+}
+
+// AddToCartForCustomer replays an add-to-cart posted while logged out. On the
+// OTP response the `auth` context key does not exist yet, so the customer is
+// resolved from the session that was just created.
+func (h *HomeService) AddToCartForCustomer(c *gin.Context, productID uint, req requests.AddToCartRequest) bool {
+	prod, err := h.repo.GetProductByID(c, productID)
+	if err != nil {
+		fmt.Println("[error]-[AddToCartForCustomer]: product not found, id:", productID)
+		return false
+	}
+
+	user := helpers.CustomerAuth(c)
+	if user.ID <= 0 {
+		return false
+	}
+
+	return h.insertCartItem(c, user, prod, productID, req)
+}
+
+// insertCartItem resolves the picked variant (and reports a flash message
+// when the selection is unusable) before the line lands in the cart.
+func (h *HomeService) insertCartItem(c *gin.Context, user CustomerRes.Customer, prod *entities.Product, productID uint, req requests.AddToCartRequest) bool {
+	inventoryID, invErr := h.repo.ResolveCartInventory(c, productID, req.InventoryID)
+	if invErr != nil {
+		fmt.Println("[error]-[insertCartItem]: inventory resolution:", invErr)
+		sessions.Set(c, "message", cartSelectionMessage(invErr))
+		return false
+	}
+
+	req.InventoryID = inventoryID
+	h.repo.InsertCart(c, user, prod, req)
+	return true
+}
+
+// cartSelectionMessage maps the inventory resolution error to the Persian
+// flash message shown on the product page.
+func cartSelectionMessage(err error) string {
+	switch {
+	case errors.Is(err, domain_err.VariantNotSelected):
+		return custom_messages.SelectVariantFirst
+	case errors.Is(err, domain_err.OutOfStock):
+		return custom_messages.VariantIsNotAvailable
+	default:
+		return domain_err.SomethingWrongHappened
+	}
 }
 
 func (h *HomeService) CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) error {

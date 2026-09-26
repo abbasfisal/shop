@@ -176,8 +176,30 @@ func (p PublicHandler) SingleProduct(c *gin.Context) {
 			"MEDIA_PATH":      util.GetProductStoragePath(),
 			"VARIANT_GROUPS":  groups,
 			"VARIANTS_JSON":   variantsJSON,
+			// variants of this product already sitting in the cart: the picker
+			// swaps «افزودن به سبد» for «مشاهده سبد خرید» per combination
+			"CART_INVENTORY_IDS_JSON": cartInventoryIDsJSON(c, product),
 		})
 	return
+}
+
+// cartInventoryIDsJSON serializes the inventory ids of this product that the
+// logged-in customer already has in the cart (e.g. [2,7]).
+func cartInventoryIDsJSON(c *gin.Context, product map[string]interface{}) string {
+	ids := []uint{}
+	if raw, ok := product["_id"].(string); ok {
+		if productID, err := strconv.ParseUint(raw, 10, 64); err == nil {
+			if customer, authed := helpers.GetAuthUser(c); authed {
+				for _, item := range customer.Cart.CartItem.Data {
+					if item.ProductID == uint(productID) {
+						ids = append(ids, item.InventoryID)
+					}
+				}
+			}
+		}
+	}
+	payload, _ := json.Marshal(ids)
+	return string(payload)
 }
 
 // VariantGroupValue is one selectable value inside a variant group.
