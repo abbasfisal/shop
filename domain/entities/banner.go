@@ -19,11 +19,14 @@ type Banner struct {
 	Layout    string `gorm:"type:varchar(8);default:'two'"`
 	Link      string
 	Priority  uint
-	SortOrder int        `gorm:"default:0"`
-	Status    bool       `gorm:"default:true"`
-	StartsAt  *time.Time `gorm:"type:date"`
-	EndsAt    *time.Time `gorm:"type:date"`
-	Image     string
+	SortOrder int `gorm:"default:0"`
+	// no `default` tag on purpose: GORM replaces a zero value with the tag
+	// default on Create, which would silently turn غیرفعال into فعال.
+	// (the SQL column keeps DEFAULT TRUE for raw inserts)
+	Status   bool
+	StartsAt *time.Time `gorm:"type:date"`
+	EndsAt   *time.Time `gorm:"type:date"`
+	Image    string
 }
 
 // ValidBannerLayout reports whether the layout is one of the two supported shapes.

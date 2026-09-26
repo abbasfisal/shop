@@ -14,6 +14,35 @@ import (
 func Seed() {
 	db := postgres.Get()
 
+	// The base demo data (users/categories/brands/attributes/products) is
+	// inserted once — every table has unique slugs, so a second insert would
+	// only produce duplicate-key errors. The demo content added afterwards is
+	// idempotent on its own and always runs.
+	if baseAlreadySeeded(db) {
+		fmt.Println("[seed] base data ............. already seeded (skipped)")
+	} else {
+		seedBaseData(db)
+	}
+
+	// demo content for the product-state / promotion-banner / slider features
+	// (idempotent — each part is skipped when already seeded)
+	SeedDemoShop(db)
+
+	// aggregates → read model → Typesense (must run after every product row)
+	insertProductReadModels(db)
+
+	fmt.Println("[seed] ~~~~ done ~~~~")
+}
+
+// baseAlreadySeeded reports whether the original demo data is present.
+func baseAlreadySeeded(db *gorm.DB) bool {
+	var users int64
+	db.Table("users").Where("phone_number = ?", "0935111111").Count(&users)
+	return users > 0
+}
+
+// seedBaseData holds the original seeding payload (inserted exactly once).
+func seedBaseData(db *gorm.DB) {
 	hashPass, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 
 	//user
@@ -48,9 +77,7 @@ func Seed() {
 	//db.Create(&productInventory)
 	//db.Create(&productInventoryAttribute)
 
-	insertProductReadModels(db)
-
-	fmt.Println("\\\\\\\\\\\\\\  ~~~~[Seed] tables successfully~~~~ \\\\\\\\\\\\\\")
+	fmt.Println("[seed] base data ............. done")
 }
 
 func fakeProducts() []entities.Product {
