@@ -78,6 +78,8 @@ const (
 	ProductInventoryNotFound     = 9004
 	UpdatePaymentFailed          = 9005
 	UpdateProductInventoryFailed = 9006
+	// verified payment arrived but the shelf is empty (see OrderPaidSuccessfully)
+	OrderOutOfStockAfterPayment = 9007
 )
 
 func HandleError(err error, notFoundMsg string) CustomError {
