@@ -1,0 +1,205 @@
+{{define "slider_form"}}
+    {{$slider := .SLIDER}}
+    <input type="hidden" id="selectedProductsJSON" value="{{.SELECTED_JSON}}">
+
+    <form action="{{if $slider.ID}}/admins/sliders/{{$slider.ID}}{{else}}/admins/sliders{{end}}"
+          method="post" id="sliderForm">
+        <div class="card">
+            <div class="card-header"><b>اطلاعات اسلایدر</b></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>عنوان *</label>
+                        <input type="text" class="form-control" name="title" id="sliderTitle"
+                               placeholder="مثلاً لوازم خودرو"
+                               value="{{if index .OLD "title"}}{{index .OLD "title"}}{{else}}{{$slider.Title}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.title}}</span>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>جایگاه *</label>
+                        <select class="form-control" name="position">
+                            {{range .POSITIONS}}
+                                <option value="{{.Value}}" {{if eq .Value $slider.Position}}selected{{end}}>{{.Label}}</option>
+                            {{end}}
+                        </select>
+                        <small class="text-muted">محل نمایش اسلایدر در صفحه اصلی — قابل تغییر در هر لحظه</small>
+                        <span class="text-danger">{{.ERRORS.position}}</span>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>وضعیت *</label>
+                        <select class="form-control" name="status">
+                            <option value="published" {{if eq $slider.Status "published"}}selected{{end}}>منتشر شده</option>
+                            <option value="draft" {{if eq $slider.Status "draft"}}selected{{end}}>پیش‌نویس</option>
+                            <option value="archived" {{if eq $slider.Status "archived"}}selected{{end}}>بایگانی</option>
+                        </select>
+                        <span class="text-danger">{{.ERRORS.status}}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>کاتالوگ «مشاهده همه» (اختیاری)</label>
+                        <select class="form-control" name="category_id">
+                            <option value="">فقط محصولات انتخاب شده</option>
+                            {{range .CATEGORIES.Data}}
+                                <option value="{{.ID}}" {{if eq .ID $slider.CategoryID}}selected{{end}}>{{.Title}}</option>
+                            {{end}}
+                        </select>
+                        <small class="text-muted">اگر دسته بندی انتخاب شود، دکمه «مشاهده همه» کل آن دسته را نشان می‌دهد</small>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>شروع (اختیاری)</label>
+                        <input type="date" class="form-control" name="starts_at"
+                               value="{{if index .OLD "starts_at"}}{{index .OLD "starts_at"}}{{else}}{{$slider.StartsAt}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.starts_at}}</span>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>پایان (اختیاری)</label>
+                        <input type="date" class="form-control" name="ends_at"
+                               value="{{if index .OLD "ends_at"}}{{index .OLD "ends_at"}}{{else}}{{$slider.EndsAt}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.ends_at}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <b>محصولات اسلایدر</b>
+                <small class="text-muted mr-2">(حداکثر ۱۰ محصول)</small>
+            </div>
+            <div class="card-body">
+                <span class="text-danger d-block mb-2">{{.ERRORS.products}}</span>
+
+                <div class="position-relative mb-3" id="pickerWrap">
+                    <label>جستجوی محصول</label>
+                    <input type="text" class="form-control" id="productSearch"
+                           placeholder="نام یا SKU محصول را بنویسید..." autocomplete="off">
+                    <div class="list-group position-absolute w-100 shadow-sm" id="searchResults"
+                         style="z-index:1000; display:none; max-height:320px; overflow:auto;"></div>
+                </div>
+
+                <div id="selectedBox" class="mb-2"></div>
+
+                <button type="submit" class="btn btn-primary btn-lg">{{if $slider.ID}}بروزرسانی اسلایدر{{else}}ذخیره اسلایدر{{end}}</button>
+                <a href="/admins/sliders" class="btn btn-secondary btn-lg">انصراف</a>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        (function () {
+            const MAX = 10;
+            const IMG_PREFIX = '/uploads/media/products/';
+            let selected = [];
+            try {
+                selected = JSON.parse(document.getElementById('selectedProductsJSON').value || '[]');
+            } catch (e) {
+                selected = [];
+            }
+
+            const box = document.getElementById('selectedBox');
+            const input = document.getElementById('productSearch');
+            const results = document.getElementById('searchResults');
+            let timer = null;
+
+            function esc(s) {
+                return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[ch]));
+            }
+
+            function render() {
+                let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0">' +
+                    '<thead><tr><th>#</th><th>محصول</th><th>قیمت</th><th>موجودی</th><th></th></tr></thead><tbody>';
+                selected.forEach((p, i) => {
+                    const img = p.image ? '<img src="' + IMG_PREFIX + esc(p.image) + '" height="34">' : '—';
+                    html += '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td>' + img + ' <span class="mr-2">' + esc(p.title) + '</span>' +
+                        '<input type="hidden" name="products[]" value="' + esc(p.product_id) + '"></td>' +
+                        '<td>' + (p.price ? Number(p.price).toLocaleString('en-US') : '—') + '</td>' +
+                        '<td>' + (p.in_stock ? '<span class="text-success">موجود</span>' : '<span class="text-danger">ناموجود</span>') + '</td>' +
+                        '<td><button type="button" class="btn btn-sm btn-outline-danger" data-remove="' + esc(p.product_id) + '">حذف</button></td>' +
+                        '</tr>';
+                });
+                html += '</tbody></table></div>';
+                if (selected.length === 0) {
+                    html = '<div class="text-muted">هنوز محصولی انتخاب نشده است.</div>';
+                }
+                box.innerHTML = html;
+                box.querySelectorAll('[data-remove]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = Number(btn.dataset.remove);
+                        selected = selected.filter(p => Number(p.product_id) !== id);
+                        render();
+                    });
+                });
+            }
+
+            function addProduct(p) {
+                if (selected.some(x => Number(x.product_id) === Number(p.product_id))) return;
+                if (selected.length >= MAX) {
+                    alert('حداکثر ' + MAX + ' محصول می‌توانید انتخاب کنید.');
+                    return;
+                }
+                selected.push(p);
+                render();
+            }
+
+            function renderResults(items) {
+                if (!items.length) {
+                    results.innerHTML = '<span class="list-group-item text-muted">محصولی پیدا نشد.</span>';
+                    results.style.display = 'block';
+                    return;
+                }
+                results.innerHTML = items.map(p => {
+                    const img = p.image ? '<img src="' + IMG_PREFIX + esc(p.image) + '" height="30" class="ml-2">' : '';
+                    const chosen = selected.some(x => Number(x.product_id) === Number(p.id)) ? ' (انتخاب شده)' : '';
+                    return '<button type="button" class="list-group-item list-group-item-action" data-pid="' + esc(p.id) + '">' +
+                        img + esc(p.title) + ' — ' + esc(p.sku) + chosen + '</button>';
+                }).join('');
+                results.querySelectorAll('[data-pid]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const item = items.find(x => Number(x.id) === Number(btn.dataset.pid));
+                        if (item) {
+                            addProduct({
+                                product_id: item.id, title: item.title, sku: item.sku,
+                                image: item.image, price: item.price, in_stock: item.in_stock
+                            });
+                        }
+                        results.style.display = 'none';
+                        input.value = '';
+                    });
+                });
+                results.style.display = 'block';
+            }
+
+            input.addEventListener('input', function () {
+                const q = this.value.trim();
+                clearTimeout(timer);
+                if (q.length < 2) {
+                    results.style.display = 'none';
+                    return;
+                }
+                timer = setTimeout(() => {
+                    fetch('/admins/api/products?q=' + encodeURIComponent(q), {headers: {'Accept': 'application/json'}})
+                        .then(r => r.json())
+                        .then(body => renderResults(body.data || []))
+                        .catch(() => {
+                            results.innerHTML = '<span class="list-group-item text-danger">خطا در جستجو</span>';
+                            results.style.display = 'block';
+                        });
+                }, 300);
+            });
+
+            document.addEventListener('click', e => {
+                if (!document.getElementById('pickerWrap').contains(e.target)) {
+                    results.style.display = 'none';
+                }
+            });
+
+            render();
+        })();
+    </script>
+{{end}}

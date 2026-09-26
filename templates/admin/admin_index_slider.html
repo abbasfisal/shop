@@ -1,0 +1,119 @@
+{{define "admin_index_slider"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                        <br>
+                        <span class="text-success">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</span>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <a href="/admins/sliders/create" class="btn btn-info float-right">
+                            <i class="fa fa-plus"></i> ایجاد اسلایدر
+                        </a>
+                        <div class="clearfix"></div>
+                        <br>
+
+                        {{if .SLIDERS.Data}}
+                            <div class="card">
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-hover text-nowrap mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>عنوان</th>
+                                            <th>جایگاه</th>
+                                            <th>وضعیت</th>
+                                            <th>بازه نمایش</th>
+                                            <th>کاتالوگ</th>
+                                            <th>محصولات</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{range .SLIDERS.Data}}
+                                            <tr>
+                                                <td>{{.ID}}</td>
+                                                <td>
+                                                    <b>{{.Title}}</b>
+                                                    <br>
+                                                    <small class="text-muted">/{{.Slug}}</small>
+                                                </td>
+                                                <td><span class="badge badge-dark">{{.PositionLabel}}</span></td>
+                                                <td>
+                                                    {{if eq .Status "published"}}
+                                                        <span class="badge badge-success">{{.StatusText}}</span>
+                                                    {{else if eq .Status "archived"}}
+                                                        <span class="badge badge-dark">{{.StatusText}}</span>
+                                                    {{else}}
+                                                        <span class="badge badge-warning">{{.StatusText}}</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>{{.Schedule}}</td>
+                                                <td>{{if .CategoryTitle}}{{.CategoryTitle}}{{else}}—{{end}}</td>
+                                                <td>
+                                                    <span class="badge badge-info">{{.ProductsCount}} محصول</span>
+                                                    {{range $i, $p := .Products}}
+                                                        {{if lt $i 3}}
+                                                            <br><small>{{$p.Title}}</small>
+                                                        {{end}}
+                                                    {{end}}
+                                                    {{if gt .ProductsCount 3}}
+                                                        <br><small class="text-muted">و {{sub .ProductsCount 3}} مورد دیگر...</small>
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    <a href="{{.CatalogURL}}" target="_blank"
+                                                       class="btn btn-sm btn-outline-secondary">صفحه کاتالوگ</a>
+                                                    <a href="/admins/sliders/{{.ID}}/edit"
+                                                       class="btn btn-sm btn-outline-primary">ویرایش</a>
+                                                    <form action="/admins/sliders/{{.ID}}/delete" method="post"
+                                                          style="display:inline" onsubmit="return confirm('این اسلایدر حذف شود؟')">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">حذف</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {{else}}
+                            <div class="text-center text-muted p-5 bg-white border rounded">
+                                اسلایدری ثبت نشده است.
+                            </div>
+                        {{end}}
+
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}

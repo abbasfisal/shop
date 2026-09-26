@@ -25,7 +25,8 @@ func NewAttributeService(repo repositories.AttributeRepositoryInterface) Attribu
 func (as AttributeService) Create(ctx context.Context, req *requests.CreateAttributeRequest) (*responses.Attribute, error) {
 
 	attr := entities.Attribute{
-		Title: req.Title,
+		Title:     req.Title,
+		InputType: req.NormalizedInputType(),
 	}
 
 	result, err := as.repo.Store(ctx, &attr)

@@ -1,0 +1,115 @@
+{{define "admin_index_banner"}}
+    {{template "head" .}}
+    <!-- navbar -->
+    {{template "navbar" .}}
+    <!-- Main Sidebar Container -->
+    {{template "sidebar" .}}
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                        <br>
+                        <span class="text-success">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</span>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <a href="/admins/banners/create" class="btn btn-info float-right">
+                            <i class="fa fa-plus"></i> ایجاد بنر پروموشن
+                        </a>
+                        <div class="clearfix"></div>
+                        <br>
+
+                        {{if .BANNERS.Data}}
+                            <div class="card">
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-hover text-nowrap mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>عنوان</th>
+                                            <th>چیدمان</th>
+                                            <th>بازه نمایش</th>
+                                            <th>وضعیت</th>
+                                            <th>اولویت</th>
+                                            <th>لینک</th>
+                                            <th>تصویر</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{range .BANNERS.Data}}
+                                            <tr>
+                                                <td>{{.ID}}</td>
+                                                <td><b>{{.Title}}</b></td>
+                                                <td>
+                                                    {{if eq .Layout "four"}}
+                                                        <span class="badge badge-info">{{.LayoutLabel}}</span>
+                                                    {{else}}
+                                                        <span class="badge badge-primary">{{.LayoutLabel}}</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>{{.Schedule}}</td>
+                                                <td>
+                                                    {{if .Status}}
+                                                        <span class="badge badge-success">{{.StatusText}}</span>
+                                                    {{else}}
+                                                        <span class="badge badge-secondary">{{.StatusText}}</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>{{.SortOrder}}</td>
+                                                <td>{{if .Link}}<a href="{{.Link}}" target="_blank">{{.Link}}</a>{{else}}—{{end}}</td>
+                                                <td>
+                                                    {{if .Image}}
+                                                        <img src="{{$.MEDIA_PATH}}{{.Image}}" alt="banner" height="40">
+                                                    {{else}}
+                                                        —
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    <a href="/admins/banners/{{.ID}}/edit"
+                                                       class="btn btn-sm btn-outline-primary">ویرایش</a>
+                                                    <form action="/admins/banners/{{.ID}}/delete" method="post"
+                                                          style="display:inline" onsubmit="return confirm('این بنر حذف شود؟')">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">حذف</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {{else}}
+                            <div class="text-center text-muted p-5 bg-white border rounded">
+                                بنری ثبت نشده است.
+                            </div>
+                        {{end}}
+
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    {{template "footer" .}}
+
+{{end}}

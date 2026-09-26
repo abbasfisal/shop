@@ -81,6 +81,10 @@ type Item struct {
 	ProductTitle string
 	ProductImage string
 	ProductSlug  string
+
+	// Attributes is the selected variant («رنگ: قرمز», «سایز: M») resolved
+	// from the inventory the line points at.
+	Attributes []entities.CartItemAttribute
 }
 
 func toCart(cartEntity []entities.Cart) Cart {
@@ -136,5 +140,6 @@ func toCartItem(cartItem entities.CartItem) Item {
 		ProductTitle:  cartItem.ProductTitle,
 		ProductImage:  util.GetProductStoragePath() + cartItem.ProductImage,
 		ProductSlug:   cartItem.ProductSlug,
+		Attributes:    cartItem.Attributes,
 	}
 }

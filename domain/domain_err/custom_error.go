@@ -56,6 +56,7 @@ const (
 var (
 	QuantityExceedsLimit        = errors.New("quantity exceeds limit")
 	OutOfStock                  = errors.New("out of stock")
+	VariantNotSelected          = errors.New("variant not selected")
 	InternalServerErr           = errors.New("internal Server Error")
 	InventoryLockedByAnotherOne = errors.New("inventory locked by another process")
 )
@@ -78,6 +79,8 @@ const (
 	ProductInventoryNotFound     = 9004
 	UpdatePaymentFailed          = 9005
 	UpdateProductInventoryFailed = 9006
+	// verified payment arrived but the shelf is empty (see OrderPaidSuccessfully)
+	OrderOutOfStockAfterPayment = 9007
 )
 
 func HandleError(err error, notFoundMsg string) CustomError {

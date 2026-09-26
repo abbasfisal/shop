@@ -31,6 +31,8 @@ type HomeServiceInterface interface {
 	//------cart
 
 	AddToCart(c *gin.Context, productID uint, req requests.AddToCartRequest)
+	// AddToCartForCustomer replays an add-to-cart posted while logged out.
+	AddToCartForCustomer(c *gin.Context, productID uint, req requests.AddToCartRequest) bool
 	CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) error
 	CartItemDecrement(c *gin.Context, req *requests.IncreaseCartItemQty) bool
 	RemoveCartItem(c *gin.Context, req *requests.IncreaseCartItemQty) bool

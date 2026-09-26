@@ -38,6 +38,18 @@
                                 </tr>
 
                                 <tr>
+                                    <td>نوع ورودی</td>
+                                    <td>
+                                        <select class="form-control" name="input_type">
+                                            <option value="text">متن ساده</option>
+                                            <option value="color">رنگ (کالرپیکر + نمایش دایره‌ای)</option>
+                                        </select>
+                                        <small class="text-muted">نوع «رنگ» برای مقادیرش کد رنگ (hex) ذخیره می‌کند</small>
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.input_type}}</td>
+                                </tr>
+
+                                <tr>
                                     <td></td>
                                     <td><input class="btn  btn-primary btn-lg" type="submit" value="ایجاد"></td>
                                     <td class="text-info border-white">

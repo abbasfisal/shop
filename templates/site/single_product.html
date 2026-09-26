@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="/assets/shop/plugin/go-to-top/style.css">
         <link rel="stylesheet" href="/assets/shop/plugin/iran-map/iranmap.css">
         <link rel="stylesheet" href="/assets/shop/css/main.css">
+        <link rel="stylesheet" href="/assets/shop/css/shop-cards.css">
     </head>
 
     <body>
@@ -229,45 +230,42 @@
                                                     {{if gt (len .PRODUCT.inventories) 0 }}
                                                         {{if eq (len .PRODUCT.inventories) 1}}
                                                             {{range $key,$item:=.PRODUCT.inventories}}
-                                                                <input type="hidden" name="inventory_id"
-                                                                       value="{{$item.InventoryID}}">
-                                                                {{if lt $item.Quantity 5}}
+                                                                {{if lt $item.Available 1}}
+                                                                    <span class="text-danger">ناموجود</span>
+                                                                {{else if lt $item.Quantity 5}}
                                                                     <b>موجودی</b>:
                                                                     {{$item.Quantity}}
                                                                     عدد
                                                                 {{end}}
                                                             {{end}}
                                                         {{else}}
-                                                            <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
-                                                                <h2>انتخاب :</h2>
-                                                            </div>
-                                                            <select name="inventory_id" class="custom-select">
-                                                                {{range $item:=.PRODUCT.inventories}}
-                                                                    {{$qty:=$item.Quantity}}
-                                                                    {{$inventory_id:=$item.InventoryID}}
-                                                                    {{if eq (len $item.Attributes) 1}}
-                                                                        {{range $item.Attributes}}
-                                                                            <option value="{{$inventory_id}}" class="">
-                                                                                {{.AttributeTitle}}
-                                                                                {{.AttributeValueTitle}}
-                                                                                {{if gt $qty 5 }} | موجودی:{{$qty}}  عدد{{end}}
-                                                                            </option>
+                                                            <input type="hidden" id="variantsData" value="{{.VARIANTS_JSON}}">
+                                                            {{range $g := .VARIANT_GROUPS}}
+                                                                <div class="variant-group" data-attr-id="{{$g.AttributeID}}">
+                                                                    <div class="section-title text-sm-title title-wide no-after-title-wide mb-0">
+                                                                        <h2>{{$g.Title}}: <b class="variant-selected-name" id="variantSel-{{$g.AttributeID}}"></b></h2>
+                                                                    </div>
+                                                                    <div class="variant-options{{if $g.IsColor}} variant-colors{{end}}">
+                                                                        {{range $g.Values}}
+                                                                            <button type="button"
+                                                                                    class="variant-pill{{if $g.IsColor}} variant-swatch{{end}}"
+                                                                                    data-attr-id="{{$g.AttributeID}}"
+                                                                                    data-value-id="{{.ID}}"
+                                                                                    data-value-name="{{.Title}}"
+                                                                                    title="{{.Title}}">
+                                                                                {{if $g.IsColor}}
+                                                                                    <span class="swatch-dot" style="background:{{if .Hex}}{{.Hex}}{{else}}#cbd5e1{{end}};">
+                                                                                        <span class="swatch-check">✓</span>
+                                                                                    </span>
+                                                                                {{else}}
+                                                                                    {{.Title}}
+                                                                                {{end}}
+                                                                            </button>
                                                                         {{end}}
-
-                                                                    {{else}}
-                                                                        {{$composite:=""}}
-                                                                        {{range .Attributes}}
-                                                                            {{$composite = printf "%s%s:%s  " $composite .AttributeTitle .AttributeValueTitle}} <!-- افزودن هر ویژگی به رشته قبلی -->
-                                                                        {{end}}
-                                                                        <option value="{{.InventoryID}}">{{$composite}}
-                                                                            {{if gt $qty 5 }}
-                                                                                |موجودی:{{.Quantity}}
-                                                                                عدد
-                                                                            {{end}}
-                                                                        </option>
-                                                                    {{end}}
-                                                                {{end}}
-                                                            </select>
+                                                                    </div>
+                                                                </div>
+                                                            {{end}}
+                                                            <div class="variant-stock" id="stockBox"></div>
                                                         {{end}}
                                                     {{end}}
                                                 </div>
@@ -299,51 +297,71 @@
 
                                                         </li>
                                                     </ul>
+                                                    {{$rm := .PRODUCT.product}}
+                                                    {{$invCount := len .PRODUCT.inventories}}
                                                     <div class="product-seller-row product-seller-row--price">
                                                         <div class="product-seller-price-info">
-                                                            <div class="product-seller-price-prev">
-                                                                {{.PRODUCT.product.OriginalPrice}}
+                                                            <div class="product-seller-price-prev" id="pricePrev">
+                                                                {{$rm.OriginalPrice}}
                                                             </div>
-                                                            <div class="product-seller-price-off">
-                                                                {{.PRODUCT.product.Discount}}%
+                                                            <div class="product-seller-price-off" id="priceOff">
+                                                                {{if gt $invCount 1}}
+                                                                    {{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}
+                                                                {{else}}
+                                                                    {{range $key,$item:=.PRODUCT.inventories}}
+                                                                        {{if and $item.HasDiscount (gt $item.DiscountPercent 0)}}{{$item.DiscountPercent}}%{{else if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}
+                                                                    {{end}}
+                                                                    {{if eq $invCount 0}}{{if gt $rm.Discount 0}}{{$rm.Discount}}%{{end}}{{end}}
+                                                                {{end}}
                                                             </div>
                                                         </div>
                                                         <div class="product-seller-price-real">
-                                                            <div class="product-seller-price-raw">
-                                                                {{.PRODUCT.product.SalePrice}}
+                                                            <div class="product-seller-price-raw" id="priceReal">
+                                                                {{if gt $invCount 1}}
+                                                                    {{if and (gt $rm.MinPrice 0) (ne $rm.MinPrice $rm.MaxPrice)}}از {{$rm.MinPrice}}{{else}}{{$rm.SalePrice}}{{end}}
+                                                                {{else}}
+                                                                    {{range $key,$item:=.PRODUCT.inventories}}{{$item.EffectivePrice}}{{end}}
+                                                                    {{if eq $invCount 0}}{{$rm.SalePrice}}{{end}}
+                                                                {{end}}
                                                             </div>
                                                             تومان
                                                         </div>
                                                     </div>
                                                     <div class="product-seller-row product-seller-row--add-to-cart">
-                                                        {{$productIDVar:=.PRODUCT.product.ID}}
-                                                        {{$found:=false}}
-                                                        {{range $CartItem:=.AUTH.Cart.CartItem.Data}}
-                                                            {{if eq .ProductID $productIDVar}}
-                                                                {{$found = true}}
-                                                            {{end}}
+                                                        {{if .MESSAGE}}
+                                                            <div class="alert alert-danger text-sm" role="alert">
+                                                                {{.MESSAGE}}
+                                                            </div>
                                                         {{end}}
-                                                        {{if $found}}
-                                                            <a href="/checkout/cart"
-                                                               class="btn-add-to-cart bg-success  btn-add-to-cart--full-width">مشاهده
-                                                                سبد خرید
-                                                            </a>
-                                                        {{else}}
-                                                            <form action="/add-to-cart" method="post">
-                                                                <input type="hidden" name="product_id"
-                                                                       value="{{.PRODUCT._id}}">
+                                                        <input type="hidden" id="cartInventoryIds"
+                                                               value="{{.CART_INVENTORY_IDS_JSON}}">
+                                                        <form action="/add-to-cart" method="post" id="addToCartForm">
+                                                            <input type="hidden" name="product_id"
+                                                                   value="{{.PRODUCT._id}}">
 
-                                                                {{range $key,$item:=.PRODUCT.inventories}}
-                                                                    <input type="hidden" name="inventory_id"
-                                                                           value="{{$item.InventoryID}}">
+                                                            {{$firstInventoryId := ""}}
+                                                            {{range $key,$item:=.PRODUCT.inventories}}
+                                                                {{if eq $firstInventoryId ""}}
+                                                                    {{if ge $item.Available 1}}{{$firstInventoryId = printf "%d" $item.InventoryID}}{{end}}
                                                                 {{end}}
+                                                            {{end}}
+                                                            {{if eq $firstInventoryId ""}}
+                                                                {{range $key,$item:=.PRODUCT.inventories}}
+                                                                    {{if eq $firstInventoryId ""}}{{$firstInventoryId = printf "%d" $item.InventoryID}}{{end}}
+                                                                {{end}}
+                                                            {{end}}
+                                                            <input type="hidden" name="inventory_id" id="cartInventoryId"
+                                                                   value="{{$firstInventoryId}}">
 
-                                                                <button type="submit"
-                                                                        class="btn-add-to-cart btn-add-to-cart--full-width">
-                                                                    <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
-                                                                </button>
-                                                            </form>
-                                                        {{end}}
+                                                            <button type="submit" id="addToCartBtn"
+                                                                    class="btn-add-to-cart btn-add-to-cart--full-width">
+                                                                <span class="btn-add-to-cart-txt">افزودن به سبد خرید</span>
+                                                            </button>
+                                                        </form>
+                                                        <a href="/checkout/cart" id="viewCartLink"
+                                                           class="btn-add-to-cart bg-success btn-add-to-cart--full-width"
+                                                           style="display:none">مشاهده سبد خرید
+                                                        </a>
                                                     </div>
                                                 </nav>
                                             </div>
@@ -601,7 +619,7 @@
                                                         <a class="product-meta"
                                                            href="/search/{{$rec.Product.Category.Slug}}"> {{$rec.Product.Category.Title}}</a>
                                                         <span class="product-price">
-                                                                {{$rec.Product.SalePrice}}
+                                                                {{if and (gt $rec.Product.MinPrice 0) (ne $rec.Product.MinPrice $rec.Product.MaxPrice)}}از {{$rec.Product.MinPrice}}{{else if gt $rec.Product.MinPrice 0}}{{$rec.Product.MinPrice}}{{else}}{{$rec.Product.SalePrice}}{{end}}
                                                                 تومان
                                                             </span>
                                                     </div>
@@ -662,6 +680,239 @@
     <script src="/assets/shop/plugin/iran-map/iranmap.js"></script>
     <!-- Main JS File -->
     <script src="/assets/shop/js/js-product/js-product.js"></script>
+    <!-- variant picker: swatches/boxes keep the cart input + price block in sync -->
+    <script>
+        (function () {
+            const hidden = document.getElementById('cartInventoryId');
+            const pricePrev = document.getElementById('pricePrev');
+            const priceReal = document.getElementById('priceReal');
+            const priceOff = document.getElementById('priceOff');
+            const stockBox = document.getElementById('stockBox');
+            const dataEl = document.getElementById('variantsData');
+            const addBtn = document.getElementById('addToCartBtn');
+            const cartForm = document.getElementById('addToCartForm');
+            const viewCartLink = document.getElementById('viewCartLink');
+            const inCartEl = document.getElementById('cartInventoryIds');
+            if (!hidden) return;
+
+            const fmt = n => Number(n).toLocaleString('en-US');
+            let VARIANTS = [];
+            try { VARIANTS = JSON.parse((dataEl && dataEl.value) || '[]'); }
+            catch (e) { VARIANTS = []; }
+
+            let IN_CART = [];
+            try { IN_CART = JSON.parse((inCartEl && inCartEl.value) || '[]'); }
+            catch (e) { IN_CART = []; }
+
+            const selected = {}; // attrId (string) -> valueId (number)
+            let interacted = false;
+
+            const groupAttrIds = () => Array.prototype.map.call(
+                document.querySelectorAll('.variant-group'),
+                g => g.getAttribute('data-attr-id'));
+
+            const valueIdsOf = v => (v && v.value_ids) || [];
+
+            function selectedIds() {
+                return Object.keys(selected).map(k => Number(selected[k]));
+            }
+
+            // how many groups one combination can answer for (a group counts
+            // as covered when one of its values belongs to the variant)
+            function coversGroups(v) {
+                const vids = valueIdsOf(v);
+                return groupAttrIds().filter(attrId => {
+                    const pills = document.querySelectorAll(
+                        '.variant-pill[data-attr-id="' + attrId + '"]');
+                    return Array.prototype.some.call(pills, p =>
+                        vids.indexOf(Number(p.getAttribute('data-value-id'))) !== -1);
+                }).length;
+            }
+
+            // exact combination match (Laravel-style): same cardinality and
+            // every selected value contained in the variant
+            function findVariant() {
+                const ids = selectedIds();
+                if (!ids.length) return null;
+                return VARIANTS.find(v => {
+                    const vids = valueIdsOf(v);
+                    return vids.length === ids.length &&
+                        ids.every(id => vids.indexOf(id) !== -1);
+                }) || null;
+            }
+
+            // an option stays enabled while some in-stock variant carries it
+            // together with every other current selection
+            function isEnabled(attrId, valueId) {
+                const others = {};
+                Object.keys(selected).forEach(k => {
+                    if (k !== String(attrId)) others[k] = selected[k];
+                });
+                return VARIANTS.some(v => {
+                    if ((v.available || 0) <= 0) return false;
+                    const vids = valueIdsOf(v);
+                    if (vids.indexOf(Number(valueId)) === -1) return false;
+                    return Object.keys(others).every(k => vids.indexOf(Number(others[k])) !== -1);
+                });
+            }
+
+            // the combination the page opens with: sellable first, then the
+            // one answering for the most groups — so رنگ + سایز (+ …) all
+            // start out selected instead of empty
+            function defaultVariant() {
+                let best = null;
+                let bestScore = -1;
+                VARIANTS.forEach(v => {
+                    const score = ((v.available || 0) > 0 ? 10000 : 0) +
+                        coversGroups(v) * 100 + valueIdsOf(v).length;
+                    if (score > bestScore) { bestScore = score; best = v; }
+                });
+                return best;
+            }
+
+            // best combination for a freshly clicked value: sellable first,
+            // then the one keeping the most of the other current selections
+            function bestVariantFor(attrId, valueId) {
+                let best = null;
+                let bestScore = -1;
+                VARIANTS.forEach(v => {
+                    const vids = valueIdsOf(v);
+                    if (vids.indexOf(Number(valueId)) === -1) return;
+                    let score = ((v.available || 0) > 0 ? 10000 : 0) +
+                        coversGroups(v) * 100;
+                    Object.keys(selected).forEach(k => {
+                        if (k === String(attrId)) return;
+                        if (vids.indexOf(Number(selected[k])) !== -1) score += 10;
+                    });
+                    if (score > bestScore) { bestScore = score; best = v; }
+                });
+                return best;
+            }
+
+            // point every group at the values of one real combination
+            function applyVariant(v) {
+                const next = {};
+                valueIdsOf(v).forEach(valueId => {
+                    const btn = document.querySelector(
+                        '.variant-pill[data-value-id="' + valueId + '"]');
+                    if (btn) next[btn.getAttribute('data-attr-id')] = Number(valueId);
+                });
+                Object.keys(selected).forEach(k => delete selected[k]);
+                Object.keys(next).forEach(k => { selected[k] = next[k]; });
+            }
+
+            // safety net: never leave a group empty (an empty group means an
+            // inventory_id of 0, which the server refuses)
+            function ensureComplete() {
+                groupAttrIds().forEach(attrId => {
+                    if (selected[attrId] != null) return;
+                    const first = document.querySelector(
+                        '.variant-pill[data-attr-id="' + attrId + '"]');
+                    if (first) selected[attrId] = Number(first.getAttribute('data-value-id'));
+                });
+            }
+
+            function refreshOptions() {
+                document.querySelectorAll('.variant-pill').forEach(btn => {
+                    const attrId = btn.dataset.attrId;
+                    const valueId = Number(btn.dataset.valueId);
+                    const isSel = selected[attrId] === valueId;
+                    btn.classList.toggle('selected', isSel);
+                    btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+                    btn.disabled = isSel ? false : !isEnabled(attrId, valueId);
+                });
+                document.querySelectorAll('.variant-selected-name').forEach(el => {
+                    const attrId = el.id.replace('variantSel-', '');
+                    const btn = document.querySelector('.variant-pill.selected[data-attr-id="' + attrId + '"]');
+                    el.textContent = btn ? btn.dataset.valueName : '';
+                });
+            }
+
+            function renderStock(v) {
+                if (!stockBox) return;
+                if (!v) { stockBox.innerHTML = ''; return; }
+                const s = Number(v.available || 0);
+                if (s <= 0) stockBox.innerHTML = '<span class="stock-no">✗ ناموجود</span>';
+                else if (s <= 3) stockBox.innerHTML = '<span class="stock-low">🔥 تنها ' + s + ' عدد در انبار باقی مانده</span>';
+                else stockBox.innerHTML = '<span class="stock-ok">✓ موجود در انبار</span>';
+            }
+
+            function renderButton(v) {
+                if (!addBtn) return;
+                if (!v || (v.available || 0) <= 0) {
+                    // stock-only products own no combination: keep the
+                    // server-rendered default instead of clearing it
+                    if (VARIANTS.length) {
+                        addBtn.disabled = true;
+                        hidden.value = '';
+                    }
+                    return;
+                }
+                addBtn.disabled = false;
+                hidden.value = v.id;
+            }
+
+            // the «مشاهده سبد خرید» link replaces the form only for the very
+            // combination that is already in the cart — other variants of the
+            // same product stay addable
+            function renderInCart(v) {
+                // products without combinations (one stock row / none) carry a
+                // single cart line, so any entry counts as «already added»
+                const inCart = VARIANTS.length
+                    ? (!!v && IN_CART.indexOf(Number(v.id)) !== -1)
+                    : IN_CART.length > 0;
+                if (viewCartLink) viewCartLink.style.display = inCart ? '' : 'none';
+                if (cartForm) cartForm.style.display = inCart ? 'none' : '';
+            }
+
+            function update() {
+                const v = findVariant();
+                if (!v) {
+                    if (interacted && priceReal) priceReal.innerText = 'ویژگی‌ها را انتخاب کنید';
+                    if (priceOff) priceOff.innerText = '';
+                    renderStock(null);
+                    renderButton(null);
+                    renderInCart(null);
+                    return;
+                }
+                if (pricePrev && v.price) pricePrev.innerText = fmt(v.price);
+                if (priceReal && v.effective != null) priceReal.innerText = fmt(v.effective);
+                if (priceOff) priceOff.innerText = (v.has_discount && v.percent > 0) ? v.percent + '%' : '';
+                renderStock(v);
+                renderButton(v);
+                renderInCart(v);
+            }
+
+            document.querySelectorAll('.variant-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    interacted = true;
+                    const attrId = btn.dataset.attrId;
+                    const valueId = Number(btn.dataset.valueId);
+                    // a selected pill never deselects itself: every group must
+                    // always answer, otherwise nothing can be added to the cart
+                    if (selected[attrId] === valueId) return;
+
+                    const v = bestVariantFor(attrId, valueId);
+                    if (v) applyVariant(v);
+                    else selected[attrId] = valueId;
+                    ensureComplete();
+
+                    refreshOptions();
+                    update();
+                });
+            });
+
+            if (VARIANTS.length) {
+                applyVariant(defaultVariant());
+                ensureComplete();
+                refreshOptions();
+                update();
+            } else {
+                refreshOptions();
+                renderInCart(null);
+            }
+        })();
+    </script>
     <!-- my custom JS File -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {

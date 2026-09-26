@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"log"
 	"math/rand"
 	AdminUserResponse "shop/application/dto/admin"
@@ -24,6 +25,7 @@ import (
 	"shop/pkg/pagination"
 	"shop/pkg/sessions"
 	"shop/pkg/util"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -52,9 +54,9 @@ func (h *HomeRepository) GetRandomProducts(ctx context.Context, limit int) ([]*e
 }
 func (h *HomeRepository) GetLatestProducts(ctx context.Context, limit int) ([]*entities.Product, error) {
 	var products []*entities.Product
-	//todo: just load data if category.status = true and product.status=true
+	//todo: just load data if category.status = true and product.status=published
 	err := h.dep.DB.WithContext(ctx).
-		Preload("Category").Where("status=?", true).
+		Preload("Category").Where("status=?", entities.ProductStatusPublished).
 		Limit(limit).Find(&products).
 		Error
 
@@ -77,7 +79,7 @@ func (h *HomeRepository) GetProduct(c *gin.Context, productSku string, productSl
 	var prod entities.Product
 	err := h.dep.DB.WithContext(c).
 		Select("id, read_model").
-		Where("sku = ? AND slug = ? AND status = true", productSku, productSlug).
+		Where("sku = ? AND slug = ? AND status = ?", productSku, productSlug, entities.ProductStatusPublished).
 		First(&prod).
 		Error
 	if err != nil {
@@ -385,7 +387,11 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 	}
 
 	var products []*entities.Product
-	condition := fmt.Sprintf("category_id=%d", category.ID)
+	// parent categories own no products directly (only their children do) and
+	// drafts/archived products must never reach the storefront
+	subtree := util.CategorySubtreeSQL(category.ID)
+	condition := fmt.Sprintf("category_id IN (%s) AND status = '%s'",
+		subtree, entities.ProductStatusPublished)
 
 	paginateQuery, exist := pagination.Paginate(c, condition, &products, &pg, h.dep.DB)
 	if !exist {
@@ -395,7 +401,7 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 	if pErr := paginateQuery(h.dep.DB).
 		Preload("Category").
 		Preload("ProductImages").
-		Where("category_id=?", category.ID).
+		Where(fmt.Sprintf("category_id IN (%s) AND status = ?", subtree), entities.ProductStatusPublished).
 		Find(&products).Error; pErr != nil {
 		return pg, pErr
 	}
@@ -404,6 +410,44 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 
 	return pg, nil
 }
+
+// ResolveCartInventory validates the variant the customer wants to put in the
+// cart: products without combinations accept 0 (plain stock row), products
+// with combinations require a variant that belongs to them and is sellable.
+// Returning an error stops a bogus inventory_id (0 / another product's id)
+// from creating a cart line that no variant can ever explain.
+func (h *HomeRepository) ResolveCartInventory(c *gin.Context, productID, inventoryID uint) (uint, error) {
+	var variantCount int64
+	if err := h.dep.DB.WithContext(c).
+		Model(&entities.ProductVariant{}).
+		Where("product_id = ?", productID).
+		Count(&variantCount).Error; err != nil {
+		return 0, err
+	}
+	if variantCount == 0 {
+		return 0, nil // stock-only product: no combination to pick
+	}
+
+	if inventoryID == 0 {
+		return 0, domain_err.VariantNotSelected
+	}
+
+	var variant entities.ProductVariant
+	if err := h.dep.DB.WithContext(c).
+		Where("id = ? AND product_id = ?", inventoryID, productID).
+		First(&variant).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, domain_err.VariantNotSelected
+		}
+		return 0, err
+	}
+
+	if variant.Status != entities.VariantStatusActive || variant.Stock < 1 {
+		return 0, domain_err.OutOfStock
+	}
+	return inventoryID, nil
+}
+
 func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, product *entities.Product, req requests.AddToCartRequest) {
 	maxQuantity := uint8(2)
 	//todo: set max quantity in config
@@ -416,6 +460,9 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 	if len(product.ProductImages) > 0 {
 		imagePath = product.ProductImages[0].Path
 	}
+
+	// prices live on the selected variant (NULL columns inherit the product)
+	originalPrice, salePrice := h.cartPrices(c, product, req.InventoryID)
 
 	//todo:check cart status
 	err := h.dep.DB.
@@ -436,8 +483,8 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 					ProductID:     product.ID,
 					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 					Quantity:      1,
-					OriginalPrice: product.OriginalPrice,
-					SalePrice:     product.SalePrice,
+					OriginalPrice: originalPrice,
+					SalePrice:     salePrice,
 					ProductSku:    product.Sku,
 					ProductTitle:  product.Title,
 					ProductImage:  imagePath,
@@ -479,8 +526,8 @@ func (h *HomeRepository) InsertCart(c *gin.Context, user responses.Customer, pro
 					ProductID:     product.ID,
 					InventoryID:   req.InventoryID, //اگر اینونتوری صفر باشه به این معنی هست که ما برای محصول فقط موجودی ست کردیم و اون محصول دارای چند موجودی به ازای چند اتریبیوت نیست!
 					Quantity:      1,
-					OriginalPrice: product.OriginalPrice,
-					SalePrice:     product.SalePrice,
+					OriginalPrice: originalPrice,
+					SalePrice:     salePrice,
 					ProductSku:    product.Sku,
 					ProductTitle:  product.Title,
 					ProductImage:  imagePath,
@@ -537,7 +584,8 @@ func (h *HomeRepository) IncreaseCartItemCount(c *gin.Context, req *requests.Inc
 		fmt.Println("----5")
 		return errors.New(domain_err.SomethingWrongHappened)
 	}
-	realQty := productInventory.Stock - productInventory.ReservedStock
+	// advisory check on the main stock (reservation is retired)
+	realQty := productInventory.Stock
 	fmt.Println("----6 : real qty:", realQty)
 
 	// 2<3 || 3<3+1
@@ -652,6 +700,71 @@ func retryWithBackoff(attempts int, delay time.Duration, operation func() error)
 }
 
 // GenerateOrderFromCart create new order and new order-item from cart and cart-item then remove cart
+// cartPrices resolves the cart item prices for the selected variant:
+// original = the crossed-out list price, sale = the price the customer pays
+// (discount_price wins when it is a real discount — golden rule #3).
+// NULL variant price columns inherit the parent product price.
+func (h *HomeRepository) cartPrices(c *gin.Context, product *entities.Product, inventoryID uint) (uint, uint) {
+	originalPrice := product.OriginalPrice
+	salePrice := product.SalePrice
+
+	if inventoryID == 0 {
+		return originalPrice, salePrice
+	}
+
+	var variant entities.ProductVariant
+	if err := h.dep.DB.WithContext(c).
+		Where("id = ? AND product_id = ?", inventoryID, product.ID).
+		First(&variant).Error; err != nil {
+		return originalPrice, salePrice
+	}
+
+	if variant.Price != nil {
+		originalPrice = *variant.Price
+	}
+	if variant.SalePrice != nil {
+		salePrice = *variant.SalePrice
+	}
+	if variant.DiscountPrice != nil && *variant.DiscountPrice > 0 && *variant.DiscountPrice < salePrice {
+		salePrice = *variant.DiscountPrice
+	}
+	return originalPrice, salePrice
+}
+
+// resolveVariant loads the exact variant a cart/order line refers to.
+// A zero inventory id falls back to the product's first variant so legacy
+// rows (stored before variants existed) still deduct from a real row.
+func resolveVariant(db *gorm.DB, ctx context.Context, productID, inventoryID uint) (*entities.ProductVariant, error) {
+	var variant entities.ProductVariant
+	q := db.WithContext(ctx)
+	if inventoryID > 0 {
+		q = q.Where("id = ? AND product_id = ?", inventoryID, productID)
+	} else {
+		q = q.Where("product_id = ?", productID).Order("id")
+	}
+	if err := q.First(&variant).Error; err != nil {
+		return nil, err
+	}
+	return &variant, nil
+}
+
+// lockVariantForUpdate is resolveVariant plus SELECT ... FOR UPDATE: the
+// payment-time stock gate. The caller must hold the surrounding transaction
+// open (the row lock releases on commit/rollback).
+func lockVariantForUpdate(tx *gorm.DB, ctx context.Context, productID, inventoryID uint) (*entities.ProductVariant, error) {
+	var variant entities.ProductVariant
+	q := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"})
+	if inventoryID > 0 {
+		q = q.Where("id = ? AND product_id = ?", inventoryID, productID)
+	} else {
+		q = q.Where("product_id = ?", productID).Order("id")
+	}
+	if err := q.First(&variant).Error; err != nil {
+		return nil, err
+	}
+	return &variant, nil
+}
+
 func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *entities.Order, inventoryID uint, GenerateOrderErr error) {
 	customer, ok := helpers.GetAuthUser(c)
 	if !ok {
@@ -661,86 +774,39 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 	// start transaction
 	tx := h.dep.DB.WithContext(c).Begin()
 
-	// store redis lock keys
-	lockKeys := make([]string, 0)
-
-	//check qty and reserve it
-	touchedProducts := make(map[uint]struct{})
+	// Advisory availability check ONLY: nothing is reserved and no locks are
+	// taken here. Adding to the cart never touches stock either. The stock is
+	// deducted exactly once, after a successful payment, under
+	// SELECT ... FOR UPDATE (see OrderPaidSuccessfully) — that is the gate
+	// that makes a zero-stock sale impossible.
+	// The resolved variant id is remembered so order_items always point at the
+	// exact row that will be deducted.
+	resolvedInventory := make(map[uint]uint) // cart item ID -> variant ID
 	for _, cartItem := range customer.Cart.CartItem.Data {
-
-		// generate keys to store in redis -> e.g. key "lock:inventory:203"
-		lockKey := fmt.Sprintf("lock:inventory:%d", cartItem.InventoryID)
-
-		// store `lockKey` in redis
-		lockErr := retryWithBackoff(3, 100*time.Millisecond,
-			func() error {
-				locked, redisErr := h.dep.RedisClient.SetNX(c, lockKey, "locked", 5*time.Second).Result()
-				if redisErr != nil {
-					return redisErr
-				}
-				if !locked {
-					return domain_err.InventoryLockedByAnotherOne
-				}
-				lockKeys = append(lockKeys, lockKey)
-				return nil
-			})
-
-		if lockErr != nil {
-			releaseLocks(c, h.dep.RedisClient, lockKeys)
-			return nil, inventoryID, lockErr
-		}
-
-		var pInventory entities.ProductVariant
-
-		// find specific inventory
-		findErr := retryWithBackoff(3, 100*time.Millisecond,
-			func() error {
-				return tx.WithContext(c).
-					Where("id = ? AND product_id = ?", cartItem.InventoryID, cartItem.ProductID).
-					First(&pInventory).
-					Error
-			})
-		// not found
+		variant, findErr := resolveVariant(tx, c, cartItem.ProductID, cartItem.InventoryID)
 		if findErr != nil {
 			tx.Rollback()
-			releaseLocks(c, h.dep.RedisClient, lockKeys)
-
-			return nil, inventoryID, findErr
+			return nil, cartItem.InventoryID, findErr
 		}
 
-		// real inventory quantity
-		realQty := pInventory.Stock - pInventory.ReservedStock
-
-		// out of stock
-		if realQty < uint(cartItem.Quantity) {
+		// out of stock (main stock only — reservation is retired)
+		if variant.Stock < uint(cartItem.Quantity) {
 			tx.Rollback()
-			releaseLocks(c, h.dep.RedisClient, lockKeys)
-
-			return nil, pInventory.ID, domain_err.OutOfStock
+			return nil, variant.ID, domain_err.OutOfStock
 		}
 
-		//var finalQty uint
-		pInventory.ReservedStock += uint(cartItem.Quantity)
-
-		//update and save reserved stock
-		updateInventoryReservedStock := retryWithBackoff(3, 100*time.Millisecond,
-			func() error {
-				return tx.Save(&pInventory).Error
-			})
-
-		//update and save reserved stock (rollback)
-		if updateInventoryReservedStock != nil {
-			tx.Rollback()
-			releaseLocks(c, h.dep.RedisClient, lockKeys)
-
-			return nil, pInventory.ID, updateInventoryReservedStock
-		}
-
-		touchedProducts[pInventory.ProductID] = struct{}{}
+		resolvedInventory[cartItem.ID] = variant.ID
 	}
 
 	//convert address struct to json to store in order
 	addressJson, _ := json.Marshal(customer.Address)
+
+	// fee snapshot: the active tariffs at checkout time (a new tariff row
+	// next month must not rewrite history)
+	shipRate, _ := repositories.ActiveRateForDB(c, tx, entities.FeeKindShipping, time.Now())
+	packRate, _ := repositories.ActiveRateForDB(c, tx, entities.FeeKindPackaging, time.Now())
+	shippingFee, packagingFee, grandTotal, shippingFree := entities.QuoteOrderFees(
+		customer.Cart.CartItem.TotalSalePrice, shipRate, packRate)
 
 	// prepare order entity
 	order := entities.Order{
@@ -752,6 +818,11 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 		Discount:           0,
 		OrderStatus:        entities.OrderPending, //pending
 		Address:            string(addressJson),
+
+		ShippingFee:  shippingFee,
+		PackagingFee: packagingFee,
+		ShippingFree: shippingFree,
+		GrandTotal:   grandTotal,
 	}
 
 	// store order in db
@@ -763,7 +834,6 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 	// store order failed
 	if createOrderError != nil {
 		tx.Rollback()
-		releaseLocks(c, h.dep.RedisClient, lockKeys)
 
 		return nil, inventoryID, createOrderError
 	}
@@ -771,11 +841,15 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 	// prepare order-item (rollback)
 	var orderItems []entities.OrderItem
 	for _, cartItem := range customer.Cart.CartItem.Data {
+		variantID := cartItem.InventoryID
+		if resolved, ok := resolvedInventory[cartItem.ID]; ok && resolved > 0 {
+			variantID = resolved
+		}
 		orderItems = append(orderItems, entities.OrderItem{
 			CustomerID:         customer.ID,
 			OrderID:            order.ID,
 			ProductID:          cartItem.ProductID,
-			InventoryID:        cartItem.InventoryID,
+			InventoryID:        variantID,
 			Quantity:           uint(cartItem.Quantity),
 			OriginalPrice:      cartItem.OriginalPrice,
 			SalePrice:          cartItem.SalePrice,
@@ -794,7 +868,6 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 	// store order-item failed(rollback)
 	if createOrderItemsErr != nil {
 		tx.Rollback()
-		releaseLocks(c, h.dep.RedisClient, lockKeys)
 
 		fmt.Println("[home_repository]-[GenerateOrderFromCart]-[create-order-items]-error:", createOrderItemsErr.Error())
 		return nil, inventoryID, createOrderItemsErr
@@ -810,24 +883,15 @@ func (h *HomeRepository) GenerateOrderFromCart(c *gin.Context) (orderModel *enti
 
 		if deleteCartErr != nil {
 			tx.Rollback()
-			releaseLocks(c, h.dep.RedisClient, lockKeys)
 
 			return nil, inventoryID, deleteCartErr
 		}
 	}
 
-	// release redis locks
-	defer releaseLocks(c, h.dep.RedisClient, lockKeys)
-
 	tx.Commit()
 
-	//reserved stock changed — refresh pricing aggregates after commit
-	for pid := range touchedProducts {
-		if pricingErr := product.RefreshProductAggregates(c, h.dep.DB, pid); pricingErr != nil {
-			util.Trace(pricingErr)
-		}
-	}
-
+	// NOTE: no pricing refresh here — order creation no longer touches
+	// variant stock (deduction happens once, at successful payment)
 	return &order, inventoryID, nil
 }
 
@@ -879,11 +943,22 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 		}
 	}
 
-	//decrees product inventory quantity and product inventory reserved stock
+	// Stock is deducted exactly once, here, after a successful payment — and
+	// only here. Adding to the cart and creating the order never touch stock.
 	lockKeys := make([]string, 0)
 	touchedProducts := make(map[uint]struct{})
 
-	for _, orderItem := range order.OrderItems {
+	// lock rows in a stable order so concurrent payment callbacks touching the
+	// same variants cannot deadlock each other
+	items := append([]*entities.OrderItem(nil), order.OrderItems...)
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].InventoryID == items[j].InventoryID {
+			return items[i].ID < items[j].ID
+		}
+		return items[i].InventoryID < items[j].InventoryID
+	})
+
+	for _, orderItem := range items {
 		lockKey := fmt.Sprintf("lock:inventory:%d", orderItem.InventoryID)
 		lockErr := retryWithBackoff(3, 100*time.Millisecond, func() error {
 			locked, redisLockErr := h.dep.RedisClient.SetNX(c, lockKey, "locked", 1*time.Second).Result()
@@ -902,17 +977,16 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 			return nil, false, domain_err.CustomError{}
 		}
 
-		log.Println("----- x 3")
 		var productInventory entities.ProductVariant
 		findProductInventoryErr :=
 			retryWithBackoff(3, 100*time.Millisecond,
 				func() error {
-					log.Println("----- x 4")
-					return tx.
-						//Clauses(clause.Locking{Strength: "UPDATE"}).
-						WithContext(c).
-						Where("product_id=? AND id=?", orderItem.ProductID, orderItem.InventoryID).
-						First(&productInventory).Error
+					variant, err := lockVariantForUpdate(tx, c, orderItem.ProductID, orderItem.InventoryID)
+					if err != nil {
+						return err
+					}
+					productInventory = *variant
+					return nil
 				})
 		if findProductInventoryErr != nil {
 			tx.Rollback()
@@ -921,45 +995,74 @@ func (h *HomeRepository) OrderPaidSuccessfully(c *gin.Context, order *entities.O
 		}
 
 		if verified {
-			log.Println("----- x 5")
+			// authoritative gate: the row is locked, so this check and the
+			// deduct below are atomic — a zero-stock item can never be sold
+			if productInventory.Stock < orderItem.Quantity {
+				log.Printf("[stock] order %s oversold: variant %d has %d, needs %d — cancelling paid order",
+					order.OrderNumber, productInventory.ID, productInventory.Stock, orderItem.Quantity)
+				// the money was taken but the shelf is empty: roll back every
+				// partial deduction, then persist the cancellation separately
+				// so operations can refund (never complete a zero-stock sale)
+				tx.Rollback()
+				releaseLocks(c, h.dep.RedisClient, lockKeys)
+				cancelErr := h.dep.DB.WithContext(c).Model(&entities.Order{}).
+					Where("id = ?", order.ID).
+					Updates(map[string]interface{}{
+						"order_status":   entities.OrderCancelled,
+						"payment_status": int(entities.OrderCancelled),
+					}).Error
+				if cancelErr != nil {
+					log.Println("[stock] cancel order failed:", cancelErr)
+				}
+				if order.Payment != nil {
+					payCancelErr := h.dep.DB.WithContext(c).Model(&entities.Payment{}).
+						Where("id = ?", order.Payment.ID).
+						Updates(map[string]interface{}{
+							"status": int(entities.OrderCancelled),
+							"ref_id": refID,
+						}).Error
+					if payCancelErr != nil {
+						log.Println("[stock] cancel payment failed:", payCancelErr)
+					}
+				}
+				order.OrderStatus = entities.OrderCancelled
+				order.PaymentStatus = int(entities.OrderCancelled)
+				return order, false, domain_err.New(domain_err.OutOfStock.Error(), "موجودی محصول کافی نیست — سفارش لغو شد", domain_err.OrderOutOfStockAfterPayment)
+			}
 			productInventory.Stock -= orderItem.Quantity
-			productInventory.ReservedStock -= orderItem.Quantity
-		} else {
-			log.Println("----- x 6")
-			productInventory.ReservedStock -= orderItem.Quantity
+			// NOTE: ReservedStock is intentionally untouched — the reservation
+			// model is retired; stock moves only here, once per payment.
 		}
+		// (verified=false: nothing was reserved, nothing to release)
 
 		// update Product Inventory
 		updateProductInventoryErr :=
 			retryWithBackoff(3, 100*time.Millisecond, func() error {
-				log.Println("----- x 7")
 				return tx.Save(&productInventory).Error
 			})
 
 		// update product Inventory
 		if updateProductInventoryErr != nil {
-			log.Println("----- x 7-1")
 			tx.Rollback()
 			releaseLocks(c, h.dep.RedisClient, lockKeys)
 			return order, false, domain_err.New(updateProductInventoryErr.Error(), domain_err.UpdateProductInventoryFaileds, domain_err.UpdateProductInventoryFailed)
-		} else {
-
-			// stock changed for this product — refresh happens after commit
-			touchedProducts[orderItem.ProductID] = struct{}{}
 		}
-		log.Println("----- x 8")
+
+		// stock changed for this product — refresh happens after commit
+		touchedProducts[orderItem.ProductID] = struct{}{}
 	}
 	defer releaseLocks(c, h.dep.RedisClient, lockKeys)
 	tx.Commit()
 	log.Println("----- x 9")
 
-	//refresh read model + pricing aggregates once the stock change is committed
+	//refresh pricing aggregates then the read model once the stock change is
+	//committed (the Typesense document mirrors the aggregates)
 	for pid := range touchedProducts {
-		if syncErr := product.SyncReadModel(c, h.dep.DB, pid); syncErr != nil {
-			util.Trace(syncErr)
-		}
 		if pricingErr := product.RefreshProductAggregates(c, h.dep.DB, pid); pricingErr != nil {
 			util.Trace(pricingErr)
+		}
+		if syncErr := product.SyncReadModel(c, h.dep.DB, pid); syncErr != nil {
+			util.Trace(syncErr)
 		}
 	}
 

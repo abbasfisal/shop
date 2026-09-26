@@ -138,3 +138,19 @@ func (p *ProductRepository) GetProductAndAttributes(ctx *gin.Context, productID 
 
 	return result, nil
 }
+
+// DeleteProductAttribute soft-deletes one product_attributes row (legacy
+// "add attributes" page). Variant links live in variant_attribute_values, so
+// the pricing aggregates are not affected — only the read model is rebuilt.
+func (p *ProductRepository) DeleteProductAttribute(c *gin.Context, productAttributeID int) (uint, error) {
+	var pa entities.ProductAttribute
+	if err := p.db.WithContext(c).First(&pa, productAttributeID).Error; err != nil {
+		return 0, err
+	}
+	if err := p.db.WithContext(c).Delete(&pa).Error; err != nil {
+		return 0, err
+	}
+
+	_ = SyncReadModel(c, p.db, pa.ProductID)
+	return pa.ProductID, nil
+}

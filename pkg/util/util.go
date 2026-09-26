@@ -204,6 +204,15 @@ func Trace(input interface{}) {
 }
 
 // GetProductStoragePath if key value set to active then address will be bucket address else address will be server address
+// GetBannerStoragePath is the banner image URL prefix (bucket when storage is
+// active, the local /uploads mount otherwise).
+func GetBannerStoragePath() string {
+	if os.Getenv("STORAGE_STATUS") == "active" {
+		return fmt.Sprintf("https://%s.parspack.net/uploads/media/banners/", os.Getenv("STORAGE_BUCKET_NAME"))
+	}
+	return "/uploads/media/banners/"
+}
+
 func GetProductStoragePath() string {
 	if os.Getenv("STORAGE_STATUS") == "active" {
 		return fmt.Sprintf("https://%s.parspack.net/uploads/media/products/", os.Getenv("STORAGE_BUCKET_NAME"))

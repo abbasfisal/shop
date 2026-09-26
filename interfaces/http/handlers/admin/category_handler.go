@@ -45,7 +45,7 @@ func (a *AdminHandler) IndexCategory(c *gin.Context) {
 
 func (a *AdminHandler) CreateCategory(c *gin.Context) {
 	categories, _ := a.categorySrv.GetAllCategories(c)
-	response.Render(c, http.StatusFound, "modules/admin/html/admin_create_category",
+	response.Render(c, http.StatusOK, "modules/admin/html/admin_create_category",
 		gin.H{
 			"TITLE":      "ایجاد کتگوری",
 			"CATEGORIES": categories,
@@ -178,7 +178,7 @@ func (a *AdminHandler) ShowCategory(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "modules/admin/html/admin_show_category", gin.H{
+	response.Render(c, http.StatusOK, "modules/admin/html/admin_show_category", gin.H{
 		"TITLE":    "show a category",
 		"CATEGORY": cat,
 	})
@@ -207,7 +207,7 @@ func (a *AdminHandler) EditCategory(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "admin_edit_category",
+	response.Render(c, http.StatusOK, "admin_edit_category",
 		gin.H{
 			"TITLE":      "ویرایش دسته بندی",
 			"CATEGORY":   cat,
@@ -351,11 +351,15 @@ func (a *AdminHandler) UpdateCategory(c *gin.Context) {
 
 }
 
+// CategoryProducts sends the admin to the product list pre-filtered by the
+// category (the list page owns the filtering).
 func (a *AdminHandler) CategoryProducts(c *gin.Context) {
-	c.JSON(200,
-		gin.H{
-			"category_id": c.Param("id"),
-			"msg":         "implement me",
-		})
+	c.Redirect(http.StatusFound, fmt.Sprintf("/admins/products?category_id=%s", c.Param("id")))
+	return
+}
+
+// BrandProducts is the brand counterpart of CategoryProducts.
+func (a *AdminHandler) BrandProducts(c *gin.Context) {
+	c.Redirect(http.StatusFound, fmt.Sprintf("/admins/products?brand_id=%s", c.Param("id")))
 	return
 }

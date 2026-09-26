@@ -7,7 +7,10 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	bannerUseCase "shop/application/usecases/banner"
+	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
+	sliderUseCase "shop/application/usecases/product_slider"
 	"shop/bootstrap"
 	webreq "shop/interfaces/http/requests/web"
 )
@@ -30,7 +33,12 @@ func postAddToCart(t *testing.T, body string, referer string) (*fakeHomeService,
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 	svc := &fakeHomeService{}
-	h := NewPublicHandler(svc, &bootstrap.Dependencies{})
+	h := NewPublicHandler(svc,
+		bannerUseCase.NewBannerService(nil),
+		sliderUseCase.NewProductSliderService(nil),
+		feeUseCase.NewFeeRateService(nil),
+		&bootstrap.Dependencies{},
+	)
 
 	r := gin.New()
 	r.POST("/add-to-cart", h.AddToCart)

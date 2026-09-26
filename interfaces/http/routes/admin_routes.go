@@ -15,9 +15,11 @@ import (
 	"shop/application/usecases/category"
 	"shop/application/usecases/customer"
 	"shop/application/usecases/dashboard"
+	"shop/application/usecases/fee"
 	order "shop/application/usecases/order"
 	"shop/application/usecases/pricing"
 	"shop/application/usecases/product"
+	sliders "shop/application/usecases/product_slider"
 	"shop/bootstrap"
 	"shop/infrastructure/database/postgres"
 	attributeRepository "shop/infrastructure/repositories/attribute"
@@ -28,8 +30,10 @@ import (
 	categoryRepository "shop/infrastructure/repositories/category"
 	customerRepository "shop/infrastructure/repositories/customer"
 	dashboardRepository "shop/infrastructure/repositories/dashboard"
+	feeRepository "shop/infrastructure/repositories/fee"
 	orderRepository "shop/infrastructure/repositories/order"
 	productRepository "shop/infrastructure/repositories/product"
+	sliderRepository "shop/infrastructure/repositories/product_slider"
 	AdminHandler "shop/interfaces/http/handlers/admin"
 	"shop/interfaces/http/middleware"
 	"time"
@@ -66,7 +70,11 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 
 	bannerSrv := banner.NewBannerService(bannerRepository.NewBannerRepository(postgres.Get()))
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, dashboardSrv, bannerSrv, dep)
+	sliderSrv := sliders.NewProductSliderService(sliderRepository.NewProductSliderRepository(postgres.Get()))
+
+	feeSrv := fee.NewFeeRateService(feeRepository.NewFeeRateRepository(postgres.Get()))
+
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, feeSrv, dashboardSrv, bannerSrv, sliderSrv, dep)
 
 	// rate limiter
 	limiter := middleware.NewRateLimiter(rate.Every(time.Minute), 5)
@@ -114,6 +122,10 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/attributes/:id", adminHlr.UpdateAttribute)
 
 		authGrp.GET("/admins/get-attributes/:catID", adminHlr.GetAttributesByCategoryID)
+		// JSON feed for the product create/edit combination builder (ajax)
+		authGrp.GET("/admins/api/attributes", adminHlr.GetAttributesJSON)
+		// JSON feed for the slider product picker (ajax search)
+		authGrp.GET("/admins/api/products", adminHlr.SearchProductsJSON)
 
 		//attribute-values
 		authGrp.GET("/admins/attribute-values", adminHlr.IndexAttributeValues)
@@ -146,6 +158,7 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/products/:id/add-images", adminHlr.UploadProductImages)
 
 		//product-attribute
+		authGrp.GET("/admins/products-attributes/:id/delete", adminHlr.DeleteProductAttribute)
 		authGrp.GET("/admins/products/:id/add-attributes", adminHlr.ProductsAddAttributes)
 		authGrp.POST("/admins/products/:id/add-attributes", adminHlr.StoreProductsAddAttributes)
 		//product-inventory
@@ -161,10 +174,22 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/brands/create", adminHlr.StoreBrand)
 		authGrp.GET("/admins/brands/:id", adminHlr.ShowBrand)
 		authGrp.GET("/admins/brands/:id/edit", adminHlr.EditBrand)
+		authGrp.GET("/admins/brands/:id/products", adminHlr.BrandProducts)
 		authGrp.POST("/admins/brands/:id/edit", adminHlr.UpdateBrand)
 
 		//customer
 		authGrp.GET("/admins/customers", adminHlr.IndexCustomer)
+
+		//order fees (shipping / packaging tariffs)
+		feesGrp := authGrp.Group("/admins/fees")
+		{
+			feesGrp.GET("/:kind", adminHlr.IndexFee)
+			feesGrp.GET("/:kind/create", adminHlr.CreateFee)
+			feesGrp.POST("/:kind", adminHlr.StoreFee)
+			feesGrp.GET("/:kind/:id/edit", adminHlr.EditFee)
+			feesGrp.POST("/:kind/:id", adminHlr.UpdateFee)
+			feesGrp.POST("/:kind/:id/delete", adminHlr.DeleteFee)
+		}
 
 		//order
 		authGrp.GET("/admins/orders", adminHlr.IndexOrders)
@@ -172,8 +197,20 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.POST("/admins/orders/:id/update-status", adminHlr.EditOrder)
 
 		//banner
+		authGrp.GET("/admins/banners", adminHlr.IndexBanner)
 		authGrp.GET("/admins/banners/create", adminHlr.CreateBanner)
 		authGrp.POST("/admins/banners", adminHlr.StoreBanner)
+		authGrp.GET("/admins/banners/:id/edit", adminHlr.EditBanner)
+		authGrp.POST("/admins/banners/:id", adminHlr.UpdateBanner)
+		authGrp.POST("/admins/banners/:id/delete", adminHlr.DeleteBanner)
+
+		//product sliders (homepage)
+		authGrp.GET("/admins/sliders", adminHlr.IndexProductSlider)
+		authGrp.GET("/admins/sliders/create", adminHlr.CreateProductSlider)
+		authGrp.POST("/admins/sliders", adminHlr.StoreProductSlider)
+		authGrp.GET("/admins/sliders/:id/edit", adminHlr.EditProductSlider)
+		authGrp.POST("/admins/sliders/:id", adminHlr.UpdateProductSlider)
+		authGrp.POST("/admins/sliders/:id/delete", adminHlr.DeleteProductSlider)
 
 	}
 

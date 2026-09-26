@@ -28,7 +28,7 @@ func (a *AdminHandler) CreateProductFeature(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "admin_add_product_feature",
+	response.Render(c, http.StatusOK, "admin_add_product_feature",
 		gin.H{
 			"TITLE":   "افزودن feature به محصول",
 			"PRODUCT": productShow,
@@ -145,7 +145,7 @@ func (a *AdminHandler) EditProductFeature(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "admin_edit_product_feature", gin.H{
+	response.Render(c, http.StatusOK, "admin_edit_product_feature", gin.H{
 		"TITLE":   "ویرایش صفت",
 		"FEATURE": feat,
 	})

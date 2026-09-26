@@ -51,7 +51,7 @@ func TestGetProduct_ReadModelContract(t *testing.T) {
 	main := entities.Product{
 		CategoryID: cat.ID, BrandID: brand.ID,
 		Title: "storefront-" + suffix, Slug: "storefront-" + suffix,
-		Sku: "sf-" + suffix, Status: true, OriginalPrice: 100, SalePrice: 90,
+		Sku: "sf-" + suffix, Status: entities.ProductStatusPublished, OriginalPrice: 100, SalePrice: 90,
 	}
 	if err := tx.Create(&main).Error; err != nil {
 		t.Fatalf("create main: %v", err)
@@ -59,7 +59,7 @@ func TestGetProduct_ReadModelContract(t *testing.T) {
 	rec := entities.Product{
 		CategoryID: cat.ID, BrandID: brand.ID,
 		Title: "recommended-" + suffix, Slug: "recommended-" + suffix,
-		Sku: "rec-" + suffix, Status: true, OriginalPrice: 50, SalePrice: 40,
+		Sku: "rec-" + suffix, Status: entities.ProductStatusPublished, OriginalPrice: 50, SalePrice: 40,
 	}
 	if err := tx.Create(&rec).Error; err != nil {
 		t.Fatalf("create recommended: %v", err)

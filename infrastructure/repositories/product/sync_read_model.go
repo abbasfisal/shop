@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"regexp"
+	"strings"
 
 	"github.com/spf13/viper"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/pkg/util"
@@ -35,10 +38,17 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 	type InventoryWithAttributes struct {
 		InventoryID                 uint
 		Quantity                    uint
+		ReservedStock               uint
+		Price                       *uint
+		SalePrice                   *uint
+		DiscountPrice               *uint
+		Status                      string
 		AttributeID                 uint
 		AttributeTitle              string
+		AttributeInputType          string
 		AttributeValueID            uint
 		AttributeValueTitle         string
+		AttributeValueMeta          datatypes.JSON
 		ProductInventoryAttributeID uint
 	}
 
@@ -46,7 +56,7 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 	serr := db.
 		WithContext(c).
 		Table("product_variants").
-		Select("product_variants.id AS inventory_id, product_variants.stock AS quantity, attributes.id AS attribute_id, attributes.title AS attribute_title, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, variant_attribute_values.id AS product_inventory_attribute_id").
+		Select("product_variants.id AS inventory_id, product_variants.stock AS quantity, product_variants.reserved_stock, product_variants.price, product_variants.sale_price, product_variants.discount_price, product_variants.status, attributes.id AS attribute_id, attributes.title AS attribute_title, attributes.input_type AS attribute_input_type, attribute_values.id AS attribute_value_id, attribute_values.value AS attribute_value_title, attribute_values.meta AS attribute_value_meta, variant_attribute_values.id AS product_inventory_attribute_id").
 		Joins("LEFT JOIN variant_attribute_values ON product_variants.id = variant_attribute_values.variant_id AND variant_attribute_values.deleted_at IS NULL").
 		Joins("LEFT JOIN attribute_values ON variant_attribute_values.attribute_value_id = attribute_values.id AND attribute_values.deleted_at IS NULL").
 		Joins("LEFT JOIN attributes ON attribute_values.attribute_id = attributes.id AND attributes.deleted_at IS NULL").
@@ -63,11 +73,7 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 	for _, inventory := range inventories {
 		key := fmt.Sprintf("%d", inventory.InventoryID)
 		if _, exists := inventoryMap[key]; !exists {
-			inventoryMap[key] = entities.Inventory{
-				InventoryID: int64(inventory.InventoryID),
-				Quantity:    int64(inventory.Quantity),
-				Attributes:  []entities.InventoryAttributes{},
-			}
+			inventoryMap[key] = variantInventory(inventory, product)
 		}
 		inv := inventoryMap[key]
 		inv.Attributes = append(inv.Attributes, entities.InventoryAttributes{
@@ -76,15 +82,22 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 			AttributeValueID:            int64(inventory.AttributeValueID),
 			AttributeValueTitle:         inventory.AttributeValueTitle,
 			ProductInventoryAttributeID: int64(inventory.ProductInventoryAttributeID),
+			IsColor:                     inventory.AttributeInputType == entities.AttributeInputColor,
+			ColorHex:                    attributeValueHex(inventory.AttributeValueMeta),
 		})
 		inventoryMap[key] = inv
 	}
 
+	// golden rule: the storefront discount is measured against the price the
+	// customer actually pays (aggregate minimum when variants exist), not the
+	// nominal product sale price.
+	effectiveSale := int64(product.SalePrice)
+	if product.MinPrice > 0 {
+		effectiveSale = int64(product.MinPrice)
+	}
 	discount := int64(0)
-	if product.OriginalPrice > 0 {
-		originalPrice := float64(product.OriginalPrice)
-		salePrice := float64(product.SalePrice)
-		discount = int64(math.Round(((originalPrice - salePrice) / originalPrice) * 100))
+	if product.OriginalPrice > 0 && effectiveSale > 0 && effectiveSale < int64(product.OriginalPrice) {
+		discount = int64(math.Round((float64(product.OriginalPrice) - float64(effectiveSale)) / float64(product.OriginalPrice) * 100))
 	}
 
 	readModel := entities.ProductReadModel{
@@ -110,6 +123,8 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 			OriginalPrice: int64(product.OriginalPrice),
 			SalePrice:     int64(product.SalePrice),
 			Discount:      discount,
+			MinPrice:      int64(product.MinPrice),
+			MaxPrice:      int64(product.MaxPrice),
 			Description:   product.Description,
 			Images:        entities.Img{Data: transformImages(product.ProductImages)},
 			Features:      entities.F{Data: transformFeatures(product.Features)},
@@ -135,15 +150,40 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 	}
 
 	// sync the rich document into typesense: upsert while published,
-	// delete while unpublished (realtime search stays consistent)
+	// delete while draft/archived (realtime search stays consistent)
 	idStr := fmt.Sprintf("%d", product.ID)
-	if !product.Status {
+	if product.Status != entities.ProductStatusPublished {
 		go util.DeleteInTypesence(c, idStr)
 	} else {
+		// prefer the PricingService aggregates (Laravel min_price/in_stock);
+		// fall back to the variant rows when the cache was not refreshed yet
 		var totalStock int64
 		for _, inv := range inventoryMap {
 			totalStock += inv.Quantity
 		}
+		if product.TotalStock > 0 {
+			totalStock = int64(product.TotalStock)
+		}
+		inStock := totalStock-int64(product.TotalReserved) > 0
+		if product.AvailableStock > 0 || product.TotalStock > 0 {
+			inStock = product.InStock
+		}
+
+		// effective selling price = min effective variant price (golden rule #5)
+		salePrice := product.SalePrice
+		if product.MinPrice > 0 {
+			salePrice = product.MinPrice
+		}
+		// discount % against the effective selling price
+		saleDiscount := discount
+		if product.OriginalPrice > 0 && salePrice != product.SalePrice {
+			pct := (float64(product.OriginalPrice) - float64(salePrice)) / float64(product.OriginalPrice) * 100
+			if pct < 0 {
+				pct = 0
+			}
+			saleDiscount = int64(math.Round(pct))
+		}
+
 		categoryTitle := ""
 		if product.Category != nil {
 			categoryTitle = product.Category.Title
@@ -161,16 +201,101 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 			Category:      categoryTitle,
 			Brand:         brandTitle,
 			OriginalPrice: int64(product.OriginalPrice),
-			SalePrice:     int64(product.SalePrice),
-			Discount:      discount,
+			SalePrice:     int64(salePrice),
+			Discount:      int64(saleDiscount),
 			Stock:         totalStock,
-			InStock:       totalStock > 0,
+			InStock:       inStock,
 			Status:        product.Status,
 		})
 	}
 
 	log.Println("-- update product read_model (jsonb) successfully, product id:", productID)
 	return nil
+}
+
+// variantInventory resolves one variant's pricing/status for the read model:
+// NULL price columns inherit the product price, discount counts only when it
+// is greater than zero and lower than the sale price (golden rule #3).
+func variantInventory(row struct {
+	InventoryID                 uint
+	Quantity                    uint
+	ReservedStock               uint
+	Price                       *uint
+	SalePrice                   *uint
+	DiscountPrice               *uint
+	Status                      string
+	AttributeID                 uint
+	AttributeTitle              string
+	AttributeInputType          string
+	AttributeValueID            uint
+	AttributeValueTitle         string
+	AttributeValueMeta          datatypes.JSON
+	ProductInventoryAttributeID uint
+}, product entities.Product) entities.Inventory {
+	price := int64(product.OriginalPrice)
+	if row.Price != nil {
+		price = int64(*row.Price)
+	}
+	sale := int64(product.SalePrice)
+	if row.SalePrice != nil {
+		sale = int64(*row.SalePrice)
+	}
+
+	effective := sale
+	hasDiscount := false
+	// the badge percent is measured against the crossed-out list price (price),
+	// consistent with the storefront display next to it
+	var discountPercent int64
+	if row.DiscountPrice != nil && *row.DiscountPrice > 0 && int64(*row.DiscountPrice) < sale {
+		effective = int64(*row.DiscountPrice)
+		hasDiscount = true
+		if price > 0 && effective < price {
+			discountPercent = int64(math.Round(float64(price-effective) / float64(price) * 100))
+		}
+	}
+
+	available := int64(0)
+	if row.Quantity > row.ReservedStock {
+		available = int64(row.Quantity - row.ReservedStock)
+	}
+
+	return entities.Inventory{
+		InventoryID:     int64(row.InventoryID),
+		Quantity:        int64(row.Quantity),
+		Attributes:      []entities.InventoryAttributes{},
+		Price:           price,
+		SalePrice:       sale,
+		DiscountPrice:   int64(derefUint(row.DiscountPrice)),
+		HasDiscount:     hasDiscount,
+		DiscountPercent: discountPercent,
+		EffectivePrice:  effective,
+		Status:          row.Status,
+		Available:       available,
+	}
+}
+
+// attributeValueHex extracts a validated #rrggbb from a meta JSONB value.
+func attributeValueHex(meta datatypes.JSON) string {
+	if len(meta) == 0 {
+		return ""
+	}
+	var m map[string]string
+	if err := json.Unmarshal(meta, &m); err != nil {
+		return ""
+	}
+	hex := strings.TrimSpace(m["hex"])
+	matched, _ := regexp.MatchString(`^#[0-9a-fA-F]{6}$`, hex)
+	if !matched {
+		return ""
+	}
+	return hex
+}
+
+func derefUint(v *uint) uint {
+	if v == nil {
+		return 0
+	}
+	return *v
 }
 
 func derefUintToInt64(p *uint) int64 {

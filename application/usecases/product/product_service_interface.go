@@ -9,13 +9,14 @@ import (
 )
 
 type ProductServiceInterface interface {
-	Index(ctx context.Context) (*responses.Products, domain_err.CustomError)
+	Index(ctx context.Context, q requests.ProductListQuery) (*responses.Products, domain_err.CustomError)
 	Show(ctx context.Context, columnName string, value any) (*responses.Product, []map[string]interface{}, domain_err.CustomError)
 	Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, domain_err.CustomError)
 	CheckSkuIsUnique(ctx context.Context, sku string) (bool, domain_err.CustomError)
 	FetchByProductID(c *gin.Context, productID int) (*responses.Product, domain_err.CustomError)
 	FetchRootAttributes(c *gin.Context, productID int) (*responses.Attributes, domain_err.CustomError)
 	AddAttributeValues(c *gin.Context, productID int, attributes []string) domain_err.CustomError
+	DeleteProductAttribute(c *gin.Context, productAttributeID int) domain_err.CustomError
 	FetchProductAttributes(c *gin.Context, productID int) (map[string]interface{}, domain_err.CustomError)
 	CreateInventory(c *gin.Context, productID int, req *requests.CreateProductInventoryRequest) domain_err.CustomError
 	FetchImage(c *gin.Context, imageID int) (*responses.ImageProduct, domain_err.CustomError)

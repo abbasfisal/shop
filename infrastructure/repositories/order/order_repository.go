@@ -45,6 +45,10 @@ func (oRepo *OrderRepository) GetOrders(c *gin.Context) (pagination.Pagination, 
 	var orders []*entities.Order
 	//condition := fmt.Sprintf("customer_id=%d", customer.ID)
 	condition := ""
+	// sidebar: سفارشات امروز → /admins/orders?today=1
+	if c.Query("today") == "1" {
+		condition = "created_at >= CURRENT_DATE"
+	}
 
 	paginateQuery, exist := pagination.Paginate(c, condition, &orders, &pg, oRepo.db)
 

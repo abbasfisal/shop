@@ -14,8 +14,9 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1 class="m-0 text-dark">{{.TITLE}}</h1>
+                        <br>
+                        <span class="text-success">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</span>
                     </div><!-- /.col -->
-
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
         </div>
@@ -24,201 +25,276 @@
 
         <!-- Main content -->
         <div class="content">
-            {{$selectedCategory:=.PRODUCT.CategoryID}}
-
-            {{$selectedBrand :=.PRODUCT.BrandID}}
+            {{$product := .PRODUCT}}
+            {{$selectedCategory := .PRODUCT.CategoryID}}
+            {{$selectedBrand := .PRODUCT.BrandID}}
+            {{$isVariable := eq .PRODUCT.ProductType "variable"}}
+            {{$variants := $product.ProductInventories.Data}}
+            {{$hasInv := gt (len $variants) 0}}
+            {{$inv := .INV}}
 
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-10 align-content-center">
-                        <form action="/admins/products/{{.PRODUCT.ID}}" method="post">
-                            <table class="table table-primary ">
-                                <tr>
-                                    <td>سایر عملیات</td>
-                                    <td>
-                                        <a href="/admins/products/{{.PRODUCT.ID}}"><b>مشاهده محصول</b></a> |
+                    <div class="col-lg-12">
 
-                                        <a href="/admins/products/{{.PRODUCT.ID}}/show-gallery"> <b> ویرایش و مشاهده
-                                                تصاویر</b> </a> |
-                                        <a href="/admins/products/{{.PRODUCT.ID}}/add-attributes">
-                                            <b>ویرایش و مشاهده ویژگی ها</b>
-                                        </a> |
-                                        <a href="/admins/products/{{.PRODUCT.ID}}/add-inventory">
-                                            <b>ویرایش و مشاهده موجودی</b>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>انتخاب دسته بندی</td>
-                                    <td>
-                                        <select class="form-control" name="category_id">
-                                            {{range .CATEGORIES.Data}}
-                                                <option value="{{.ID}}" {{if eq $selectedCategory .ID}} selected {{end}}>{{.Title}}</option>
-                                            {{end}}
-                                        </select>
-                                    </td>
-                                    <td class="text-danger">{{if .ERRORS.categoryid}}{{.ERRORS.categoryid}}{{end}}</td>
-                                </tr>
-                                <tr>
-                                    <td>انتخاب برند</td>
-                                    <td>
-                                        <select class="form-control" name="brand_id">
-                                            <option value="0">انتخاب برند</option>
-                                            {{range .BRANDS.Data}}
-                                                <option value="{{.ID}}" {{if eq $selectedBrand .ID}} selected {{end}}>{{.Title}}</option>
-                                            {{end}}
-                                        </select>
-                                    </td>
-                                    <td class="text-danger">{{if .ERRORS.brandid}}{{.ERRORS.brandid}}{{end}}</td>
+                        {{if .ERRORS}}
+                            <div class="alert alert-danger">
+                                <ul style="margin:0; padding-right:1rem;">
+                                    {{range $k, $v := .ERRORS}}
+                                        <li>{{$v}}</li>
+                                    {{end}}
+                                </ul>
+                            </div>
+                        {{end}}
 
-                                </tr>
+                        <div class="card">
+                            <div class="card-header">
+                                <b>سایر عملیات</b>
+                                <div class="mt-1">
+                                    <a href="/admins/products/{{$product.ID}}" class="btn btn-sm btn-outline-secondary">مشاهده محصول</a>
+                                    <a href="/admins/products/{{$product.ID}}/show-gallery" class="btn btn-sm btn-outline-secondary">تصاویر</a>
+                                    <a href="/admins/products/{{$product.ID}}/add-feature" class="btn btn-sm btn-outline-secondary">افزودن صفت</a>
+                                    <a href="/admins/products/{{$product.ID}}/show-feature" class="btn btn-sm btn-outline-secondary">مشاهده صفات</a>
+                                    <a href="/admins/products/{{$product.ID}}/add-attributes" class="btn btn-sm btn-outline-secondary">ویژگی‌های قدیمی</a>
+                                    <a href="/admins/products/{{$product.ID}}/add-inventory" class="btn btn-sm btn-outline-secondary">موجودی قدیمی</a>
+                                </div>
+                            </div>
+                        </div>
 
-                                <tr>
-                                    <td>عنوان</td>
-                                    <td><input type="text" class="form-control"
-                                                {{if .OLDS.title}}
-                                                    value="{{range .OLDS.title}}{{.}}{{end}}"
-                                                {{else }}
-                                                    value="{{.PRODUCT.Title}}"
-                                                {{end}}
-                                               name="title"></td>
-                                    <td class="text-danger">{{if .ERRORS.title}}{{.ERRORS.title}}{{end}}</td>
-                                </tr>
+                        <form action="/admins/products/{{$product.ID}}" method="post" id="productForm">
+                            <input type="hidden" id="oldVariants" value="{{.OLDVARIANTS}}">
+                            <input type="hidden" id="variantCount" value="{{len $variants}}">
+                            <input type="hidden" name="product_type" value="{{$product.ProductType}}">
 
-                                <tr>
-                                    <td>اسلاگ</td>
-                                    <td><input type="text"
-                                               name="slug"
-                                               class="form-control"
-                                                {{if .OLDS.title}}
-                                                    value="{{range .OLDS.title}}{{.}}{{end}}"
-                                                {{else }}
-                                                    value="{{.PRODUCT.Slug}}"
-                                                {{end}}
-                                        >
-                                    <td class="text-danger">{{if .ERRORS.slug}}{{.ERRORS.slug}}{{end}}</td>
-                                </tr>
-
-                                <tr>
-                                    <td>شناسه محصول sku</td>
-                                    <td><input type="text" class="form-control"
-                                                {{if .OLDS.sku}}
-                                                    value="{{range .OLDS.sku}}{{.}}{{end}}"
-                                                {{else }}
-                                                    value="{{.PRODUCT.Sku}}"
-                                                {{end}}
-                                               name="sku">
-                                    </td>
-                                    <td class="text-danger">{{if .ERRORS.sku}}{{.ERRORS.sku}}{{end}}</td>
-                                </tr>
-
-                                <tr>
-                                    <td>وضعیت</td>
-                                    <td><input type="checkbox"{{if eq .PRODUCT.Status true}} checked{{end}}
-                                               name="status"></td>
-                                    <td></td>
-                                </tr>
-
-                                {{/*                                <tr>*/}}
-                                {{/*                                    <td>موجودی</td>*/}}
-                                {{/*                                    <td><input class="form-control" type="number"*/}}
-                                {{/*                                               value="{{range .OLDS.quantity}}{{.}}{{end}}" name="quantity">*/}}
-                                {{/*                                    </td>*/}}
-                                {{/*                                    <td class="text-danger">{{if .ERRORS.quantity}}{{.ERRORS.quantity}}{{end}}</td>*/}}
-                                {{/*                                </tr>*/}}
-
-                                <tr>
-                                    <td>قیمت اصلی</td>
-                                    <td><input class="form-control" type="number"
-                                                {{if .OLDS.original_price}}
-                                                    value="{{range .OLDS.original_price}}{{.}}{{end}}"
-                                                {{else }}
-                                                    value="{{.PRODUCT.OriginalPrice}}"
-                                                {{end}}
-                                               name="original_price"></td>
-                                    <td class="text-danger">{{if .ERRORS.originalprice}}{{.ERRORS.originalprice}}{{end}}</td>
-                                </tr>
-
-                                <tr>
-                                    <td>قیمت فروش</td>
-                                    <td><input type="number"
-                                               class="form-control"
-                                                {{if .OLDS.sale_price}}
-                                                    value="{{range .OLDS.sale_price}}{{.}}{{end}}"
-                                                {{else }}
-                                                    value="{{.PRODUCT.SalePrice}}"
-                                                {{end}}
-                                               name="sale_price"></td>
-                                    <td class="text-danger">{{if .ERRORS.saleprice}}{{.ERRORS.saleprice}}{{end}}</td>
-                                </tr>
-
-                                <tr>
-                                    <td>توضیحات</td>
-                                    <td>
-                                        <textarea name="description" cols="30" class="form-control"
-                                                  rows="10">{{if .OLDS.description}}{{range .OLDS.description}}{{.}}{{end}}{{else }}{{.PRODUCT.Description}}{{end}}</textarea>
-                                    </td>
-                                    <td class="text-danger">{{if .ERRORS.description}}{{.ERRORS.description}}{{end}}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <select class="form-group-lg" name="recommendations"
-                                                        multiple="multiple">
-                                                    <option value="">انتخاب کنید</option>
-                                                    {{range $product:=.AllProducts}}
-
-                                                        {{if gt ( len $.RECOMMENDATIONS) 0}}
-                                                            {{range $rProduct:=$.RECOMMENDATIONS}}
-                                                                {{if eq $rProduct.product.id $product.product.id }}
-                                                                    <option selected value="{{$product.id}}">
-                                                                        {{$product.product.title}}
-                                                                    </option>
-                                                                {{else}}
-                                                                    <option value="{{$product.id}}">
-                                                                        {{$product.product.title}}
-                                                                    </option>
-                                                                {{end}}
-                                                            {{end}}
-                                                        {{else}}
-                                                            <option value="{{$product.id}}">{{$product.product.title}}</option>
-                                                        {{end}}
-                                                    {{end}}
-
-
-                                                </select>
-
-
-                                            </div>
-
+                            <div class="card">
+                                <div class="card-header"><b>اطلاعات پایه</b></div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 form-group">
+                                            <label>عنوان محصول *</label>
+                                            <input type="text" class="form-control" name="title"
+                                                   value="{{if index .OLD "title"}}{{index .OLD "title"}}{{else}}{{$product.Title}}{{end}}">
+                                            <span class="text-danger">{{.ERRORS.title}}</span>
                                         </div>
-                                        <b>
-                                            محصولات پیشنهاد شده:
-                                        </b>
-                                        <ul class="form-group-lg">
+                                        <div class="col-md-4 form-group">
+                                            <label>اسلاگ *</label>
+                                            <input type="text" class="form-control" name="slug"
+                                                   value="{{if index .OLD "slug"}}{{index .OLD "slug"}}{{else}}{{$product.Slug}}{{end}}">
+                                            <span class="text-danger">{{.ERRORS.slug}}</span>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>شناسه محصول sku *</label>
+                                            <input type="text" class="form-control" name="sku"
+                                                   value="{{if index .OLD "sku"}}{{index .OLD "sku"}}{{else}}{{$product.Sku}}{{end}}">
+                                            <span class="text-danger">{{.ERRORS.sku}}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3 form-group">
+                                            <label>دسته بندی *</label>
+                                            <select class="form-control" name="category_id">
+                                                {{range .CATEGORIES.Data}}
+                                                    <option value="{{.ID}}" {{if eq .ID $selectedCategory}}selected{{end}}>{{.Title}}</option>
+                                                {{end}}
+                                            </select>
+                                            <span class="text-danger">{{.ERRORS.category_id}}{{.ERRORS.categoryid}}</span>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>برند *</label>
+                                            <select class="form-control" name="brand_id">
+                                                {{range .BRANDS}}
+                                                    <option value="{{.ID}}" {{if eq .ID $selectedBrand}}selected{{end}}>{{.Title}}</option>
+                                                {{end}}
+                                            </select>
+                                            <span class="text-danger">{{.ERRORS.brand_id}}{{.ERRORS.brandid}}</span>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>وضعیت *</label>
+                                            {{$status := index .OLD "status"}}
+                                            {{if eq $status ""}}{{$status = $product.Status}}{{end}}
+                                            <select class="form-control" name="status">
+                                                <option value="draft" {{if eq $status "draft"}}selected{{end}}>پیش‌نویس</option>
+                                                <option value="published" {{if eq $status "published"}}selected{{end}}>منتشر شده</option>
+                                                <option value="archived" {{if eq $status "archived"}}selected{{end}}>بایگانی</option>
+                                            </select>
+                                            <span class="text-danger">{{.ERRORS.status}}</span>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>تاریخ انقضای محصول</label>
+                                            <input type="date" class="form-control" name="expires_at"
+                                                   value="{{if index .OLD "expires_at"}}{{index .OLD "expires_at"}}{{else}}{{if $product.ExpiresAt}}{{dateValue $product.ExpiresAt}}{{end}}{{end}}">
+                                            <span class="text-danger">{{.ERRORS.expires_at}}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 form-group">
+                                            <label>توضیحات</label>
+                                            <textarea name="description" rows="4"
+                                                      class="form-control">{{if index .OLD "description"}}{{index .OLD "description"}}{{else}}{{$product.Description}}{{end}}</textarea>
+                                            <span class="text-danger">{{.ERRORS.description}}</span>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>قیمت اصلی (قبل از تخفیف) *</label>
+                                            <input type="number" min="0" class="form-control" name="original_price"
+                                                   value="{{if index .OLD "original_price"}}{{index .OLD "original_price"}}{{else}}{{$product.OriginalPrice}}{{end}}">
+                                            <span class="text-danger">{{.ERRORS.original_price}}{{.ERRORS.originalprice}}</span>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>قیمت فروش (پرداختی) *</label>
+                                            <input type="number" min="0" class="form-control" name="sale_price"
+                                                   value="{{if index .OLD "sale_price"}}{{index .OLD "sale_price"}}{{else}}{{$product.SalePrice}}{{end}}">
+                                            <span class="text-danger">{{.ERRORS.sale_price}}{{.ERRORS.saleprice}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{if not $isVariable}}
+                                <!-- ======== simple: single variant ======== -->
+                                <div class="card" id="simpleBox">
+                                    <div class="card-header"><b>قیمت و موجودی</b></div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3 form-group">
+                                                <label>قیمت با تخفیف</label>
+                                                <input type="number" min="0" class="form-control" name="simple_discount_price"
+                                                       value="{{if index .OLD "simple_discount_price"}}{{index .OLD "simple_discount_price"}}{{else}}{{if $hasInv}}{{if $inv.DiscountPrice}}{{$inv.DiscountPrice}}{{end}}{{end}}{{end}}">
+                                                <small class="text-muted">اختیاری — اگر پر شود، قیمت فروش خط می‌خورد</small>
+                                                <span class="text-danger">{{.ERRORS.simple_discount_price}}</span>
+                                            </div>
+                                            <div class="col-md-3 form-group">
+                                                <label>موجودی *</label>
+                                                <input type="number" min="0" class="form-control" name="simple_stock"
+                                                       value="{{if index .OLD "simple_stock"}}{{index .OLD "simple_stock"}}{{else}}{{if $hasInv}}{{$inv.Quantity}}{{end}}{{end}}">
+                                                <span class="text-danger">{{.ERRORS.simple_stock}}</span>
+                                            </div>
+                                            <div class="col-md-3 form-group">
+                                                <label>وضعیت واریانت *</label>
+                                                {{$s := index .OLD "simple_status"}}
+                                                {{if eq $s ""}}{{$s = "active"}}{{if $hasInv}}{{$s = $inv.Status}}{{end}}{{end}}
+                                                <select class="form-control" name="simple_status">
+                                                    <option value="active" {{if eq $s "active"}}selected{{end}}>فعال</option>
+                                                    <option value="inactive" {{if eq $s "inactive"}}selected{{end}}>غیرفعال</option>
+                                                </select>
+                                                <span class="text-danger">{{.ERRORS.simple_status}}</span>
+                                            </div>
+                                            <div class="col-md-3 form-group">
+                                                <label>تاریخ انقضای واریانت</label>
+                                                <input type="date" class="form-control" name="simple_expires_at"
+                                                       value="{{if index .OLD "simple_expires_at"}}{{index .OLD "simple_expires_at"}}{{else}}{{if $hasInv}}{{if $inv.ExpiresAt}}{{dateValue $inv.ExpiresAt}}{{end}}{{end}}{{end}}">
+                                                <span class="text-danger">{{.ERRORS.simple_expires_at}}</span>
+                                            </div>
+                                        </div>
+                                        {{if not $hasInv}}
+                                            <div class="text-muted">هنوز واریانتی ثبت نشده — با ذخیره، واریانت ساخته می‌شود.</div>
+                                        {{end}}
+                                    </div>
+                                </div>
+                            {{else}}
+                                <!-- ======== variable: existing combinations ======== -->
+                                <div class="card">
+                                    <div class="card-header"><b>ترکیب‌های موجود</b></div>
+                                    <div class="card-body">
+                                        <span class="text-danger d-block mb-2">{{.ERRORS.variants}}</span>
+                                        {{if $hasInv}}
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm" id="existingVariants">
+                                                    <thead>
+                                                    <tr>
+                                                        <th style="width:16%">ترکیب</th>
+                                                        <th>قیمت اصلی</th>
+                                                        <th>قیمت فروش</th>
+                                                        <th>قیمت تخفیف</th>
+                                                        <th>موجودی</th>
+                                                        <th>وضعیت</th>
+                                                        <th>انقضا</th>
+                                                        <th>عملیات</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {{range $i, $inv := $variants}}
+                                                        <tr data-variant-id="{{$inv.ID}}" data-index="{{$i}}" data-value-ids="{{$inv.ValueIDsKey}}">
+                                                            <td>
+                                                                {{if $inv.Label}}<b>{{$inv.Label}}</b>{{else}}<span class="text-muted">بدون ویژگی</span>{{end}}
+                                                                <input type="hidden" name="variants[{{$i}}][id]" value="{{$inv.ID}}">
+                                                                {{range $inv.AttributeValues}}
+                                                                    <input type="hidden"
+                                                                           name="variants[{{$i}}][attribute_value_ids][]"
+                                                                           value="{{.AttributeValueID}}">
+                                                                {{end}}
+                                                            </td>
+                                                            <td><input type="number" min="0" class="form-control form-control-sm" name="variants[{{$i}}][price]" value="{{$inv.Price}}"></td>
+                                                            <td><input type="number" min="0" class="form-control form-control-sm" name="variants[{{$i}}][sale_price]" value="{{$inv.SalePrice}}"></td>
+                                                            <td><input type="number" min="0" class="form-control form-control-sm" name="variants[{{$i}}][discount_price]" value="{{if $inv.DiscountPrice}}{{$inv.DiscountPrice}}{{end}}"></td>
+                                                            <td><input type="number" min="0" class="form-control form-control-sm" name="variants[{{$i}}][stock]" value="{{$inv.Quantity}}"></td>
+                                                            <td>
+                                                                <select class="form-control form-control-sm" name="variants[{{$i}}][status]">
+                                                                    <option value="active" {{if eq $inv.Status "active"}}selected{{end}}>فعال</option>
+                                                                    <option value="inactive" {{if eq $inv.Status "inactive"}}selected{{end}}>غیرفعال</option>
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="date" class="form-control form-control-sm" name="variants[{{$i}}][expires_at]" value="{{if $inv.ExpiresAt}}{{dateValue $inv.ExpiresAt}}{{end}}"></td>
+                                                            <td>
+                                                                <a class="btn btn-sm btn-outline-danger"
+                                                                   href="/admins/inventories/{{$inv.ID}}/delete"
+                                                                   onclick="return confirm('حذف این ترکیب؟')">حذف</a>
+                                                            </td>
+                                                        </tr>
+                                                    {{end}}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {{else}}
+                                            <div class="text-muted">هنوز ترکیبی ثبت نشده است.</div>
+                                        {{end}}
+                                    </div>
+                                </div>
+
+                                <!-- ======== variable: add new combinations ======== -->
+                                <div class="card">
+                                    <div class="card-header"><b>افزودن ترکیب جدید</b></div>
+                                    <div class="card-body">
+                                        <p class="text-muted mb-2">مقادیر مورد نظر را انتخاب کن — ترکیب‌ها خودکار ساخته می‌شوند.</p>
+                                        <div id="attributesBox"><span class="text-muted">در حال بارگذاری ویژگی‌ها...</span></div>
+                                        <div id="variantsBox"></div>
+                                    </div>
+                                </div>
+                            {{end}}
+
+                            <div class="card">
+                                <div class="card-header"><b>محصولات پیشنهاد شده</b></div>
+                                <div class="card-body">
+                                    <select class="form-control" name="recommendations" multiple="multiple" size="6">
+                                        {{range $brief := .AllProducts}}
+                                            {{$selected := false}}
+                                            {{range $rec := $.RECOMMENDATIONS}}
+                                                {{if eq $rec.product.id $brief.product.id}}{{$selected = true}}{{end}}
+                                            {{end}}
+                                            <option value="{{$brief.id}}" {{if $selected}}selected{{end}}>
+                                                {{$brief.product.title}}
+                                            </option>
+                                        {{end}}
+                                    </select>
+                                    <div class="mt-2">
+                                        <b>در حال حاضر:</b>
+                                        <ul class="mb-0">
                                             {{range .RECOMMENDATIONS}}
-                                                <li> {{.product.title}}</li>
+                                                <li>{{.product.title}}</li>
                                             {{end}}
                                         </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><input
-                                                class="btn  btn-primary btn-lg"
-                                                type="submit" value="بروزرسانی"></td>
-                                    <td class="text-info">{{if .MESSAGE}}{{.MESSAGE}}{{end}}</td>
-                                </tr>
+                                    </div>
+                                </div>
+                            </div>
 
-                            </table>
-
+                            <div class="mt-3 mb-5">
+                                <button type="submit" class="btn btn-primary btn-lg">بروزرسانی</button>
+                                <a href="/admins/products" class="btn btn-secondary btn-lg">بازگشت</a>
+                            </div>
                         </form>
 
                     </div>
-                    <!-- /.col-md-6 -->
-
                 </div>
                 <!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -231,4 +307,169 @@
 
     <!-- Main Footer -->
     {{template "footer" .}}
+
+    <script>
+        // rows posted by a failed validation: id > 0 → existing row, 0 → new
+        const OLD_VARIANTS = JSON.parse(document.getElementById('oldVariants').value || '[]');
+        const IS_VARIABLE = {{if $isVariable}}true{{else}}false{{end}};
+        const INDEX_BASE = Number(document.getElementById('variantCount').value || 0);
+        let ATTRS = [];
+
+        async function loadAttributes() {
+            if (!IS_VARIABLE) return;
+            patchExistingRows();
+
+            try {
+                const res = await fetch('/admins/api/attributes', {headers: {'Accept': 'application/json'}});
+                const body = await res.json();
+                ATTRS = body.data || [];
+            } catch (e) {
+                console.error('attributes load failed', e);
+                ATTRS = [];
+            }
+            renderAttributeBoxes();
+            restoreNewCombinations();
+        }
+
+        function renderAttributeBoxes() {
+            const box = document.getElementById('attributesBox');
+            if (!box) return;
+            if (!ATTRS.length) {
+                box.innerHTML = '<div class="text-muted">هیچ ویژگی‌ای ثبت نشده است — ابتدا از منوی «ویژگی‌ها» یک ویژگی بسازید.</div>';
+                return;
+            }
+            let html = '';
+            ATTRS.forEach(attr => {
+                if (!attr.values || !attr.values.length) return;
+                html += '<div class="border rounded p-3 mb-2"><b>' + attr.title + '</b><div class="mt-2">';
+                attr.values.forEach(v => {
+                    html += '<label class="mr-3 text-nowrap">' +
+                        '<input type="checkbox" class="value-checkbox mr-1" ' +
+                        'data-attr-id="' + attr.id + '" ' +
+                        'data-value-id="' + v.id + '" ' +
+                        'data-value-name="' + v.value + '" ' +
+                        'onchange="rebuildCombinations()"> ' + v.value + '</label>';
+                });
+                html += '</div></div>';
+            });
+            box.innerHTML = html;
+        }
+
+        // re-tick the checkboxes of combos that were posted but not saved yet
+        function restoreNewCombinations() {
+            const pending = OLD_VARIANTS.filter(r => !r.id);
+            if (!pending.length) return;
+            const wanted = new Set();
+            pending.forEach(r => (r.attribute_value_ids || []).forEach(id => wanted.add(Number(id))));
+            document.querySelectorAll('.value-checkbox').forEach(cb => {
+                if (wanted.has(Number(cb.dataset.valueId))) cb.checked = true;
+            });
+            rebuildCombinations();
+        }
+
+        // bring back the values typed into existing rows before the failed post
+        function patchExistingRows() {
+            OLD_VARIANTS.filter(r => r.id).forEach(r => {
+                const tr = document.querySelector('tr[data-variant-id="' + r.id + '"]');
+                if (!tr) return;
+                const i = tr.dataset.index;
+                setVal(tr, 'variants[' + i + '][price]', r.price);
+                setVal(tr, 'variants[' + i + '][sale_price]', r.sale_price);
+                setVal(tr, 'variants[' + i + '][discount_price]', r.discount_price);
+                setVal(tr, 'variants[' + i + '][stock]', r.stock);
+                setVal(tr, 'variants[' + i + '][status]', r.status);
+                setVal(tr, 'variants[' + i + '][expires_at]', r.expires_at);
+            });
+        }
+
+        function setVal(scope, name, value) {
+            const el = scope.querySelector('[name="' + name + '"]');
+            if (el && value !== undefined && value !== null) el.value = value;
+        }
+
+        function selectedRowsFor(values) {
+            const key = values.slice().sort((a, b) => a - b).join(',');
+            return OLD_VARIANTS.find(r => (r.attribute_value_ids || []).slice().sort((a, b) => a - b).join(',') === key) || {};
+        }
+
+        function existingKeys() {
+            const set = new Set();
+            document.querySelectorAll('tr[data-value-ids]').forEach(tr => {
+                const key = tr.dataset.valueIds;
+                if (key) set.add(key);
+            });
+            return set;
+        }
+
+        function rebuildCombinations() {
+            const box = document.getElementById('variantsBox');
+            if (!box) return;
+
+            const groups = {};
+            document.querySelectorAll('.value-checkbox:checked').forEach(cb => {
+                const attrId = cb.dataset.attrId;
+                if (!groups[attrId]) groups[attrId] = [];
+                groups[attrId].push({valueId: Number(cb.dataset.valueId), valueName: cb.dataset.valueName});
+            });
+
+            const attrIds = Object.keys(groups);
+            if (attrIds.length === 0) {
+                box.innerHTML = '';
+                return;
+            }
+
+            let combos = [[]];
+            attrIds.forEach(attrId => {
+                const next = [];
+                combos.forEach(combo => groups[attrId].forEach(v => next.push(combo.concat([v]))));
+                combos = next;
+            });
+
+            const existing = existingKeys();
+            let index = 0;
+            let html = '<h5 class="mt-4">ترکیب‌های جدید</h5>' +
+                '<div class="table-responsive"><table class="table table-bordered table-sm">' +
+                '<thead><tr><th style="width:16%">ترکیب</th><th>قیمت اصلی *</th><th>قیمت فروش *</th>' +
+                '<th>قیمت با تخفیف</th><th>موجودی *</th><th>وضعیت *</th><th>انقضا</th></tr></thead><tbody>';
+
+            combos.forEach(combo => {
+                const ids = combo.map(c => c.valueId);
+                const key = ids.slice().sort((a, b) => a - b).join(',');
+                if (existing.has(key)) return;
+
+                const old = selectedRowsFor(ids);
+                const i = INDEX_BASE + index;
+                index++;
+                const label = combo.map(c => c.valueName).join(' / ');
+                const hidden = combo.map(c =>
+                    '<input type="hidden" name="variants[' + i + '][attribute_value_ids][]" value="' + c.valueId + '">'
+                ).join('');
+
+                html += '<tr>' +
+                    '<td><b>' + label + '</b>' + hidden + '</td>' +
+                    '<td><input type="number" min="0" class="form-control form-control-sm" name="variants[' + i + '][price]" value="' + val(old.price) + '" required></td>' +
+                    '<td><input type="number" min="0" class="form-control form-control-sm" name="variants[' + i + '][sale_price]" value="' + val(old.sale_price) + '" required></td>' +
+                    '<td><input type="number" min="0" class="form-control form-control-sm" name="variants[' + i + '][discount_price]" value="' + val(old.discount_price) + '" placeholder="اختیاری"></td>' +
+                    '<td><input type="number" min="0" class="form-control form-control-sm" name="variants[' + i + '][stock]" value="' + val(old.stock, 0) + '" required></td>' +
+                    '<td><select class="form-control form-control-sm" name="variants[' + i + '][status]">' +
+                    '<option value="active"' + (old.status !== 'inactive' ? ' selected' : '') + '>فعال</option>' +
+                    '<option value="inactive"' + (old.status === 'inactive' ? ' selected' : '') + '>غیرفعال</option>' +
+                    '</select></td>' +
+                    '<td><input type="date" class="form-control form-control-sm" name="variants[' + i + '][expires_at]" value="' + val(old.expires_at) + '"></td>' +
+                    '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            box.innerHTML = index === 0
+                ? '<div class="text-muted mt-3">همه ترکیب‌های انتخاب‌شده از قبل ثبت شده‌اند.</div>'
+                : html;
+        }
+
+        function val(v, fallback) {
+            if (v === undefined || v === null) return fallback === undefined ? '' : fallback;
+            return v;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAttributes);
+    </script>
 {{end}}

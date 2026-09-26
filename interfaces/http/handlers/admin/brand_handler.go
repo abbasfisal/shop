@@ -86,7 +86,7 @@ func (a *AdminHandler) EditBrand(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "edit-brand", gin.H{
+	response.Render(c, http.StatusOK, "edit-brand", gin.H{
 		"TITLE":    "بروزرسانی برند",
 		"BRAND_ID": brandID,
 		"BRAND":    brand,

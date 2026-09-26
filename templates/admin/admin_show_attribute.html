@@ -39,6 +39,18 @@
                                 </tr>
 
                                 <tr>
+                                    <td>نوع ورودی</td>
+                                    <td>
+                                        <select class="form-control" name="input_type">
+                                            <option value="text" {{if eq .ATTRIBUTE.InputType "text"}}selected{{end}}>متن ساده</option>
+                                            <option value="color" {{if eq .ATTRIBUTE.InputType "color"}}selected{{end}}>رنگ (کالرپیکر + نمایش دایره‌ای)</option>
+                                        </select>
+                                        <small class="text-muted">تغییر به «رنگ» مقادیر موجود را خاکستری نشان می‌دهد تا کد رنگ ثبت شود</small>
+                                    </td>
+                                    <td class="text-danger">{{ .ERRORS.input_type}}</td>
+                                </tr>
+
+                                <tr>
                                     <td></td>
                                     <td><input class="btn  btn-primary btn-lg" type="submit" value="بروزرسانی"></td>
                                     <td class="text-info border-white">

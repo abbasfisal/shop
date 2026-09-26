@@ -25,10 +25,14 @@ func NewProductService(repo repositories.ProductRepositoryInterface, pricingSvc 
 }
 
 // refreshPricing recompute the product aggregate cache after a variant change
-// (golden rule: call PricingService after every variant change).
+// (golden rule: call PricingService after every variant change) and then
+// rebuilds the read model so Typesense always indexes fresh aggregates.
 func (p *ProductService) refreshPricing(ctx context.Context, productID uint) {
 	if err := p.pricing.RefreshProductAggregates(ctx, productID); err != nil {
 		log.Println("[pricing] refresh aggregates failed, product:", productID, "err:", err)
+	}
+	if err := p.repo.SyncReadModel(ctx, productID); err != nil {
+		log.Println("[readmodel] sync failed, product:", productID, "err:", err)
 	}
 }
 
@@ -36,9 +40,9 @@ func (p *ProductService) refreshPricing(ctx context.Context, productID uint) {
 //<<<<<<<<<<<<<<<< Method >>>>>>>>>>>>>>>>>
 //-----------------------------------------
 
-func (p *ProductService) Index(ctx context.Context) (*responses.Products, domain_err.CustomError) {
+func (p *ProductService) Index(ctx context.Context, q requests.ProductListQuery) (*responses.Products, domain_err.CustomError) {
 
-	products, err := p.repo.GetAll(ctx)
+	products, err := p.repo.GetList(ctx, q)
 	if err != nil {
 		return nil, domain_err.HandleError(err, domain_err.RecordNotFound)
 	}
@@ -63,29 +67,70 @@ func (p *ProductService) Show(ctx context.Context, columnName string, value any)
 
 func (p *ProductService) Create(ctx context.Context, req *requests.CreateProductRequest) (*responses.Product, domain_err.CustomError) {
 
+	status := strings.TrimSpace(req.Status)
+	if !entities.ValidProductStatus(status) {
+		status = entities.ProductStatusDraft
+	}
+
+	productType := strings.TrimSpace(req.ProductType)
+	if productType != "variable" {
+		productType = "simple"
+	}
+
 	var prepareProduct = entities.Product{
 		CategoryID: uint(req.CategoryID),
 		BrandID:    req.BrandID,
 		Title:      strings.TrimSpace(req.Title),
-		Slug:       strings.TrimSpace(req.Title),
-		Sku:        strings.TrimSpace(req.Title),
-		Status: func() bool {
-			if req.Status == "" {
-				return false
-			}
-			return true
-		}(),
+		Slug:       productSlug(req.Slug, req.Title),
+		Sku:        strings.TrimSpace(req.Sku),
+		Status:     status,
+		ExpiresAt:  req.ExpiresAtTime(),
+
 		OriginalPrice: req.OriginalPrice,
 		SalePrice:     req.SalePrice,
 		Description:   strings.TrimSpace(req.Description),
+		ProductType:   productType,
 		ProductImages: prepareProductImages(req.ProductImage),
 	}
 
-	newProduct, err := p.repo.Store(ctx, &prepareProduct)
+	// product + variants (+ attribute links) land in one transaction
+	newProduct, err := p.repo.Store(ctx, &prepareProduct, req.VariantRows())
 	if err != nil {
-		return nil, domain_err.HandleError(err, domain_err.RecordNotFound)
+		return nil, domain_err.HandleError(err, domain_err.SomethingWrongHappened)
 	}
+
+	// golden rule: aggregates first, read model + typesense after
+	p.refreshPricing(ctx, newProduct.ID)
+
 	return responses.ToProduct(newProduct), domain_err.CustomError{}
+}
+
+// productSlug prefers the admin-provided slug and falls back to a
+// slugified title (Laravel: Str::slug(name).'-'.uniqid()).
+func productSlug(slug, title string) string {
+	slug = strings.TrimSpace(slug)
+	if slug != "" {
+		return slug
+	}
+	return slugify(title)
+}
+
+func slugify(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	var b strings.Builder
+	lastDash := false
+	for _, r := range s {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
+			b.WriteRune(r)
+			lastDash = false
+			continue
+		}
+		if !lastDash && b.Len() > 0 {
+			b.WriteRune('-')
+			lastDash = true
+		}
+	}
+	return strings.Trim(b.String(), "-")
 }
 
 func prepareProductImages(imageNames []string) []*entities.ProductImages {
@@ -135,6 +180,15 @@ func (p *ProductService) AddAttributeValues(c *gin.Context, productID int, attri
 	return domain_err.CustomError{}
 }
 
+// DeleteProductAttribute removes a legacy product_attributes row (the
+// delete link of the add-attributes page).
+func (p *ProductService) DeleteProductAttribute(c *gin.Context, productAttributeID int) domain_err.CustomError {
+	if _, err := p.repo.DeleteProductAttribute(c, productAttributeID); err != nil {
+		return domain_err.HandleError(err, domain_err.RecordNotFound)
+	}
+	return domain_err.CustomError{}
+}
+
 func (p *ProductService) FetchProductAttributes(c *gin.Context, productID int) (map[string]interface{}, domain_err.CustomError) {
 	//fetch product and its attribute and also inventories
 	pResult, err := p.repo.GetProductAndAttributes(c, productID)
@@ -178,9 +232,13 @@ func (p *ProductService) UploadImage(c *gin.Context, productID int, imageStoredP
 func (p *ProductService) Update(c *gin.Context, productID int, req *requests.UpdateProductRequest) domain_err.CustomError {
 	_, err := p.repo.Update(c, productID, req)
 	if err != nil {
-		return domain_err.HandleError(err, domain_err.RecordNotFound)
+		return domain_err.HandleError(err, domain_err.SomethingWrongHappened)
 	}
+	// golden rule: aggregates first, read model + typesense after
 	p.refreshPricing(c, uint(productID))
+	if syncErr := p.repo.SyncReadModel(c, uint(productID)); syncErr != nil {
+		log.Println("[readmodel] sync failed, product:", productID, "err:", syncErr)
+	}
 	return domain_err.CustomError{}
 }
 

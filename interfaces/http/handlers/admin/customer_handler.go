@@ -19,7 +19,7 @@ func (a *AdminHandler) IndexCustomer(c *gin.Context) {
 	}
 
 	fmt.Println("----- customers data : ", customers)
-	response.Render(c, http.StatusFound, "admin_index_customer", gin.H{
+	response.Render(c, http.StatusOK, "admin_index_customer", gin.H{
 		"TITLE":     "مدیریت مشتریان",
 		"CUSTOMERS": customers,
 	})

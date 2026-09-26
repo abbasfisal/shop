@@ -123,54 +123,55 @@ func (h *HomeService) UpdateProfile(c *gin.Context, req *requests.CustomerProfil
 	return domain_err.CustomError{}
 }
 
+// menuCacheTTL keeps the header menu fresh even when a category row is
+// written outside the repository (e.g. by the seeder, which cannot invalidate
+// the cache). Category writes still invalidate it immediately.
+const menuCacheTTL = 5 * time.Minute
+
 func (h *HomeService) GetMenu(c context.Context) ([]*CustomerRes.CategoryResponse, error) {
+	if menu, ok := menuFromCache(c); ok {
+		return menu, nil
+	}
 
-	//get menu from cache
-	menu := cache.Get(c, "menu")
+	// cache miss / stale entry → read the categories from the database
+	menu, err := h.repo.GetMenu(c)
+	if err != nil {
+		return nil, err
+	}
 
-	var categoryResponses []*CustomerRes.CategoryResponse
+	categoryResponses := make([]*CustomerRes.CategoryResponse, 0, len(menu))
+	for _, category := range menu {
+		categoryResponses = append(categoryResponses, CustomerRes.ToMenuResponse(category))
+	}
 
-	if menu == "" {
-		fmt.Println("--- menu was not exist in cache ------")
-
-		//get menu from database
-		menu, err := h.repo.GetMenu(c)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, category := range menu {
-			categoryResponse := CustomerRes.ToMenuResponse(category)
-			categoryResponses = append(categoryResponses, categoryResponse)
-		}
-
-		//marsh repository response
-		categoryJsonResponse, err := json.Marshal(categoryResponses)
-		if err != nil {
-			fmt.Println("--- category marshal error :", string(categoryJsonResponse))
-			return categoryResponses, err
-		} else {
-			fmt.Println("--- category marshal success :", string(categoryJsonResponse))
-		}
-
-		//store marshaled data into cache
-		cacheSetErr := cache.Set(c, "menu", string(categoryJsonResponse), -1)
-		if err != nil {
-			fmt.Println("---- cache set menu key error: ", cacheSetErr)
-			return categoryResponses, err
-		}
-
-	} else {
-
-		fmt.Println("--- menu was exist in cache ------")
-		//menu was existed in cache
-		unmarshalErr := json.Unmarshal([]byte(menu), &categoryResponses)
-		if unmarshalErr != nil {
-			fmt.Println("---- unmarshal category response err :", unmarshalErr)
-			return categoryResponses, unmarshalErr
+	// never cache an empty menu: json.Marshal(nil slice) is the literal
+	// "null", and with a no-expiry key that value poisoned the menu forever
+	// (the header showed an empty «دسته بندی کالاها» panel).
+	if len(categoryResponses) > 0 {
+		payload, marshalErr := json.Marshal(categoryResponses)
+		if marshalErr != nil {
+			fmt.Println("---- menu marshal error :", marshalErr)
+		} else if setErr := cache.Set(c, "menu", string(payload), menuCacheTTL); setErr != nil {
+			fmt.Println("---- cache set menu key error: ", setErr)
 		}
 	}
 	return categoryResponses, nil
+}
+
+// menuFromCache returns the cached menu only when it is a usable payload.
+// "null" / "[]" / unparsable / empty entries are treated as a miss so the
+// next request rebuilds them from the database.
+func menuFromCache(c context.Context) ([]*CustomerRes.CategoryResponse, bool) {
+	raw := cache.Get(c, "menu")
+	if raw == "" || raw == "null" || raw == "[]" {
+		return nil, false
+	}
+
+	var menu []*CustomerRes.CategoryResponse
+	if err := json.Unmarshal([]byte(raw), &menu); err != nil || len(menu) == 0 {
+		return nil, false
+	}
+	return menu, true
 }
 
 func (h *HomeService) GetSingleProduct(c *gin.Context, productSku string, productSlug string) (map[string]interface{}, []entities.RecommendedProduct, domain_err.CustomError) {
@@ -196,9 +197,55 @@ func (h *HomeService) AddToCart(c *gin.Context, productID uint, req requests.Add
 		return
 	}
 
-	h.repo.InsertCart(c, user, prod, req)
+	h.insertCartItem(c, user, prod, productID, req)
 
 	fmt.Println("succ find :title", prod.Title)
+}
+
+// AddToCartForCustomer replays an add-to-cart posted while logged out. On the
+// OTP response the `auth` context key does not exist yet, so the customer is
+// resolved from the session that was just created.
+func (h *HomeService) AddToCartForCustomer(c *gin.Context, productID uint, req requests.AddToCartRequest) bool {
+	prod, err := h.repo.GetProductByID(c, productID)
+	if err != nil {
+		fmt.Println("[error]-[AddToCartForCustomer]: product not found, id:", productID)
+		return false
+	}
+
+	user := helpers.CustomerAuth(c)
+	if user.ID <= 0 {
+		return false
+	}
+
+	return h.insertCartItem(c, user, prod, productID, req)
+}
+
+// insertCartItem resolves the picked variant (and reports a flash message
+// when the selection is unusable) before the line lands in the cart.
+func (h *HomeService) insertCartItem(c *gin.Context, user CustomerRes.Customer, prod *entities.Product, productID uint, req requests.AddToCartRequest) bool {
+	inventoryID, invErr := h.repo.ResolveCartInventory(c, productID, req.InventoryID)
+	if invErr != nil {
+		fmt.Println("[error]-[insertCartItem]: inventory resolution:", invErr)
+		sessions.Set(c, "message", cartSelectionMessage(invErr))
+		return false
+	}
+
+	req.InventoryID = inventoryID
+	h.repo.InsertCart(c, user, prod, req)
+	return true
+}
+
+// cartSelectionMessage maps the inventory resolution error to the Persian
+// flash message shown on the product page.
+func cartSelectionMessage(err error) string {
+	switch {
+	case errors.Is(err, domain_err.VariantNotSelected):
+		return custom_messages.SelectVariantFirst
+	case errors.Is(err, domain_err.OutOfStock):
+		return custom_messages.VariantIsNotAvailable
+	default:
+		return domain_err.SomethingWrongHappened
+	}
 }
 
 func (h *HomeService) CartItemIncrement(c *gin.Context, req *requests.IncreaseCartItemQty) error {
@@ -255,7 +302,8 @@ func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinp
 	description := "order id :" + order.OrderNumber
 
 	//paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), "http://vivify.ir/checkout/payment/verify", description, "", customer.Mobile)
-	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.TotalSalePrice), os.Getenv("ZARINPAL_CALLBACKURL"), description, "", customer.Mobile)
+	// the customer pays the grand total: items + resolved shipping/packaging
+	paymentURL, authority, statusCode, zarinErr := zarin.NewPaymentRequest(int(order.GrandTotal), os.Getenv("ZARINPAL_CALLBACKURL"), description, "", customer.Mobile)
 	if zarinErr != nil || statusCode != 100 {
 		log.Println("[home_service]-[ProcessOrderPayment]-[New ZarinPal Payment Request Error]:", zarinErr)
 		return nil, nil, 0, domain_err.InternalServerErr
@@ -270,7 +318,7 @@ func (h *HomeService) ProcessOrderPayment(c *gin.Context, zarin *zarinpal.Zarinp
 		Description: description,
 		PaymentURL:  paymentURL,
 		StatusCode:  statusCode,
-		Amount:      order.TotalSalePrice,
+		Amount:      order.GrandTotal,
 		RefID:       "",
 		Status:      0, //pending
 	}

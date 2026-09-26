@@ -17,8 +17,10 @@ import (
 	"shop/application/usecases/category"
 	"shop/application/usecases/customer"
 	"shop/application/usecases/dashboard"
+	"shop/application/usecases/fee"
 	"shop/application/usecases/order"
 	"shop/application/usecases/product"
+	sliders "shop/application/usecases/product_slider"
 	"shop/bootstrap"
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
@@ -41,8 +43,10 @@ type AdminHandler struct {
 	brandSrv         brand.BrandServiceInterface
 	customerSrv      customer.CustomerServiceInterface
 	orderSrv         order.OrderServiceInterface
+	feeSrv           *fee.FeeRateService
 	DashboardService *dashboard.DashboardService
 	bannerSrv        *banner.BannerService
+	slidersSrv       *sliders.ProductSliderService
 
 	dep *bootstrap.Dependencies
 }
@@ -56,8 +60,10 @@ func NewAdminHandler(
 	brandSrv brand.BrandServiceInterface,
 	customerSrv customer.CustomerServiceInterface,
 	orderSrv order.OrderServiceInterface,
+	feeSrv *fee.FeeRateService,
 	dashboardSrv *dashboard.DashboardService,
 	bannerSrv *banner.BannerService,
+	slidersSrv *sliders.ProductSliderService,
 
 	dep *bootstrap.Dependencies,
 ) *AdminHandler {
@@ -70,8 +76,10 @@ func NewAdminHandler(
 		brandSrv:         brandSrv,
 		customerSrv:      customerSrv,
 		orderSrv:         orderSrv,
+		feeSrv:           feeSrv,
 		DashboardService: dashboardSrv,
 		bannerSrv:        bannerSrv,
+		slidersSrv:       slidersSrv,
 
 		dep: dep,
 	}
@@ -273,7 +281,7 @@ func (a *AdminHandler) ShowProductGallery(c *gin.Context) {
 		response.Error500(c)
 		return
 	}
-	response.Render(c, http.StatusFound, "edit-gallery-product", gin.H{
+	response.Render(c, http.StatusOK, "edit-gallery-product", gin.H{
 		"TITLE":      "ویرایش تصاویر محصول",
 		"PRODUCT":    productShow,
 		"MEDIA_PATH": util.GetProductStoragePath(),

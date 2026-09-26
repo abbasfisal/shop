@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/domain/domain_err"
+	"shop/domain/entities"
 	"shop/infrastructure/messages"
 	"shop/interfaces/http/requests/admin"
 	"shop/interfaces/http/response"
@@ -12,12 +13,13 @@ import (
 	"shop/pkg/old"
 	"shop/pkg/sessions"
 	"strconv"
+	"strings"
 )
 
 func (a *AdminHandler) CreateAttributeValues(c *gin.Context) {
 
 	attributes, _ := a.attributeSrv.Index(c)
-	response.Render(c, http.StatusFound, "admin_create_attribute_values", gin.H{
+	response.Render(c, http.StatusOK, "admin_create_attribute_values", gin.H{
 		"TITLE":      "create new attribute-values",
 		"ATTRIBUTES": attributes,
 	})
@@ -45,6 +47,11 @@ func (a *AdminHandler) StoreAttributeValues(c *gin.Context) {
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
 
+		c.Redirect(http.StatusFound, "/admins/attribute-values/create")
+		return
+	}
+
+	if !requireColorHex(c, a, req.AttributeID, req.ColorHex) {
 		c.Redirect(http.StatusFound, "/admins/attribute-values/create")
 		return
 	}
@@ -206,6 +213,11 @@ func (a *AdminHandler) UpdateAttributeValues(c *gin.Context) {
 		return
 	}
 
+	if !requireColorHex(c, a, req.AttributeID, req.ColorHex) {
+		c.Redirect(http.StatusFound, url)
+		return
+	}
+
 	//update attribute-value
 	updateErr := a.attrValueSrv.Update(c, attValID, &req)
 	if updateErr.Code == 404 {
@@ -224,4 +236,28 @@ func (a *AdminHandler) UpdateAttributeValues(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/admins/attribute-values")
 	return
 
+}
+
+// requireColorHex validates the posted hex when the chosen attribute is a
+// color attribute. It returns false (errors already flashed) when the request
+// must stop.
+func requireColorHex(c *gin.Context, a *AdminHandler, attributeID uint, hex string) bool {
+	attr, aErr := a.attributeSrv.Show(c, int(attributeID))
+	if aErr.Code != 0 || attr == nil {
+		return true
+	}
+	if attr.InputType != entities.AttributeInputColor {
+		return true
+	}
+	if !entities.ValidHexColor(strings.TrimSpace(hex)) {
+		errors.Init()
+		errors.Add("color_hex", "کد رنگ معتبر نیست (مثل #a020f0).")
+		sessions.Set(c, "errors", errors.ToString())
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "olds", old.ToString())
+		return false
+	}
+	return true
 }

@@ -1,152 +1,250 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	responses "shop/application/dto/admin"
 	"shop/domain/domain_err"
-	"shop/domain/entities"
+	"shop/infrastructure/messages"
 	"shop/interfaces/http/requests/admin"
 	"shop/interfaces/http/response"
 	"shop/pkg/errors"
 	"shop/pkg/old"
 	"shop/pkg/sessions"
 	"shop/pkg/util"
-	"slices"
 )
 
-func (a *AdminHandler) CreateBanner(c *gin.Context) {
-	response.Render(c, 200, "create_banner", gin.H{"TITLE": "ایجاد بنر"})
+// IndexBanner lists every promotion banner (sidebar: لیست بنر ها).
+func (a *AdminHandler) IndexBanner(c *gin.Context) {
+	banners, err := a.bannerSrv.Index(c)
+	if err != nil {
+		sessions.Set(c, "message", domain_err.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, "/admins/banners")
+		return
+	}
+
+	response.Render(c, http.StatusOK, "admin_index_banner", gin.H{
+		"TITLE":      "لیست بنرهای پروموشن",
+		"BANNERS":    responses.ToBanners(banners),
+		"MEDIA_PATH": util.GetBannerStoragePath(),
+	})
+	return
 }
 
-func (a *AdminHandler) StoreBanner(c *gin.Context) {
+// CreateBanner renders the empty promotion form.
+func (a *AdminHandler) CreateBanner(c *gin.Context) {
+	response.Render(c, http.StatusOK, "create_banner", gin.H{
+		"TITLE":  "ایجاد بنر پروموشن",
+		"LAYOUT": "two",
+		"STATUS": "1",
+	})
+	return
+}
+
+// EditBanner renders the promotion form pre-filled with the banner.
+func (a *AdminHandler) EditBanner(c *gin.Context) {
+	banner, err := a.bannerSrv.Show(c, uint(util.StringToUint(c.Param("id"))))
+	if err != nil {
+		sessions.Set(c, "message", domain_err.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/banners")
+		return
+	}
+
+	response.Render(c, http.StatusOK, "create_banner", gin.H{
+		"TITLE":      "ویرایش بنر پروموشن",
+		"BANNER":     responses.ToBanner(banner),
+		"IS_EDIT":    true,
+		"MEDIA_PATH": util.GetBannerStoragePath(),
+	})
+	return
+}
+
+// bannerFormData is the common validation + old-input flash for store/update.
+// It returns false when the request must not continue.
+func (a *AdminHandler) bannerFormData(c *gin.Context) (requests.CreateBannerRequest, bool) {
+	_ = c.Request.ParseMultipartForm(32 << 20)
+
 	var req requests.CreateBannerRequest
-	_ = c.Request.ParseForm()
 	if err := c.ShouldBind(&req); err != nil {
 		errors.Init()
 		errors.SetFromErrors(err)
-
 		sessions.Set(c, "errors", errors.ToString())
-
 		old.Init()
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
-
-		c.Redirect(http.StatusFound, "/admins/banners/create")
-		return
+		return req, false
 	}
 
-	//check slider type validation
-	if !entities.IsValidBannerType(req.Type) {
+	if formErrs := requests.ValidateBannerForm(c.Request.PostForm); len(formErrs) > 0 {
 		errors.Init()
-		errors.Add("type", domain_err.SliderTypeIsNotValid)
+		for key, msg := range formErrs {
+			errors.Add(key, msg)
+		}
 		sessions.Set(c, "errors", errors.ToString())
-
 		old.Init()
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
-
-		c.Redirect(http.StatusFound, "/admins/banners/create")
-		return
+		return req, false
 	}
 
+	return req, true
+}
+
+// saveBannerImage stores the uploaded file and returns its stored name.
+// On a validation problem it flashes the error and returns an empty name.
+func (a *AdminHandler) saveBannerImage(c *gin.Context) string {
 	imageFile, _ := c.FormFile("image")
-
-	//check required validation
 	if imageFile == nil {
-		errors.Init()
-		errors.Add("image", domain_err.IsRequired)
-		sessions.Set(c, "errors", errors.ToString())
-
-		old.Init()
-		old.Set(c)
-		sessions.Set(c, "olds", old.ToString())
-
-		c.Redirect(http.StatusFound, "/admins/banners/create")
-		return
+		return ""
 	}
 
 	extension := filepath.Ext(imageFile.Filename)
-
-	// file extension validation
-	ok := slices.Contains(util.AllowImageExtensions(), extension)
-	if !ok {
+	if !slices.Contains(util.AllowImageExtensions(), extension) {
 		errors.Init()
 		errors.Add("image", domain_err.MustBeImage)
 		sessions.Set(c, "errors", errors.ToString())
-
 		old.Init()
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
-
-		c.Redirect(http.StatusFound, "/admins/banners/create")
-		return
-
+		return ""
 	}
 
-	//generate file name
-	imageGenerateFileName := util.GenerateFilename(imageFile.Filename)
+	imageName := util.GenerateFilename(imageFile.Filename)
 
-	//check upload and store file to storage bucket
 	if os.Getenv("STORAGE_STATUS") == "active" {
 		go func() {
-			{
-				imageFile, _ := imageFile.Open()
-				err := a.dep.Storage.UploadFile(imageFile, os.Getenv("STORAGE_BANNER_PATH")+imageGenerateFileName)
-				if err != nil {
-					log.Println("-- failed to upload file to s3 : ", err)
-				}
+			imageHandle, _ := imageFile.Open()
+			if err := a.dep.Storage.UploadFile(imageHandle, os.Getenv("STORAGE_BANNER_PATH")+imageName); err != nil {
+				log.Println("-- failed to upload banner to s3: ", err)
 			}
 		}()
 	}
 
-	//store images on disk
-	saveUploadedImageErr := c.SaveUploadedFile(imageFile, viper.GetString("Upload.Banners")+imageGenerateFileName)
-	if saveUploadedImageErr != nil {
-		_ = os.Remove(viper.GetString("Upload.Products") + imageGenerateFileName)
+	if err := c.SaveUploadedFile(imageFile, viper.GetString("Upload.Banners")+imageName); err != nil {
+		_ = os.Remove(viper.GetString("Upload.Banners") + imageName)
 
 		errors.Init()
-		errors.Add("images", domain_err.StoreImageOnDiskFailed)
+		errors.Add("image", domain_err.StoreImageOnDiskFailed)
 		sessions.Set(c, "errors", errors.ToString())
-
 		old.Init()
 		old.Set(c)
 		sessions.Set(c, "olds", old.ToString())
+		return ""
+	}
 
+	return imageName
+}
+
+func (a *AdminHandler) StoreBanner(c *gin.Context) {
+	req, ok := a.bannerFormData(c)
+	if !ok {
 		c.Redirect(http.StatusFound, "/admins/banners/create")
 		return
 	}
 
-	req.BannerImage = imageGenerateFileName
+	imageName := a.saveBannerImage(c)
+	if imageName == "" {
+		if errors.Get()["image"] == "" {
+			errors.Init()
+			errors.Add("image", domain_err.IsRequired)
+			sessions.Set(c, "errors", errors.ToString())
+			old.Init()
+			old.Set(c)
+			sessions.Set(c, "olds", old.ToString())
+		}
+		c.Redirect(http.StatusFound, "/admins/banners/create")
+		return
+	}
+	req.BannerImage = imageName
 
-	bErr := a.bannerSrv.Create(c, req)
-	if bErr != nil {
-		//remove images from disk
-		_ = os.Remove(viper.GetString("Upload.Categories") + imageGenerateFileName)
-
-		//delete from bucket
-		go func() {
-			if os.Getenv("STORAGE_STATUS") == "active1" {
-				go func() {
-					{
-						err := a.dep.Storage.DeleteFile(os.Getenv("STORAGE_BANNER_PATH") + imageGenerateFileName)
-						if err != nil {
-							log.Println("-- failed to delete file from s3 : ", err)
-						}
-					}
-				}()
-			}
-		}()
-
+	if err := a.bannerSrv.Create(c, req); err != nil {
+		_ = os.Remove(viper.GetString("Upload.Banners") + imageName)
 		sessions.Set(c, "message", domain_err.SomethingWrongHappened)
 		c.Redirect(http.StatusFound, "/admins/banners/create")
 		return
 	}
 
-	sessions.Set(c, "message", domain_err.SuccessfullyCreated)
-	c.Redirect(http.StatusFound, "/admins/banners/create")
+	sessions.Set(c, "message", custom_messages.SuccessfullyCreatedBanner)
+	c.Redirect(http.StatusFound, "/admins/banners")
+	return
+}
+
+func (a *AdminHandler) UpdateBanner(c *gin.Context) {
+	bannerID := util.StringToUint(c.Param("id"))
+	if bannerID == 0 {
+		sessions.Set(c, "message", domain_err.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/banners")
+		return
+	}
+
+	current, err := a.bannerSrv.Show(c, bannerID)
+	if err != nil {
+		sessions.Set(c, "message", domain_err.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/banners")
+		return
+	}
+
+	req, ok := a.bannerFormData(c)
+	if !ok {
+		c.Redirect(http.StatusFound, "/admins/banners/"+c.Param("id")+"/edit")
+		return
+	}
+
+	// keep the current image unless a new file was uploaded
+	if imageName := a.saveBannerImage(c); imageName != "" {
+		req.BannerImage = imageName
+	} else if errors.Get()["image"] != "" {
+		c.Redirect(http.StatusFound, "/admins/banners/"+c.Param("id")+"/edit")
+		return
+	}
+
+	if err := a.bannerSrv.Update(c, bannerID, req); err != nil {
+		sessions.Set(c, "message", domain_err.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, "/admins/banners/"+c.Param("id")+"/edit")
+		return
+	}
+
+	// drop the replaced file from disk (best effort)
+	if req.BannerImage != "" && current.Image != "" && req.BannerImage != current.Image {
+		_ = os.Remove(viper.GetString("Upload.Banners") + current.Image)
+	}
+
+	sessions.Set(c, "message", custom_messages.SuccessfullyUpdatedBanner)
+	c.Redirect(http.StatusFound, "/admins/banners")
+	return
+}
+
+func (a *AdminHandler) DeleteBanner(c *gin.Context) {
+	bannerID := util.StringToUint(c.Param("id"))
+	if bannerID == 0 {
+		sessions.Set(c, "message", domain_err.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, "/admins/banners")
+		return
+	}
+
+	current, err := a.bannerSrv.Show(c, bannerID)
+	if err == nil {
+		if delErr := a.bannerSrv.Delete(c, bannerID); delErr != nil {
+			sessions.Set(c, "message", domain_err.SomethingWrongHappened)
+			c.Redirect(http.StatusFound, "/admins/banners")
+			return
+		}
+		if current.Image != "" {
+			_ = os.Remove(viper.GetString("Upload.Banners") + current.Image)
+		}
+	} else {
+		sessions.Set(c, "message", domain_err.RecordNotFound)
+		c.Redirect(http.StatusFound, "/admins/banners")
+		return
+	}
+
+	sessions.Set(c, "message", custom_messages.DeleteSuccessfully)
+	c.Redirect(http.StatusFound, "/admins/banners")
 	return
 }

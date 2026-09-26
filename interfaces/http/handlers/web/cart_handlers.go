@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/domain/domain_err"
+	"shop/interfaces/http/middleware"
 	"shop/interfaces/http/requests/web"
 	"shop/interfaces/http/response"
 	"shop/pkg/errors"
@@ -15,6 +16,12 @@ import (
 
 func (p PublicHandler) AddToCart(c *gin.Context) {
 	var req requests.AddToCartRequest
+
+	// where the customer came from — the page that must show the new line
+	back := middleware.LocalReferer(c)
+	if back == "" {
+		back = "/"
+	}
 
 	_ = c.Request.ParseForm()
 	bindErr := c.ShouldBind(&req)
@@ -29,12 +36,12 @@ func (p PublicHandler) AddToCart(c *gin.Context) {
 	productID, err := strconv.ParseUint(req.ProductID, 10, 64)
 	if err != nil {
 		fmt.Println("[error]-[AddToCart]:", err)
-		c.Redirect(http.StatusFound, c.Request.Referer())
+		c.Redirect(http.StatusFound, back)
 		return
 	}
 
 	p.homeSrv.AddToCart(c, uint(productID), req)
-	c.Redirect(http.StatusFound, c.Request.Referer())
+	c.Redirect(http.StatusFound, back)
 	return
 }
 

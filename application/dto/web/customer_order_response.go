@@ -16,6 +16,11 @@ type CustomerOrder struct {
 	TotalSalePrice           uint
 	PrettyTotalSalePrice     string
 	PrettyTotalOriginalPrice string
+	ShippingFee              uint
+	PackagingFee             uint
+	ShippingFree             bool
+	GrandTotal               uint
+	PrettyGrandTotal         string
 	CreatedAt                time.Time
 	Discount                 uint
 	//OrderNote          string
@@ -48,6 +53,11 @@ func ToCustomerOrder(o *entities.Order) *CustomerOrder {
 		TotalSalePrice:           o.TotalSalePrice,
 		PrettyTotalOriginalPrice: util.PrettyPrice(int(o.TotalOriginalPrice)),
 		PrettyTotalSalePrice:     util.PrettyPrice(int(o.TotalSalePrice)),
+		ShippingFee:              o.ShippingFee,
+		PackagingFee:             o.PackagingFee,
+		ShippingFree:             o.ShippingFree,
+		GrandTotal:               o.GrandTotal,
+		PrettyGrandTotal:         util.PrettyPrice(int(o.GrandTotal)),
 		CreatedAt:                o.CreatedAt,
 		Discount:                 o.Discount,
 		//OrderStatus:        o.OrderStatus,

@@ -16,7 +16,7 @@ import (
 )
 
 func (a *AdminHandler) CreateAttribute(c *gin.Context) {
-	response.Render(c, http.StatusFound, "admin_create_attribute",
+	response.Render(c, http.StatusOK, "admin_create_attribute",
 		gin.H{
 			"TITLE": "ایجاد اتریبیوت",
 		})
@@ -98,7 +98,7 @@ func (a *AdminHandler) ShowAttribute(c *gin.Context) {
 		return
 	}
 
-	response.Render(c, http.StatusFound, "admin_show_attribute",
+	response.Render(c, http.StatusOK, "admin_show_attribute",
 		gin.H{
 			"TITLE":     "نمایش اتریبیوت",
 			"ATTRIBUTE": attributeShow,
@@ -148,7 +148,8 @@ func (a *AdminHandler) UpdateAttribute(c *gin.Context) {
 	}
 
 	//don't need to update
-	if oldAttribute.Title == strings.TrimSpace(req.Title) {
+	if oldAttribute.Title == strings.TrimSpace(req.Title) &&
+		oldAttribute.InputType == req.NormalizedInputType() {
 		sessions.Set(c, "message", custom_messages.AttributeUpdatedSuccessfully)
 		c.Redirect(http.StatusFound, "/admins/attributes")
 		return
@@ -204,22 +205,74 @@ func (a *AdminHandler) AppendAttribute(c *gin.Context) {
 	return
 }
 
-func (a *AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
-	//todo: error for converting string to integer
-	cat, err := strconv.Atoi(c.Param("catID"))
-	fmt.Println(" category id : ", cat)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+// DeleteProductAttribute removes one product↔attribute-value row of the
+// legacy add-attributes page (link: /admins/products-attributes/:id/delete).
+func (a *AdminHandler) DeleteProductAttribute(c *gin.Context) {
+	productAttributeID, convErr := strconv.Atoi(c.Param("id"))
+	back := c.Request.Referer()
+	if back == "" {
+		back = "/admins/products"
+	}
+	if convErr != nil {
+		sessions.Set(c, "message", domain_err.IDIsNotCorrect)
+		c.Redirect(http.StatusFound, back)
 		return
 	}
 
-	attributes, err := a.attributeSrv.FetchByCategoryID(c, cat)
+	dErr := a.productSrv.DeleteProductAttribute(c, productAttributeID)
+	if dErr.Code > 0 {
+		sessions.Set(c, "message", domain_err.SomethingWrongHappened)
+		c.Redirect(http.StatusFound, back)
+		return
+	}
 
-	if err != nil {
+	sessions.Set(c, "message", custom_messages.DeleteSuccessfully)
+	c.Redirect(http.StatusFound, back)
+	return
+}
+
+func (a *AdminHandler) GetAttributesByCategoryID(c *gin.Context) {
+	// legacy AJAX route used by the attribute-value pages to fill the picker.
+	// Attributes are not category scoped anymore → return every attribute
+	// (with its values) in the shape those pages expect: {Data:[{ID,Title}]}.
+	attributes, aErr := a.attributeSrv.Index(c)
+	if aErr.Code > 0 {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch attributes"})
 		return
 	}
-
-	fmt.Println("response attributes : ", attributes)
 	c.JSON(http.StatusOK, attributes)
+}
+
+// GetAttributesJSON feeds the product create/edit combination builder:
+// GET /admins/api/attributes → {data:[{id,title,code,values:[{id,value}]}]}
+func (a *AdminHandler) GetAttributesJSON(c *gin.Context) {
+	attributes, aErr := a.attributeSrv.Index(c)
+	if aErr.Code > 0 {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": domain_err.SomethingWrongHappened})
+		return
+	}
+
+	type valueJSON struct {
+		ID    uint   `json:"id"`
+		Value string `json:"value"`
+	}
+	type attributeJSON struct {
+		ID     uint        `json:"id"`
+		Title  string      `json:"title"`
+		Code   string      `json:"code"`
+		Values []valueJSON `json:"values"`
+	}
+
+	data := make([]attributeJSON, 0, len(attributes.Data))
+	for _, attr := range attributes.Data {
+		row := attributeJSON{ID: attr.ID, Title: attr.Title, Code: attr.Code, Values: []valueJSON{}}
+		if attr.AttributeValues != nil {
+			for _, v := range attr.AttributeValues.Data {
+				row.Values = append(row.Values, valueJSON{ID: v.ID, Value: v.Title})
+			}
+		}
+		data = append(data, row)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": data})
 }

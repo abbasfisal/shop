@@ -39,6 +39,7 @@
                                 <tr>
                                     <td>ID</td>
                                     <td>title</td>
+                                    <td>رنگ</td>
                                     <td>op</td>
                                 </tr>
                                 </thead>
@@ -46,6 +47,7 @@
                                     <tr>
                                         <td>{{.ID}}</td>
                                         <td>{{.Title}}</td>
+                                        <td>{{if .ColorHex}}<span title="{{.ColorHex}}" style="display:inline-block;width:22px;height:22px;border-radius:50%;background:{{.ColorHex}};border:1px solid #ccc;vertical-align:middle;"></span> <small class="text-muted">{{.ColorHex}}</small>{{else}}—{{end}}</td>
                                         <td>
                                             <a href="/admins/attribute-values/{{.ID}}/edit">
                                                 <i class="nav-icon text-danger fa fa-edit"></i>

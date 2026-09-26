@@ -3,10 +3,17 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
+	bannerUseCase "shop/application/usecases/banner"
+	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
+	sliderUseCase "shop/application/usecases/product_slider"
 	"shop/bootstrap"
+	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/events"
+	bannerRepository "shop/infrastructure/repositories/banner"
+	feeRepository "shop/infrastructure/repositories/fee"
 	mysqlRepo "shop/infrastructure/repositories/home"
+	sliderRepository "shop/infrastructure/repositories/product_slider"
 	PublicHandler "shop/interfaces/http/handlers/web"
 	"shop/interfaces/http/middleware"
 	"time"
@@ -28,11 +35,17 @@ func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.
 	r.Use(publicLimiter.Middleware())
 	//----
 
-	publicHdl := PublicHandler.NewPublicHandler(homeSrv, dep)
+	// promotion banners + homepage product sliders (storefront feed)
+	bannerSrv := bannerUseCase.NewBannerService(bannerRepository.NewBannerRepository(postgres.Get()))
+	sliderSrv := sliderUseCase.NewProductSliderService(sliderRepository.NewProductSliderRepository(postgres.Get()))
+	feeSrv := feeUseCase.NewFeeRateService(feeRepository.NewFeeRateRepository(postgres.Get()))
+
+	publicHdl := PublicHandler.NewPublicHandler(homeSrv, bannerSrv, sliderSrv, feeSrv, dep)
 
 	r.GET("/", publicHdl.HomePage)
 	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct) //show single product
 	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)     //show products by category
+	r.GET("/sliders/:slug", publicHdl.SliderCatalog)                      //catalog page of one product slider
 	r.GET("/checkout/payment/verify", publicHdl.VerifyPayment)            //payment callback url
 
 	r.GET("/tsearch", publicHdl.SearchProductByTypesence) //search product with typesence

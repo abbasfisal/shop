@@ -67,11 +67,29 @@ func RunServe() {
 
 func RunHttpServer(ctx context.Context, dependencies *bootstrap.Dependencies, em *events.EventManager) {
 	r := gin.Default()
-	gin.SetMode(gin.ReleaseMode)
+
+	if viper.GetBool("APP_DEBUG") == true {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	r.SetFuncMap(template.FuncMap{
 		"stringToUint": util.StringToUint,
 		"hasSuffix":    util.HasSuffix,
+		// dateValue formats a *time.Time for <input type="date"> (YYYY-MM-DD)
+		// sub: small integer subtraction for template counters
+		"sub": func(a, b interface{}) int {
+			ai, _ := a.(int)
+			bi, _ := b.(int)
+			return ai - bi
+		},
+		"dateValue": func(t *time.Time) string {
+			if t == nil {
+				return ""
+			}
+			return t.Format("2006-01-02")
+		},
 	})
 	setupSessions(r)
 	setupRoutes(ctx, r, dependencies, em)

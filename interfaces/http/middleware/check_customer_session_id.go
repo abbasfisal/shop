@@ -68,7 +68,8 @@ func CheckCustomerSessionID() gin.HandlerFunc {
 		customer, ok := helpers.GetAuthUser(c)
 		if ok {
 			if customer.ID > 0 {
-				c.Redirect(http.StatusFound, "/")
+				// already logged in: land where they were headed, not on "/"
+				c.Redirect(http.StatusFound, SafeNext(TakeLoginIntent(c).Next))
 				c.Abort()
 				return
 			}

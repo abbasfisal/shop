@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="/assets/shop/css/vendor/owl.carousel.min.css">
         <!-- Main CSS File -->
         <link rel="stylesheet" href="/assets/shop/css/main.css">
+        <link rel="stylesheet" href="/assets/shop/css/shop-cards.css">
     </head>
 
     <body class="pt-0">
@@ -307,7 +308,7 @@
                             <ul class="checkout-summary-summary">
                                 <li>
                                     <span>
-                                                            مبلغ کل ({{.AUTH.Cart.CartItem.TotalItemCount}} کالا)
+                                                            جمع قیمت محصولات ({{.AUTH.Cart.CartItem.TotalItemCount}} کالا)
                                     </span>
                                     <span class="summery-total-original-price">
                                         {{.AUTH.Cart.CartItem.TotalOriginalPrice}}
@@ -318,7 +319,6 @@
                                 <li class="checkout-summary-discount">
                                     <span>سود شما از خرید</span>
                                     <span class="summary-discount-total-profile-price">
-                                                            {{/*<span>(۱٪)</span>*/}}
                                         {{.AUTH.Cart.CartItem.TotalProfitPrice}}
                                                         تومان
                                     </span>
@@ -326,20 +326,26 @@
                                 <li>
                                     <span>هزینه ارسال<span class="help-sn" data-toggle="tooltip" data-html="true"
                                                            data-placement="bottom"
-                                                           title="<div class='help-container is-right'><div class='help-arrow'></div><p class='help-text'>هزینه ارسال مرسولات می‌تواند وابسته به شهر و آدرس گیرنده متفاوت باشد. در صورتی که هر یک از مرسولات حداقل ارزشی برابر با ۱۵۰هزار تومان داشته باشد، آن مرسوله بصورت رایگان ارسال می‌شود.<br>'حداقل ارزش هر مرسوله برای ارسال رایگان، می تواند متغیر باشد.'</p></div>">
+                                                           title="<div class='help-container is-right'><div class='help-arrow'></div><p class='help-text'>{{if gt .FREE_THRESHOLD 0}}سفارش‌های با جمع اقلام بالای {{.FREE_THRESHOLD}} تومان، ارسال رایگان دارند.{{else}}هزینه ارسال بر اساس تعرفه جاری فروشگاه محاسبه می‌شود.{{end}}</p></div>">
                                             <span class="mdi mdi-information-outline"></span>
-                                        </span></span><span>وابسته به آدرس</span>
+                                        </span></span><span class="fee-shipping-price">{{if .SHIPPING_FREE}}رایگان{{else}}{{.SHIPPING_FEE}} تومان{{end}}</span>
                                 </li>
+                                {{if gt .PACKAGING_FEE 0}}
+                                    <li>
+                                        <span>هزینه آماده‌سازی</span>
+                                        <span class="fee-packaging-price">{{.PACKAGING_FEE}} تومان</span>
+                                    </li>
+                                {{end}}
 
                             </ul>
                             <div class="checkout-summary-devider">
                                 <div></div>
                             </div>
                             <div class="checkout-summary-content">
-                                <div class="checkout-summary-price-title">مبلغ قابل پرداخت:</div>
+                                <div class="checkout-summary-price-title">جمع کل:</div>
                                 <div class="checkout-summary-price-value">
                                     <span class="checkout-summary-price-value-amount">
-                                        {{.AUTH.Cart.CartItem.TotalSalePrice}}
+                                        {{.GRAND_TOTAL}}
                                     </span>
                                 </div>
 
@@ -446,6 +452,8 @@
             formatPriceElements('.item-price');
             formatPriceElements('.summery-total-original-price');
             formatPriceElements('.summary-discount-total-profile-price');
+            formatPriceElements('.fee-shipping-price');
+            formatPriceElements('.fee-packaging-price');
             formatPriceElements('.checkout-summary-price-value-amount');
         });
     </script>

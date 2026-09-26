@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="/assets/shop/plugin/go-to-top/style.css">
         <link rel="stylesheet" href="/assets/shop/plugin/iran-map/iranmap.css">
         <link rel="stylesheet" href="/assets/shop/css/main.css">
+        <link rel="stylesheet" href="/assets/shop/css/shop-cards.css">
     </head>
 
     <body>
@@ -146,6 +147,7 @@
                     </div>
                 </div>
                 <!-- End Main-Slider -->
+                {{range index $.SLIDERS "after_slider"}}{{template "home_slider_section" .}}{{end}}
             </div>
             <!-- Start Product-Slider -->
             <section class="slider-section mb-5 amazing-section" style="background: #ef394e">
@@ -647,24 +649,39 @@
                     </div>
                 </div>
                 <!-- End Product-Slider -->
-                <!-- Start Banner -->
-                <div class="row mt-3 mb-5">
-                    <div class="col-sm-6 col-12 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/medium-banner-1.jpg" alt="">
-                            </a>
+                <!-- Start Banner (promotions 2-up) -->
+                {{if .BANNERS_TWO.Data}}
+                    <div class="row mt-3 mb-5">
+                        {{range .BANNERS_TWO.Data}}
+                            <div class="col-sm-6 col-12 mb-2">
+                                <div class="widget-banner">
+                                    {{if .Link}}<a href="{{.Link}}">{{else}}<a href="#">{{end}}
+                                        <img src="{{$.BANNER_PATH}}{{.Image}}" alt="{{.Title}}">
+                                    </a>
+                                </div>
+                            </div>
+                        {{end}}
+                    </div>
+                {{else}}
+                    <div class="row mt-3 mb-5">
+                        <div class="col-sm-6 col-12 mb-2">
+                            <div class="widget-banner">
+                                <a href="#">
+                                    <img src="/assets/shop/img/banner/medium-banner-1.jpg" alt="">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12 mb-2">
+                            <div class="widget-banner">
+                                <a href="#">
+                                    <img src="/assets/shop/img/banner/medium-banner-2.jpg" alt="">
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-12 mb-2">
-                        <div class="widget-banner">
-                            <a href="#">
-                                <img src="/assets/shop/img/banner/medium-banner-2.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                {{end}}
                 <!-- End Banner -->
+                {{range index $.SLIDERS "mid_content"}}{{template "home_slider_section" .}}{{end}}
             </div>
             <!-- Start Product-Slider -->
             <section class="slider-section mb-5 amazing-section" style="background: #304ffe">
@@ -833,8 +850,21 @@
             </section>
             <!-- End Product-Slider -->
             <div class="container main-container">
-                <!-- Start Banner -->
-                <div class="row mt-3 mb-5">
+                <!-- Start Banner (promotions 4-up) -->
+                {{if .BANNERS_FOUR.Data}}
+                    <div class="row mt-3 mb-5">
+                        {{range .BANNERS_FOUR.Data}}
+                            <div class="col-md-3 col-sm-6 col-6 mb-2">
+                                <div class="widget-banner">
+                                    {{if .Link}}<a href="{{.Link}}">{{else}}<a href="#">{{end}}
+                                        <img src="{{$.BANNER_PATH}}{{.Image}}" alt="{{.Title}}">
+                                    </a>
+                                </div>
+                            </div>
+                        {{end}}
+                    </div>
+                {{else}}
+                    <div class="row mt-3 mb-5">
                     <div class="col-md-3 col-sm-6 col-6 mb-2">
                         <div class="widget-banner">
                             <a href="#">
@@ -863,7 +893,8 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                    </div>
+                {{end}}
                 <!-- End Banner -->
                 <!-- Start Category-Section -->
                 <div class="row mt-3 mb-5">
@@ -944,6 +975,7 @@
                     </div>
                 </div>
                 <!-- End Category-Section -->
+                {{range index $.SLIDERS "after_categories"}}{{template "home_slider_section" .}}{{end}}
                 <!-- Start Product-Slider -->
                 <section class="slider-section dt-sl mb-5">
                     <div class="row mb-3">
@@ -1658,6 +1690,7 @@
                     </div>
                 </section>
                 <!-- End Brand-Slider -->
+                {{range index $.SLIDERS "before_footer"}}{{template "home_slider_section" .}}{{end}}
             </div>
         </main>
         <!--------------------------------- Main Content -->

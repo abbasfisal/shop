@@ -66,6 +66,7 @@
                         <br>
                         <b>جزییات پرداخت</b>
 
+                        {{if .Data.Payment}}
                         <table class="table-info table table-hover">
                             <tr>
                                 <td>ID</td>
@@ -106,6 +107,7 @@
                             </tr>
 
                         </table>
+                        {{end}}
                         <b>جزییات سفارش دهنده</b>
                         <table class="table table-info table-hover">
                             <tr>
@@ -154,8 +156,22 @@
                                 <td>{{.Data.TotalOriginalPrice}}</td>
                             </tr>
                             <tr>
-                                <td>جمع کل مبلغ پرداختی سفارش</td>
+                                <td>جمع اقلام سفارش</td>
                                 <td>{{.Data.TotalSalePrice}}</td>
+                            </tr>
+                            <tr>
+                                <td>هزینه ارسال</td>
+                                <td>{{if .Data.ShippingFree}}رایگان{{else}}{{.Data.ShippingFee}}{{end}}</td>
+                            </tr>
+                            {{if gt .Data.PackagingFee 0}}
+                                <tr>
+                                    <td>هزینه بسته‌بندی</td>
+                                    <td>{{.Data.PackagingFee}}</td>
+                                </tr>
+                            {{end}}
+                            <tr>
+                                <td><b>جمع کل قابل پرداخت</b></td>
+                                <td><b>{{.Data.GrandTotal}}</b></td>
                             </tr>
                             <tr>
                                 <td>تخفیف سفارش</td>

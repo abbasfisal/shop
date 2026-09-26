@@ -1,0 +1,94 @@
+{{define "banner_form"}}
+    {{$banner := .BANNER}}
+    {{$layout := .LAYOUT}}
+    {{$status := .STATUS}}
+    {{if $banner}}
+        {{$layout = $banner.Layout}}
+        {{if $banner.Status}}{{$status = "1"}}{{else}}{{$status = "0"}}{{end}}
+    {{end}}
+
+    <form action="{{if $banner}}/admins/banners/{{$banner.ID}}{{else}}/admins/banners{{end}}"
+          method="post" enctype="multipart/form-data">
+        {{if $banner}}<input type="hidden" name="current_image" value="{{$banner.Image}}">{{end}}
+
+        <div class="card">
+            <div class="card-header"><b>اطلاعات بنر</b></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>عنوان *</label>
+                        <input type="text" class="form-control" name="title"
+                               placeholder="مثلاً جشنواره بهاره"
+                               value="{{if index .OLD "title"}}{{index .OLD "title"}}{{else if $banner}}{{$banner.Title}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.title}}</span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>چیدمان *</label>
+                        <select class="form-control" name="layout">
+                            <option value="two" {{if eq $layout "two"}}selected{{end}}>دوتایی (۲ ستونه)</option>
+                            <option value="four" {{if eq $layout "four"}}selected{{end}}>چهار تایی (۴ ستونه)</option>
+                        </select>
+                        <small class="text-muted">شکل نمایش بنر در صفحه اصلی</small>
+                        <span class="text-danger">{{.ERRORS.layout}}</span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>وضعیت *</label>
+                        <select class="form-control" name="status">
+                            <option value="1" {{if eq $status "1"}}selected{{end}}>فعال</option>
+                            <option value="0" {{if eq $status "0"}}selected{{end}}>غیرفعال</option>
+                        </select>
+                        <span class="text-danger">{{.ERRORS.status}}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>لینک</label>
+                        <input type="text" class="form-control" name="link"
+                               placeholder="https://... یا یک مسیر داخلی"
+                               value="{{if index .OLD "link"}}{{index .OLD "link"}}{{else if $banner}}{{$banner.Link}}{{end}}">
+                        <small class="text-muted">در صورت خالی بودن، روی بنر کلیک نمی‌شود</small>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>اولویت نمایش</label>
+                        <input type="number" class="form-control" name="sort_order" min="0"
+                               value="{{if index .OLD "sort_order"}}{{index .OLD "sort_order"}}{{else if $banner}}{{$banner.SortOrder}}{{else}}0{{end}}">
+                        <small class="text-muted">عدد کوچک‌تر زودتر نمایش داده می‌شود</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>شروع (اختیاری)</label>
+                        <input type="date" class="form-control" name="starts_at"
+                               value="{{if index .OLD "starts_at"}}{{index .OLD "starts_at"}}{{else if $banner}}{{$banner.StartsAt}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.starts_at}}</span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>پایان (اختیاری)</label>
+                        <input type="date" class="form-control" name="ends_at"
+                               value="{{if index .OLD "ends_at"}}{{index .OLD "ends_at"}}{{else if $banner}}{{$banner.EndsAt}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.ends_at}}</span>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>تصویر *</label>
+                        <input type="file" name="image" class="form-control-file">
+                        {{if $banner}}
+                            <div class="mt-2">
+                                <img src="{{$.MEDIA_PATH}}{{$banner.Image}}" alt="banner" height="60">
+                            </div>
+                        {{end}}
+                        <span class="text-danger">{{.ERRORS.image}}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-lg">{{if $banner}}بروزرسانی بنر{{else}}ذخیره بنر{{end}}</button>
+                        <a href="/admins/banners" class="btn btn-secondary btn-lg">انصراف</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{{end}}

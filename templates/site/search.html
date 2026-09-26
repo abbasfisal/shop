@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="/assets/shop/plugin/iran-map/iranmap.css">
         <!-- Main CSS File -->
         <link rel="stylesheet" href="/assets/shop/css/main.css">
+        <link rel="stylesheet" href="/assets/shop/css/shop-cards.css">
     </head>
 
     <body>
@@ -335,8 +336,10 @@
                                                         </div>
 
                                                         <a class="product-thumb" href="/product/{{.Sku}}/{{.Slug}}">
-                                                            {{with index .Images.Data 0 }}
-                                                                <img src="{{$.MEDIA_PATH}}{{.OriginalPath}}" alt="{{$title}}">
+                                                            {{with .Images.Data}}
+                                                                {{with index . 0}}
+                                                                    <img src="{{$.MEDIA_PATH}}{{.OriginalPath}}" alt="{{$title}}">
+                                                                {{end}}
                                                             {{end}}
                                                         </a>
                                                         <div class="product-card-body">
@@ -354,8 +357,17 @@
 {{/*                                                            <a class="product-meta" href="shop-categories.html">*/}}
 {{/*                                                                لباس زنانه*/}}
 {{/*                                                            </a>*/}}
-                                                            <span class="product-price">{{.SalePrice}} تومان </span>
-                                                            <span class="product-price"><del>{{.OriginalPrice}} تومان </del></span>
+                                                            {{if and (gt .MinPrice 0) (ne .MinPrice .MaxPrice)}}
+                                                                <span class="product-price">از {{.MinPrice}} تومان </span>
+                                                            {{else}}
+                                                                <span class="product-price">{{.EffectivePrice}} تومان </span>
+                                                            {{end}}
+                                                            {{if gt .OriginalPrice .EffectivePrice}}
+                                                                <span class="product-price"><del>{{.OriginalPrice}} تومان </del></span>
+                                                            {{end}}
+                                                            {{if not .InStock}}
+                                                                <span class="product-price text-danger">ناموجود</span>
+                                                            {{end}}
                                                         </div>
                                                     </div>
                                                 </div>

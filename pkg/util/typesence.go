@@ -11,19 +11,19 @@ import (
 // UpsertTypesenceProduct is the rich document indexed into Typesense
 // (mirrors the products collection schema).
 type UpsertTypesenceProduct struct {
-	ID             string
-	Title          string
-	Slug           string
-	Sku            string
-	Description    string
-	Category       string
-	Brand          string
-	OriginalPrice  int64
-	SalePrice      int64
-	Discount       int64
-	Stock          int64
-	InStock        bool
-	Status         bool
+	ID            string
+	Title         string
+	Slug          string
+	Sku           string
+	Description   string
+	Category      string
+	Brand         string
+	OriginalPrice int64
+	SalePrice     int64
+	Discount      int64
+	Stock         int64
+	InStock       bool
+	Status        string
 }
 
 // UpsertInTypesence upsert product in typesense search engine
@@ -41,7 +41,7 @@ func UpsertInTypesence(c context.Context, product UpsertTypesenceProduct) {
 		Discount      int64  `json:"discount"`
 		Stock         int64  `json:"stock"`
 		InStock       bool   `json:"in_stock"`
-		Status        bool   `json:"status"`
+		Status        string `json:"status"`
 	}{
 		ID:            product.ID,
 		Title:         product.Title,

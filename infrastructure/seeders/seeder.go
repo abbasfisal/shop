@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/infrastructure/database/postgres"
@@ -14,6 +15,35 @@ import (
 func Seed() {
 	db := postgres.Get()
 
+	// The base demo data (users/categories/brands/attributes/products) is
+	// inserted once — every table has unique slugs, so a second insert would
+	// only produce duplicate-key errors. The demo content added afterwards is
+	// idempotent on its own and always runs.
+	if baseAlreadySeeded(db) {
+		fmt.Println("[seed] base data ............. already seeded (skipped)")
+	} else {
+		seedBaseData(db)
+	}
+
+	// demo content for the product-state / promotion-banner / slider features
+	// (idempotent — each part is skipped when already seeded)
+	SeedDemoShop(db)
+
+	// aggregates → read model → Typesense (must run after every product row)
+	insertProductReadModels(db)
+
+	fmt.Println("[seed] ~~~~ done ~~~~")
+}
+
+// baseAlreadySeeded reports whether the original demo data is present.
+func baseAlreadySeeded(db *gorm.DB) bool {
+	var users int64
+	db.Table("users").Where("phone_number = ?", "0935111111").Count(&users)
+	return users > 0
+}
+
+// seedBaseData holds the original seeding payload (inserted exactly once).
+func seedBaseData(db *gorm.DB) {
 	hashPass, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 
 	//user
@@ -48,9 +78,7 @@ func Seed() {
 	//db.Create(&productInventory)
 	//db.Create(&productInventoryAttribute)
 
-	insertProductReadModels(db)
-
-	fmt.Println("\\\\\\\\\\\\\\  ~~~~[Seed] tables successfully~~~~ \\\\\\\\\\\\\\")
+	fmt.Println("[seed] base data ............. done")
 }
 
 func fakeProducts() []entities.Product {
@@ -62,7 +90,7 @@ func fakeProducts() []entities.Product {
 			Title:         "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر" + strconv.Itoa(i*2),
 			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl" + strconv.Itoa(i*2),
 			Sku:           "sku1000" + strconv.Itoa(i*2),
-			Status:        true,
+			Status:        entities.ProductStatusPublished,
 			OriginalPrice: 822_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
@@ -127,7 +155,7 @@ func fakeProducts() []entities.Product {
 			Title:         "ادو پرفیوم زنانه بالرینا مدل گود گرل Good Girl حجم 90 میلی لیتر",
 			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-گود-گرل-good-girl",
 			Sku:           "sku1000",
-			Status:        true,
+			Status:        entities.ProductStatusPublished,
 			OriginalPrice: 822_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل Good Girl عطری است که با رایحه ی منحصر به فرد خود به یکی از محبوب ترین عطرهای زنانه در دنیای عطر و ادکلن تبدیل شده است. این عطر مناسب خانم هایی است که به دنبال رایحه ای جذاب، ماندگار و خاص هستند.",
@@ -188,7 +216,7 @@ func fakeProducts() []entities.Product {
 			Title:         "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson حجم 100 میلی لیتر",
 			Slug:          "ادو-پرفیوم-زنانه-بالرینا-مدل-پویزن-poisson",
 			Sku:           "sku1001",
-			Status:        true,
+			Status:        entities.ProductStatusPublished,
 			OriginalPrice: 780_000,
 			SalePrice:     349_000,
 			Description:   "ادو پرفیوم زنانه بالرینا مدل پویزن Poisson عطری است زنانه با رایحه ای شیرین و گرم که مکمل شخصیت زنانه است و به شما احساس منحصر به فرد و جذاب می دهد. با بسته‌بندی و طراحی لوکس شیشه، این عطر بهترین کیفیت را در اختیار شما قرار می‌دهد.",
@@ -253,7 +281,7 @@ func fakeProducts() []entities.Product {
 			Title:         "ادو پرفیوم زنانه بایلندو مدل اکلت Eclatto حجم 100 میلی لیتر",
 			Slug:          "ادو-پرفیوم-زنانه-بایلندو-مدل-اکلت-eclatto",
 			Sku:           "sku1002",
-			Status:        true,
+			Status:        entities.ProductStatusPublished,
 			OriginalPrice: 815_000,
 			SalePrice:     477_600,
 			Description:   "ادو پرفیوم زنانه بایلندو مدل d’ Eclatto قصیده ای فریبنده برای ظرافت زنانگی است،‌ جاییکه ترکیب مست کننده میوه ها، لمس مخملی گل پائونیا، و با حضور باشکوه سرو گرد هم می آیند.تا نقش و نگار طلسم کننده ای از جذابیت و اعتماد به نفس را بیافریند.",
@@ -316,7 +344,7 @@ func fakeProducts() []entities.Product {
 			Title:         "شلوار مردانه مدل بنگال کمربند دار",
 			Slug:          "شلوار-مردانه-مدل-بنگال-کمربند-دار",
 			Sku:           "sku2000",
-			Status:        true,
+			Status:        entities.ProductStatusPublished,
 			OriginalPrice: 280_000,
 			SalePrice:     238_000,
 			Description:   "شلوار از پارچه ی به اصطلاح بنگال تولید شده است،پارچه ی کتان بنگال پارچه ای با ظرافت بالا همراه با کشسانی نسبی مناسب می باشد که زیبایی دو چندانی در پوشیدن شلوار به شما می دهد پس اگر دنبال شلوار ضخیم میگردید ما پارچه ی بنگال را توصیه نمیکنیم.قد شلوار صد سانتی متر است،پاچه ی شلوار پاکتی است و در قسمت پاچه و کمربند مارک فلزی کار شده است،قسمت پشت کمر کش کار شده است و در جلوی کار طراحی کمربندی زیبا که شمارا از بستن کمربند بی نیاز میکند و راحتی دو چندانی را به ارمغان خواهد آورد.شلوار دارای دو جیب در بغل و یک جیب کوچک در پشت است،یک ساسون در پای چپ و یک ساسون در روی پای راست به ظاهر کلاسیکی شلوار می افزاید.رنگ شلوار مشکی است و مهمترین ویژگی آن استایل جذب و قابلیت پوشیدن با کفش کالج و تیپ رسمی و همینطور قابلیت پوشیدن با کفش اسپرت و تیپ اسپرت را دارد.",
@@ -455,27 +483,31 @@ func fakeAttributeAndValues() []entities.Attribute {
 			},
 		},
 		{
-			Model: gorm.Model{},
-			Title: "رنگ",
-			Code:  "color",
+			Model:     gorm.Model{},
+			Title:     "رنگ",
+			Code:      "color",
+			InputType: entities.AttributeInputColor,
 			AttributeValues: []*entities.AttributeValue{
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
 					AttributeTitle: "رنگ",
 					Value:          "آبی",
+					Meta:           datatypes.JSON([]byte(`{"hex": "#2563eb"}`)),
 				},
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
 					AttributeTitle: "رنگ",
 					Value:          "قرمز",
+					Meta:           datatypes.JSON([]byte(`{"hex": "#dc2626"}`)),
 				},
 				{
 					Model:          gorm.Model{},
 					AttributeID:    0,
 					AttributeTitle: "رنگ",
 					Value:          "بنفش",
+					Meta:           datatypes.JSON([]byte(`{"hex": "#7c3aed"}`)),
 				},
 			},
 		},
@@ -1010,15 +1042,16 @@ func insertProductReadModels(db *gorm.DB) {
 	} else {
 
 		for _, pItem := range products {
+			// aggregates first — the read model / Typesense document mirrors them
+			if pErr := productRepo.RefreshProductAggregates(context.Background(), db, pItem.ID); pErr != nil {
+				fmt.Printf("~~~~ [pricing] refresh failed for product id %d ~~~~ error: %s\n", pItem.ID, pErr.Error())
+			}
 			err := productRepo.SyncReadModel(context.Background(), db, pItem.ID)
 			if err != nil {
 				fmt.Printf("~~~~ [syncReadModel] failed for product id %d ~~~~ error: %s\n", pItem.ID, err.Error())
 				return
 			} else {
 				fmt.Printf("~~~~ [syncReadModel] success for product id %d ~~~~\n", pItem.ID)
-			}
-			if pErr := productRepo.RefreshProductAggregates(context.Background(), db, pItem.ID); pErr != nil {
-				fmt.Printf("~~~~ [pricing] refresh failed for product id %d ~~~~ error: %s\n", pItem.ID, pErr.Error())
 			}
 		}
 
