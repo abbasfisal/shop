@@ -23,14 +23,14 @@
                         <!-- Add icons to the links using the .nav-icon class
                              with font-awesome or any other icon font library -->
                         <li class="nav-item has-treeview menu-open">
-                            <a href="/admins/home" class="nav-link">
+                            <a href="/admins/home" class="nav-link {{if eq .ACTIVE_MENU "home"}}active{{end}}">
                                 <i class="nav-icon fa fa-home"></i>
                                 <p>خانه</p>
                             </a>
                         </li>
 
                         <li class="nav-item has-treeview">
-                            <a href="/admins/monitoring/" class="nav-link">
+                            <a href="/admins/monitoring/" class="nav-link {{if eq .ACTIVE_MENU "monitoring"}}active{{end}}">
                                 <i class="nav-icon fa fa-tasks"></i>
                                 <p>مدیریت صف ها</p>
                             </a>
@@ -38,8 +38,8 @@
                         </li>
 
                         <!-- Banner Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "banners"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "banners"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت بنر ها
@@ -48,13 +48,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/banners" class="nav-link">
+                                    <a href="/admins/banners" class="nav-link {{if eq .ACTIVE_MENU "banners-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست بنر ها</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/banners/create" class="nav-link">
+                                    <a href="/admins/banners/create" class="nav-link {{if eq .ACTIVE_MENU "banners-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد بنر</p>
                                     </a>
@@ -64,8 +64,8 @@
                         </li>
 
                         <!-- Product Slider Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "sliders"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "sliders"}}active{{end}}">
                                 <i class="nav-icon fa fa-exchange"></i>
                                 <p>
                                     اسلایدر محصولات
@@ -74,13 +74,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/sliders" class="nav-link">
+                                    <a href="/admins/sliders" class="nav-link {{if eq .ACTIVE_MENU "sliders-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست اسلایدرها</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/sliders/create" class="nav-link">
+                                    <a href="/admins/sliders/create" class="nav-link {{if eq .ACTIVE_MENU "sliders-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد اسلایدر</p>
                                     </a>
@@ -90,8 +90,8 @@
                         </li>
 
                         <!-- Brand Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "brands"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "brands"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت برند ها
@@ -100,13 +100,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/brands" class="nav-link">
+                                    <a href="/admins/brands" class="nav-link {{if eq .ACTIVE_MENU "brands-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست برند ها</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/brands/create" class="nav-link">
+                                    <a href="/admins/brands/create" class="nav-link {{if eq .ACTIVE_MENU "brands-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد برند</p>
                                     </a>
@@ -116,8 +116,8 @@
                         </li>
 
                         <!-- Category Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "categories"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "categories"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت دسته بندی ها
@@ -126,13 +126,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/categories" class="nav-link">
+                                    <a href="/admins/categories" class="nav-link {{if eq .ACTIVE_MENU "categories-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست دسته بندی ها</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/categories/create" class="nav-link">
+                                    <a href="/admins/categories/create" class="nav-link {{if eq .ACTIVE_MENU "categories-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد دسته بندی</p>
                                     </a>
@@ -142,8 +142,8 @@
                         </li>
 
                         <!-- Attribute Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "attributes"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "attributes"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت ویژگی ها
@@ -152,13 +152,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/attributes" class="nav-link">
+                                    <a href="/admins/attributes" class="nav-link {{if eq .ACTIVE_MENU "attributes-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست ویژگی ها</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/attributes/create" class="nav-link">
+                                    <a href="/admins/attributes/create" class="nav-link {{if eq .ACTIVE_MENU "attributes-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد ویژگی</p>
                                     </a>
@@ -168,8 +168,8 @@
                         </li>
 
                         <!-- Attribute-Values Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "attr-values"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "attr-values"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت ویژگی-مقادیر
@@ -178,13 +178,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/attribute-values" class="nav-link">
+                                    <a href="/admins/attribute-values" class="nav-link {{if eq .ACTIVE_MENU "attr-values-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست ویژگی-مقادیر</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/attribute-values/create" class="nav-link">
+                                    <a href="/admins/attribute-values/create" class="nav-link {{if eq .ACTIVE_MENU "attr-values-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد ویژگی-مقادیر</p>
                                     </a>
@@ -194,8 +194,8 @@
                         </li>
 
                         <!-- Product Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "products"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "products"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت محصولات
@@ -204,13 +204,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/products" class="nav-link">
+                                    <a href="/admins/products" class="nav-link {{if eq .ACTIVE_MENU "products-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست محصولات</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/products/create" class="nav-link">
+                                    <a href="/admins/products/create" class="nav-link {{if eq .ACTIVE_MENU "products-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد محصول جدید</p>
                                     </a>
@@ -220,8 +220,8 @@
                         </li>
 
                         <!-- Customer Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "customers"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "customers"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت مشتریان
@@ -230,7 +230,7 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/customers" class="nav-link">
+                                    <a href="/admins/customers" class="nav-link {{if eq .ACTIVE_MENU "customers-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست مشتریان</p>
                                     </a>
@@ -239,8 +239,8 @@
                         </li>
 
                         <!-- Order Fees Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "fees"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "fees"}}active{{end}}">
                                 <i class="nav-icon fa fa-truck"></i>
                                 <p>
                                     هزینه‌های سفارش
@@ -249,13 +249,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/fees/shipping" class="nav-link">
+                                    <a href="/admins/fees/shipping" class="nav-link {{if eq .ACTIVE_MENU "fees-shipping"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>هزینه ارسال</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/admins/fees/packaging" class="nav-link">
+                                    <a href="/admins/fees/packaging" class="nav-link {{if eq .ACTIVE_MENU "fees-packaging"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>هزینه بسته‌بندی</p>
                                     </a>
@@ -265,8 +265,8 @@
                         </li>
 
                         <!-- Order Menu -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "orders"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "orders"}}active{{end}}">
                                 <i class="nav-icon fa fa-book"></i>
                                 <p>
                                     مدیریت سفارشات
@@ -275,14 +275,14 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/admins/orders?today=1" class="nav-link">
+                                    <a href="/admins/orders?today=1" class="nav-link {{if eq .ACTIVE_MENU "orders-today"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>سفارشات امروز</p>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="/admins/orders" class="nav-link">
+                                    <a href="/admins/orders" class="nav-link {{if eq .ACTIVE_MENU "orders-list"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>لیست سفارشات</p>
                                     </a>
