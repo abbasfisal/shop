@@ -840,8 +840,8 @@
     "semantic_hash": "b38482d235794eb06417115045c47a43"
   },
   "interfaces/http/response/render.go": {
-    "mtime": 1790409248.2764308,
-    "ast_hash": "5c0f3751232f1b5ac6a236e40064c320",
+    "mtime": 1790425669.7575839,
+    "ast_hash": "20a3a1baa227be177cc292919aa179a4",
     "semantic_hash": ""
   },
   "interfaces/http/routes/admin_routes.go": {
@@ -1165,8 +1165,8 @@
     "semantic_hash": "d270bfec2b22c15650bf9ce82bc2c4f3"
   },
   "templates/layouts/sidebar.html": {
-    "mtime": 1790418961.9286618,
-    "ast_hash": "741f4a6f2881b46f18b76359ffa8109d",
+    "mtime": 1790426112.2849424,
+    "ast_hash": "74dfff1a7a54171ad6e1474f2c582e01",
     "semantic_hash": ""
   },
   "templates/layouts/starter.html": {
@@ -5587,6 +5587,11 @@
   "migrations/20260926000003_attribute_value_meta.sql": {
     "mtime": 1790422821.0008414,
     "ast_hash": "9cb4dfe22ada429d4b161bfe84064684",
+    "semantic_hash": ""
+  },
+  "interfaces/http/response/render_test.go": {
+    "mtime": 1790425720.5349703,
+    "ast_hash": "dc88c5f607df74a5806cfcbf02baffc3",
     "semantic_hash": ""
   }
 }
