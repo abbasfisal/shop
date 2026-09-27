@@ -71,3 +71,42 @@ A scoped subgraph is almost always smaller and more relevant than reading `GRAPH
 **Known gap:** the graph has no edges linking `templates/*.html` to the Go handlers that render them — import-path nodes are dropped at build time. For handler↔template contracts, read the template and the handler directly.
 
 Rebuild from scratch: `/graphify .` (or `graphify extract --force`). Incremental: `graphify update`.
+
+## Task Report (HTML, RTL, Persian)
+
+After completing ANY task (feature, bugfix, refactor, migration, investigation, or even a failed attempt),
+you MUST produce a self-contained HTML report before considering the task done.
+
+### Where
+Write to: `reports/<YYYY-MM-DD_HHMM>_<short-slug>.html`
+(e.g. `reports/2026-09-27_0512_fix-variant-price-inheritance.html`).
+Never overwrite an existing report — always create a new file.
+
+### Hard requirements
+- `<!DOCTYPE html>`, `<html lang="fa" dir="rtl">`.
+- Fully self-contained: inline `<style>`, no external CSS/JS/fonts/CDN.
+- No build step, no dependencies. Opening the file in a browser must work offline.
+- Code snippets inside `<pre><code>` with `direction: ltr; text-align: left;`
+  so Go/SQL/YAML stays readable inside the RTL page.
+
+### Required sections (in this order)
+
+1. **عنوان و خلاصه اجرایی** — one-paragraph TL;DR of what was done and why.
+2. **درخواست اصلی** — the exact user prompt, quoted.
+3. **زمینه و کشف** — files/modules touched, and how you located them
+   (mention `graphify query` calls and their results, if used).
+4. **تصمیم‌ها و چرایی (ADR-style)** — for each non-trivial decision:
+    - گزینه‌های بررسی‌شده
+    - گزینه انتخاب‌شده
+    - دلیل انتخاب + دلیل رد بقیه
+    - هزینه/ریسک پذیرفته‌شده
+5. **مراحل انجام کار** — numbered, chronological. Include commands actually run.
+6. **تغییرات فایل‌ها** — table: path | نوع تغییر (add/edit/delete) | خلاصه.
+7. **باگ‌ها و مشکلات برخوردشده** — what broke, the error text,
+   root cause, fix, and how you verified the fix.
+8. **تست و اعتبارسنجی** — commands run (`go build ./...`, `go vet ./...`, `make test`,
+   migrations applied, manual curl checks, etc.) and their real output/result.
+9. **نکات آموزشی** — 3–7 bullet points a junior Go dev would learn from this task
+   (architecture rules from this repo, GORM/Goose/Asynq/Typesense gotchas, etc.).
+10. **کارهای باقی‌مانده / ریسک‌ها** — follow-ups, TODOs, known limitations.
+11. you can also add extra part or what you think is necessary and useful
