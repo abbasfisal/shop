@@ -10,6 +10,7 @@ import (
 	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/database/typesenceclient"
 	"shop/infrastructure/repositories/product"
+	"shop/pkg/util"
 )
 
 var reindexRecreate bool
@@ -57,6 +58,12 @@ var reindexCmd = &cobra.Command{
 			}
 			ok++
 		}
+
+		// SyncReadModel fires tracked async Typesense writes: without this
+		// wait the process exits first and the collection stays empty
+		// (the old code reported success with 0 indexed documents).
+		fmt.Println("waiting for pending typesense writes to finish...")
+		util.WaitForTypesence()
 
 		fmt.Printf("reindex done: %d indexed, %d failed (of %d)\n", ok, failed, len(ids))
 	},

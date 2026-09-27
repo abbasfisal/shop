@@ -3,10 +3,44 @@ package util
 import (
 	"context"
 	"log"
+	"sync"
 
 	"github.com/typesense/typesense-go/v3/typesense/api"
 	"shop/infrastructure/database/typesenceclient"
 )
+
+// typesenseWG tracks fire-and-forget index writes so batch commands
+// (e.g. `search:reindex`) can wait until every upsert/delete has really
+// reached Typesense before the process exits. Without this wait the
+// runtime kills in-flight goroutines on exit and the collection stays
+// empty even though the command reported success.
+var typesenseWG sync.WaitGroup
+
+// UpsertInTypesenceAsync is the non-blocking twin of UpsertInTypesence for
+// request paths (admin save, order flow): the HTTP response never waits
+// for the search engine, but the write is registered in typesenseWG.
+func UpsertInTypesenceAsync(c context.Context, product UpsertTypesenceProduct) {
+	typesenseWG.Add(1)
+	go func() {
+		defer typesenseWG.Done()
+		UpsertInTypesence(c, product)
+	}()
+}
+
+// DeleteInTypesenceAsync is the non-blocking twin of DeleteInTypesence.
+func DeleteInTypesenceAsync(c context.Context, productID string) {
+	typesenseWG.Add(1)
+	go func() {
+		defer typesenseWG.Done()
+		DeleteInTypesence(c, productID)
+	}()
+}
+
+// WaitForTypesence blocks until every tracked async index write has
+// finished. Batch commands MUST call it before exiting.
+func WaitForTypesence() {
+	typesenseWG.Wait()
+}
 
 // UpsertTypesenceProduct is the rich document indexed into Typesense
 // (mirrors the products collection schema).

@@ -20,7 +20,7 @@ services:
 
 
   typesense:
-    image: typesense/typesense:28.0.rc30
+    image: typesense/typesense:30.2
     container_name: dev_shop_typesense
     restart: always
     ports:

@@ -157,10 +157,12 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 	}
 
 	// sync the rich document into typesense: upsert while published,
-	// delete while draft/archived (realtime search stays consistent)
+	// delete while draft/archived (realtime search stays consistent).
+	// Async (tracked) so HTTP paths never block on the search engine —
+	// batch commands flush via util.WaitForTypesence before exiting.
 	idStr := fmt.Sprintf("%d", product.ID)
 	if product.Status != entities.ProductStatusPublished {
-		go util.DeleteInTypesence(c, idStr)
+		util.DeleteInTypesenceAsync(c, idStr)
 	} else {
 		// prefer the PricingService aggregates (Laravel min_price/in_stock);
 		// fall back to the variant rows when the cache was not refreshed yet
@@ -192,7 +194,7 @@ func SyncReadModel(c context.Context, db *gorm.DB, productID uint) error {
 		if product.Brand != nil {
 			brandTitle = product.Brand.Title
 		}
-		go util.UpsertInTypesence(c, util.UpsertTypesenceProduct{
+		util.UpsertInTypesenceAsync(c, util.UpsertTypesenceProduct{
 			ID:          idStr,
 			Title:       product.Title,
 			Slug:        product.Slug,
