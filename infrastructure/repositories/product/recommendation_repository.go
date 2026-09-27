@@ -4,9 +4,10 @@ import (
 	"context"
 	"strconv"
 
+	"shop/domain/entities"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"shop/domain/entities"
 )
 
 // GetAllProductBriefs returns lightweight product summaries used by the admin

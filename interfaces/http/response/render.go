@@ -3,13 +3,14 @@ package response
 import (
 	"encoding/json"
 
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"net/http"
 	"shop/application/dto/admin"
 	"shop/pkg/converters"
 	"shop/pkg/helpers"
 	"shop/pkg/sessions"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func Render(c *gin.Context, code int, name string, data gin.H) {

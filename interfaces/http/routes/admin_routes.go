@@ -2,10 +2,6 @@ package routes
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/hibiken/asynq"
-	"github.com/hibiken/asynqmon"
-	"golang.org/x/time/rate"
 	"os"
 	"shop/application/usecases/attribute"
 	attributeValue "shop/application/usecases/attribute_value"
@@ -37,6 +33,11 @@ import (
 	AdminHandler "shop/interfaces/http/handlers/admin"
 	"shop/interfaces/http/middleware"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
+	"github.com/hibiken/asynqmon"
+	"golang.org/x/time/rate"
 )
 
 func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {

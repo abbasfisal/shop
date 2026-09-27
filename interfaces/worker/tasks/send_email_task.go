@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hibiken/asynq"
 	"shop/bootstrap"
 	"shop/domain/entities"
+
+	"github.com/hibiken/asynq"
 )
 
 const TypeSendEmail = "send:email"

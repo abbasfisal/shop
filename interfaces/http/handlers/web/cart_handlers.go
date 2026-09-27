@@ -3,7 +3,6 @@ package handlers
 import (
 	errors2 "errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/interfaces/http/middleware"
@@ -12,6 +11,8 @@ import (
 	"shop/pkg/errors"
 	"shop/pkg/sessions"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (p PublicHandler) AddToCart(c *gin.Context) {

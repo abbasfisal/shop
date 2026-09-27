@@ -8,14 +8,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	responses "shop/application/dto/admin"
 	"shop/domain/entities"
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
 	"shop/pkg/pagination"
 	"shop/pkg/util"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type ProductSliderRepository struct {

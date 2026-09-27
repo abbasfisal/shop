@@ -1,9 +1,10 @@
 package product
 
 import (
-	"github.com/gin-gonic/gin"
 	"shop/domain/entities"
 	"shop/interfaces/http/requests/admin"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (p *ProductRepository) InsertFeature(c *gin.Context, productID int, req *requests.CreateProductFeatureRequest) error {

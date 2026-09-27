@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	responses "shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/domain/entities"
@@ -14,6 +13,8 @@ import (
 	"shop/pkg/errors"
 	"shop/pkg/old"
 	"shop/pkg/sessions"
+
+	"github.com/gin-gonic/gin"
 )
 
 // feeKind validates the :kind route segment (shipping | packaging).

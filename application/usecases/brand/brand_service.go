@@ -3,13 +3,14 @@ package brand
 import (
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/domain/entities"
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type BrandService struct {

@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"shop/bootstrap"
+
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{

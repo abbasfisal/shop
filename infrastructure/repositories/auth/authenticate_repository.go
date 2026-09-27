@@ -2,9 +2,10 @@ package auth
 
 import (
 	"context"
-	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/domain/repositories"
+
+	"gorm.io/gorm"
 )
 
 type AuthenticateRepository struct {

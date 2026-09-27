@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"shop/domain/entities"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"shop/domain/entities"
 )
 
 // testCtx builds a bare gin context (the repository only needs it as a

@@ -4,9 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"github.com/hibiken/asynq"
 	"log"
 	"net/http/httptest"
 	"os"
@@ -17,6 +14,10 @@ import (
 	"shop/infrastructure/repositories/home"
 	"shop/pkg/util"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/hibiken/asynq"
 )
 
 const CancelPendingOrders = "orders:pending:cancel"

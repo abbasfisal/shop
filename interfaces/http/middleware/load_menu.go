@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"shop/application/usecases/home"
 	"shop/pkg/logging"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func LoadMenu(homeSrv home.HomeServiceInterface) gin.HandlerFunc {

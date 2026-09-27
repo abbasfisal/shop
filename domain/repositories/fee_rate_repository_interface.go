@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
+	"shop/domain/entities"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"shop/domain/entities"
 )
 
 // FeeRateRepositoryInterface manages the time-windowed order fee tariffs

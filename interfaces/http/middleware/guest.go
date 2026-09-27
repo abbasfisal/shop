@@ -2,12 +2,13 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/infrastructure/database/postgres"
 	adminAuthRepo "shop/infrastructure/repositories/auth"
 	"shop/pkg/sessions"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func IsGuest(c *gin.Context) {

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/interfaces/http/requests/admin"
 	"shop/interfaces/http/response"
@@ -9,6 +8,8 @@ import (
 	"shop/pkg/old"
 	"shop/pkg/sessions"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (a *AdminHandler) ShowLogin(c *gin.Context) {

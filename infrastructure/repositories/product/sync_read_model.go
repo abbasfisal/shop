@@ -9,11 +9,12 @@ import (
 	"regexp"
 	"strings"
 
+	"shop/domain/entities"
+	"shop/pkg/util"
+
 	"github.com/spf13/viper"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
-	"shop/domain/entities"
-	"shop/pkg/util"
 )
 
 // SyncReadModel builds the flattened product document (product + category + brand

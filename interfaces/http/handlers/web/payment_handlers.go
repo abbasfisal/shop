@@ -2,7 +2,6 @@ package handlers
 
 import (
 	errors2 "errors"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +14,8 @@ import (
 	"shop/pkg/helpers"
 	"shop/pkg/sessions"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (p PublicHandler) Payment(c *gin.Context) {

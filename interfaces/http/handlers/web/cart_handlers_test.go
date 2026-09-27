@@ -6,13 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	bannerUseCase "shop/application/usecases/banner"
 	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
 	sliderUseCase "shop/application/usecases/product_slider"
 	"shop/bootstrap"
 	webreq "shop/interfaces/http/requests/web"
+
+	"github.com/gin-gonic/gin"
 )
 
 // fakeHomeService embeds the interface so only AddToCart needs implementing.

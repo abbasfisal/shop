@@ -2,10 +2,11 @@ package product
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/interfaces/http/requests/admin"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // StoreProductInventory creates a product variant (stock row) and links the

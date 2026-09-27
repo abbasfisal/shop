@@ -1,9 +1,10 @@
 package customer
 
 import (
-	"github.com/gin-gonic/gin"
 	"shop/application/dto/admin"
 	"shop/domain/domain_err"
+
+	"github.com/gin-gonic/gin"
 )
 
 type CustomerServiceInterface interface {

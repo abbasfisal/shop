@@ -2,9 +2,10 @@ package pagination
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"math"
 )
 
 type Pagination struct {

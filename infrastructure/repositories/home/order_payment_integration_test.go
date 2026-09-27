@@ -7,12 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/redis/go-redis/v9"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"shop/bootstrap"
 	"shop/domain/domain_err"
 	"shop/domain/entities"
+
+	"github.com/redis/go-redis/v9"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // testDB opens the migrated test database (transaction rollback is NOT used

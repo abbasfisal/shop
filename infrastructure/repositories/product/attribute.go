@@ -2,10 +2,11 @@ package product
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"shop/domain/entities"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (p *ProductRepository) GetRootAttributes(c *gin.Context, productID int) ([]*entities.Attribute, error) {

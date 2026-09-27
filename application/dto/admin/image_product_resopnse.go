@@ -1,8 +1,9 @@
 package responses
 
 import (
-	"github.com/spf13/viper"
 	"shop/domain/entities"
+
+	"github.com/spf13/viper"
 )
 
 type ImageProduct struct {

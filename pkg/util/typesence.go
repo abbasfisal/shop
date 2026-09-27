@@ -5,8 +5,9 @@ import (
 	"log"
 	"sync"
 
-	"github.com/typesense/typesense-go/v3/typesense/api"
 	"shop/infrastructure/database/typesenceclient"
+
+	"github.com/typesense/typesense-go/v3/typesense/api"
 )
 
 // typesenseWG tracks fire-and-forget index writes so batch commands

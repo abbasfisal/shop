@@ -3,11 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"html/template"
 	"log"
 	"net/http"
@@ -24,6 +19,12 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func RunServe() {

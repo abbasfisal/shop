@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,6 +16,9 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func (a *AdminHandler) ShowCreateBrand(c *gin.Context) {

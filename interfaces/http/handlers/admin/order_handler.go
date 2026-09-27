@@ -3,14 +3,15 @@ package handlers
 import (
 	errors2 "errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/interfaces/http/requests/admin"
 	"shop/interfaces/http/response"
 	"shop/pkg/sessions"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func (a *AdminHandler) IndexOrders(c *gin.Context) {

@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"gorm.io/gorm"
 	"shop/domain/entities"
 	productRepo "shop/infrastructure/repositories/product"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================

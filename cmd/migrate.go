@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
+	"shop/infrastructure/database/postgres"
+
 	"github.com/pressly/goose/v3"
 	"github.com/spf13/cobra"
-	"shop/infrastructure/database/postgres"
 )
 
 func init() {

@@ -3,11 +3,12 @@ package cache
 import (
 	"context"
 	"fmt"
-	"github.com/redis/go-redis/v9"
-	"github.com/spf13/viper"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/spf13/viper"
 )
 
 var (

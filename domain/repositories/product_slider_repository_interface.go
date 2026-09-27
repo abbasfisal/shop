@@ -3,10 +3,11 @@ package repositories
 import (
 	"context"
 
-	"github.com/gin-gonic/gin"
 	"shop/domain/entities"
 	"shop/interfaces/http/requests/admin"
 	"shop/pkg/pagination"
+
+	"github.com/gin-gonic/gin"
 )
 
 // ProductSliderRepositoryInterface manages the curated homepage product

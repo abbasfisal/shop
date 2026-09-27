@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
@@ -16,6 +14,9 @@ import (
 	"shop/pkg/util"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func (p PublicHandler) ShowLogin(c *gin.Context) {

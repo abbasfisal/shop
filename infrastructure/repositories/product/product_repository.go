@@ -9,11 +9,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type ProductRepository struct {

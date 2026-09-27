@@ -3,11 +3,12 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/hibiken/asynq"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"shop/infrastructure/events"
+
+	"github.com/hibiken/asynq"
+	"github.com/spf13/cobra"
 	//adminJob "shop/interfaces/worker/adminjobs"
 	"shop/bootstrap"
 )

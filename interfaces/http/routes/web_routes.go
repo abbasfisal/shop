@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
-	"golang.org/x/time/rate"
 	bannerUseCase "shop/application/usecases/banner"
 	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
@@ -17,6 +15,9 @@ import (
 	PublicHandler "shop/interfaces/http/handlers/web"
 	"shop/interfaces/http/middleware"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
 func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.EventManager) {

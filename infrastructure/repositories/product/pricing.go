@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"log"
 
+	"shop/domain/entities"
+
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
-	"shop/domain/entities"
 )
 
 // RefreshProductAggregates recomputes the aggregate cache columns on the

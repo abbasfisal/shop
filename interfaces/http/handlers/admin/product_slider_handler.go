@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	responses "shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
@@ -15,6 +14,8 @@ import (
 	"shop/pkg/old"
 	"shop/pkg/sessions"
 	"shop/pkg/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 // sliderFormData binds + validates the slider form (create and edit).

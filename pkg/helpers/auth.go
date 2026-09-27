@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	customerResponse "shop/application/dto/web"
 	"shop/domain/entities"
 	"shop/infrastructure/database/postgres"
@@ -10,6 +9,8 @@ import (
 	customerAuthRepo "shop/infrastructure/repositories/customer_auth"
 	"shop/pkg/sessions"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Auth(c *gin.Context) *entities.User {

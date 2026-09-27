@@ -2,8 +2,9 @@ package kavenegar
 
 import (
 	"fmt"
-	"github.com/kavenegar/kavenegar-go"
 	"os"
+
+	"github.com/kavenegar/kavenegar-go"
 )
 
 func Send(receptors []string, message string) {

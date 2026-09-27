@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/interfaces/http/requests/web"
@@ -11,6 +10,8 @@ import (
 	"shop/pkg/old"
 	"shop/pkg/sessions"
 	"shop/pkg/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (p PublicHandler) ShowProfile(c *gin.Context) {

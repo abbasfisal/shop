@@ -3,13 +3,14 @@ package seeders
 import (
 	"context"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/datatypes"
-	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/infrastructure/database/postgres"
 	productRepo "shop/infrastructure/repositories/product"
 	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 func Seed() {

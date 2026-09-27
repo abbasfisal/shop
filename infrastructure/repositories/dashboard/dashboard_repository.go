@@ -1,10 +1,11 @@
 package dashboard
 
 import (
-	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/domain/repositories"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type DashboardRepository struct {

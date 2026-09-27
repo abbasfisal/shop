@@ -5,10 +5,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"shop/domain/entities"
 	"shop/domain/repositories"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type FeeRateService struct {

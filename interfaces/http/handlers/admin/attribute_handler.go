@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
@@ -13,6 +12,8 @@ import (
 	"shop/pkg/sessions"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (a *AdminHandler) CreateAttribute(c *gin.Context) {

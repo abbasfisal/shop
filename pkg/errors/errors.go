@@ -3,11 +3,12 @@ package errors
 import (
 	"encoding/json"
 	"errors"
+	"shop/pkg/sessions"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"shop/pkg/sessions"
-	"strings"
 )
 
 var errorList = make(map[string]string)

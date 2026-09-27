@@ -3,8 +3,6 @@ package product
 import (
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"log"
 	"shop/application/dto/admin"
 	"shop/application/usecases/pricing"
@@ -13,6 +11,9 @@ import (
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type ProductService struct {

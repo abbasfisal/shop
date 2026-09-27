@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"os"
 	"shop/application/dto/admin"
@@ -23,6 +22,8 @@ import (
 	"shop/pkg/pagination"
 	"shop/pkg/sessions"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type HomeService struct {

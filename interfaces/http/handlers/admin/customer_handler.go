@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/interfaces/http/response"
 	"shop/pkg/sessions"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (a *AdminHandler) IndexCustomer(c *gin.Context) {

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
@@ -12,6 +11,8 @@ import (
 	"shop/pkg/old"
 	"shop/pkg/sessions"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (a *AdminHandler) CreateProductFeature(c *gin.Context) {

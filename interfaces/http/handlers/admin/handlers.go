@@ -3,8 +3,6 @@ package handlers
 import "C"
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"os"
@@ -32,6 +30,9 @@ import (
 	"shop/pkg/util"
 	"slices"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 type AdminHandler struct {

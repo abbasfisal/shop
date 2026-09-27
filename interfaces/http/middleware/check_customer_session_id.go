@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"shop/pkg/helpers"
+
+	"github.com/gin-gonic/gin"
 )
 
 func CheckCustomerSessionID() gin.HandlerFunc {

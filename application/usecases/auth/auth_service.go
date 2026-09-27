@@ -2,12 +2,13 @@ package auth
 
 import (
 	"context"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	AdminUserResponse "shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthenticateService struct {

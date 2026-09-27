@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
+	"shop/domain/entities"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"shop/domain/entities"
 )
 
 // testDB opens a connection to a migrated PostgreSQL database.

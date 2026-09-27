@@ -1,8 +1,9 @@
 package repositories
 
 import (
-	"github.com/gin-gonic/gin"
 	"shop/domain/entities"
+
+	"github.com/gin-gonic/gin"
 )
 
 type CustomerAuthenticateRepositoryInterface interface {

@@ -2,6 +2,15 @@ package bootstrap
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"shop/infrastructure/database/postgres"
+	"shop/infrastructure/database/typesenceclient"
+	"shop/pkg/cache"
+	"shop/pkg/logging"
+	"shop/pkg/util"
+	"sync"
+
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -12,14 +21,6 @@ import (
 	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 	"gorm.io/gorm"
-	"os"
-	"path/filepath"
-	"shop/infrastructure/database/postgres"
-	"shop/infrastructure/database/typesenceclient"
-	"shop/pkg/cache"
-	"shop/pkg/logging"
-	"shop/pkg/util"
-	"sync"
 )
 
 var (

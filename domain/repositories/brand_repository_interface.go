@@ -2,9 +2,10 @@ package repositories
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"shop/domain/entities"
 	"shop/interfaces/http/requests/admin"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BrandRepositoryInterface interface {

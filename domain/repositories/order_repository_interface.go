@@ -1,10 +1,11 @@
 package repositories
 
 import (
-	"github.com/gin-gonic/gin"
 	"shop/domain/entities"
 	"shop/interfaces/http/requests/admin"
 	"shop/pkg/pagination"
+
+	"github.com/gin-gonic/gin"
 )
 
 type OrderRepositoryInterface interface {

@@ -3,8 +3,6 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,6 +16,9 @@ import (
 	"shop/pkg/util"
 	"slices"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 //-------------------------------

@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/spf13/cobra"
 	"shop/bootstrap"
 	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/database/typesenceclient"
 	"shop/infrastructure/repositories/product"
 	"shop/pkg/util"
+
+	"github.com/spf13/cobra"
 )
 
 var reindexRecreate bool

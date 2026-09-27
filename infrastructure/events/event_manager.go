@@ -3,10 +3,11 @@ package events
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
-	"sync"
 )
 
 var (

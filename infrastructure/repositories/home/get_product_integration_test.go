@@ -8,12 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"shop/bootstrap"
 	"shop/domain/entities"
 	"shop/infrastructure/repositories/product"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // TestGetProduct_ReadModelContract verifies the storefront single-product

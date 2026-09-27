@@ -6,10 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"shop/interfaces/http/response"
+
 	"github.com/gin-gonic/gin"
 	"github.com/typesense/typesense-go/v3/typesense/api"
 	"github.com/typesense/typesense-go/v3/typesense/api/pointer"
-	"shop/interfaces/http/response"
 )
 
 // SearchProductByTypesence realtime product search.

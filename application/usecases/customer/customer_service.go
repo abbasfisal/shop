@@ -1,10 +1,11 @@
 package customer
 
 import (
-	"github.com/gin-gonic/gin"
 	"shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/domain/repositories"
+
+	"github.com/gin-gonic/gin"
 )
 
 type CustomerService struct {

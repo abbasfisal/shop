@@ -12,8 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	responses "shop/application/dto/admin"
 	"shop/domain/domain_err"
 	"shop/infrastructure/messages"
@@ -23,6 +21,9 @@ import (
 	"shop/pkg/old"
 	"shop/pkg/sessions"
 	"shop/pkg/util"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 // flashFormErrors stores Persian validation errors + old input so the

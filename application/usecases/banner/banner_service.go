@@ -3,10 +3,11 @@ package banner
 import (
 	"context"
 
-	"github.com/gin-gonic/gin"
 	"shop/domain/entities"
 	"shop/domain/repositories"
 	"shop/interfaces/http/requests/admin"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BannerService struct {
