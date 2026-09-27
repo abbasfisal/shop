@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	responses "shop/application/dto/admin"
@@ -23,6 +24,7 @@ import (
 	"shop/domain/entities"
 	"shop/interfaces/http/response"
 	"shop/pkg/helpers"
+	"shop/pkg/pagination"
 	"shop/pkg/util"
 )
 
@@ -111,6 +113,50 @@ func (p PublicHandler) ShowProductsByCategory(c *gin.Context) {
 			"PAGINATION":     productPagination,
 			"MEDIA_PATH":     util.GetProductStoragePath(),
 			"PrimaryMessage": domain_err.RecordNotFound,
+		},
+	)
+	return
+
+}
+
+// SearchProducts renders the free-text search results page (GET /search?q=...)
+// with the same paginated "search" template used for categories: pressing
+// Enter in the header search box lands here instead of a single product page,
+// while clicking a live suggestion still opens that product directly.
+func (p PublicHandler) SearchProducts(c *gin.Context) {
+	query := strings.TrimSpace(c.Query("q"))
+	if query == "" {
+		response.CustomerRender(c, http.StatusOK, "search",
+			gin.H{
+				"TITLE":          "جستجو",
+				"QUERY":          "",
+				"PAGINATION":     pagination.Pagination{},
+				"MEDIA_PATH":     util.GetProductStoragePath(),
+				"PrimaryMessage": "عبارت جستجو را وارد کنید",
+			},
+		)
+		return
+	}
+
+	productPagination, err := p.homeSrv.SearchProducts(c, query)
+	if err != nil {
+		//هر خطایی به جز خطای مرتبط با پیدانکردن رکورد اگر وجود داشت اون خطا رو نشون میدیم
+		//در غیر این صورت پیغام رکورد یافت نشد به کاربر نشون داده میشه :)
+		if !errors2.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(200, gin.H{
+				"msg": domain_err.SomethingWrongHappened,
+			})
+			return
+		}
+	}
+
+	response.CustomerRender(c, http.StatusOK, "search",
+		gin.H{
+			"TITLE":          "نتایج جستجو برای «" + query + "»",
+			"QUERY":          query,
+			"PAGINATION":     productPagination,
+			"MEDIA_PATH":     util.GetProductStoragePath(),
+			"PrimaryMessage": "محصولی با این مشخصات یافت نشد",
 		},
 	)
 	return

@@ -25,6 +25,9 @@ type HomeRepositoryInterface interface {
 	UpdateProfile(c *gin.Context, req *requests.CustomerProfileRequest) error
 	GetMenu(ctx context.Context) ([]*entities.Category, error)
 	ListProductBy(c *gin.Context, slug string) (pagination.Pagination, error)
+	// SearchProducts is the free-text storefront search behind GET /search?q=...
+	// (title / sku / slug ILIKE, published only, paginated like ListProductBy).
+	SearchProducts(c *gin.Context, query string) (pagination.Pagination, error)
 	InsertCart(c *gin.Context, user responses.Customer, product *entities.Product, req requests.AddToCartRequest)
 	// ResolveCartInventory validates the variant the customer picked for a
 	// product (stock-only products accept 0) and returns the id to store.

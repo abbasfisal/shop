@@ -21,6 +21,7 @@ import (
 	PublicRoutes "shop/interfaces/http/routes"
 	"shop/pkg/logging"
 	"shop/pkg/util"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -110,6 +111,8 @@ func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies
 
 	wd, _ := os.Getwd()
 
+	r.Use(noCacheAssets())
+
 	r.LoadHTMLGlob(filepath.Join(wd, "templates", "*", "*.html")) // templates/{admin,site,layouts,errors}/*.html
 
 	r.Static("/uploads", filepath.Join(wd, "public", "uploads"))
@@ -123,6 +126,21 @@ func setupRoutes(ctx context.Context, r *gin.Engine, dep *bootstrap.Dependencies
 	r.GET("/500", func(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "templates/html/errors/500", nil)
 	})
+}
+
+// noCacheAssets forces browsers to revalidate /assets responses (JS/CSS)
+// instead of heuristic caching: file responses carry Last-Modified but no
+// Cache-Control, so an updated storefront script (e.g. tsearch.js) could
+// otherwise stay stale in the browser for days and the new behaviour would
+// silently never reach users. Revalidation still returns 304 when the file
+// is unchanged, so the cost is one cheap conditional request per asset.
+func noCacheAssets() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path, "/assets/") {
+			c.Header("Cache-Control", "no-cache, must-revalidate")
+		}
+		c.Next()
+	}
 }
 
 func init() {

@@ -19,6 +19,9 @@ type HomeServiceInterface interface {
 
 	ListProductByCategorySlug(c *gin.Context, slug string) (pagination.Pagination, error)
 
+	// SearchProducts is the free-text storefront search behind GET /search?q=....
+	SearchProducts(c *gin.Context, query string) (pagination.Pagination, error)
+
 	// GetMenu fetch categories to show in menu
 	GetMenu(c context.Context) ([]*CustomerResp.CategoryResponse, error)
 	SendOtp(ctx context.Context, Mobile string) (*entities.OTP, domain_err.CustomError)

@@ -71,6 +71,18 @@ func (h *HomeService) ListProductByCategorySlug(c *gin.Context, slug string) (pa
 
 }
 
+// SearchProducts is the free-text storefront search behind GET /search?q=....
+func (h *HomeService) SearchProducts(c *gin.Context, query string) (pagination.Pagination, error) {
+
+	productList, err := h.repo.SearchProducts(c, query)
+	if err != nil {
+		return pagination.Pagination{}, err
+	}
+
+	return productList, nil
+
+}
+
 func (h *HomeService) ShowCategory(ctx context.Context, columnName string, value any) (*responses.Category, domain_err.CustomError) {
 
 	category, err := h.repo.GetCategoryBy(ctx, columnName, value)

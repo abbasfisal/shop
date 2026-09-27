@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"log"
+	"math"
 	"math/rand"
 	AdminUserResponse "shop/application/dto/admin"
 	"shop/application/dto/web"
@@ -409,6 +410,88 @@ func (h *HomeRepository) ListProductBy(c *gin.Context, slug string) (pagination.
 	pg.Rows = AdminUserResponse.ToProducts(products)
 
 	return pg, nil
+}
+
+// SearchProducts is the free-text storefront search behind GET /search?q=...:
+// title / sku / slug ILIKE over published products, paginated for the
+// "search" template. Queries are parameterized (no string interpolation) and
+// LIKE wildcards in the user input are escaped; page links preserve ?q=...
+// via the same convention as pagination.Paginate.
+func (h *HomeRepository) SearchProducts(c *gin.Context, query string) (pagination.Pagination, error) {
+	limitStr := c.Query("limit")
+	pageStr := c.Query("page")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 12
+	}
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+	var pg = pagination.Pagination{
+		Limit: limit,
+		Page:  page,
+	}
+
+	q := strings.TrimSpace(query)
+	if q == "" {
+		return pg, gorm.ErrRecordNotFound
+	}
+	like := "%" + escapeSearchLike(q) + "%"
+
+	var totalRows int64
+	if err := h.dep.DB.WithContext(c).Model(&entities.Product{}).
+		Where("status = ?", entities.ProductStatusPublished).
+		Where("(title ILIKE ? OR sku ILIKE ? OR slug ILIKE ?)", like, like, like).
+		Count(&totalRows).Error; err != nil {
+		return pg, err
+	}
+	if totalRows <= 0 {
+		return pg, gorm.ErrRecordNotFound
+	}
+
+	pg.TotalRows = totalRows
+	totalPages := int(math.Ceil(float64(totalRows) / float64(pg.GetLimit())))
+	pg.TotalPages = totalPages
+	for i := 1; i <= pg.TotalPages; i++ {
+		pg.TotalPagesArr = append(pg.TotalPagesArr, i)
+	}
+	queryParams := c.Request.URL.Query()
+	queryParams.Del("page")
+	queryString := queryParams.Encode()
+	pg.CurrentLink = fmt.Sprintf("?%s&page=", queryString)
+	if pg.Page > 1 {
+		pg.PrevLink = fmt.Sprintf("?%s&page=%d", queryString, pg.Page-1)
+	}
+	if pg.Page < pg.TotalPages {
+		pg.NextLink = fmt.Sprintf("?%s&page=%d", queryString, pg.Page+1)
+	}
+
+	var products []*entities.Product
+	if err := h.dep.DB.WithContext(c).
+		Preload("Category").
+		Preload("ProductImages").
+		Where("status = ?", entities.ProductStatusPublished).
+		Where("(title ILIKE ? OR sku ILIKE ? OR slug ILIKE ?)", like, like, like).
+		Offset(pg.GetOffset()).Limit(pg.GetLimit()).Order("id DESC").
+		Find(&products).Error; err != nil {
+		return pg, err
+	}
+
+	pg.Rows = AdminUserResponse.ToProducts(products)
+
+	return pg, nil
+}
+
+// escapeSearchLike neutralizes LIKE wildcards coming from the storefront
+// search box so a literal % / _ / \ is matched literally.
+func escapeSearchLike(s string) string {
+	s = strings.ReplaceAll(s, "\\", "\\\\")
+	s = strings.ReplaceAll(s, "%", "\\%")
+	s = strings.ReplaceAll(s, "_", "\\_")
+	return s
 }
 
 // ResolveCartInventory validates the variant the customer wants to put in the

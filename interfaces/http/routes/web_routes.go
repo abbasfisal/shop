@@ -44,6 +44,7 @@ func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.
 
 	r.GET("/", publicHdl.HomePage)
 	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct) //show single product
+	r.GET("/search", publicHdl.SearchProducts)                            //free-text results: /search?q=... (paginated list)
 	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)     //show products by category
 	r.GET("/sliders/:slug", publicHdl.SliderCatalog)                      //catalog page of one product slider
 	r.GET("/checkout/payment/verify", publicHdl.VerifyPayment)            //payment callback url
