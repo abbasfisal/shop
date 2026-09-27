@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>گزارش: دستور db:wipe — پاک‌سازی کامل اشیای دیتابیس</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a21; --panel2:#1b202a; --fg:#e6e9ef; --muted:#9aa4b2;
+    --accent:#4ea1ff; --ok:#3fb950; --warn:#e3b341; --err:#f85149; --border:#2a3140;
+    --code:#0b0d12;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:32px 20px 80px; background:var(--bg); color:var(--fg);
+    font-family:"Vazirmatn","Segoe UI",Tahoma,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.9; font-size:16px;
+  }
+  main{max-width:1000px; margin:0 auto}
+  h1{font-size:26px; margin:0 0 6px; color:#fff}
+  h2{font-size:21px; margin:38px 0 12px; padding-bottom:8px; border-bottom:2px solid var(--border); color:var(--accent)}
+  h3{font-size:17px; margin:22px 0 8px; color:#ffd479}
+  p{margin:8px 0}
+  .meta{color:var(--muted); font-size:14px; margin-bottom:22px}
+  .tl; .panel{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin:14px 0}
+  .tl{border-right:4px solid var(--accent)}
+  table{width:100%; border-collapse:collapse; margin:12px 0 20px; font-size:14.5px; background:var(--panel); border-radius:10px; overflow:hidden}
+  th,td{border:1px solid var(--border); padding:9px 11px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:#fff; font-weight:700}
+  td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; direction:ltr; text-align:left; white-space:nowrap; color:#9cdcfe}
+  pre{
+    background:var(--code); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; margin:10px 0 18px;
+  }
+  pre code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13.5px; direction:ltr; text-align:left; color:#d7dae0; display:block; white-space:pre}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13.5px; direction:ltr; unicode-bidi:embed; background:var(--code); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#e06c75}
+  ul,ol{margin:8px 0 14px; padding-inline-start:22px}
+  li{margin:5px 0}
+  blockquote{margin:12px 0; padding:10px 16px; border-right:4px solid var(--warn); background:var(--panel); color:#dfe3ea; border-radius:8px}
+  .tag{display:inline-block; padding:2px 9px; border-radius:99px; font-size:12.5px; border:1px solid var(--border); background:var(--panel2); margin-inline-start:6px}
+  .tag.ok{color:var(--ok); border-color:#2ea04355}
+  .tag.warn{color:var(--warn); border-color:#e3b34155}
+  .tag.err{color:var(--err); border-color:#f8514955}
+  .ltr{direction:ltr; text-align:left; display:block}
+  .small{font-size:13.5px; color:var(--muted)}
+  hr{border:0; border-top:1px solid var(--border); margin:30px 0}
+</style>
+</head>
+<body>
+<main>
+
+<h1>افزودن دستور <code>db:wipe</code> — پاک‌سازی کامل اشیای دیتابیس (معادل <span class="ltr">php artisan db:wipe</span>)</h1>
+<div class="meta">تاریخ: ۲۰۲۶-۰۲۷ / ۱۳:۲۹ &nbsp;•&nbsp; مسیر گزارش: <code>reports/2026-09-27_1329_db-wipe-command.html</code></div>
+
+<h2>۱. عنوان و خلاصهٔ اجرایی</h2>
+<div class="tl">
+  دستور <code>go run . db:wipe</code> (و هدف <code>make db-wipe</code>) به پروژه اضافه شد: این دستور با پرسش از کاتالوگ‌های PostgreSQL،
+  <b>تمام اشیای قابل حذف</b> (view/matview، جدول، sequence، function/procedure، domain/enum/range/composite type) را در همهٔ
+  اسکیماهای غیرسیستمی پیدا کرده، به‌صورت <b>یک تراکنش واحد</b> با <code>DROP ... CASCADE</code> حذف می‌کند.
+  خود دیتابیس، اسکیماها و extensionها (مثل <code>pg_trgm</code>) دست‌نخورده می‌مانند؛ رفتاری که دقیقاً با
+  <code>php artisan db:wipe</code> برابر است. روی ترمینال، قبل از اجرا تأیید <code>yes</code> می‌گیرد و با <code>--force</code>
+  می‌توان از آن رد شد. چرخهٔ کامل <code>migrate → db:wipe → migrate</code> روی یک دیتابیس موقت تست و تأیید شد.
+</div>
+
+<h2>۲. درخواست اصلی</h2>
+<blockquote>add db:wipe comamnd to drop db like php artisan db:wipe</blockquote>
+<p>در ادامه، با یک پرسش کوتاه دامنهٔ رفتار روشن شد و کاربر گزینهٔ <b>«Drop all schema objects (مثل artisan)»</b> را انتخاب کرد؛
+یعنی اشیای درون دیتابیس حذف شوند، نه خود دیتابیس.</p>
+
+<h2>۳. زمینه و کشف</h2>
+<ul>
+  <li><code>graphify query "how do cobra commands connect to postgres and run migrations"</code> — نشان داد فرمان‌های cobra در
+  <code>cmd/</code> همگی از <code>openMigrateDB()</code> (در <code>cmd/migrate.go:25</code>) استفاده می‌کنند که
+  <code>postgres.Connect()</code> را صدا زده و هندل <code>*sql.DB</code> برمی‌گرداند. نتیجه: دستور جدید هم باید همین مسیر را طی کند.</li>
+  <li>فایل‌های خوانده‌شده: <code>cmd/migrate.go</code>، <code>cmd/root.go</code>، <code>cmd/seed.go</code>،
+  <code>infrastructure/database/postgres/postgres.go</code>، <code>bootstrap/bootstrap.go</code> (برای فهم بارگذاری <code>.env</code>)،
+  <code>Makefile</code>، <code>README.md</code>، <code>doc/database.md</code>.</li>
+  <li>بازرسی دیتابیس واقعی با <code>psql</code>: فقط اسکیمای <code>public</code>، فقط extensionهای <code>plpgsql</code>؛
+  مایگریشن‌ها <code>CREATE EXTENSION</code>، <code>CREATE FUNCTION</code> یا <code>CREATE SCHEMA</code> ندارند.</li>
+  <li>وابستگی‌ها: <code>github.com/pressly/goose/v3</code> و <code>github.com/spf13/cobra</code> از قبل در <code>go.mod</code> هستند؛
+  <code>golang.org/x/sys</code> به‌صورت <code>indirect</code> موجود بود و به <code>direct</code> ارتقا یافت (بدون نیاز به شبکه).</li>
+</ul>
+
+<h2>۴. تصمیم‌ها و چرایی (ADR-style)</h2>
+
+<h3>۴.۱ دامنهٔ wipe: اشیای اسکیما یا خود دیتابیس؟</h3>
+<div class="panel">
+  <p><b>گزینه‌های بررسی‌شده</b></p>
+  <ol>
+    <li><b>حذف همهٔ اشیای اسکیما</b> (رفتار <code>artisan db:wipe</code>) — جدول‌ها/viewها/sequenceها/routineها/typeها حذف، دیتابیس می‌ماند.</li>
+    <li><code>DROP DATABASE</code> + <code>CREATE DATABASE</code> — نیازمند اتصال به دیتابیس نگهدارنده (<code>postgres</code>)، قطع همهٔ اتصال‌ها و دسترسی <code>CREATEDB</code>؛ ریسک اختلاف <code>ENCODING/LC_COLLATE</code> هنگام بازسازی.</li>
+    <li>هر دو با فلگ <code>--drop</code>.</li>
+  </ol>
+  <p><b>انتخاب:</b> گزینهٔ ۱ (تأییدشده توسط کاربر).<br>
+  <b>چرا رد شد بقیه:</b> گزینهٔ ۲ در محیط توسعهٔ این پروژه (کاربر <code>shop</code>، بدون دسترسی superuser لزومی) شکست می‌خورد و
+  <code>migrate</code> بعد از آن هم به دسترسی CREATE دیتابیس نیاز داشت؛ ریسک پذیرفته‌شده: دستور خالی‌کردنِ خودِ دیتابیس را انجام نمی‌دهد.</p>
+</div>
+
+<h3>۴.۲ مکانیزم حذف: SQL دستی از کاتالوگ یا <code>DROP SCHEMA ... CASCADE</code>؟</h3>
+<div class="panel">
+  <p><b>گزینه‌ها:</b> (۱) تولید دستور <code>DROP</code> از <code>pg_class/pg_proc/pg_type</code>؛ (۲) <code>DROP SCHEMA public CASCADE; CREATE SCHEMA public;</code>؛ (۳) استفاده از <code>goose Reset</code> (یعنی همان <code>migrate:reset</code>).</p>
+  <p><b>انتخاب:</b> گزینهٔ ۱.</p>
+  <p><b>چرا:</b> گزینهٔ ۲ وقتی objectی متعلق به extension باشد خطای
+  <span class="ltr">cannot drop ... because extension ... requires it</span> می‌دهد و schemaهای سفارشی را هم نابود می‌کند؛
+  گزینهٔ ۳ فقط migrationها را برمی‌گرداند و دادهٔ دستی/جداول باقی‌مانده را پاک نمی‌کند (و Downهای شکسته عملاً کار نمی‌کنند).
+  با تولید SQL از کاتالوگ، اشیای متعلق به extension با فیلتر <code>pg_depend.deptype = 'e'</code> مستثنا می‌شوند.</p>
+  <p><b>ریسک پذیرفته‌شده:</b> اشیای خیلی عجیب (event trigger، publication، operator سفارشیِ وابسته به object حذف‌نشده)
+  به‌صورت صریح فهرست نشده‌اند؛ اما <code>CASCADE</code> روی هر DROP وابستگی‌هایشان را هم می‌برد.</p>
+</div>
+
+<h3>۴.۳ تراکنشی بودن اجرا</h3>
+<div class="panel">
+  <p><b>گزینه‌ها:</b> اجرای هر DROP مستقل در یک اتصال یا اجرای همه در یک تراکنش.<br>
+  <b>انتخاب:</b> یک تراکنش واحد (<code>db.Begin()</code> … <code>Commit()</code>). PostgreSQL از تراکنش DDL پشتیبانی می‌کند؛
+  اگر وسط کار خطا بیاید، هیچ‌چیزی حذف نشده و دیتابیس سالم می‌ماند.<br>
+  <b>ریسک پذیرفته‌شده:</b> قفل شدن objectها تا پایان اجرای دستور (برای یک فرمان توسعه‌ای نامحسوس است).</p>
+</div>
+
+<h3>۴.۴ تأیید کاربر و تشخیص ترمینال</h3>
+<div class="panel">
+  <p><b>گزینه‌ها:</b> (۱) بدون تأیید؛ (۲) تأیید با تشخیص TTY؛ (۳) همیشه تأیید؛ (۴) فقط در production مثل Laravel.</p>
+  <p><b>انتخاب:</b> گزینهٔ ۲ — روی ترمینال واقعی «yes» بپرس، در session غیرتعاملی با یک هشدار اجرا کن، فلگ <code>--force</code> برای رد شدن.</p>
+  <p><b>چرا:</b> گزینهٔ ۳ در CI/لوله باعث <code>EOF</code> و شکست می‌شود (در اولین تست همین اتفاق افتاد)؛ گزینهٔ ۱ خطرناک است؛
+  پروژه مفهوم <code>APP_ENV=production</code> را ندارد پس شرط Laravel قابل پیاده‌سازی نبود.<br>
+  <b>تشخیص TTY:</b> در لینوکس با <code>unix.IoctlGetTermios(fd, unix.TCGETS)</code> (در فایل با build tag)، در بقیهٔ پلتفرم‌ها با
+  هوریستیک <code>ModeCharDevice</code> به‌جز <code>/dev/null</code>. دلیل رد راه‌حل سادهٔ <code>ModeCharDevice</code>:
+  <code>/dev/null</code> هم character device است، پس <code>&lt; /dev/null</code> اشتباهی prompt می‌زد.</p>
+</div>
+
+<h3>۴.۵ ترتیب حذف</h3>
+<div class="panel">
+  <p><b>انتخاب:</b> view → table → sequence → routine → type.<br>
+  دلیل: اگر جدول‌ها اول حذف شوند، viewهای وابسته با <code>CASCADE</code> می‌روند و شمارش viewها صفر می‌شود؛
+  typeها آخر می‌آیند چون جدول/view ممکن است به ستونی از نوع enum/domain وابسته باشند.
+  <code>IF EXISTS</code> روی همهٔ دستورها باعث می‌شود objectهایی که قبلاً با CASCADE رفته‌اند خطا ندهند.</p>
+</div>
+
+<h2>۵. مراحل انجام کار</h2>
+<ol>
+  <li>کاوش ساختار فرمان‌های cobra با <code>graphify query</code> و خواندن <code>cmd/migrate.go</code>، <code>cmd/seed.go</code>، <code>postgres.go</code>.</li>
+  <li>پرسش دامنهٔ رفتار از کاربر → «Drop all schema objects (مثل artisan)».</li>
+  <li>بازرسی دیتابیس: <code>psql -c "select extname from pg_extension"</code> و لیست اسکیماها؛ بررسی مایگریشن‌ها با grep برای <code>CREATE EXTENSION/TYPE/FUNCTION</code>.</li>
+  <li>نوشتن <code>cmd/db.go</code> (دستور، پنج کوئری کاتالوگ، تأیید، خلاصهٔ خروجی).</li>
+  <li>نوشتن <code>cmd/db_tty_linux.go</code> و <code>cmd/db_tty_other.go</code> برای تشخیص ترمینال.</li>
+  <li><code>go build ./... && go vet ./...</code> و بعد <code>go mod tidy</code> (انتقال <code>x/sys</code> به direct).</li>
+  <li>ساخت دیتابیس موقت <code>wipe_scratch</code> و اجرای <code>POSTGRES_DB=wipe_scratch go run . migrate</code> (۵۲ object).</li>
+  <li>ساخت objectهای مصنوعی: اسکیمای <code>analytics</code>، enum <code>mood</code>، domain <code>us_postal_code</code>، sequence مستقل، function، view، جدول وابسته به type، extension <code>pg_trgm</code>.</li>
+  <li>اجرای <code>db:wipe</code> در سه حالت (غیرتعاملی، ترمینال با «no»، ترمینال با «yes») و سپس <code>migrate</code> دوباره.</li>
+  <li>به‌روزرسانی <code>Makefile</code>، <code>README.md</code>، <code>doc/database.md</code>، <code>AGENTS.md</code>.</li>
+  <li>اجرای <code>gofmt -l cmd/</code>، <code>go build</code>، <code>go vet</code>، <code>make test</code>.</li>
+  <li>حذف دیتابیس موقت: <code>DROP DATABASE wipe_scratch</code>.</li>
+</ol>
+
+<pre><code>go build ./... &amp;&amp; go vet ./...          # BUILD_VET_OK
+go mod tidy                             # فقط go.mod (یک خط: x/sys → direct)
+gofmt -l cmd/                           # خروجی خالی
+make test                               # بدون FAIL
+
+# چرخه کامل روی دیتابیس موقت
+psql "... dbname=postgres" -c "CREATE DATABASE wipe_scratch;"
+POSTGRES_DB=wipe_scratch go run . migrate
+POSTGRES_DB=wipe_scratch go run . db:wipe &lt; /dev/null
+POSTGRES_DB=wipe_scratch go run . migrate
+psql "... dbname=wipe_scratch" -Atc "select count(*) ..."   # 52</code></pre>
+
+<h2>۶. تغییرات فایل‌ها</h2>
+<table>
+  <tr><th>مسیر</th><th>نوع تغییر</th><th>خلاصه</th></tr>
+  <tr><td>cmd/db.go</td><td>add</td><td>دستور <code>db:wipe</code>: پنج کوئری کاتالوگ، اجرای تراکنشی DROPها، تأیید کاربر، خلاصهٔ آماری</td></tr>
+  <tr><td>cmd/db_tty_linux.go</td><td>add</td><td>تشخیص TTY با <code>unix.IoctlGetTermios(TCGETS)</code> (build tag <code>linux</code>)</td></tr>
+  <tr><td>cmd/db_tty_other.go</td><td>add</td><td>جایگزین غیرلینوکسی تشخیص ترمینال (build tag <code>!linux</code>)</td></tr>
+  <tr><td>go.mod</td><td>edit</td><td><code>golang.org/x/sys v0.47.0</code> از <code>indirect</code> به direct منتقل شد؛ <code>go.sum</code> بدون تغییر</td></tr>
+  <tr><td>Makefile</td><td>edit</td><td>هدف جدید <code>db-wipe</code></td></tr>
+  <tr><td>README.md</td><td>edit</td><td>افزودن <code>make db-wipe</code> به بلوک فرمان‌های migration</td></tr>
+  <tr><td>doc/database.md</td><td>edit</td><td>افزودن <code>db:wipe</code> به فهرست فرمان‌ها + توضیح کوتاه فارسی</td></tr>
+  <tr><td>AGENTS.md</td><td>edit</td><td>افزودن ردیف <code>db:wipe</code> به جدول Commands</td></tr>
+</table>
+
+<h2>۷. باگ‌ها و مشکلات برخوردشده</h2>
+
+<h3>۷.۱ تشخیص ترمینال با <code>ModeCharDevice</code> اشتباه بود <span class="tag err">باگ</span></h3>
+<div class="panel">
+  <p class="ltr"><b>متن خطا:</b> <code>-- db:wipe read confirmation error: EOF</code> / <code>exit status 1</code></p>
+  <p><b>ریشه:</b> <code>/dev/null</code> هم یک character device است، پس <code>os.Stdin.Stat()&amp;os.ModeCharDevice != 0</code>
+  برای <code>go run . db:wipe &lt; /dev/null</code> هم «terminal» گزارش می‌شد، prompt چاپ می‌شد و چون EOF بود خواندن fail می‌کرد.</p>
+  <p><b>-fix:</b> تشخیص با <code>unix.IoctlGetTermios(..., unix.TCGETS)</code> (فقط terminal واقعی true می‌دهد) + فایل جایگزین
+  برای غیرلینوکس که <code>/dev/null</code> را مستثنا می‌کند؛ ضمناً خطای خواندنِ prompt به‌جای <code>log.Fatal</code> حالا
+  «aborted» با کد خروج ۱ چاپ می‌کند.</p>
+  <p><b>تأیید:</b> با <code>script -qec "go run . db:wipe" /dev/null</code> (PTY مصنوعی) هم حالت «no» (abort و ۵۲ object باقی‌ماند)
+  و هم حالت «yes» (۰ object) تست شد؛ حالت <code>&lt; /dev/null</code> هم بدون prompt اجرا شد.</p>
+</div>
+
+<h3>۷.۲ ابهام operator در کوئری‌های بازرسی test <span class="tag warn">محیطی</span></h3>
+<div class="panel">
+  <p class="ltr"><b>متن خطا:</b> <code>ERROR: operator is not unique: text || "char"</code></p>
+  <p><b>ریشه:</b> کوئری‌های SQL من برای راستی‌آزمایی، ستون‌های <code>"char"</code> مانند <code>relkind</code>/<code>typtype</code>
+  را بدون <code>::text</code> به string وصل می‌کردند. <b>مربوط به کد محصول نبود</b>؛ فقط اسکریپت بازرسی.</p>
+  <p><b>-fix:</b> افزودن <code>::text</code>. کوئری‌های داخل <code>cmd/db.go</code> از این مشکل مبرا هستند چون با
+  <code>quote_ident</code> فقط identifier می‌سازند.</p>
+</div>
+
+<h3>۷.۳ اشیای extension بعد از wipe باقی می‌مانند (رفتار درست، نه باگ) <span class="tag ok">تأیید</span></h3>
+<div class="panel">
+  <p>بعد از wipe شمارش ۳۱ routine و ۲ type باقی ماند. بررسی نشان داد همگی متعلق به <code>pg_trgm</code> هستند
+  (<code>public.gtrgm</code> و <code>public._gtrgm</code> و ده‌ها تابع <code>gin_trgm_ops</code>) و extension هم نصب است.
+  این دقیقاً همان قاعدهٔ <code>pg_depend.deptype='e'</code> است: دیتابیس خالی می‌شود ولی infrastructure دست‌نخورده می‌ماند.</p>
+</div>
+
+<h2>۸. تست و اعتبارسنجی</h2>
+<table>
+  <tr><th>دستور / سناریو</th><th>نتیجهٔ واقعی</th></tr>
+  <tr><td>go build ./...</td><td><span class="tag ok">OK</span> بدون خروجی خطا</td></tr>
+  <tr><td>go vet ./...</td><td><span class="tag ok">OK</span></td></tr>
+  <tr><td>gofmt -l cmd/</td><td><span class="tag ok">خالی</span> (همهٔ فایل‌ها format شده)</td></tr>
+  <tr><td>make test</td><td><span class="tag ok">ok</span> در همهٔ پکیج‌ها؛ هیچ <code>FAIL</code> یا <code>panic</code> وجود نداشت</td></tr>
+  <tr><td>go mod tidy</td><td>فقط یک تغییر در <code>go.mod</code>؛ <code>go.sum</code> بدون تغییر</td></tr>
+  <tr><td>مایگریشن + wipe + مایگریشن (دیتابیس موقت)</td><td>۵۲ object → <code>dropped 59 object(s)</code> (view:1, table:28, sequence:27, routine:1, type:2) → دوباره ۵۲ object</td></tr>
+  <tr><td>اجرای دوم wipe روی دیتابیس خالی</td><td><span class="ltr">database "wipe_scratch" has no objects, nothing to drop</span></td></tr>
+  <tr><td>ترمینال مصنوعی با «no»</td><td><code>[db:wipe] aborted</code> + <code>exit status 1</code>؛ ۵۲ object باقی‌ماند</td></tr>
+  <tr><td>ترمینال مصنوعی با «yes»</td><td>wipe کامل؛ ۰ object باقی‌ماند</td></tr>
+  <tr><td>--force با ورودی غیرتعاملی</td><td>بدون prompt اجرا شد</td></tr>
+  <tr><td>حفظ extensionها و اسکیماها</td><td><code>extensions=plpgsql,pg_trgm</code>، <code>schemas=public,analytics</code>، objectهای <code>pg_trgm</code> باقی</td></tr>
+  <tr><td>حذف objectهای سفارشی</td><td>enum/domain/sequence/function/view جدول‌های دست‌ساز و <code>analytics.t1</code> حذف شدند؛ خود اسکیمای <code>analytics</code> ماند</td></tr>
+  <tr><td>DROP DATABASE wipe_scratch</td><td>دیتابیس موقت پاک شد؛ <code>go_shop_dev</code> دست‌نخورده ماند</td></tr>
+</table>
+
+<h2>۹. نکات آموزشی</h2>
+<ul>
+  <li><b>فرمان‌های cobra در این مخزن</b> الگوی ثابتی دارند: <code>init()</code> → <code>rootCmd.AddCommand(...)</code>، و اتصال DB از طریق
+  <code>openMigrateDB()</code> در <code>cmd/migrate.go</code>. فرمان جدید باید همین ورودی را استفاده کند تا تنظیمات <code>.env</code> یکسان اعمال شود.</li>
+  <li><b><code>godotenv.Load</code> متغیرهای موجود در shell را override نمی‌کند</b>؛ بنابراین <code>POSTGRES_DB=wipe_scratch go run . db:wipe</code>
+  بدون هیچ تغییر کد، امکان تست روی دیتابیس موقت را می‌دهد — الگوی خوبی برای تست فرمان‌های مخرب.</li>
+  <li><b>حذف object در PostgreSQL تراکنشی است.</b> برخلاف MySQL، می‌توان ده‌ها <code>DROP</code> را در یک تراکنش گذاشت و
+  در صورت خطا همه را rollback کرد. این امن‌ترین راه برای یک فرمان ویرانگر است.</li>
+  <li><b>هرگز <code>DROP SCHEMA ... CASCADE</code> را به‌عنوان «wipe» استفاده نکنید:</b> اشیای متعلق به یک extension
+  (<code>pg_depend.deptype='e'</code>) قابل حذف نیستند و دستور کل شکست می‌خورد؛ راه درست فیلتر کردن روی کاتالوگ است.</li>
+  <li><b>ترتیب DROP مهم است اگر می‌خواهید آمار درست بگیرید:</b> view قبل از table تا با <code>CASCADE</code> حذف نشود،
+  type بعد از table چون ستون‌ها به enum/domain وابسته‌اند.</li>
+  <li><b>تشخیص ترمینال با <code>ModeCharDevice</code> کافی نیست:</b> <code>/dev/null</code> هم character device است؛
+  راه استاندارد در لینوکس <code>ioctl(TCGETS)</code> از <code>golang.org/x/sys/unix</code> است (با build tag تا cross-compile نشکند).</li>
+  <li><b>«خالی» یعنی خالی از اشیای شما، نه خالی مطلق:</b> بعد از wipe همچنان extensionها و اسکیماها هستند؛
+  شمارش‌گیری برای پیام «nothing to drop» باید دقیقاً همان کوئری‌هایی را بگیرد که حذف می‌کنند.</li>
+</ul>
+
+<h2>۱۰. کارهای باقی‌مانده / ریسک‌ها</h2>
+<ul>
+  <li>دستور روی <code>go_shop_dev</code> اجرا نشده (عمداً — دیتابیس توسعه حاوی داده است). برای استفاده:
+  <code>make db-wipe &amp;&amp; make migration-up &amp;&amp; make seed</code>. اگر بخواهید، اجرایش را می‌توانم انجام دهم.</li>
+  <li>اشیای خارج از فهرست صریح (event trigger، publication، operator سفارشیِ standalone، foreign data wrapper)
+  به‌صورت مستقل drop نمی‌شوند ولی معمولاً با <code>CASCADE</code> کنار objectهای اصلی می‌روند. در صورت نیاز می‌توان
+  یک کوئری دیگر به <code>wipeKinds</code> اضافه کرد.</li>
+  <li>دادهٔ داخل objectهای موقتِ یک تراکنش large object (BLOB در <code>pg_largeobject</code>) حذف نمی‌شود —
+  این پروژه از large object استفاده نمی‌کند (فایل‌ها روی دیسک هستند)، پس فعلاً نادیده گرفته شد.</li>
+  <li>اسکیماهای غیر<code>public</code> حذف نمی‌شوند فقط اشیای درون‌شان (رفتار Laravel)؛ اگر مایگریشنی <code>DROP SCHEMA</code> نداشته باشد،
+  اسکیمای خالی باقی می‌ماند.</li>
+  <li>هیچ تست خودکار واحدی برای دستور اضافه نشد (نیاز به PostgreSQL واقعی دارد). اگر خواستید، می‌توان یک تست
+  integration با شرط <code>TEST_DATABASE_URL</code> نوشت که طبق AGENTS.md در نبود آن skip می‌شود.</li>
+  <li>ریسک باقی‌مانده: <code>db:wipe --force</code> هیچ سؤالی نمی‌پرسد؛ در اسکریپت‌ها حتماً <code>POSTGRES_DB</code> را صریح ست کنید.</li>
+</ul>
+
+<h2>۱۱. نکات تکمیلی</h2>
+<div class="panel">
+  <p><b>نحوهٔ استفاده:</b></p>
+<pre><code>go run . db:wipe            # با تأیید روی ترمینال
+go run . db:wipe --force    # بدون تأیید (CI/اسکریپت)
+make db-wipe                # معادل make
+POSTGRES_DB=other_db go run . db:wipe --force   # روی دیتابیس دیگر
+
+# بعد از wipe حتماً اسکیما را بسازید:
+go run . migrate            # یا: make migration-up &amp;&amp; make seed</code></pre>
+
+  <p><b>شکل خروجی موفق:</b></p>
+<pre><code>[postgres] connected to postgresql database successfully
+[db:wipe] non-interactive session: wiping "wipe_scratch" without confirmation
+[db:wipe] dropped 59 object(s) from "wipe_scratch" (view: 1, table: 28, sequence: 27, routine: 1, type: 2)
+[db:wipe] run `go run . migrate` to rebuild the schema</code></pre>
+
+  <p><b>تفاوت با <code>migrate:reset</code>:</b> هر دو «شروع از صفر» می‌دهند، اما
+  <code>migrate:reset</code> فقط migrationهای ثبت‌شده را با <code>goose down</code> برمی‌گرداند (اگر Down خراب/ناقص باشد می‌ماند)،
+  در حالی که <code>db:wipe</code> وضعیت نهاییِ دیتابیس را صفر می‌کند و برای دیتابیس‌های آلوده به object دست‌ساز
+  (data.sql، دستی، باقی‌مانده از نسخه قدیمی) راه مطمئن‌تری است.</p>
+
+  <p><b>نکتهٔ گراف دانش:</b> پس از commit، هوک <code>post-commit</code> گراف را با فایل‌های <code>cmd/*.go</code> جدید بازسازی می‌کند؛
+  تغییرات <code>README.md</code>/<code>doc/database.md</code>/<code>Makefile</code> با <code>/graphify --update</code> لازم است
+  اضافه شوند چون AST فقط کد Go را می‌خواند.</p>
+</div>
+
+<hr>
+<p class="small">گزارش خودمختار — طبق AGENTS.md پس از اتمام هر تسک در پوشهٔ <code>reports/</code> ساخته شده است.</p>
+
+</main>
+</body>
+</html>

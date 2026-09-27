@@ -50,6 +50,9 @@ migration-status:
 migration-reset:
 	@go run . migrate:reset
 
+db-wipe:
+	@go run . db:wipe
+
 make-migration:
 	@go run . make:migration NAME=$(NAME)
 

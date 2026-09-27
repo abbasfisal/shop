@@ -29,6 +29,7 @@ interfaces (http/worker) → application (usecases/dto/pricing) → infrastructu
 | `go run . migrate:rollback` / `make migration-down` | goose down (last) |
 | `go run . migrate:status` | goose status |
 | `go run . migrate:reset` | goose down all (re-run `migrate` after) |
+| `go run . db:wipe` / `make db-wipe` | drop every object in the DB (tables/views/sequences/routines/types); DB + extensions kept — re-run `migrate` |
 | `go run . make:migration NAME=add_x` | create migration stub |
 | `go run . seed` / `make seed` | seed data (needs migrated schema) |
 | `go run . search:reindex [--recreate]` | rebuild typesense index from read models |

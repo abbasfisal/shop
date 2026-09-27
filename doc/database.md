@@ -1,7 +1,9 @@
 # دیتابیس — PostgreSQL (goose)
 
 اتصال: متغیرهای `POSTGRES_*` در `.env` (نمونه: `.env.example`).
-فرمان‌ها: `go run . migrate | migrate:status | migrate:rollback | migrate:reset | make:migration NAME=...`
+فرمان‌ها: `go run . migrate | migrate:status | migrate:rollback | migrate:reset | db:wipe | make:migration NAME=...`
+
+`db:wipe` همه اشیای اسکیما (جدول، view، sequence، function/type) را حذف می‌کند ولی خود دیتابیس و extensionها می‌مانند؛ بعد اجرا دوباره `migrate` بزنید. روی ترمینال ابتدا تأیید می‌گیرد (`--force` برای رد شدن از تأیید).
 
 ## فایل‌های مایگریشن
 

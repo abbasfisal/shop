@@ -52,6 +52,7 @@ make migration-status  # goose status
 make migration-down    # goose down (last migration)
 make migration-reset   # goose down all — run migration-up again after
 make make-migration NAME=add_xxx
+make db-wipe           # drop every table/view/sequence/function (go run . db:wipe)
 ```
 
 ### 2️⃣ Run the application
