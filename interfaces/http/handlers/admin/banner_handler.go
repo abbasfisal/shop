@@ -100,6 +100,11 @@ func (a *AdminHandler) bannerFormData(c *gin.Context) (requests.CreateBannerRequ
 // saveBannerImage stores the uploaded file and returns its stored name.
 // On a validation problem it flashes the error and returns an empty name.
 func (a *AdminHandler) saveBannerImage(c *gin.Context) string {
+	// errors.errorList is process-wide and survives the request: reset it so
+	// the callers' errors.Get()["image"] checks are deterministic (otherwise a
+	// stale «پسوند عکس…» from an earlier failed upload blocks every update).
+	errors.Init()
+
 	imageFile, _ := c.FormFile("image")
 	if imageFile == nil {
 		return ""

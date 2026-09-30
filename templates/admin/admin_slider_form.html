@@ -38,6 +38,13 @@
 
                 <div class="row">
                     <div class="col-md-4 form-group">
+                        <label>زیرعنوان (اختیاری)</label>
+                        <input type="text" class="form-control" name="subtitle"
+                               placeholder="مثلاً بر اساس سلیقه شما"
+                               value="{{if index .OLD "subtitle"}}{{index .OLD "subtitle"}}{{else}}{{$slider.Subtitle}}{{end}}">
+                        <small class="text-muted">زیر تیتر نمایش داده می‌شود — در اسلایدر اصلی صفحه</small>
+                    </div>
+                    <div class="col-md-4 form-group">
                         <label>کاتالوگ «مشاهده همه» (اختیاری)</label>
                         <select class="form-control" name="category_id">
                             <option value="">فقط محصولات انتخاب شده</option>

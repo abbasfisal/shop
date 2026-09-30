@@ -1,0 +1,2557 @@
+{{define "home2"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="/assets/css/video-js.css" />
+    <link rel="stylesheet" href="/assets/css/nouislider.min.css" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <style>
+        /* ---------- home2: جستجو (لیست پیشنهادات مثل home) ---------- */
+        #results.header-search-results {
+            list-style: none;
+            margin: 0 0 8px;
+            padding: 0;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        #results.header-search-results li a {
+            display: block;
+            padding: 9px 6px;
+            font-size: 14px;
+            color: #3f3f46;
+            border-bottom: 1px dashed #e0e0e2;
+        }
+
+        #results.header-search-results li a:hover,
+        #results.header-search-results li a.active {
+            background: #f8f8f8;
+        }
+
+        .highlight_search {
+            background-color: #fff3bf;
+            font-weight: bold;
+        }
+
+        /* ---------- home2: کاروسل شگفت‌انگیزها ---------- */
+        .amazing-carousel {
+            background:
+                radial-gradient(130% 150% at 92% -10%, rgba(255, 255, 255, .25) 0%, rgba(255, 255, 255, 0) 55%),
+                linear-gradient(135deg, #ef394e 0%, #ef4056 45%, #d51f3d 100%);
+            border-radius: 16px;
+        }
+
+        /* آیتم‌ها کنار هم (افقی) چیده می‌شوند، نه زیر هم */
+        .amazing-carousel .swiper-wrapper {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .amazing-carousel .swiper-slide {
+            width: auto;
+            min-width: 176px;
+            max-width: 216px;
+            flex: 0 0 auto;
+            height: auto;
+        }
+
+        @media only screen and (min-width: 1024px) {
+            .amazing-carousel .swiper-slide {
+                min-width: 200px;
+                max-width: 240px;
+            }
+        }
+
+        /* عنوان محصول: فقط بخشی نمایش داده می‌شود، باقی مخفی (۲ خط + …) */
+        .amazing-carousel .amazing-carousel-item-title {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #28282d;
+            min-height: 44px;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .amazing-carousel .amazing-carousel-item .discount-percent {
+            min-width: 52px;
+            height: 26px;
+        }
+
+        /* ---------- home2: اسلایدر اصلی (کارت محصولات) ---------- */
+        .mainSlider-products-swiper .swiper-wrapper {
+            display: flex;
+            flex-direction: row;
+        }
+
+        /* کارت‌ها کنار هم (افقی) چیده می‌شوند، نه زیر هم */
+        .mainSlider-products-swiper .swiper-slide {
+            width: auto;
+            min-width: 156px;
+            max-width: 178px;
+            flex: 0 0 auto;
+            height: auto;
+        }
+
+        @media only screen and (min-width: 1024px) {
+            .mainSlider-products-swiper .swiper-slide {
+                min-width: 180px;
+                max-width: 212px;
+            }
+        }
+
+        .mainSlider-product {
+            border: 1px solid #f0f0f1;
+        }
+
+        .mainSlider-product:hover {
+            border-color: #e0e0e2;
+        }
+
+        .mainSlider-product-img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+        }
+
+        /* عنوان محصول: فقط بخشی نمایش داده می‌شود، باقی مخفی (۲ خط + …) */
+        .mainSlider-product-title {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #28282d;
+            min-height: 44px;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .mainSlider-product .discount-percent {
+            width: auto;
+            min-width: 44px;
+            height: 24px;
+        }
+
+        .mainSlider-product-outofstock {
+            color: #ef4056;
+        }
+
+        /* دکمه‌های قبلی/بعدی با کلاس اختصاصی تا با اسلایدرهای دیگر قاطی نشوند */
+        .mainSlider-products-prev,
+        .mainSlider-products-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+        }
+
+        .mainSlider-products-prev {
+            right: 8px;
+            left: auto;
+        }
+
+        .mainSlider-products-next {
+            left: 8px;
+            right: auto;
+        }
+    </style>
+    <title>{{.TITLE}}</title><!--MARKER1-->
+</head>
+
+<body><!--BODYMARKER-->
+
+    <div class="overlay header-overlay"></div>
+
+    <header class="position-fixed bg-white top-0 start-0 end-0">
+
+        {{if .HEADER_BANNER}}
+        <a class="d-flex header-banner d-lg-none" {{if .HEADER_BANNER.Link}}href="{{.HEADER_BANNER.Link}}"{{end}}>
+            <img class="w-p-100 object-fit-cover"
+                src="{{$.SITE_BANNER_PATH}}{{.HEADER_BANNER.MobileSrc}}" />
+        </a>
+        {{end}}
+           
+     
+
+        <div
+            class="mobile-top-header d-flex align-items-center d-lg-none py-3 mx-4 justify-content-between border-b-gray-100 ">
+            <i class="icon-menu mobile-hamburgerMenubtn"></i>
+            <a class="">
+                <img src="/assets/images/logo/logo.svg" height="24" />
+            </a>
+            <div class="d-flex align-items-center">
+                <a class="d-flex align-items-center gap-2">
+                    <i class="icon-signIn "></i>
+                    ورود
+                </a>
+
+                <a class="icon-cart p-2  color-gray-700"></a>
+            </div>
+        </div>
+
+        <div class="header-top position-relative">
+            {{if .HEADER_BANNER}}
+            <a class=" header-banner d-none d-lg-flex" {{if .HEADER_BANNER.Link}}href="{{.HEADER_BANNER.Link}}"{{end}}>
+                <img class="w-p-100 object-fit-cover"
+                    src="{{$.SITE_BANNER_PATH}}{{.HEADER_BANNER.Image}}" />
+            </a>
+            {{end}}
+            <div class=" bg-white container-4xl d-flex justify-content-between py-3 px-4">
+                <div class="d-flex flex-grow-1">
+                    <a class="ms-5 d-none d-lg-flex align-items-center" href="/">
+                        <img src="/assets/images/logo/logo.svg" />
+                    </a>
+    
+                    <form
+                        class="search w-p-100 h-11 radius-medium bg-gray-100 d-flex align-items-center px-lg-4 px-2 position-relative"
+                        action="/search" method="get">
+                        <i class="icon-search color-gray-400"></i>
+                        <input class="header-search-input w-p-100 mx-2 mx-lg-4 bg-transparent text-medium" type="text"
+                            id="searchQuery" name="q" autocomplete="off" placeholder="جستجوZZZ" />
+    
+                        <div
+                            class="header-search-result position-absolute end-0 start-0 top-0 px-4 pb-4 pt-11 bg-white radius-medium">
+                            <div class="header-search-result-container">
+                                <ul id="results" class="header-search-results"></ul>
+                                <img class="w-p-100 radius-medium mt-7" src="/assets/images/search-result.jpg" />
+                                <div class="d-flex color-gray-700  align-items-center text-strong-3 py-4">
+                                    <i class="icon-searchTrend color-gray-400 ms-4"></i>
+                                    جستجوهای پرطرفدار
+                                </div>
+    
+                                <div class="swiper searchTrends-swiper">
+                                    <div class="swiper-wrapper">
+                                        <div class="swiper-slide">
+                                            <a
+                                                class="d-flex align-items-center py-2 gap-1  text-strong-2 border-gray-200 pe-3 ps-1 radius-u h-10">
+                                                سرم ویتامین c
+                                                <i class="icon-chevronLeft icon-fs-large "></i>
+                                            </a>
+                                        </div>
+                                        <div class="swiper-slide">
+                                            <a
+                                                class="d-flex align-items-center text-strong-2 border-gray-200 pe-3 ps-1 radius-u h-10 gap-1 py-2">
+                                                سرم ویتامین c
+                                                <i class="icon-chevronLeft icon-fs-large"></i>
+                                            </a>
+                                        </div>
+                                        <div class="swiper-slide">
+                                            <a
+                                                class="d-flex align-items-center text-strong-2 border-gray-200 pe-3 ps-1 radius-u h-10 gap-1 py-2">
+                                                سرم ویتامین c
+                                                <i class="icon-chevronLeft icon-fs-large"></i>
+                                            </a>
+                                        </div>
+                                        <div class="swiper-slide">
+                                            <a
+                                                class="d-flex align-items-center text-strong-2 border-gray-200 pe-3 ps-1 radius-u h-10 gap-1 py-2">
+                                                سرم ویتامین c
+                                                <i class="icon-chevronLeft icon-fs-large"></i>
+                                            </a>
+                                        </div>
+    
+                                        <div class="swiper-slide">
+                                            <a
+                                                class="d-flex align-items-center text-strong-2 border-gray-200 pe-3 ps-1 radius-u h-10 gap-1 py-2">
+                                                سرم ویتامین c
+                                                <i class="icon-chevronLeft icon-fs-large"></i>
+                                            </a>
+                                        </div>
+                                        <div class="swiper-slide">
+                                            <a
+                                                class="d-flex align-items-center text-strong-2 border-gray-200 pe-3 ps-1 radius-u h-10 gap-1 py-2">
+                                                سرم ویتامین c
+                                                <i class="icon-chevronLeft icon-fs-large"></i>
+                                            </a>
+                                        </div>
+    
+                                    </div>
+    
+                                    <div class="swiper-btn-prev icon-chevronRight"></div>
+                                    <div class="swiper-btn-next icon-chevronLeft"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="d-none d-lg-flex align-items-center">
+                    <a class="d-flex align-items-center border-lg-gray-200 h-10 text-button-1 px-4 radius-medium">
+                        <i class="icon-signIn ms-2"></i>
+                        ورود | ثبت‌نام
+                    </a>
+    
+                    <span class="horizontal-divider h-6 d-lg-flex d-none bg-gray-200 mx-3"></span>
+    
+                    <a class="icon-cart p-2 color-gray-700"></a>
+                </div>
+            </div>
+          
+        </div>
+
+        <nav class="header-nav d-flex justify-content-between container-4xl px-lg-4 bg-white">
+            <div class="flex-grow-1">
+                <ul class="mainMenu d-flex flex-column flex-lg-row align-items-lg-center w-p-100">
+                    <li class="d-lg-none py-5 border-b-gray-100 mx-5 w-p-100">
+                        <img src="/assets/images/logo/logo-fa.svg" class="h-6" />
+                    </li>
+                    <li class="mainMenu-hover">
+
+                    </li>
+                    <li class="mainMenu-li-hasSubMenu">
+                        <div
+                            class="h-10 d-none d-lg-flex align-items-center text-strong-2 gap-1 pointer color-gray-700">
+                            <i class="icon-menu icon-fs-large"></i>
+                            دسته‌بندی کالاها
+
+
+                        </div>
+
+                        <div class="mainMenu-list position-absolute w-p-auto bg-white overflow-hidden ">
+                            <div class="mainMenu-list-categories overflow-auto d-none d-lg-block">
+                                {{range $i, $cat := .MENU}}
+                                <a class="mainMenu-list-categoryTitle {{if eq $i 0}}hovered{{end}} gap-2 d-flex align-items-center text-strong py-3 px-2 color-gray-700"
+                                    data-id="{{$cat.ID}}" href="/search/{{$cat.Slug}}">
+                                    <i class="icon-category icon-fs-medium"></i>
+                                    {{$cat.Title}}
+                                </a>
+                                {{end}}
+                            </div>
+
+                            <div class="mainMenu-sublist flex-grow-1 overflow-auto border-b-gray-200 border-lg-none">
+                                {{range $i, $cat := .MENU}}
+                                <div class="mainMenu-sublist-content p-lg-5 {{if eq $i 0}}active{{end}} flex-column"
+                                    data-id="{{$cat.ID}}">
+                                    <a class="mainMenu-list-categoryTitle d-lg-none d-flex justify-content-between align-items-center text-strong-3 px-5"
+                                        data-id="{{$cat.ID}}">
+                                        {{$cat.Title}}
+                                        <i class="icon-chevronDown"></i>
+                                    </a>
+
+                                    <div class="mainMenu-sublist-menulist">
+                                        <a class="d-flex align-items-center color-secondary-700 gap-1 mt-5 mt-lg-0 mb-5 text-strong"
+                                            href="/search/{{$cat.Slug}}">
+                                            همه محصولات {{$cat.Title}}
+                                            <i class="icon-chevronLeft icon-fs-small"></i>
+                                        </a>
+
+                                        <ul class="d-flex flex-column flex-wrap">
+                                            {{range $cat.SubCategories}}
+                                            <li
+                                                class="py-1 mainMenu-sublist-item color-gray-900 mainMenu-sublist-item-main mb-2 d-flex align-items-center text-strong-2">
+                                                <a class="text-truncate" href="/search/{{.Slug}}">{{.Title}}</a>
+                                                {{if .SubCategories}}
+                                                <i class="icon-chevronLeft icon-fs-small"></i>
+                                                {{end}}
+                                            </li>
+                                            {{range .SubCategories}}
+                                            <li class="py-1 mainMenu-sublist-item color-gray-500 text-medium">
+                                                <a class="text-truncate" href="/search/{{.Slug}}">{{.Title}}</a>
+                                            </li>
+                                            {{end}}
+                                            {{end}}
+                                        </ul>
+                                    </div>
+                                </div>
+                                {{end}}
+                            </div>
+                        </div>
+                    </li>
+
+                    <div class="horizontal-divider h-4 bg-gray-200 me-5 d-none d-lg-flex"></div>
+
+                    <li>
+                        <a class="mainMenu-item d-flex gap-1 px-3 align-items-center color-gray-600 text-medium">
+                            <i class="icon-amazing icon-fs-medium color-gray-400"></i>
+                            شگفت‌انگیزها
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="mainMenu-item d-flex gap-1 px-3 align-items-center color-gray-600 text-medium">
+                            <i class="icon-fresh icon-fs-medium color-gray-400"></i>
+                            سوپرمارکت
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="mainMenu-item d-flex gap-1 px-3 align-items-center color-gray-600 text-medium">
+                            <i class="icon-giftCard icon-fs-medium color-gray-400"></i>
+                            کارت هدیه
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class=" mainMenu-item d-flex gap-1 px-3 align-items-center color-gray-600 text-medium">
+                            <i class="icon-searchTrend icon-fs-medium color-gray-400"></i>
+                            پرفروش‌ترین‌ها
+                        </a>
+                    </li>
+
+                    <li>
+                        <a
+                            class="mainMenu-item d-none d-xl-flex gap-1 px-3 align-items-center color-gray-600 text-medium">
+                            <i class="icon-discount icon-fs-medium color-gray-400"></i>
+                            تخفیف‌ها و پیشنهادها
+                        </a>
+                    </li>
+
+                    <div class="horizontal-divider h-4 bg-gray-200  d-none d-lg-flex"></div>
+
+                    <li>
+                        <a class="mainMenu-item d-flex gap-1 px-3 align-items-center color-gray-600 text-medium">
+                            <i class="icon-askQuestion d-flex d-lg-none icon-fs-medium color-gray-400"></i>
+                            سوالی دارید؟
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="mainMenu-item d-flex gap-1 px-3 align-items-center color-gray-600 text-medium">
+                            <i class="icon-seller d-flex d-lg-none  icon-fs-medium color-gray-400"></i>
+                            در دیجی‌پرس بفروشید!
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="text-medium color-gray-700 d-none d-lg-flex align-items-center gap-2">
+                <i class="icon-location icon-fs-large"></i>
+                <span>لطفا شهر خود را انتخاب کنید</span>
+            </div>
+        </nav>
+
+
+        <div class="overlay mobile-header-overlay"></div>
+    </header>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="container-2xl pt-4">
+            <div class="swiper stories-Swiper">
+
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide storiesList-slide">
+                        <div class="stories-Swiper-item d-flex flex-column align-items-center">
+                            <div
+                                class="stories-Swiper-item-imgContainer position-relative  d-flex justify-content-center align-items-center radius-circle ">
+                                <div class="bg-white  overflow-hidden  radius-circle d-flex">
+                                    <div class=" radius-circle overflow-hidden d-flex">
+                                        <img class=" object-fit-cover  " src="/assets/images/stories/1.jpg" />
+
+                                    </div>
+                                </div>
+                                <span
+                                    class="stories-Swiper-item-time position-absolute fanumber bottom-0 mx-auto text-subtitle-strong radius-medium">17:00
+                            </div>
+                            </span>
+
+                            <span class="mt-2 text-subtitle color-gray-800 text-truncate-2">آچار و پیچگوشتی با ارزش خرید
+                                بالا</span>
+                        </div>
+                    </div>
+                    <div class="swiper-slide storiesList-slide">
+                        <div class="stories-Swiper-item d-flex flex-column align-items-center">
+                            <div
+                                class="stories-Swiper-item-imgContainer position-relative  d-flex justify-content-center align-items-center radius-circle ">
+                                <div class="bg-white  overflow-hidden  radius-circle d-flex">
+                                    <div class=" radius-circle overflow-hidden d-flex">
+                                        <img class=" object-fit-cover  " src="/assets/images/stories/2.jpg" />
+
+                                    </div>
+                                </div>
+                                <span
+                                    class="stories-Swiper-item-time position-absolute fanumber bottom-0 mx-auto text-subtitle-strong radius-medium">17:00
+                            </div>
+                            </span>
+
+                            <span class="mt-2 text-subtitle color-gray-800 text-truncate-2">آچار و پیچگوشتی با ارزش خرید
+                                بالا</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-btn-prev icon-chevronRight"></div>
+                <div class="swiper-btn-next icon-chevronLeft"></div>
+            </div>
+        </div>
+        <!-- mainSlider — بنر تصویری (site_banners / placement=main) + کارت محصولات (product_sliders / position=main) -->
+        {{if or .MAIN_SLIDER_BANNERS .MAIN_SLIDER}}
+        <div class="mainSlider mt-lg-5">
+            {{if .MAIN_SLIDER_BANNERS}}
+                {{template "home2_hero_slider" .}}
+            {{end}}
+            {{if .MAIN_SLIDER}}
+                {{template "home2_main_slider" .}}
+            {{end}}
+        </div>
+        {{end}}
+
+        <div class="container-2xl ">
+            <div class="main-services d-lg-flex justify-content-around mt-5 py-2 px-3 grid" style="--bs-columns:4">
+                <a class="main-services-item d-flex flex-column gap-1 align-items-center">
+                    <img loading="lazy" src="/assets/images/dkServices/1.png" />
+                    <span class="text-subtitle-strong ">دیجی‌پرس جت</span>
+                </a>
+                <a class="main-services-item d-flex flex-column gap-1 align-items-center">
+                    <img loading="lazy" src="/assets/images/dkServices/3.png" />
+                    <span class="text-subtitle-strong ">دریافت وام</span>
+                </a>
+                <a class="main-services-item d-flex flex-column gap-1 align-items-center">
+                    <img loading="lazy" src="/assets/images/dkServices/2.png" />
+                    <span class="text-subtitle-strong "> حراج استایل</span>
+                </a>
+                <a class="main-services-item d-flex flex-column gap-1 align-items-center">
+                    <img loading="lazy" src="/assets/images/dkServices/4.png" />
+                    <span class="text-subtitle-strong ">سوپرمارکت</span>
+                </a>
+                <a class="main-services-item d-flex flex-column gap-1 align-items-center">
+                    <img loading="lazy" src="/assets/images/dkServices/5.png" />
+                    <span class="text-subtitle-strong ">گیم‌نت </span>
+                </a>
+                <a class="main-services-item d-flex flex-column gap-1 align-items-center">
+                    <img loading="lazy" src="/assets/images/dkServices/6.png" />
+                    <span class="text-subtitle-strong ">دیجی‌پلاس</span>
+                </a>
+                <a class="main-services-item d-flex flex-column gap-1 align-items-center">
+                    <img loading="lazy" src="/assets/images/dkServices/7.png" />
+                    <span class="text-subtitle-strong ">ارسال سریع</span>
+                </a>
+
+
+                <div class="main-services-item d-flex flex-column gap-1 align-items-center pointer "
+                    data-modal="dkServices">
+                    <div
+                        class="main-services-item-more bg-gray-100 radius-circle d-flex align-items-center justify-content-center">
+                        <i class="icon-moreHorizontal color-gray-400"></i>
+                    </div>
+
+                    <span class="text-subtitle-strong ">بیشتر </span>
+                </div>
+
+            </div>
+
+            <!-- amazing carousel -->
+
+            {{if .AMAZING}}
+            <div class="amazing-carousel py-3 py-lg-5 mt-5 radius-lg-large">
+                <div class="swiper amazing-carousel-swiper h-p-100">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide ">
+                            <a
+                                class="amazing-carousel-first-item h-p-100 me-5 d-flex flex-column align-items-center justify-content-center"
+                                href="{{if .AMAZING_URL}}{{.AMAZING_URL}}{{else}}/{{end}}">
+                                <img src="/assets/images/amazingCarousel/Amazings.svg" />
+                                <img class="amazing-carousel-first-item-imgBox object-fit-contain"
+                                    src="/assets/images/amazingCarousel/box.png" />
+                                <div
+                                    class="d-flex align-items-center mt-1 mazing-carousel-first-item-showAll color-white">
+                                    <span class="text-strong-2">مشاهده همه</span>
+                                    <i class="icon-chevronLeft icon-fs-medium"></i>
+                                </div>
+                            </a>
+                        </div>
+
+                        {{range .AMAZING}}
+                        <div class="swiper-slide">
+                            <a class="amazing-carousel-item h-p-100 py-3 px-4 bg-white d-flex flex-column"
+                                href="{{.ProductURL}}">
+                                <div class="position-relative">
+                                    <img loading="lazy" class="amazing-carousel-item-img mb-2"
+                                        src="{{$.MEDIA_PATH}}{{.Image}}" alt="{{.Title}}" />
+                                    {{if .InStock}}
+                                    <div class="amazing-carousel-item-addBasket  position-absolute bottom-0  mb-2 me-2">
+                                        <div class="radius-circle amazing-carousel-item-addBasket-container bg-white">
+                                            <i class="icon-addSimple color-primary-500"></i>
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                </div>
+
+                                <div class="amazing-carousel-item-title text-truncate-2">{{.Title}}</div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    {{if gt .DiscountPercent 0}}
+                                    <div
+                                        class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                        <span class="text-strong fanumber">{{.DiscountPercent}}٪</span>
+                                    </div>
+                                    {{end}}
+
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="h5 fanumber currency">{{.Price}}</span>
+                                        <i class="icon-toman icon-fs-small color-gray-700"></i>
+                                    </div>
+                                </div>
+
+                                {{if gt .OriginalPrice .Price}}
+                                <div class="align-self-end">
+                                    <span
+                                        class="fanumber currency color-gray-300 text-medium text-decoration-line-through">{{.OriginalPrice}}</span>
+                                </div>
+                                {{end}}
+                            </a>
+                        </div>
+                        {{end}}
+
+                        <div class="swiper-slide">
+                            <a
+                                class="amazing-carousel-last-item d-flex flex-column align-items-center justify-content-center h-p-100 bg-white"
+                                href="{{if .AMAZING_URL}}{{.AMAZING_URL}}{{else}}/{{end}}">
+                                <div class="amazing-carousel-last-item-icon radius-circle p-3">
+                                    <i class="icon-arrowLeft icon-fs-large color-secondary-500"></i>
+                                </div>
+
+                                <span class="color-gray-700 text-strong-3 mt-3">مشاهده همه</span>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="swiper-btn-prev icon-chevronRight"></div>
+                    <div class="swiper-btn-next icon-chevronLeft"></div>
+                </div>
+            </div>
+            {{end}}
+
+            <div class="amazing-shortcut mt-2 mx-5 mx-lg-0 bg-gray-100 radius-large">
+                <div class="d-flex flex-wrap flex-lg-nowrap justify-content-between   px-lg-10 px-5 pt-4 pb-5"
+                    style="    background: url(/assets/images/svg/freshPattern.svg) no-repeat;">
+                    <div class="d-flex align-items-center">
+                        <img loading="lazy" class="amazing-shortcut-freshImg" src="/assets/images/fresh.png" />
+                        <img loading="lazy" class="amazing-shortcut-freshTitleImg mx-2 mx-lg-5"
+                            src="/assets/images/svg/fresh.svg" class="mx-5" />
+                        <div class="bg-fresh-700 px-3 radius-large d-none d-xl-flex">
+                            <span class="text-strong-3  color-white">تا ۴۵٪ تخفیف</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between flex-grow-1 mt-4 mt-lg-0">
+                        <div
+                            class="amazing-shortcut-products d-flex flex-wrap flex-grow-1  justify-content-lg-end overflow-hidden">
+                            <a class="amazing-shortcut-product ms-2" href="#">
+                                <div class="d-flex position-relative p-2 radius-circle bg-white ">
+
+                                    <img loading="lazy" class="radius-circle overflow-hidden"
+                                        src="/assets/images/product/300/13.webp" />
+                                    <div
+                                        class="discount-percent position-absolute bottom-0 end-0 color-white bg-primary-700 d-flex align-items-center justify-content-center radius-large ">
+                                        <span class="text-strong">۲۷٪</span>
+                                    </div>
+
+
+                                </div>
+                            </a>
+                            <a class="amazing-shortcut-product ms-2" href="#">
+                                <div class="d-flex position-relative p-2 radius-circle bg-white ">
+
+                                    <img loading="lazy" class="radius-circle overflow-hidden"
+                                        src="/assets/images/product/300/14.webp" />
+                                    <div
+                                        class="discount-percent position-absolute bottom-0 end-0 color-white bg-primary-700 d-flex align-items-center justify-content-center radius-large ">
+                                        <span class="text-strong">۲۷٪</span>
+                                    </div>
+
+
+                                </div>
+                            </a>
+                            <a class="amazing-shortcut-product ms-2" href="#">
+                                <div class="d-flex position-relative p-2 radius-circle bg-white ">
+
+                                    <img loading="lazy" class="radius-circle overflow-hidden"
+                                        src="/assets/images/product/300/15.webp" />
+                                    <div
+                                        class="discount-percent position-absolute bottom-0 end-0 color-white bg-primary-700 d-flex align-items-center justify-content-center radius-large ">
+                                        <span class="text-strong">۲۷٪</span>
+                                    </div>
+
+
+                                </div>
+                            </a>
+                            <a class="amazing-shortcut-product ms-2" href="#">
+                                <div class="d-flex position-relative p-2 radius-circle bg-white ">
+
+                                    <img loading="lazy" class="radius-circle overflow-hidden"
+                                        src="/assets/images/product/300/16.webp" />
+                                    <div
+                                        class="discount-percent position-absolute bottom-0 end-0 color-white bg-primary-700 d-flex align-items-center justify-content-center radius-large ">
+                                        <span class="text-strong">۲۷٪</span>
+                                    </div>
+
+
+                                </div>
+                            </a>
+                            <a class="amazing-shortcut-product ms-2" href="#">
+                                <div class="d-flex position-relative p-2 radius-circle bg-white ">
+
+                                    <img loading="lazy" class="radius-circle overflow-hidden"
+                                        src="/assets/images/product/300/17.webp" />
+                                    <div
+                                        class="discount-percent position-absolute bottom-0 end-0 color-white bg-primary-700 d-flex align-items-center justify-content-center radius-large ">
+                                        <span class="text-strong">۲۷٪</span>
+                                    </div>
+
+
+                                </div>
+                            </a>
+                            <a class="amazing-shortcut-product ms-2" href="#">
+                                <div class="d-flex position-relative p-2 radius-circle bg-white ">
+
+                                    <img loading="lazy" class="radius-circle overflow-hidden"
+                                        src="/assets/images/product/300/18.webp" />
+                                    <div
+                                        class="discount-percent position-absolute bottom-0 end-0 color-white bg-primary-700 d-flex align-items-center justify-content-center radius-large ">
+                                        <span class="text-strong">۲۷٪</span>
+                                    </div>
+
+
+                                </div>
+                            </a>
+                        </div>
+                        <a
+                            class="amazing-shortcut-more d-flex align-items-center bg-white radius-large text-strong color-fresh-700 py-3 px-sm-5 px-3 radius-u">
+                            <span class="text-nowrap d-none d-sm-flex">بیش از ۹۰ کالا</span>
+                            <i class="icon-arrowLeft me-sm-2"></i>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="banner d-flex flex-wrap mt-6 mx-5 mx-lg-0 gap-3 flex-lg-nowrap justify-content-between"
+                data-count="4">
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/1.webp" />
+                </a>
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/2.webp" />
+                </a>
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/3.webp" />
+                </a>
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/4.webp" />
+                </a>
+            </div>
+
+            <div class="banner-category px-4 mt-6 pb-10">
+                <p class="mb-9 h3 d-flex justify-content-center">خرید بر اساس دسته‌بندی</p>
+
+                <div class="d-flex justify-content-center flex-wrap row-gap-8 column-gap-12">
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/1.webp" />
+                        <span class="text-strong">موبایل</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/2.webp" />
+                        <span class="text-strong">کالای دیجیتال</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/3.webp" />
+                        <span class="text-strong">خانه و آشپزخانه</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/4.webp" />
+                        <span class="text-strong">مد و پوشاک</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/5.webp" />
+                        <span class="text-strong">کالاهای سوپرمارکتی</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/6.webp" />
+                        <span class="text-strong">کتاب، لوازم تحریر و هنر</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/7.webp" />
+                        <span class="text-strong">اسباب بازی، کودک و نوزاد</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/8.webp" />
+                        <span class="text-strong">زیبایی و سلامت</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/9.webp" />
+                        <span class="text-strong">ورزش و سفر</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/10.webp" />
+                        <span class="text-strong">ابزار آلات و تجهیزات</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/11.webp" />
+                        <span class="text-strong">خودرو و موتورسیکلت</span>
+                    </a>
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/12.webp" />
+                        <span class="text-strong">محصولات بومی و محلی</span>
+                    </a>
+
+                    <a class="d-flex flex-column align-items-center gap-2">
+                        <img loading="lazy" src="/assets/images/category/13.webp" />
+                        <span class="text-strong">کارت هدیه</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="banner d-flex flex-wrap mt-6 mx-5 mx-lg-0 gap-3 flex-lg-nowrap justify-content-between"
+                data-count="2">
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/5.webp" />
+                </a>
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/6.webp" />
+                </a>
+
+                </a>
+            </div>
+
+            <div class="mt-6 mx-5 mx-lg-0">
+                <p class="mb-9 h3 d-flex justify-content-center">پیشنهاد دیجی‌پرس </p>
+
+                <div class="digikalaRecommendation radius-large border-gray-200">
+                    <div class="swiper digikalaRecommendation-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/20.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">گوشی
+                                        موبایل</span>
+                                </a>
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/21.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">هدست،
+                                        هدفون و هندزفری </span>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/22.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">گوشی
+                                        موبایل</span>
+                                </a>
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/23.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">هدست،
+                                        هدفون و هندزفری </span>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/24.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">گوشی
+                                        موبایل</span>
+                                </a>
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/25.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">هدست،
+                                        هدفون و هندزفری </span>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/26.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">گوشی
+                                        موبایل</span>
+                                </a>
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/27.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">هدست،
+                                        هدفون و هندزفری </span>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/28.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">گوشی
+                                        موبایل</span>
+                                </a>
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/29.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate"> لپ
+                                        تاپ </span>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/30.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">تبلت</span>
+                                </a>
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/31.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">تلویزیون
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/32.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">لامپ
+                                        و پراغ</span>
+                                </a>
+                                <a class="d-flex flex-column py-4 align-items-center">
+
+                                    <div class="radius-circle bg-gray-100 p-3">
+                                        <div class="d-flex digikalaRecommendation-item-img">
+                                            <img src="/assets/images/product/300/33.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <span
+                                        class="digikalaRecommendation-item-title text-medium-2 mt-2 text-truncate">کاغذ
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popularBrands mt-6 py-6 radius-large border-lg-gray-200">
+                <div class="d-flex align-items-center gap-2 justify-content-center">
+                    <i class="icon-star-2 color-rating-0-2"></i>
+                    <p class=" h3  color-gray-800"> محبوب‌ترین برندها </p>
+
+                </div>
+
+                <div class="swiper popularBrands-swiper mt-3">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/1.png" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/2.png" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/3.png" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/4.png" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/5.png" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/6.png" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/7.jpg" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/8.jpg" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/9.png" />
+                            </a>
+                        </div>
+                        <div class="swiper-slide px-4 py-1">
+                            <a class="d-flex">
+                                <img class="w-p-100 object-fit-contain" loading="lazy"
+                                    src="/assets/images/brand/10.png" />
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="swiper-btn-prev icon-chevronRight"></div>
+                    <div class="swiper-btn-next icon-chevronLeft"></div>
+                </div>
+            </div>
+            <div class="banner d-flex flex-wrap mt-6 mx-5 mx-lg-0 gap-3 flex-lg-nowrap justify-content-between"
+                data-count="2">
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/7.webp" />
+                </a>
+                <a>
+                    <img loading="lazy" class="w-p-100 radius-large" src="/assets/images/banner/8.webp" />
+                </a>
+
+                </a>
+            </div>
+
+            <div class="baseOnvisit-products border-lg-gray-200 radius-large d-flex flex-wrap mt-6">
+                <div class="baseOnvisit-products-item py-2 px-5 d-flex flex-column col-lg-3 col-12">
+                    <span class="h5 color-gray-800">طبق آخرین بازدیدهایتان</span>
+                    <span class="text-subtitle color-gray-500">خرید نیمه‌تمام را با این پیشنهادها نهایی کنید</span>
+                    <div class="baseOnvisit-products-item-grid grid bg-gray-100">
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/34.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/35.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/36.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/37.jpg" />
+                        </a>
+
+                    </div>
+
+                    <a
+                        class="text-strong d-flex align-items-center color-secondary-500 justify-content-center mt-1 mb-3">
+                        مشاهده
+                        <i class="icon-chevronLeft icon-fs-medium"></i>
+                    </a>
+                </div>
+                <div class="baseOnvisit-products-item py-2 px-5 d-flex flex-column col-lg-3 col-12">
+                    <span class="h5 color-gray-800">طبق آخرین بازدیدهایتان</span>
+                    <span class="text-subtitle color-gray-500">خرید نیمه‌تمام را با این پیشنهادها نهایی کنید</span>
+                    <div class="baseOnvisit-products-item-grid grid bg-gray-100">
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/34.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/35.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/36.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/37.jpg" />
+                        </a>
+
+                    </div>
+
+                    <a
+                        class="text-strong d-flex align-items-center color-secondary-500 justify-content-center mt-1 mb-3">
+                        مشاهده
+                        <i class="icon-chevronLeft icon-fs-medium"></i>
+                    </a>
+                </div>
+                <div class="baseOnvisit-products-item py-2 px-5 d-flex flex-column col-lg-3 col-12">
+                    <span class="h5 color-gray-800">طبق آخرین بازدیدهایتان</span>
+                    <span class="text-subtitle color-gray-500">خرید نیمه‌تمام را با این پیشنهادها نهایی کنید</span>
+                    <div class="baseOnvisit-products-item-grid grid bg-gray-100">
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/34.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/35.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/36.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/37.jpg" />
+                        </a>
+
+                    </div>
+
+                    <a
+                        class="text-strong d-flex align-items-center color-secondary-500 justify-content-center mt-1 mb-3">
+                        مشاهده
+                        <i class="icon-chevronLeft icon-fs-medium"></i>
+                    </a>
+                </div>
+                <div class="baseOnvisit-products-item py-2 px-5 d-flex flex-column col-lg-3 col-12">
+                    <span class="h5 color-gray-800">طبق آخرین بازدیدهایتان</span>
+                    <span class="text-subtitle color-gray-500">خرید نیمه‌تمام را با این پیشنهادها نهایی کنید</span>
+                    <div class="baseOnvisit-products-item-grid grid bg-gray-100">
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/34.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/35.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/36.jpg" />
+                        </a>
+                        <a class=" d-flex justify-content-center p-2 g-col-6 bg-white">
+                            <img loading="lazy" class="w-p-100" src="/assets/images/product/300/37.jpg" />
+                        </a>
+
+                    </div>
+
+                    <a
+                        class="text-strong d-flex align-items-center color-secondary-500 justify-content-center mt-1 mb-3">
+                        مشاهده
+                        <i class="icon-chevronLeft icon-fs-medium"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="digiplus-widget bg-dgplus-700 radius-lg-large mt-6 p-4 d-flex flex-column flex-lg-row">
+                <div class="digiplus-widget-rSide flex-grow-1 d-flex flex-column pe-6 pt-6 align-items-start">
+                    <a><img src="/assets/images/svg/digiplus-logo.svg" /></a>
+
+                    <span class="text-medium color-white">خدمات ویژه برای اعضای دیجی‌پلاس</span>
+                    <a
+                        class="color-white d-flex align-items-center border-white mt-3 px-4 py-1 radius-medium text-medium-2">
+                        عضویت
+                        <i class="icon-arrowLeft me-2"></i>
+                    </a>
+                </div>
+
+                <div class="d-flex flex-column flex-lg-row radius-medium gap-1 overflow-hidden">
+                    <div class="bg-white d-flex flex-column px-4 pt-4 pb-5">
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="icon-deliveryInstant color-dgplus-500"></i>
+                                <span class="h5 me-2">ارسال فوری رایگان</span>
+                            </div>
+
+                            <a class="d-flex align-items-center color-dgplus-500">
+                                <span class="text-strong">مشاهده همه</span>
+                                <i class="icon-chevronLeft icon-fs-large"></i>
+                            </a>
+                        </div>
+
+                        <div class="grid mt-4 gap-7">
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/19.webp" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/20.jpg" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/21.jpg" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/19.webp" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/20.jpg" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/22.jpg" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/20.jpg" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+                            <a class="g-col-4 g-col-lg-2 digiplus-widget-product position-relative">
+                                <img src="/assets/images/product/300/22.jpg" class="w-p-100">
+                                <div
+                                    class="digiplus-widget-product-cashback position-absolute d-flex align-items-center text-strong bg-white radius-large py-1 px-2 color-dgplus-900">
+                                    <span class="fanumber currency">1448</span>
+                                    <i class="icon-toman"></i>
+                                    <span class="text-subtitle-strong me-1">هدیه</span>
+                                </div>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="digiclub-widget mt-6 radius-lg-large d-flex flex-column flex-lg-row justify-content-between py-3 px-4">
+                <a class="d-flex align-items-center justify-content-between me-lg-6">
+                    <img width="120" src="/assets/images/svg/digiclub-logo-white.svg" />
+                    <div class="d-flex align-items-center color-white ms-7 d-lg-none">
+                        <span class="text-subtitle ">امتیاز شما</span>
+                        <span class="fanumber mx-1 h3-strong">504</span>
+                        <img src="/assets/images/svg/club-point.svg" />
+                    </div>
+                </a>
+
+                <div class="d-flex align-self-center">
+
+                    <div class="d-lg-flex align-items-center color-white ms-7 d-none">
+                        <span class="text-subtitle ">امتیاز شما</span>
+                        <span class="fanumber mx-1 h3-strong">504</span>
+                        <img src="/assets/images/svg/club-point.svg" />
+                    </div>
+
+                    <div class="d-flex gap-1 radius-medium overflow-hidden">
+                        <a class="digiclub-widget-item bg-white d-flex flex-column flex-lg-row align-items-center">
+                            <i class="icon-luckyDraw color-secondary-600 me-4 icon-fs-large"></i>
+                            <span class="text-strong me-2">چرخ و بخت</span>
+                            <img class="object-fit-cover" src="/assets/images/wheel-spinner.jpg" />
+                        </a>
+                        <a class="digiclub-widget-item bg-white d-flex flex-column flex-lg-row align-items-center">
+                            <i class="icon-missions color-secondary-600 me-4 icon-fs-large"></i>
+                            <span class="text-strong me-2">ماموریت‌ ها</span>
+                            <img class="object-fit-cover" src="/assets/images/missions.png" />
+                        </a>
+                        <a class="digiclub-widget-item bg-white d-flex flex-column flex-lg-row align-items-center">
+                            <i class="icon-voucher color-secondary-600 me-4 icon-fs-large"></i>
+                            <span class="text-strong me-2">جایزه‌ ها</span>
+                            <img class="object-fit-cover" src="/assets/images/awards.png" />
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-4 border-lg-gray-200 radius-large py-4">
+                <div class="grid">
+                    <div class="g-col-7 d-flex align-items-center justify-content-lg-end px-2">
+                        <i class="icon-searchTrend color-warning-100"></i>
+                        <span class="h3 me-2">پرفروش‌ترین کالاها</span>
+                    </div>
+
+                    <a class="color-secondary-500 text-strong-3 g-col-5 d-flex justify-content-end ps-4">
+                        مشاهده همه
+                    </a>
+                </div>
+
+                <div class="swiper bestSelling-swiper px-2 mt-5 mt-lg-7">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/41.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">1</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/35.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">2</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/36.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">3</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="swiper-slide">
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/37.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">4</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/38.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">5</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/39.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">6</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="swiper-slide">
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/41.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">7</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/37.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">8</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/40.webp" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">9</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="swiper-slide">
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/41.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">10</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/37.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">11</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                            <a class="d-flex bestSelling-swiper-product">
+                                <img loading="lazy" src="/assets/images/product/300/38.jpg" />
+                                <span
+                                    class="fanumber color-secondary-500 h2-strong mx-3 d-flex align-items-center">12</span>
+                                <div
+                                    class="bestSelling-swiper-productTitle position-relative d-flex align-items-center">
+                                    <span class="text-medium color-gray-700 text-truncate-2">
+                                        دفتر کرافت 30 برگ تیما مدل CAMEL
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="swiper-btn-prev icon-chevronRight"></div>
+                    <div class="swiper-btn-next icon-chevronLeft"></div>
+                </div>
+            </div>
+
+            <div class="bestDiscount-widget mt-6 px-3 border-lg-gray-200 radius-large">
+                <div class="d-flex justify-content-center align-items-center pt-4 pb-6">
+                    <i class="icon-discount color-primary-500"></i>
+                    <span class="h3 me-2">منتخب محصولات تخفیف و حراج</span>
+                </div>
+
+                <div class="bestDiscount-widget-products grid gap-0">
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/1.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/2.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/3.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/4.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/5.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/6.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/7.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/8.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/9.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/10.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/11.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/12.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/13.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/14.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/15.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+                    <a class="bestDiscount-widget-item py-3 px-2 d-flex flex-column">
+                        <img loading="lazy" class="bestDiscount-widget-item-img mb-2 align-self-center"
+                            src="/assets/images/product/300/16.webp" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div
+                                class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-large ">
+                                <span class="text-strong fanumber">27٪</span>
+                            </div>
+
+                            <span class="me-auto fanumber currency h5 ms-1">16200000</span>
+                            <i class="icon-toman icon-fs-small color-gray-700"></i>
+
+                        </div>
+
+                        <div class="align-self-end ps-5">
+                            <span
+                                class="fanumber currency text-decoration-line-through color-gray-300 text-medium">17200000</span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="blog-widget mt-6 mx-5 mx-lg-0 mb-5">
+                <div class="d-flex justify-content-between">
+                    <span class="h5">خواندنی‌ها</span>
+
+                    <a class="d-flex align-items-center color-secondary-500 text-strong">
+                        <span>مطالب بیشتر در دیجی‌پرس مگ</span>
+                        <i class="icon-chevronLeft icon-fs-medium"></i>
+                    </a>
+                </div>
+
+                <div class="blog-widget-items grid mt-4">
+                    <a class="border-gray-200 radius-medium overflow-hidden">
+                        <img class="w-p-100" src="/assets/images/blog/1.png" />
+
+                        <p class="px-4 mb-3 mt-2 text-medium">راهنمای خرید بهترین موس A4tech، زیبایی و کیفیت در کنار هم
+                        </p>
+                    </a>
+                    <a class="border-gray-200 radius-medium overflow-hidden">
+                        <img class="w-p-100" src="/assets/images/blog/2.jpg" />
+
+                        <p class="px-4 mb-3 mt-2 text-medium">راهنمای خرید بهترین موس A4tech، زیبایی و کیفیت در کنار هم
+                        </p>
+                    </a>
+                    <a class="border-gray-200 radius-medium overflow-hidden">
+                        <img class="w-p-100" src="/assets/images/blog/3.jpg" />
+
+                        <p class="px-4 mb-3 mt-2 text-medium">راهنمای خرید بهترین موس A4tech، زیبایی و کیفیت در کنار هم
+                        </p>
+                    </a>
+                    <a class="border-gray-200 radius-medium overflow-hidden">
+                        <img class="w-p-100" src="/assets/images/blog/4.jpg" />
+
+                        <p class="px-4 mb-3 mt-2 text-medium">راهنمای خرید بهترین موس A4tech، زیبایی و کیفیت در کنار هم
+                        </p>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay "></div>
+
+    <div class="modals">
+        <div class="modal radius-lg-large modal-dkServices overflow-hidden d-flex flex-column pt-12" data-id="dkServices">
+
+            <div
+                class="modal-header d-flex align-items-center mx-5 border-b-gray-200 position-fixed end-0 start-0 top-0 bg-white">
+                <i class="icon-dkSmile color-primary-500 ms-2"></i>
+                <span class="modal-title py-3">خدمات دیجی‌پرس</span>
+                <i class="modal-close icon-close me-auto color-gray-700 pointer"></i>
+            </div>
+            <div class="modal-content py-4 px-5 w-p-100 overflow-auto">
+                <div class="mt-5">
+                    <div class="grid gap-3">
+                        <a class="g-col-4 g-col-lg-2 main-services-item d-flex flex-column gap-1 align-items-center">
+                            <img loading="lazy" src="/assets/images/dkServices/1.png" />
+                            <span class="text-subtitle-strong ">دیجی‌پرس جت</span>
+                        </a>
+                        <a class="g-col-4 g-col-lg-2 main-services-item d-flex flex-column gap-1 align-items-center">
+                            <img loading="lazy" src="/assets/images/dkServices/3.png" />
+                            <span class="text-subtitle-strong ">دریافت وام</span>
+                        </a>
+                        <a class="g-col-4 g-col-lg-2 main-services-item d-flex flex-column gap-1 align-items-center">
+                            <img loading="lazy" src="/assets/images/dkServices/2.png" />
+                            <span class="text-subtitle-strong "> حراج استایل</span>
+                        </a>
+                        <a class="g-col-4 g-col-lg-2 main-services-item d-flex flex-column gap-1 align-items-center">
+                            <img loading="lazy" src="/assets/images/dkServices/4.png" />
+                            <span class="text-subtitle-strong ">سوپرمارکت</span>
+                        </a>
+                        <a class="g-col-4 g-col-lg-2 main-services-item d-flex flex-column gap-1 align-items-center">
+                            <img loading="lazy" src="/assets/images/dkServices/5.png" />
+                            <span class="text-subtitle-strong ">گیم‌نت </span>
+                        </a>
+                        <a class="g-col-4 g-col-lg-2 main-services-item d-flex flex-column gap-1 align-items-center">
+                            <img loading="lazy" src="/assets/images/dkServices/6.png" />
+                            <span class="text-subtitle-strong ">دیجی‌پلاس</span>
+                        </a>
+                        <a class="g-col-4 g-col-lg-2 main-services-item d-flex flex-column gap-1 align-items-center">
+                            <img loading="lazy" src="/assets/images/dkServices/7.png" />
+                            <span class="text-subtitle-strong ">ارسال سریع</span>
+                        </a>
+                    </div>
+
+                    <div class="text-strong-2 color-gray-500 mt-6">
+                        سرویس‌های گروه دیجی‌پرس
+                    </div>
+
+                    <div class="servicesList grid gap-3 mt-2">
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                        <a class="border-lg-gray-200 d-flex radius-large border-b-gray-200 gap-3 px-lg-3 py-3">
+                            <img src="/assets/images/dkServices/1.png" height="52" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-strong-3 color-gray-700">دیجی‌پرس جت</span>
+                                    <i class="icon-arrowLeft color-gray-400"></i>
+                                </div>
+                                <div class="text-medium color-gray-400">خرید فوری از سوپرمارکت‌های اطراف</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div
+            class="stories-modal position-fixed w-p-100 h-p-100 top-0 d-flex align-items-center justify-content-center">
+            <div class="stories-modal-bg position-absolute top-0 bottom-0 end-0 start-0"></div>
+            <div class="stories-modal-swiper-btn swiper-btn-prev icon-chevronRight"></div>
+            <div class="swiper storiesModal-swiper h-p-100">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="d-flex flex-column h-p-100">
+                            <div class="flex-grow-1 position-relative">
+                                <div class="stories-header-bg position-absolute top-0 start-0 end-0 z-1 "></div>
+                                <div class="stories-header z-1 position-absolute top-0 end-0 start-0 px-5 pt-4">
+                                    <div class="d-flex align-items-center color-white">
+                                        <i class="icon-arrowRight pointer stories-modal-close"></i>
+                                        <a class="me-5 d-flex align-items-center">
+                                            <img src="/assets/images/stories/profile/1.jpg" height="40"
+                                                class="radius-circle" />
+                                            <span class="me-2 h5 color-gray-100">Alireza</span>
+                                        </a>
+                                        <button class="me-auto h-9 bg-white px-4 text-button-1 radius-medium">دنبال
+                                            کن</button>
+                                    </div>
+                                </div>
+
+                                <div class="stories-video-container h-p-100 w-p-100 position-relative">
+                                    <video-js class="h-p-100 w-p-100 stories-video"
+                                        src="/assets/video/stories/1.mp4"></video-js>
+                                    <i
+                                        class="icon-mute color-white d-none video-mute position-absolute top-0 w-p-100 h-p-100 d-flex align-items-center justify-content-center"></i>
+                                </div>
+
+
+                                <div class="position-absolute bottom-0 end-0 start-0 px-5">
+                                    <div class="stories-bottom-bg position-absolute top-0 start-0 end-0 bottom-0"></div>
+                                    <div
+                                        class="d-flex justify-content-between align-items-end gap-4 gap-lg-4 position-relative">
+                                        <h5 class="h5 color-gray-100">کهن دژ خفن تر از دژ</h5>
+                                        <div class="color-white d-flex flex-column gap-4">
+                                            <div class="d-flex flex-column align-items-center pointer">
+                                                <i class="icon-favorite"></i>
+                                                <span class="text-strong-2 fanumber ">98</span>
+                                            </div>
+                                            <div class="d-flex flex-column align-items-center pointer">
+                                                <i class="icon-comment"></i>
+                                                <span class="text-strong-2 fanumber ">98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center w-p-100  gap-1">
+                                        <div class="w-p-100 px-1 ltr">
+                                            <div class="video-progress w-p-100">
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="text-subtitle-strong w-12 color-white videoTime text-start z-1">
+                                            ۰۰:۰۰
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-2 d-flex gap-2 bg-gray-900 flex-grow-0">
+                                <div class="stories-product-item pointer d-flex bg-white radius-medium overflow-hidden">
+                                    <img src="/assets/images/product/300/45.jpg" height="60" />
+                                    <span class="text-truncate-2 px-2 pt-2 text-strong">نور ثابت ال ای دی دی بی کی مدل
+                                        BGD015</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="d-flex flex-column h-p-100">
+                            <div class="flex-grow-1 position-relative">
+                                <div class="stories-header-bg position-absolute top-0 start-0 end-0 z-1 "></div>
+                                <div class="stories-header z-1 position-absolute top-0 end-0 start-0 px-5 pt-4">
+                                    <div class="d-flex align-items-center color-white">
+                                        <i class="icon-arrowRight pointer stories-modal-close"></i>
+                                        <a class="me-5 d-flex align-items-center">
+                                            <img src="/assets/images/stories/profile/1.jpg" height="40"
+                                                class="radius-circle" />
+                                            <span class="me-2 h5 color-gray-100">Alireza</span>
+                                        </a>
+                                        <button class="me-auto h-9 bg-white px-4 text-button-1 radius-medium">دنبال
+                                            کن</button>
+                                    </div>
+                                </div>
+
+                                <div class="stories-video-container h-p-100 w-p-100 position-relative">
+                                    <video-js class="h-p-100 w-p-100 stories-video"
+                                        src="/assets/video/stories/1.mp4"></video-js>
+                                    <i
+                                        class="icon-mute color-white d-none video-mute position-absolute top-0 w-p-100 h-p-100 d-flex align-items-center justify-content-center"></i>
+                                </div>
+
+
+                                <div class="position-absolute bottom-0 end-0 start-0 px-5">
+                                    <div class="stories-bottom-bg position-absolute top-0 start-0 end-0 bottom-0"></div>
+                                    <div
+                                        class="d-flex justify-content-between align-items-end gap-4 gap-lg-4 position-relative">
+                                        <h5 class="h5 color-gray-100">کهن دژ خفن تر از دژ</h5>
+                                        <div class="color-white d-flex flex-column gap-4">
+                                            <div class="d-flex flex-column align-items-center pointer">
+                                                <i class="icon-favorite"></i>
+                                                <span class="text-strong-2 fanumber ">98</span>
+                                            </div>
+                                            <div class="d-flex flex-column align-items-center pointer">
+                                                <i class="icon-comment"></i>
+                                                <span class="text-strong-2 fanumber ">98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center w-p-100  gap-1">
+                                        <div class="w-p-100 px-1 ltr">
+                                            <div class="video-progress w-p-100">
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="text-subtitle-strong w-12 color-white videoTime text-start z-1">
+                                            ۰۰:۰۰
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-2 d-flex gap-2 bg-gray-900 flex-grow-0">
+                                <div class="stories-product-item pointer d-flex bg-white radius-medium overflow-hidden">
+                                    <img src="/assets/images/product/300/45.jpg" height="60" />
+                                    <span class="text-truncate-2 px-2 pt-2 text-strong">نور ثابت ال ای دی دی بی کی مدل
+                                        BGD015</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="stories-modal-swiper-btn swiper-btn-next icon-chevronLeft"></div>
+        </div>
+
+    </div>
+
+    <footer class="border-t-gray-100 mt-12 pt-8">
+        <div class="container-4xl px-5">
+            <div class="d-flex justify-content-between">
+                <a href="/">
+                    <img src="/assets/images/logo/logo-fa.svg" class="w-p-100 footer-logo" />
+                </a>
+
+                <a
+                    class="gotoTop h-10 border-gray-200 radius-medium d-flex align-items-center text-strong px-4 color-gray-400">
+                    <span>بازگشت به بالا</span>
+                    <i class="icon-chevronUp me-2"></i>
+                </a>
+            </div>
+
+            <div class="d-flex flex-md-row flex-column color-gray-700 text-medium mt-4 mb-8 mb-md-0">
+                <span>تلفن پشتیبانی ۶۱۹۳۶۱۹۳ - ۰۲۱</span>
+                <span class="px-5 color-gray-400 d-none d-md-flex">|</span>
+                <span>۷ روز هفته، ۲۴ ساعته پاسخگوی شما هستیم</span>
+            </div>
+
+            <div class="py-11 d-none d-md-flex justify-content-around">
+                <a class="d-flex flex-column align-items-center">
+                    <img src="/assets/images/footer/express-delivery.svg" />
+                    <span class="text-subtitle color-gray-700">امکان تحویل اکسپرس</span>
+                </a>
+                <a class="d-flex flex-column align-items-center">
+                    <img src="/assets/images/footer/cash-on-delivery.svg" />
+                    <span class="text-subtitle color-gray-700">امکان پرداخت در محل</span>
+                </a>
+                <a class="d-flex flex-column align-items-center">
+                    <img src="/assets/images/footer/support.svg" />
+                    <span class="text-subtitle color-gray-700">۷ روز ﻫﻔﺘﻪ، ۲۴ ﺳﺎﻋﺘﻪ</span>
+                </a>
+                <a class="d-flex flex-column align-items-center">
+                    <img src="/assets/images/footer/days-return.svg" />
+                    <span class="text-subtitle color-gray-700">هفت روز ضمانت بازگشت کالا</span>
+                </a>
+                <a class="d-flex flex-column align-items-center">
+                    <img src="/assets/images/footer/original-products.svg" />
+                    <span class="text-subtitle color-gray-700">ﺿﻤﺎﻧﺖ اﺻﻞ ﺑﻮدن ﮐﺎﻟﺎ</span>
+                </a>
+            </div>
+
+            <div class="d-flex flex-wrap flex-md-nowrap mb-8">
+                <div class="d-flex flex-column flex-grow-1 w-p-50 w-p-lg-unset mb-2 gap-2">
+                    <p class="h5 color-gray-700 ">با دیجی‌پرس</p>
+                    <a class="color-gray-500 text-medium-2">اتاق خبر دیجی‌پرس</a>
+                    <a class="color-gray-500 text-medium-2">فروش در دیجی‌پرس</a>
+                    <a class="color-gray-500 text-medium-2">فرصت‌های شغلی</a>
+                    <a class="color-gray-500 text-medium-2">گزارش تخلف در دیجی‌پرس</a>
+                    <a class="color-gray-500 text-medium-2">تماس با دیجی‌پرس</a>
+                    <a class="color-gray-500 text-medium-2">درباره دیجی‌پرس</a>
+                </div>
+                <div class="d-flex flex-column flex-grow-1 w-p-50 w-p-lg-unset mb-2 gap-2">
+                    <p class="h5 color-gray-700 ">خدمات مشتریان</p>
+                    <a class="color-gray-500 text-medium-2">پاسخ به پرسش‌های متداول</a>
+                    <a class="color-gray-500 text-medium-2">رویه‌های بازگرداندن کالا</a>
+                    <a class="color-gray-500 text-medium-2">شرایط استفاده</a>
+                    <a class="color-gray-500 text-medium-2">حریم خصوصی</a>
+                    <a class="color-gray-500 text-medium-2">گزارش باگ</a>
+                </div>
+
+                <div class="d-none d-lg-flex flex-column flex-grow-1  mb-2 gap-2">
+                    <p class="h5 color-gray-700 ">راهنمای خرید از دیجی‌پرس</p>
+                    <a class="color-gray-500 text-medium-2">نحوه ثبت سفارش</a>
+                    <a class="color-gray-500 text-medium-2">رویه ارسال سفارش</a>
+                    <a class="color-gray-500 text-medium-2">شیوه‌های پرداخت</a>
+                </div>
+
+                <div class="w-p-100 w-p-md-unset mt-8 mt-md-0">
+                    <div class="d-flex flex-row flex-md-column justify-content-between">
+                        <span class="h5 color-gray-700 mb-4">همراه ما باشید!</span>
+
+                        <div class="footer-socialLink d-flex mb-8">
+                            <a class="ms-6 ms-lg-8"><i class="icon-instagram color-gray-400"></i></a>
+                            <a class="ms-6 ms-lg-8"><i class="icon-twitter color-gray-400"></i></a>
+
+                            <a class="ms-6 ms-lg-8"><i class="icon-linkedin color-gray-400"></i></a>
+
+                            <a class="ms-6 ms-lg-8"><i class="icon-aparat color-gray-400"></i></a>
+
+                        </div>
+                    </div>
+
+                    <p class="h5 color-gray-700 mb-3 d-none d-md-flex">
+                        با ثبت ایمیل، از جدید‌ترین تخفیف‌ها با‌خبر شوید
+                    </p>
+
+                    <form class="footer-newslater-form d-flex h-12">
+                        <input type="text" placeholder="ایمیل شما" class="bg-gray-100 radius-medium w-p-100 px-4" />
+                        <button class="text-strong btn-disabled px-4 radius-medium me-2">ثبت</button>
+                    </form>
+                </div>
+            </div>
+
+            <div
+                class="footer-appLink d-flex flex-column flex-lg-row justify-content-lg-between align-items-center radius-medium px-5 py-2 py-lg-4">
+                <div class="d-flex align-items-center">
+                    <img class="footer-appLink-logo" src="/assets/images/logo/logo2.webp" />
+                    <span class="h3 color-white me-4">دانلود اپلیکیشن دیجی‌پرس</span>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-center mt-4 mt-lg-0">
+                    <a class="ms-4">
+                        <img src="/assets/images/svg/footer/coffe-bazzar.svg" height="44px" />
+                    </a>
+                    <a class="ms-4">
+                        <img src="/assets/images/svg/footer/myket.svg" />
+                    </a>
+                    <a class="ms-4">
+                        <img src="/assets/images/svg/footer/sib-app.svg" />
+                    </a>
+
+                    <a
+                        class="footer-appLink-moreApp h-11 w-11 bg-white me-2 radius-small d-none d-lg-flex align-items-center justify-content-center">
+                        <i class="icon-moreHorizontal color-gray-700"></i>
+                    </a>
+                </div>
+
+                <a class="color-white d-flex d-lg-none align-items-center text- mt-2">
+                    <span>اطلاعات بیشتر</span>
+                    <i class="icon-chevronLeft"></i>
+                </a>
+            </div>
+
+            <div class="mt-6 border-t-gray-100 d-flex flex-column flex-lg-row py-8 gap-8">
+
+                <div class="d-flex flex-column">
+                    <div
+                        class="textWithShowore overflow-hidden position-relative d-flex flex-column text-medium color-gray-500 ms-lg-12">
+                        <h1 class="h3 color-gray-600">فروشگاه اینترنتی دیجی‌پرس، بررسی، انتخاب و خرید آنلاین</h1>
+                        <p>یک خرید اینترنتی مطمئن، نیازمند فروشگاهی است که بتواند کالاهایی متنوع، باکیفیت و دارای
+                            قیمت
+                            مناسب را در مدت زمانی کوتاه به دست مشتریان خود برساند و ضمانت بازگشت کالا هم داشته باشد؛
+                            ویژگی‌هایی که فروشگاه اینترنتی دیجی‌پرس سال‌هاست بر روی آن‌ها کار کرده و توانسته از این
+                            طریق مشتریان ثابت خود را داشته باشد.<br>
+                            یکی از مهم‌ترین دغدغه‌های کاربران دیجی‌پرس یا هر فروشگاه‌ اینترنتی دیگری، این است که
+                            کالای
+                            خریداری شده چه زمانی به دستشان می‌رسد. دیجی‌پرس شیوه‌های مختلفی از ارسال را متناسب با
+                            فروشنده کالا،‌ مقصد کالا و همچنین نوع کالا در اختیار کاربران خود قرار می‌دهد. هر یک از
+                            <a>روش های ارسال دیجی‌ پرس</a> شرایط و ویژگی‌های خاص خود را دارند که ممکن است گاهی برای
+                            کاربران جدید، مبهم و پیچیده به نظر برسند. برای آگاهی بیشتر مشتریان از خدمات دیجی‌پرس،
+                            این
+                            فروشگاه اینترنتی در بخشی از وب‌سایت خود راهنمای کاملی از شیوه‌‌های ارسال را به صورت ساده
+                            و
+                            به دور از پیچیدگی، قرار داده است که شامل 8 نوع ارسال کالا به روش‌های زیر است: ارسال
+                            امروز،
+                            دریافت حضوری، دریافت از گنجه، ارسال توسط فروشنده، ارسال عادی، ارسال کالاهای بزرگ، سنگین
+                            و
+                            فوق سنگین، ارسال سریع سوپرمارکتی، ارسال با پست
+                        </p>
+
+                        <h2 class="h5">کدام محصولات در دیجی‌پرس قابل سفارش هستند؟</h2>
+                        <p>تقریبا می‌توان گفت محصولی وجود ندارد که دیجی‌پرس برای مشتریان خود در سراسر کشور فراهم
+                            نکرده
+                            باشد. شما می‌توانید در تمامی روزهای هفته و تمامی شبانه روز یا در روزهای خاصی مثل حراج
+                            شگفت
+                            انگیز دیجی‌پرس که محصولات دارای تخفیف عالی می‌شوند، سفارش خود را به سادگی ثبت کرده و در
+                            روز
+                            و محدوده زمانی مناسب خود، درب منزل تحویل بگیرید. بعضی از گروه‌های اصلی و زیر مجموعه‌های
+                            پرطرفدار محصولات دیجی‌پرس شامل مواردی می‌شود که در ادامه به معرفی آن‌ها می‌پردازیم که
+                            امکان
+                            ارسال امروز برای آن ها وجود دارد. </p>
+
+                        <h2 class="h5">کالای دیجیتال</h2>
+                        <p>انواع گوشی موبایل از برندهای مختلفی مثل آیفون، گوشی سامسونگ، گوشی نوکیا، گوشی شیائومی،
+                            گوشی
+                            هواوی، و...، انواع کنسول بازی ps4 و ps5، انواع تبلت‌های پرطرفدار مثل تبلت سامسونگ نوت
+                            10،
+                            انواع هندزفری مثل هندزفری بی سیم، تلوزیون از برندهای مختلف مثل تلویزیون سامسونگ، سونی
+                            و...،
+                            انواع مانیتور، کیس، کیبورد، مودم از برندهای مختلف مثل مودم ایرانسل، آنتن و ... تنها بخشی
+                            از
+                            محصولاتی هستند که زیر مجموعه کالای دیجیتال در دیجی‌پرس قرار دارند.</p>
+
+                        <h2 class="h5">خودرو، ابزار و تجهیزات صنعتی</h2>
+                        <p>انواع خودروهای ایرانی و خارجی از برندهای مطرحی مثل هوندا، کیا و...، موتور سیکلت از
+                            برندهایی
+                            مثل کویر موتور و...، لوازم جانبی خودرو مثل سیستم صوتی تصویر، ضبط و...، لوازم یدکی مثل
+                            دیسک و
+                            صفحه کلاج و... و لوازم مصرفی خودرو مثل کفپوش سانا در این گروه قرار می‌گیرند.</p>
+
+                        <h2 class="h5">مد و پوشاک</h2>
+                        <p>محصولاتی مثل انواع لباس مثل لباس مجلسی زنانه و مردانه، لباس راحتی، لباس ورزشی، اکسسوری،
+                            کیف،
+                            کفش، عینک آفتابی، لباس زیر، شال و روسری و... جزو مواردی هستند که می‌توانید آن‌ها را از
+                            برندهای مطرح ایرانی و خارجی موجود در دیجی‌ پرس مثل آدیداس، نایکی، دبنهامز، آلدو، درسا
+                            و...
+                            خریداری کنید.</p>
+
+                        <h2 class="h5">اسباب بازی کودک و نوزاد</h2>
+                        <p>در این دسته از کالاهای دیجی‌پرس، انواع لوازم بهداشتی و حمام کودک و نوزاد، انواع پوشاک و
+                            کفش،
+                            تبلت، اسباب‌بازی، لوازم اتاق خواب کودک، لوازم ایمنی، لوازم شخصی و غذا خوری و ... قرار
+                            می‌گیرد تا خرید را برای پدر و مادرها به کاری سریع و آسان تبدیل کند.</p>
+
+                        <h2 class="h5">کالاهای سوپر مارکتی</h2>
+                        <p>هر چیزی از مواد خوراکی که به آن نیاز دارید، در سوپرمارکت دیجی‌پرس پیدا می‌شود، محصولات
+                            پرطرفداری مثل کره بادام‌زمینی، عسل، سس، قهوه، زعفران، شکلات، انواع نان و ... از برندهای
+                            معتبر و معروفی مثل نستله، نوتلا، استارباکس، مزمز، چی توز و ... همگی در اختیار شما هستند
+                            و تا
+                            رسیدن به آشپزخانه شما تنها چند کلیک فاصله دارند.</p>
+
+                        <h2 class="h5">زیبایی و سلامت</h2>
+                        <p>انواع لوازم آرایش مثل لاک، رنگ مو، لوازم آرایش لب، چشم، صورت و... همگی در دیجی‌پرس موجود
+                            هستند. همچنین محصولات بهداشتی مثل انواع شامپو، کرم، ماسک صورت، ضد تعریق، ماسک مو و...،
+                            انواع
+                            لوازم شخصی برقی، ست هدیه، بهترین انواع عطر و اسپری، انواع زیورآلات طلا و نقره مثل سرویس
+                            طلا،
+                            سرویس نقره و... به همراه وسایل مراقبت شخصی طبی در گروه زیبایی و سلامت دیجی‌پرس قرار
+                            می‌گیرد. در این بخش برندهای مطرحی مثل اسنس، پنبه ریز، سینره و... حضور دارند.</p>
+                        <h2 class="h5">خانه و آشپزخانه</h2>
+                        <p>یکی از متنوع‌ترین بخش‌های دیجی‌پرس، بخش لوازم خانه و آشپزخانه است که از محصولاتی مثل
+                            صندلی
+                            گیمینگ در بخش صندلی‌ها گرفته تا انواع مبل راحتی، انواع آبگرمکن مثل آبگرمکن بوتان،
+                            لباسشویی‌های متنوع مثل انواع لباسشویی اسنوا، شیرآلات مختلف مثل شیرآلات قهرمان و...، ظروف
+                            و
+                            همچنین لوازم برقی آشپزخانه مثل توستر و... را شامل می‌شود و امکان خریدی عالی را برای
+                            مشتریان
+                            فراهم کرده است. در بخش لوازم خانگی دیجی‌پرس، برندهای معتبری مثل تفال، اخوان، فیلیپس، ال
+                            جی،
+                            اسنوا، جی پلاس و... حضور دارند.</p>
+                        <h2 class="h5">کتاب، لوازم تحریر و هنر</h2>
+                        <p>بخش هنر، کتاب، رمان و لوازم تحریر دیجی‌پرس نیز یکی از متنوع‌ترین بخش‌های این فروشگاه
+                            اینترنتی است. انواع کتاب و مجله، کتاب زبان، بازی، لوازم تحریر با طرح‌های مختلف مانند
+                            دختر
+                            کفشدوزکی، سازهایی مثل پیانو، سنتور، هنگ درام و... با بهترین قیمت‌ها و از بهترین برندها
+                            در
+                            دسترس شما قرار دارند.</p>
+                        <h2 class="h5">ورزش و سفر</h2>
+                        <p>هر نوع وسیله و لباس ورزشی که فکرش را کنید، انواع وسایل کمپینگ و کوهنوردی، ساک و قمقمه
+                            ورزشی
+                            و... در این بخش قرار می‌گیرند. همچنین شما می‌توانید وسایل مد نظر خود را بر اساس نوع ورزش
+                            (آبی، هوازی، بدنسازی و...) در دسته‌بندی‌های دیجی‌پرس پیدا کنید.</p>
+                        <h2 class="h5">محصولات بومی و محلی</h2>
+                        <p>و در آخر دیجی‌پرس از طریق به فروش رساندن محصولات بومی و سنتی متفاوتی مثل انواع خوراکی،
+                            گلیم
+                            و گبه، ابزار و ... تلاش کرده تا بین هنر ایرانی و متقاضیان آن کوتاه‌ترین راه را پیدا کند.
+                            در
+                            این بخش شما می‌توانید انواع محصولات از جمله ظروف زیبای مخصوص به سفره هفت‌سین و پذیرایی
+                            از
+                            مهمانان در روزهای نوروز، انواع آیینه و شمعدان و هر آن چیزی را که برای خلق زیبایی در
+                            روزهای
+                            بهاری به آن نیاز دارید، با قیمت مناسب و تنوع بسیار بالا انتخاب کنید. همچنین در صفحه
+                            برچسب
+                            ها، امکان مشاهده و خرید انواع محصولات با طرح های بومی وجود دارد. دیجی‌پرس همچنین برای
+                            اینکه
+                            حال و هوای عید را به اعضای خود هدیه کند، تقویم ۱۴۰۱، انواع ایده عکس پروفایل عید نوروز،
+                            آهنگ‌های عید نوروز و موزیک‌های شاد بهاری، وسایل مربوط به خانه‌تکانی و انواع لباس های عید
+                            را
+                            برای شما فراهم کرده است تا بتوانید در کنار خرید خود، از این حال و هوای تازه نهایت لذت را
+                            ببرید.</p>
+                        <h2 class="h5">گزارش های سالیانه دیجی‌ پرس</h2>
+                        <p>در راستای توجه ویژه به شفافیت به عنوان یکی از اصلی‌ترین ارزش‌های محوری دیجی‌پرس، با شروع
+                            سال
+                            ۱۳۹۸ داستان‌پردازی با داده‌های آماری و ارائه گزارش‌های سالانه آغاز شد. مسیری که دستاورد
+                            آن
+                            تا امروز چندین گزارش سالانه و تخصصی مثل گزارش سالانه ۱۳۹۸، گزارش سالانه ۱۳۹۹ و گزارش
+                            سالانه
+                            ۱۴۰۰ دیجی‌پرس هستند. علاوه بر این، گزارش منابع انسانی سال ۱۳۹۹، گزارش منابع انسانی سال
+                            ۱۴۰۰
+                            و همچنین گزارش کتاب دیجی‌پرس، از دیگر گزارش‌های تخصصی دیجی‌پرس به حساب می‌آیند. انتشار
+                            این
+                            گزارش‌ها امکان رصد شفاف‌تر و دقیق‌تر خدمات دیجی‌پرس را فراهم می‌کند، وضعیت بازار آنلاین
+                            کشور را به نمایش می‌گذارد و به تمامی کسب‌وکارهای ایرانی کمک می‌کند تا با فرایندهای فروش
+                            و
+                            عرضه آنلاین کالاهای خود بیشتر آشنا شوند.</p>
+                    </div>
+
+                    <div class=" ">
+                        <a class=" text-strong textWithShowore-btn-showMore color-secondary-500 d-flex align-items-center">
+                            <span>مشاهده بیشتر</span>
+                            <i class="icon-chevronLeft icon-fs-medium"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-enamad d-flex justify-content-center align-items-start me-lg-12">
+                    <a class="d-flex radius-medium border-gray-200 p-2 p-lg-4 me-2">
+                        <img class="object-fit-contain" src="/assets/images/footer/samandehi.webp" />
+                    </a>
+                    <a class="d-flex radius-medium border-gray-200 p-2 p-lg-4 me-2">
+                        <img class="object-fit-contain" src="/assets/images/footer/kasbokar.webp" />
+                    </a>
+                    <a class="d-flex radius-medium border-gray-200 p-2 p-lg-4 me-2">
+                        <img class="object-fit-contain" src="/assets/images/footer/enamad.png" />
+                    </a>
+                </div>
+            </div>
+
+            <div class="border-t-gray-100 d-flex justify-content-center text-subtitle py-8 color-gray-500">
+                برای استفاده از مطالب دیجی‌پرس، داشتن «هدف غیرتجاری» و ذکر «منبع» کافیست. تمام حقوق اين وب‌سايت نیز
+                برای شرکت نوآوران فن آوازه (فروشگاه آنلاین دیجی‌پرس) است.
+            </div>
+        </div>
+
+        <div class="bg-gray-100 d-none d-lg-flex">
+            <div class="footer-partners d-flex flex-wrap container-4xl bg-gray-200">
+                <a class="px-5 bg-gray-100  d-flex align-items-center  flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digimag.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digipay.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digistyle.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digiplus.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digiclub.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/jet.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/magnet.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digiMehr.svg" />
+                </a>
+
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/diginext.svg" />
+                </a>
+
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digiexpress.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/ganjeh.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digify.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/smartech.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digikala-business.svg" />
+                </a>
+                <a class="px-5 bg-gray-100  d-flex align-items-center flex-grow-1">
+                    <img class="w-p-100" src="/assets/images/footer/partners/digikala-service.svg" />
+                </a>
+
+            </div>
+        </div>
+    </footer>
+
+
+
+    <script src="/assets/js/jquery-3.7.0.min.js"></script>
+    <script src="/assets/js/swiper-bundle.min.js"></script>
+    <script src="/assets/js/video.min.js"></script>
+    <script src="/assets/js/nouislider.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/shop/js/tseaerch/tsearch.js"></script>
+
+    <script>
+        stories()
+        if (document.querySelector('.mainSlider-swiper')) mainSlider()
+        amazingCarousel()
+        digikalaRecommendationSwiper()
+        popularBrandSwiper();
+        bestSellingswiper();
+
+        if (document.querySelector('.mainSlider-products-swiper')) {
+            new Swiper('.mainSlider-products-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 12,
+                freeMode: true,
+                navigation: {
+                    nextEl: '.mainSlider-products-next',
+                    prevEl: '.mainSlider-products-prev'
+                }
+            });
+        }
+
+    </script>
+</body>
+
+</html>
+{{end}}

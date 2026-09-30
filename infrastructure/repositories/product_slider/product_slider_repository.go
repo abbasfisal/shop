@@ -71,6 +71,7 @@ func (r *ProductSliderRepository) Store(c *gin.Context, req *requests.CreateProd
 	startsAt, endsAt := requests.SliderDates(req.StartsAt, req.EndsAt)
 	slider := &entities.ProductSlider{
 		Title:    strings.TrimSpace(req.Title),
+		Subtitle: strings.TrimSpace(req.Subtitle),
 		Slug:     provisionalSlug(req.Title),
 		Position: req.Position,
 		Status:   req.Status,
@@ -107,6 +108,7 @@ func (r *ProductSliderRepository) Update(c *gin.Context, sliderID uint, req *req
 	startsAt, endsAt := requests.SliderDates(req.StartsAt, req.EndsAt)
 	values := map[string]interface{}{
 		"title":     strings.TrimSpace(req.Title),
+		"subtitle":  strings.TrimSpace(req.Subtitle),
 		"position":  req.Position,
 		"status":    req.Status,
 		"starts_at": startsAt,

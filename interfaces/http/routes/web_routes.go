@@ -5,6 +5,7 @@ import (
 	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
 	sliderUseCase "shop/application/usecases/product_slider"
+	siteBannerUseCase "shop/application/usecases/site_banner"
 	"shop/bootstrap"
 	"shop/infrastructure/database/postgres"
 	"shop/infrastructure/events"
@@ -12,6 +13,7 @@ import (
 	feeRepository "shop/infrastructure/repositories/fee"
 	mysqlRepo "shop/infrastructure/repositories/home"
 	sliderRepository "shop/infrastructure/repositories/product_slider"
+	siteBannerRepository "shop/infrastructure/repositories/site_banner"
 	PublicHandler "shop/interfaces/http/handlers/web"
 	"shop/interfaces/http/middleware"
 	"time"
@@ -38,12 +40,14 @@ func SetPublic(r *gin.Engine, dep *bootstrap.Dependencies, eventManager *events.
 
 	// promotion banners + homepage product sliders (storefront feed)
 	bannerSrv := bannerUseCase.NewBannerService(bannerRepository.NewBannerRepository(postgres.Get()))
+	siteBannerSrv := siteBannerUseCase.NewSiteBannerService(siteBannerRepository.NewSiteBannerRepository(postgres.Get()))
 	sliderSrv := sliderUseCase.NewProductSliderService(sliderRepository.NewProductSliderRepository(postgres.Get()))
 	feeSrv := feeUseCase.NewFeeRateService(feeRepository.NewFeeRateRepository(postgres.Get()))
 
-	publicHdl := PublicHandler.NewPublicHandler(homeSrv, bannerSrv, sliderSrv, feeSrv, dep)
+	publicHdl := PublicHandler.NewPublicHandler(homeSrv, bannerSrv, siteBannerSrv, sliderSrv, feeSrv, dep)
 
 	r.GET("/", publicHdl.HomePage)
+	r.GET("/home2", publicHdl.HomePage2)
 	r.GET("/product/:product_sku/:product_slug", publicHdl.SingleProduct) //show single product
 	r.GET("/search", publicHdl.SearchProducts)                            //free-text results: /search?q=... (paginated list)
 	r.GET("/search/:category_slug", publicHdl.ShowProductsByCategory)     //show products by category

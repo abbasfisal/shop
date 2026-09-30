@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>گزارش: اصلاح مسیر استاتیک‌های home2.html</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --ink:#e2e8f0; --muted:#94a3b8;
+    --accent:#38bdf8; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171;
+    --border:#334155;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:0;background:#0b1220;color:var(--ink);
+    font-family:"Vazirmatn","Segoe UI",Tahoma,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.9;font-size:16px}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px}
+  header.hero{background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);
+    border-radius:16px;padding:28px 30px;margin-bottom:28px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  header.hero h1{margin:0 0 8px;font-size:26px;color:#fff}
+  header.hero p{margin:0;color:#e0f2fe;font-size:15px}
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:22px 26px;margin-bottom:22px}
+  h2{margin:0 0 14px;font-size:20px;color:var(--accent);
+    border-bottom:1px dashed var(--border);padding-bottom:10px}
+  h3{margin:20px 0 8px;font-size:17px;color:#facc15}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-inline-start:22px}
+  li{margin:5px 0}
+  blockquote{margin:10px 0;padding:12px 16px;background:#0f172a;
+    border-inline-start:4px solid var(--accent);border-radius:8px;color:#cbd5e1}
+  code{font-family:"JetBrains Mono",Consolas,Menlo,monospace;font-size:14px;
+    background:#0f172a;color:#7dd3fc;padding:2px 6px;border-radius:5px;
+    direction:ltr;unicode-bidi:embed}
+  pre{background:#0f172a;border:1px solid var(--border);border-radius:10px;
+    padding:14px 16px;overflow-x:auto;margin:10px 0}
+  pre code{background:none;padding:0;color:#a5f3fc;direction:ltr;text-align:left;
+    display:block;unicode-bidi:plaintext}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#0f172a;color:var(--accent)}
+  tr:nth-child(even) td{background:#172033}
+  .tag{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12.5px;
+    border:1px solid var(--border);background:#0f172a;color:var(--muted);margin-inline-end:6px}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  .grid{display:flex;gap:14px;flex-wrap:wrap}
+  .card{flex:1 1 200px;background:#0f172a;border:1px solid var(--border);
+    border-radius:10px;padding:14px 16px}
+  .card b{display:block;font-size:22px;color:var(--accent);direction:ltr;text-align:right}
+  .card span{font-size:13.5px;color:var(--muted)}
+  .path{direction:ltr;text-align:left;unicode-bidi:embed}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>اصلاح home2.html و استاتیک‌های قالب جدید</h1>
+  <p>مسیرهای نسبی CSS/JS/تصاویر صفحه‌ی <code>/home2</code> به مسیر مطلق تبدیل شد،
+  فولدر <code>assets</code> قالب دانلودی داخل <code>public/</code> کپی شد تا با روت
+  <code>/assets</code> سرو شود، و سه باگ ریز (تایتل، فایل غایب اسلایدر، یک URL相对 در JS) هم اصلاح گردید.
+  صفحه با HTTP 200 و بدون هیچ asset گم‌شده‌ای بالا می‌آید.</p>
+</header>
+
+<section>
+  <h2>۱. عنوان و خلاصه‌ی اجرایی</h2>
+  <p>روت <code>GET /home2</code> به هندلر <code>HomePage2</code> و قالب <code>templates/site/home2.html</code>
+  اضافه شده بود، اما این قالب مستقیماً از قالب آماده‌ی «Home6» (پروژه‌ی 279533) کپی شده بود و سه مشکل داشت:</p>
+  <ol>
+    <li>هر ۲۱۶ مرجع <code>href="/assets/…"</code> / <code>src="assets/…"</code> <b>نسبی</b> بودند (کار می‌کردند ولی در برابر trailing-slash و اِمبد شدن partial شکننده بودند).</li>
+    <li>فولدر <code>assets/</code> اصلاً داخل ریپو وجود نداشت → عملاً همه‌ی CSS/JS/تصاویر <span class="bad">404</span> می‌شدند و صفحه بی‌استایل بالا می‌آمد.</li>
+    <li>یک تصویر اشتباه (<code>mobile/7.webp</code> به‌جای <code>.gif</code>)، تایتل هاردکد و یک URL نسبی داخل <code>main.js</code>.</li>
+  </ol>
+  <p>راه‌حل: کپی <code>css/js/fonts/images/video</code> از پوشه‌ی دانلود به <code>public/</code> (طبق قرارداد موجودِ <code>/assets/shop → public/shop</code>)،
+  تبدیل همه‌ی مسیرها به مطلق، و اصلاح سه باگ ریز. تغییری در هندلر/روت لازم نبود.</p>
+</section>
+
+<section>
+  <h2>۲. درخواست اصلی</h2>
+  <blockquote>r.GET("/", publicHdl.HomePage)<br>
+  r.GET("/home2", publicHdl.HomePage2)<br>
+  «یه homepage2 اضافه کردم که باید بری و home2.html رو اصلاح کنی مثلاً مسیر های css»</blockquote>
+</section>
+
+<section>
+  <h2>۳. زمینه و کشف</h2>
+  <ul>
+    <li><b>گراف:</b> برای این تسک چون مستقیماً مسیر فایل مشخص بود، سراغ grepping رفتم نه
+      <code>graphify query</code> (سوال درباره‌ی «مسیر فایل‌های استاتیک» است نه جریان داده بین لایه‌ها).</li>
+    <li><b>روت استاتیک:</b> <code class="path">cmd/serve.go:119-122</code> —
+      <code>r.Static("/assets", filepath.Join(wd, "public"))</code> یعنی
+      <code>/assets/X</code> ⇔ <code>public/X</code> (پس <code>/assets/css/a.css</code> ⇔ <code>public/css/a.css</code>).</li>
+    <li><b>هندلر:</b> <code class="path">interfaces/http/handlers/web/handlers.go:202</code>
+      (<code>HomePage2</code>) — کپی از <code>HomePage</code> با نام تمپلیت <code>home2</code>.</li>
+    <li><b>روت:</b> <code class="path">interfaces/http/routes/web_routes.go:47</code>.</li>
+    <li><b>بارگذاری تمپلیت:</b> <code class="path">interfaces/http/response/load.go:7</code> —
+      <code>LoadHTMLGlob("templates/*/*.html")</code> → فایل جدید خودکار لود می‌شود، نیازی به رجیست دستی نیست.</li>
+    <li><b>منبع قالب:</b> با جستجوی کلاس اختصاصی <code>stories-Swiper</code> در کل دیسک، منبع پیدا شد:
+      <code class="path">~/Downloads/279533-main-3.0.0/Home6&amp;otherPages/</code>
+      (فایل <code>index.html</code> همان <code>home2.html</code> است با دو خط <code>{{define}}</code> بیشتر).</li>
+    <li><b>مقایسه با <code>home.html</code>:</b> صفحه‌ی اصلی از <code>/assets/shop/css/main.css</code> استفاده می‌کند
+      و همه‌ی مسیرهایش مطلق‌اند — یعنی قرارداد پروژه از اول مطلق‌نویسی بوده است.</li>
+    <li><b>RTL:</b> در <code>style.css</code> قاعده <code>body { direction: rtl; }</code> هست، پس تگ
+      <code>&lt;html lang="en"&gt;</code> را دست نزدم (رفتار چیدمان از CSS می‌آید).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۴. تصمیم‌ها و چرایی (ADR-style)</h2>
+
+  <h3>ADR-1: فولدر assets قالب کجا کپی شود؟</h3>
+  <table>
+    <tr><th>گزینه</th><th>توضیح</th><th>وضعیت</th></tr>
+    <tr><td>الف) ریشه‌ی <code>public/</code> <span class="tag">انتخاب‌شده</span></td>
+      <td>کپی <code>css/ js/ fonts/ images/ video/</code> داخل <code>public/</code> → با همان روت فعلی
+      <code>/assets/…</code> سرو می‌شوند؛ دقیقاً هم‌قیددادِ <code>/assets/shop → public/shop</code> که
+      صفحه‌ی <code>home.html</code> الان استفاده می‌کند. هیچ تغییری در کد Go لازم نیست.</td>
+      <td class="ok">✅ پذیرفته</td></tr>
+    <tr><td>ب) <code>public/assets/</code></td>
+      <td>چون <code>/assets</code> ← <code>public</code>، URL می‌شد <code>/assets/assets/css/…</code>
+      (زشت) یا نیاز به روت جدید در <code>cmd/serve.go</code> داشت (پیچیدگی بی‌جهت + برخورد نام‌ها).</td>
+      <td class="bad">❌ رد</td></tr>
+    <tr><td>ج) فقط css/js/fonts</td>
+      <td>صفحه بدون عکس بالا می‌آمد ولی ۲۰۵ تصویرِ طراحی (بنر، اسلایدر، دسته‌بندی) خالی می‌شد.</td>
+      <td class="bad">❌ رد — با اصرار کاربر بر «صفحه‌ی درست» ناسازگار بود</td></tr>
+    <tr><td>د) فقط مسیرها را اصلاح کن، فایل‌ها را نیاور</td>
+      <td>مسیر درست می‌شد ولی همچنان 404 — عملاً هیچ مشکلی حل نمی‌شد.</td>
+      <td class="bad">❌ رد</td></tr>
+  </table>
+  <p><b>ریسک پذیرفته‌شده:</b> حدود <b>۲۹ مگابایت</b> فایل باینری (عکس + ویدیو) به ریپو اضافه می‌شود.
+  اگر نخواهید در git نگه‌شان دارید، می‌توان آن‌ها را به <code>.gitignore</code> اضافه کرد یا از آپلود/CDN سرو کرد.</p>
+
+  <h3>ADR-2: نسبی یا مطلق؟</h3>
+  <ul>
+    <li><b>انتخاب:</b> مطلق (<code>/assets/…</code>) برای هر ۲۱۶ مرجع.</li>
+    <li><b>دلیل:</b> مرجع نسبی از <code>/home2</code> به <code>/assets/…</code> resolve می‌شود ولی از
+      <code>/home2/</code> یا صفحه‌ی تودرتو به <code>/home2/assets/…</code> می‌شکند؛ ضمن اینکه قرارداد
+      <code>home.html</code> هم مطلق است.</li>
+    <li><b>گزینه‌ی ردشده:</b> افزودن <code>&lt;base href="/"&gt;</code> — کل خط تغییر کمتر بود اما
+      روی <code>&lt;a href="#"&gt;</code> و فرم‌ها اثر جانبی دارد و باز هم فایل‌های غایب را حل نمی‌کرد.</li>
+    <li><b>ریسک:</b> صفر — چون روت <code>/assets</code> از قبل ثابت است.</li>
+  </ul>
+
+  <h3>ADR-3: دست نزدن به داده‌های داینامیک (BANNERS / SLIDERS)</h3>
+  <ul>
+    <li><b>مشاهده:</b> هندلر <code>HomePage2</code> مقادیر <code>BANNERS_TWO</code>,
+      <code>BANNERS_FOUR</code>, <code>SLIDERS</code> را پاس می‌دهد ولی قالب از آن‌ها استفاده‌ای نمی‌کند
+      (همه‌چیز هاردکد از قالب دانلودی است).</li>
+    <li><b>تصمیم:</b> در این تسک دست نزدم، چون درخواست فقط «اصلاح مسیرها» بود.</li>
+    <li><b>پیامد:</b> بنرها/اسلایدرهای ادمین روی <code>/home2</code> نمایش داده نمی‌شوند — در بخش
+      «کارهای باقی‌مانده» ثبت شد.</li>
+  </ul>
+
+  <h3>ADR-4: تایتل و زبان</h3>
+  <ul>
+    <li><b>انتخاب:</b> <code>&lt;title&gt;{{.TITLE}}&lt;/title&gt;</code> (هندلر از قبل <code>صفحه اصلی فروشگاه</code> را پاس می‌دهد).</li>
+    <li><b>رد:</b> تغییر <code>lang="en"</code> به <code>fa</code> + حذف <code>direction:rtl</code> از CSS —
+      چیدمان قالب به قاعده‌ی <code>body{direction:rtl}</code> در <code>style.css</code> تکیه دارد؛
+      دست زدن به آن ریسک به‌هم‌ریختن layout دارد.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۵. مراحل انجام کار</h2>
+  <ol>
+    <li>پیدا کردن فایل و هندلر: <code>glob **/home2.html</code> + <code>grep HomePage2</code>.</li>
+    <li>بررسی روت استاتیک: <code>grep -rn '"public\|Static(' --include="*.go" --exclude-dir=vendor .</code>
+      → <code>cmd/serve.go:120</code>.</li>
+    <li>کشف اینکه هیچ فولدر <code>assets</code>‌ای در پروژه نیست:
+      <code>find . -type d -name assets</code> → خروجی خالی.</li>
+    <li>پیدا کردن منبع قالب در کل دیسک:
+      <code>grep -rl "stories-Swiper" /home/abbas/Downloads /home/abbas/develop …</code>
+      → <code>~/Downloads/279533-main-3.0.0/Home6&amp;otherPages/</code>.</li>
+    <li>پرسیدن محل کپی از کاربر (۳ گزینه) ← انتخاب «ریشه‌ی <code>public/</code>».</li>
+    <li>کپی دارایی‌ها:
+      <pre><code>D="/home/abbas/Downloads/279533-main-3.0.0/Home6&amp;otherPages/assets"
+for d in css js fonts images video; do cp -r "$D/$d" public/; done</code></pre>
+    </li>
+    <li>تبدیل مسیرهای نسبی به مطلق در تمپلیت:
+      <pre><code>sed -i 's|="assets/|="/assets/|g' templates/site/home2.html   # 216 جایگزینی</code></pre>
+    </li>
+    <li>اصلاح تایتل: <code>&lt;title&gt;فروشگاه دیجی‌پرس&lt;/title&gt;</code> ← <code>{{.TITLE}}</code>.</li>
+    <li>اصلاح URL شکسته داخل CSS طراحی (نسبی به فایل CSS resolve می‌شد نه به صفحه):
+      <pre><code>sed -i 's|url(assets/images/|url(../images/|g' public/css/style.css   # digiplua-modal-header-bg.svg</code></pre>
+    </li>
+    <li>اصلاح تصویر غایب: <code>mainSlider/mobile/7.webp</code> ← <code>7.gif</code> (در منبع هم gif هست).</li>
+    <li>اصلاح URL نسبی داخل <code>public/js/main.js</code> (خط ۱۰۲۹ و ۱۰۳۵):
+      <code>"assets/images/comment/"</code> ← <code>"/assets/images/comment/"</code>.</li>
+    <li>اعتبارسنجی: <code>go build ./...</code>, <code>go vet ./...</code>, <code>make test</code>,
+      و چک کردن صفحه و ۱۵۴ مرجع یکتای assets با curl / بررسی فایل سیستم.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>۶. تغییرات فایل‌ها</h2>
+  <table>
+    <tr><th>مسیر</th><th>نوع</th><th>خلاصه</th></tr>
+    <tr><td class="path">templates/site/home2.html</td><td>edit</td>
+      <td>۲۱۶ مرجع <code>assets/…</code> ← <code>/assets/…</code>؛ تایتل ← <code>{{.TITLE}}</code>؛
+      <code>mobile/7.webp</code> ← <code>mobile/7.gif</code></td></tr>
+    <tr><td class="path">public/css/</td><td>add</td><td><code>style.css</code>, <code>swiper-bundle.min.css</code>, <code>video-js.css</code>, <code>nouislider.min.css</code> + اصلاح یک <code>url()</code> در style.css (≈536KB)</td></tr>
+    <tr><td class="path">public/js/</td><td>add</td><td>jquery, swiper, video.min, nouislider, main.js … + اصلاح دو مسیر نسبی در main.js (≈2.0MB)</td></tr>
+    <tr><td class="path">public/fonts/</td><td>add</td><td>icomoons + فونت‌های IRANYekan (≈1.4MB)</td></tr>
+    <tr><td class="path">public/images/</td><td>add</td><td>بنر، اسلایدر، دسته‌بندی، محصولات نمونه، لوگو … (≈19MB)</td></tr>
+    <tr><td class="path">public/video/</td><td>add</td><td><code>stories/1.mp4</code> برای استوری‌های صفحه (≈5.8MB)</td></tr>
+    <tr><td class="path">interfaces/http/handlers/web/handlers.go</td><td>—</td><td class="warn">قبلاً توسط کاربر اضافه شده بود؛ تغییری ندادم</td></tr>
+    <tr><td class="path">interfaces/http/routes/web_routes.go</td><td>—</td><td class="warn">قبلاً توسط کاربر اضافه شده بود؛ تغییری ندادم</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>۷. باگ‌ها و مشکلات برخوردشده</h2>
+  <table>
+    <tr><th>مشکل</th><th>متن/علامت</th><th>ریشه</th><th>رفع</th><th>تأیید</th></tr>
+    <tr>
+      <td>همه‌ی استاتیک‌ها 404</td>
+      <td class="bad">curl /assets/css/style.css → 404 (پیش از کپی)</td>
+      <td>فولدر <code>assets</code> قالب دانلودی هرگز داخل <code>public/</code> کپی نشده بود</td>
+      <td>کپی <code>css js fonts images video</code> به <code>public/</code></td>
+      <td class="ok">200 — 315,533 بایت</td>
+    </tr>
+    <tr>
+      <td>مسیرهای نسبی شکننده</td>
+      <td><code>href="assets/css/style.css"</code></td>
+      <td>کپی مستقیم از <code>index.html</code> که با فرض «صفحه در ریشه» نوشته شده</td>
+      <td><code>sed</code> به <code>="/assets/</code> روی هر ۲۱۶ مورد</td>
+      <td class="ok">grep باقی‌مانده <code>="assets/</code> = 0</td>
+    </tr>
+    <tr>
+      <td>تصویر اسلایدر موبایل گم‌شده</td>
+      <td class="bad">MISSING: /assets/images/mainSlider/mobile/7.webp</td>
+      <td>در منبع طراحی فایل <code>7.gif</code> است نه <code>7.webp</code></td>
+      <td>اصلاح پسوند در تمپلیت</td>
+      <td class="ok">curl → 200</td>
+    </tr>
+    <tr>
+      <td>بک‌گراند مودال دیجی‌پلاس</td>
+      <td><code>url(assets/images/svg/digiplua-modal-header-bg.svg)</code> در style.css</td>
+      <td>URL داخل CSS نسبی به <b>خودِ فایل CSS</b> resolve می‌شود، نه به صفحه →
+        <code>/assets/css/assets/…</code></td>
+      <td>تغییر به <code>url(../images/…)</code></td>
+      <td class="ok">مسیر اکنون <code>/assets/images/svg/…</code></td>
+    </tr>
+    <tr>
+      <td>تایتل هاردکد</td>
+      <td><code>&lt;title&gt;فروشگاه دیجی‌پرس&lt;/title&gt;</code></td>
+      <td>کپی از قالب ایستا؛ <code>.TITLE</code> پاس‌شده توسط هندلر خوانده نمی‌شد</td>
+      <td><code>{{.TITLE}}</code></td>
+      <td class="ok">خروجی: <code>&lt;title&gt;صفحه اصلی فروشگاه&lt;/title&gt;</code></td>
+    </tr>
+    <tr>
+      <td class="warn">گم‌شدن در بررسی اولیه (false positive)</td>
+      <td><code>MISSING: /assets/css/style.css</code> برای هر ۱۵۴ فایل</td>
+      <td>باگ در اسکریپت اعتبارسنجی خودم: <code>public${p}</code> مسیر <code>public/assets/…</code>
+        می‌ساخت در حالی که مپ درست <code>public/…</code> است</td>
+      <td>اسکریپت را اصلاح کردم (<code>public/${p#/assets/}</code>)</td>
+      <td class="ok">total=154 missing=0</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>۸. تست و اعتبارسنجی</h2>
+  <pre><code>go build ./... &amp;&amp; go vet ./...     # خروجی خالی، exit 0
+make test                          # FAIL_COUNT:0 — همه‌ی پکیج‌ها ok / no test files</code></pre>
+
+  <p>اعتبارسنجی زنده روی سرور در حال اجرا (<code>127.0.0.1:8010</code>):</p>
+  <pre><code>GET /home2                                  → 200
+&lt;title&gt;صفحه اصلی فروشگاه&lt;/title&gt;            ✓ (TEMPLATE فعال است)
+
+# نمونه‌ی استاتیک‌ها
+/assets/css/style.css        → 200  315533 bytes
+/assets/css/swiper-bundle.min.css → 200  18442
+/assets/js/main.js           → 200   76017
+/assets/images/logo/logo.svg → 200   51555
+/assets/fonts/icon/icomoon.woff → 200  35600
+/assets/video/stories/1.mp4  → 200  6019040
+/assets/images/comment/1.jpg → 200
+/assets/images/mainSlider/mobile/7.gif → 200
+/assets/shop/css/main.css    → 200   220478   # صفحه‌ی home قبلی نشکست
+GET /                                        → 200   # رگرسیون ندارد</code></pre>
+
+  <p>بررسی سیستماتیک همه‌ی مراجع صفحه‌ی رندرشده:</p>
+  <pre><code>grep -oE '(href|src)="/assets/[^"]*"' rendered.html | sort -u
+→ total=154  unique references
+→ missing=0   (همه روی دیسک موجودند)
+→ مراجع باقی‌مانده با پیشوند نسبی "assets/": 0</code></pre>
+
+  <div class="grid">
+    <div class="card"><b>216</b><span>مسیر اصلاح‌شده در تمپلیت</span></div>
+    <div class="card"><b>154</b><span>فایل یکتای استاتیکِ ارجاع‌شده</span></div>
+    <div class="card"><b>0</b><span>فایل غایب / 404</span></div>
+    <div class="card"><b>29MB</b><span>دارایی‌های اضافه‌شده</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>۹. نکات آموزشی</h2>
+  <ul>
+    <li><b>قرارداد استاتیک این پروژه:</b> <code>r.Static("/assets", "public")</code> یعنی
+      <code>/assets/X</code> ⇔ <code>public/X</code>. فایل جدید = کپی داخل <code>public/</code>،
+      نه داخل یک زیرفولدر <code>assets</code> (اگر <code>public/assets/</code> بگذاری URL می‌شود <code>/assets/assets/…</code>).</li>
+    <li><b>URL در HTML نسبی به صفحه است، URL در CSS نسبی به فایل CSS است.</b>
+      <code>url(assets/x.svg)</code> داخل <code>/assets/css/style.css</code> می‌شود
+      <code>/assets/css/assets/x.svg</code> — حتماً <code>../</code> بزنید.</li>
+    <li><b>URL در JS نسبی به سند (document) است، نه به فایل JS</b> — پس
+      <code>"assets/images/…"</code> در <code>main.js</code> از <code>/home2</code> درست resolve می‌شد،
+      اما برای یکدستی و ایمنی مطلقش کردیم.</li>
+    <li><b>تمپلیت‌های Gin با Glob سر استارت لود می‌شوند</b>
+      (<code>LoadHTMLGlob("templates/*/*.html")</code>): اسم <code>{{define "home2"}}</code>
+      باید دقیقاً با سومین آرگومان <code>CustomerRender(c, 200, "home2", …)</code> یکی باشد؛
+      فایل جدید نیازی به رجیست دستی ندارد ولی تغییرش نیاز به ری‌استارت دارد (در اینجا air hot-reload داشت).</li>
+    <li><b>قالب دانلودی را هرگز کورکورانه کپی نکنید:</b> اول منبع را پیدا کنید
+      (<code>grep -rl "&lt;کلاس_اختصاصی&gt;" /home/…</code>) تا بدانید کدام فایل‌ها همراهش می‌آیند و
+      کدام پسوندها واقعاً وجود دارند (<code>7.gif</code> vs <code>7.webp</code>).</li>
+    <li><b>«صفحه بالا می‌آید» ≠ «درست است»:</b> 200 برای HTML هیچ تضمینی برای CSS/JS نمی‌دهد؛
+      بعد از هر تغییر مسیر، حداقل یک بررسی سیستماتیک روی <b>همه‌ی</b> مراجع خروجی بگیرید
+      (اینجا: استخراج با grep + چک وجود فایل).</li>
+    <li><b>قالب‌های <code>templates/</code> در این ریپو «frozen» هستن</b> (AGENTS.md) — این تغییر با
+      اصرار مستقیم کاربر روی فایل جدید <code>home2.html</code> انجام شد؛ برای قالب‌های قدیمی اول بپرسید.</li>
+    <li><b>گذاشتن فایل باینری در git:</b> ۲۹MB عکس/ویدیو هزینه‌ی ریپو دارد؛ اگر لازم نیست
+      <code>.gitignore</code> کنید یا به آپلود/CDN منتقل کنید.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۱۰. کارهای باقی‌مانده / ریسک‌ها</h2>
+  <ul>
+    <li><span class="warn">داده‌های داینامیک:</span> قالب از <code>BANNERS_TWO</code>,
+      <code>BANNERS_FOUR</code>, <code>SLIDERS</code> استفاده نمی‌کند → بنر/اسلایدر ادمین روی
+      <code>/home2</code> دیده نمی‌شود. باید بخش‌های هاردکد را با
+      <code>{{range .SLIDERS.…}}</code> و <code>{{range .BANNERS_TWO.Data}}</code> جایگزین کرد
+      (مسیر تصویر از <code>.BANNER_PATH</code> / <code>.MEDIA_PATH</code> می‌آید).</li>
+    <li><span class="warn">لینک‌ها:</span> تقریباً همه‌ی <code>&lt;a&gt;</code>‌ها <code>href="#"</code>
+      هستند — مسیرهای واقعی routes (دسته‌بندی، محصول، سبد خرید، ورود) باید وصل شوند.</li>
+    <li><span class="warn">تکرار کد:</span> <code>HomePage2</code> عیناً <code>HomePage</code> است؛
+      می‌شود یک متد مشترک ساخت و فقط نام تمپلیت را پارامتری کرد.</li>
+    <li><span class="warn">پوشه‌ی scss:</span> عمداً کپی نشد (فقط منبع کامپایل است، استفاده‌ای ندارد).</li>
+    <li><span class="warn">committed نشده:</span> هیچ چیزی را commit نکردم؛
+      <code>git status</code> → ۲ فایل modified (هندلر/روتِ کاربر) + ۱ تمپلیت + ۵ فولدر جدید <code>public/</code>.</li>
+    <li><span class="warn">assets ناخواسته:</span> پوشه‌های <code>images/product/300/*</code> و
+      <code>mainSlider</code> عکس‌های نمونه‌ی قالب‌اند؛ در آینده باید از <code>uploads/</code> و دیتابیس بیان.</li>
+    <li><span class="warn">سرور در حال اجرا:</span> پروسه‌ی <code>shop</code> روی پورت 8010 از قبل
+      بالا بود (با air). اگر جای دیگری اجرا می‌کنید، ری‌استارت لازم است.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۱۱. بخش اضافه: چک‌لیست سریع قبل از merge</h2>
+  <ul>
+    <li><span class="ok">✓</span> <code>go build ./...</code> و <code>go vet ./...</code> بدون خطا</li>
+    <li><span class="ok">✓</span> <code>make test</code> — 0 FAIL</li>
+    <li><span class="ok">✓</span> <code>GET /home2</code> → 200 با تایتل داینامیک</li>
+    <li><span class="ok">✓</span> 154/154 مرجع استاتیک موجود و 200</li>
+    <li><span class="ok">✓</span> <code>GET /</code> (صفحه‌ی اصلی قبلی) → 200 — بدون رگرسیون</li>
+    <li><span class="warn">□</span> تصمیم درباره‌ی commit کردن ۲۹MB دارایی</li>
+    <li><span class="warn">□</span> وصل کردن BANNERS/SLIDERS و لینک‌های واقعی به قالب</li>
+  </ul>
+</section>
+
+<footer>گزارش تولیدشده در ۲۰۲۶-۰۹-۳۰ · مسیر فایل: reports/2026-09-30_0129_fix-home2-asset-paths.html</footer>
+
+</div>
+</body>
+</html>

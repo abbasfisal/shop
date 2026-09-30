@@ -10,6 +10,7 @@ import (
 	feeUseCase "shop/application/usecases/fee"
 	"shop/application/usecases/home"
 	sliderUseCase "shop/application/usecases/product_slider"
+	siteBannerUseCase "shop/application/usecases/site_banner"
 	"shop/bootstrap"
 	webreq "shop/interfaces/http/requests/web"
 
@@ -36,6 +37,7 @@ func postAddToCart(t *testing.T, body string, referer string) (*fakeHomeService,
 	svc := &fakeHomeService{}
 	h := NewPublicHandler(svc,
 		bannerUseCase.NewBannerService(nil),
+		siteBannerUseCase.NewSiteBannerService(nil),
 		sliderUseCase.NewProductSliderService(nil),
 		feeUseCase.NewFeeRateService(nil),
 		&bootstrap.Dependencies{},

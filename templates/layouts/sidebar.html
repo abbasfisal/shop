@@ -63,6 +63,39 @@
                             </ul>
                         </li>
 
+                        <!-- Site Banner Menu (بنر هدر) -->
+                        <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "site-banners"}}menu-open{{end}}">
+                            <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "site-banners"}}active{{end}}">
+                                <i class="nav-icon fa fa-picture-o"></i>
+                                <p>
+                                    بنرهای سایت
+                                    <i class="fa fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/admins/site-banners" class="nav-link {{if eq .ACTIVE_MENU "site-banners-list"}}active{{end}}">
+                                        <i class="fa fa-circle-o nav-icon"></i>
+                                        <p>لیست بنرها</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/admins/site-banners/create" class="nav-link {{if eq .ACTIVE_MENU "site-banners-create"}}active{{end}}">
+                                        <i class="fa fa-circle-o nav-icon"></i>
+                                        <p>ایجاد بنر</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/admins/site-banners?placement=main" class="nav-link {{if eq .ACTIVE_MENU "site-banners-main"}}active{{end}}">
+                                        <i class="fa fa-circle-o nav-icon"></i>
+                                        <p>بنر اسلایدر اصلی</p>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+
                         <!-- Product Slider Menu -->
                         <li class="nav-item has-treeview {{if eq .ACTIVE_PARENT "sliders"}}menu-open{{end}}">
                             <a href="#" class="nav-link {{if eq .ACTIVE_PARENT "sliders"}}active{{end}}">
@@ -83,6 +116,13 @@
                                     <a href="/admins/sliders/create" class="nav-link {{if eq .ACTIVE_MENU "sliders-create"}}active{{end}}">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>ایجاد اسلایدر</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/admins/sliders?position=main" class="nav-link {{if eq .ACTIVE_MENU "sliders-main"}}active{{end}}">
+                                        <i class="fa fa-circle-o nav-icon"></i>
+                                        <p>اسلایدر اصلی</p>
                                     </a>
                                 </li>
 

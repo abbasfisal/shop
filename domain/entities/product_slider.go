@@ -9,6 +9,9 @@ import (
 // Homepage slots a product slider can be attached to (جایگاه — the admin can
 // move a slider between them at any time).
 const (
+	// SliderPositionMain is the hero strip at the top of the homepage
+	// (اسلایدر اصلی — inside <div class="mainSlider">).
+	SliderPositionMain            = "main"
 	SliderPositionAfterSlider     = "after_slider"
 	SliderPositionMidContent      = "mid_content"
 	SliderPositionAfterCategories = "after_categories"
@@ -27,6 +30,7 @@ type SliderPositionOption struct {
 // SliderPositions returns every homepage slot in rendering order.
 func SliderPositions() []SliderPositionOption {
 	return []SliderPositionOption{
+		{Value: SliderPositionMain, Label: "اسلایدر اصلی (بالای صفحه)"},
 		{Value: SliderPositionAfterSlider, Label: "بعد از اسلایدر اصلی"},
 		{Value: SliderPositionMidContent, Label: "وسط صفحه"},
 		{Value: SliderPositionAfterCategories, Label: "بعد از دسته‌بندی‌ها"},
@@ -59,6 +63,7 @@ func SliderPositionLabel(position string) string {
 type ProductSlider struct {
 	gorm.Model
 	Title      string
+	Subtitle   string // زیرعنوان اختیاری (زیر تیتر) — مثلاً «بر اساس سلیقه شما»
 	Slug       string `gorm:"unique"`
 	Position   string `gorm:"type:varchar(32);default:'after_categories'"`
 	CategoryID *uint

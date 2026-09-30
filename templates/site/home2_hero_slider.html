@@ -1,0 +1,24 @@
+{{define "home2_hero_slider"}}
+    {{/* بنر تصویری اسلایدر اصلی — site_banners با placement=main (دسکتاپ + موبایل) */}}
+    <div class="swiper mainSlider-swiper position-relative">
+        <div class="swiper-wrapper">
+            {{range .MAIN_SLIDER_BANNERS}}
+                <div class="swiper-slide">
+                    <a class="mainSlider-item" {{if .Link}}href="{{.Link}}"{{end}}>
+                        <img class="w-p-100 h-p-100 object-fit-cover d-none d-lg-block" loading="lazy"
+                            src="{{$.SITE_BANNER_PATH}}{{.Image}}" alt="{{.Title}}" />
+                        <img class="w-p-100 h-p-100 object-fit-cover d-lg-none" loading="lazy"
+                            src="{{$.SITE_BANNER_PATH}}{{.MobileSrc}}" alt="{{.Title}}" />
+                    </a>
+                </div>
+            {{end}}
+        </div>
+
+        <div class="swiper-pagination"></div>
+
+        <div class="swiper-btn">
+            <div class="swiper-btn-prev icon-chevronRight"></div>
+            <div class="swiper-btn-next icon-chevronLeft"></div>
+        </div>
+    </div>
+{{end}}

@@ -20,6 +20,7 @@ import (
 	"shop/application/usecases/fee"
 	"shop/application/usecases/home"
 	sliders "shop/application/usecases/product_slider"
+	siteBanner "shop/application/usecases/site_banner"
 	"shop/bootstrap"
 	"shop/domain/domain_err"
 	"shop/domain/entities"
@@ -30,26 +31,29 @@ import (
 )
 
 type PublicHandler struct {
-	homeSrv    home.HomeServiceInterface
-	bannerSrv  *banner.BannerService
-	slidersSrv *sliders.ProductSliderService
-	feeSrv     *fee.FeeRateService
-	dep        *bootstrap.Dependencies
+	homeSrv       home.HomeServiceInterface
+	bannerSrv     *banner.BannerService
+	siteBannerSrv *siteBanner.SiteBannerService
+	slidersSrv    *sliders.ProductSliderService
+	feeSrv        *fee.FeeRateService
+	dep           *bootstrap.Dependencies
 }
 
 func NewPublicHandler(
 	homeSrv home.HomeServiceInterface,
 	bannerSrv *banner.BannerService,
+	siteBannerSrv *siteBanner.SiteBannerService,
 	slidersSrv *sliders.ProductSliderService,
 	feeSrv *fee.FeeRateService,
 	dep *bootstrap.Dependencies,
 ) PublicHandler {
 	return PublicHandler{
-		homeSrv:    homeSrv,
-		bannerSrv:  bannerSrv,
-		slidersSrv: slidersSrv,
-		feeSrv:     feeSrv,
-		dep:        dep,
+		homeSrv:       homeSrv,
+		bannerSrv:     bannerSrv,
+		siteBannerSrv: siteBannerSrv,
+		slidersSrv:    slidersSrv,
+		feeSrv:        feeSrv,
+		dep:           dep,
 	}
 }
 
@@ -196,6 +200,87 @@ func (p PublicHandler) HomePage(c *gin.Context) {
 		"SLIDERS":      slidersByPosition,
 		"BANNER_PATH":  util.GetBannerStoragePath(),
 		"MEDIA_PATH":   util.GetProductStoragePath(),
+	})
+}
+
+func (p PublicHandler) HomePage2(c *gin.Context) {
+	bannersTwo := responses.Banners{}
+	bannersFour := responses.Banners{}
+	if active, err := p.bannerSrv.Active(c); err == nil {
+		for _, b := range responses.ToBanners(active).Data {
+			if b.Layout == entities.BannerLayoutFour {
+				bannersFour.Data = append(bannersFour.Data, b)
+			} else {
+				bannersTwo.Data = append(bannersTwo.Data, b)
+			}
+		}
+	}
+
+	slidersByPosition := map[string][]responses.ProductSlider{}
+	if active, err := p.slidersSrv.ActiveSliders(c); err == nil {
+		for position, views := range responses.SlidersByPosition(active) {
+			for i := range views {
+				views[i].MediaPath = util.GetProductStoragePath()
+			}
+			slidersByPosition[position] = views
+		}
+	}
+
+	// /home2 renders one «شگفت‌انگیزها» strip: every published slider's
+	// products flattened in slot order, deduped by product id, so the admin
+	// can fill any slot (or several) and the carousel stays in sync with home.
+	amazingProducts := make([]responses.SliderProduct, 0, 16)
+	amazingURL := ""
+	seenProducts := make(map[uint]struct{}, 16)
+	for _, slot := range entities.SliderPositions() {
+		for _, slider := range slidersByPosition[slot.Value] {
+			if amazingURL == "" {
+				amazingURL = slider.CatalogURL
+			}
+			for _, product := range slider.Products {
+				if _, dup := seenProducts[product.ProductID]; dup {
+					continue
+				}
+				seenProducts[product.ProductID] = struct{}{}
+				amazingProducts = append(amazingProducts, product)
+			}
+		}
+	}
+
+	// header banner — خالی یعنی «بنری برای نمایش نداریم» و قالب کلاً حذفش می‌کند
+	var headerBanner *responses.SiteBanner
+	if active, err := p.siteBannerSrv.Active(c, entities.SiteBannerPlacementHeader); err == nil && len(active) > 0 {
+		headerBanner = responses.ToSiteBanner(active[0])
+	}
+
+	// بنر تصویری اسلایدر اصلی (site_banners/placement=main) — خالی یعنی حذف کل بخش
+	heroBanners := make([]responses.SiteBanner, 0, 4)
+	if active, err := p.siteBannerSrv.Active(c, entities.SiteBannerPlacementMain); err == nil {
+		heroBanners = responses.ToSiteBanners(active).Data
+	}
+
+	// اسلایدر اصلی — اولین اسلایدر منتشرشده در جایگاه main
+	var mainSlider *responses.ProductSlider
+	for _, slider := range slidersByPosition[entities.SliderPositionMain] {
+		view := slider
+		view.MediaPath = util.GetProductStoragePath()
+		mainSlider = &view
+		break
+	}
+
+	response.CustomerRender(c, 200, "home2", gin.H{
+		"TITLE":               "صفحه اصلی فروشگاه",
+		"BANNERS_TWO":         bannersTwo,
+		"BANNERS_FOUR":        bannersFour,
+		"SLIDERS":             slidersByPosition,
+		"AMAZING":             amazingProducts,
+		"AMAZING_URL":         amazingURL,
+		"HEADER_BANNER":       headerBanner,
+		"SITE_BANNER_PATH":    util.GetSiteBannerStoragePath(),
+		"MAIN_SLIDER":         mainSlider,
+		"MAIN_SLIDER_BANNERS": heroBanners,
+		"BANNER_PATH":         util.GetBannerStoragePath(),
+		"MEDIA_PATH":          util.GetProductStoragePath(),
 	})
 }
 

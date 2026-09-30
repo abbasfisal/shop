@@ -16,6 +16,7 @@ import (
 	"shop/application/usecases/pricing"
 	"shop/application/usecases/product"
 	sliders "shop/application/usecases/product_slider"
+	siteBanner "shop/application/usecases/site_banner"
 	"shop/bootstrap"
 	"shop/infrastructure/database/postgres"
 	attributeRepository "shop/infrastructure/repositories/attribute"
@@ -30,6 +31,7 @@ import (
 	orderRepository "shop/infrastructure/repositories/order"
 	productRepository "shop/infrastructure/repositories/product"
 	sliderRepository "shop/infrastructure/repositories/product_slider"
+	siteBannerRepository "shop/infrastructure/repositories/site_banner"
 	AdminHandler "shop/interfaces/http/handlers/admin"
 	"shop/interfaces/http/middleware"
 	"time"
@@ -70,12 +72,13 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 	dashboardSrv := dashboard.NewDashboardService(dashboardRepository.NewDashboardRepository(postgres.Get()))
 
 	bannerSrv := banner.NewBannerService(bannerRepository.NewBannerRepository(postgres.Get()))
+	siteBannerSrv := siteBanner.NewSiteBannerService(siteBannerRepository.NewSiteBannerRepository(postgres.Get()))
 
 	sliderSrv := sliders.NewProductSliderService(sliderRepository.NewProductSliderRepository(postgres.Get()))
 
 	feeSrv := fee.NewFeeRateService(feeRepository.NewFeeRateRepository(postgres.Get()))
 
-	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, feeSrv, dashboardSrv, bannerSrv, sliderSrv, dep)
+	adminHlr := AdminHandler.NewAdminHandler(authSrv, categorySrv, productSrv, attributeSrv, attributeValueSrv, brandSrv, customerSrv, orderSrv, feeSrv, dashboardSrv, bannerSrv, siteBannerSrv, sliderSrv, dep)
 
 	// rate limiter
 	limiter := middleware.NewRateLimiter(rate.Every(time.Minute), 5)
@@ -204,6 +207,14 @@ func SetAdminRoutes(r *gin.Engine, dep *bootstrap.Dependencies) {
 		authGrp.GET("/admins/banners/:id/edit", adminHlr.EditBanner)
 		authGrp.POST("/admins/banners/:id", adminHlr.UpdateBanner)
 		authGrp.POST("/admins/banners/:id/delete", adminHlr.DeleteBanner)
+
+		//site banners (بنر هدر)
+		authGrp.GET("/admins/site-banners", adminHlr.IndexSiteBanner)
+		authGrp.GET("/admins/site-banners/create", adminHlr.CreateSiteBanner)
+		authGrp.POST("/admins/site-banners", adminHlr.StoreSiteBanner)
+		authGrp.GET("/admins/site-banners/:id/edit", adminHlr.EditSiteBanner)
+		authGrp.POST("/admins/site-banners/:id", adminHlr.UpdateSiteBanner)
+		authGrp.POST("/admins/site-banners/:id/delete", adminHlr.DeleteSiteBanner)
 
 		//product sliders (homepage)
 		authGrp.GET("/admins/sliders", adminHlr.IndexProductSlider)

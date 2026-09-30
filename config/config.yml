@@ -21,6 +21,7 @@ upload:
   products: "public/uploads/media/products/"
   brands: "public/uploads/media/brands/"
   banners: "public/uploads/media/banners/"
+  site_banners: "public/uploads/media/site-banners/"
 
 kavenegar:
   api_key: ""

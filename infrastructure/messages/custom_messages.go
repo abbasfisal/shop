@@ -28,6 +28,10 @@ const (
 	SuccessfullyCreatedBanner = "بنر پروموشن با موفقیت ایجاد شد"
 	SuccessfullyUpdatedBanner = "بنر پروموشن با موفقیت بروزرسانی شد"
 
+	//site banners (بنر هدر)
+	SuccessfullyCreatedSiteBanner = "بنر سایت با موفقیت ایجاد شد"
+	SuccessfullyUpdatedSiteBanner = "بنر سایت با موفقیت بروزرسانی شد"
+
 	SelectOne          = "لطفا یکی از گزینه های موجود را انتخاب کنید"
 	DeleteSuccessfully = "با موفقیت حذف گردید"
 

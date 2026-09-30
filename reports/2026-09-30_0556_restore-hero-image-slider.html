@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>گزارش: بازگردانی اسلایدر بنر تصویری (بالای صفحه)</title>
+<style>
+  :root{--card:#1e293b;--ink:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--border:#334155}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b1220;color:var(--ink);font-family:"Vazirmatn","Segoe UI",Tahoma,Arial,sans-serif;line-height:1.9;font-size:16px}
+  .wrap{max-width:1020px;margin:0 auto;padding:32px 20px 80px}
+  header.hero{background:linear-gradient(135deg,#f43f5e 0%,#8b5cf6 100%);border-radius:16px;padding:26px 30px;margin-bottom:26px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  header.hero h1{margin:0 0 8px;font-size:25px;color:#fff}
+  header.hero p{margin:0;color:#ffe4e6;font-size:15px}
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin-bottom:20px}
+  h2{margin:0 0 14px;font-size:20px;color:var(--accent);border-bottom:1px dashed var(--border);padding-bottom:10px}
+  h3{margin:20px 0 8px;font-size:17px;color:#facc15}
+  p{margin:8px 0}ul,ol{margin:8px 0;padding-inline-start:22px}li{margin:5px 0}
+  blockquote{margin:10px 0;padding:12px 16px;background:#0f172a;border-inline-start:4px solid var(--accent);border-radius:8px;color:#cbd5e1}
+  code{font-family:Consolas,Menlo,monospace;font-size:14px;background:#0f172a;color:#7dd3fc;padding:2px 6px;border-radius:5px;direction:ltr;unicode-bidi:embed}
+  pre{background:#0f172a;border:1px solid var(--border);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:10px 0}
+  pre code{background:none;padding:0;color:#a5f3fc;direction:ltr;text-align:left;display:block;unicode-bidi:plaintext}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#0f172a;color:var(--accent)}
+  tr:nth-child(even) td{background:#172033}
+  .tag{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12.5px;border:1px solid var(--border);background:#0f172a;color:var(--muted);margin-inline-end:6px}
+  .ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+  .grid{display:flex;gap:14px;flex-wrap:wrap}
+  .card{flex:1 1 190px;background:#0f172a;border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+  .card b{display:block;font-size:22px;color:var(--accent);direction:ltr;text-align:right}
+  .card span{font-size:13.5px;color:var(--muted)}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>بازگردانی اسلایدر بنر تصویریِ بالای صفحه (بدون از دست رفتن کارت محصولات)</h1>
+  <p>در تسک قبلی، بلاک <code>.mainSlider</code> را <b>کاملاً</b> با کارت محصولات جایگزین کرده بودم و بنر
+  تصویری بزرگِ بالای صفحه (عکس ارسالی) حذف شده بود. این گزارش اصلاح آن است: هر دو بخش اکنون در یک wrapper
+  کنار هم رندر می‌شوند، هر کدام مستقلِ ادمین-محور و هر کدام در نبود داده کلاً حذف می‌شوند.</p>
+</header>
+
+<section>
+  <h2>۱. عنوان و خلاصه‌ی اجرایی</h2>
+  <p>کاربر با ارسال اسکرین‌شات بنر تصویری بالای صفحه پرسید «این اسلایدر اصلی که بالا هست رو چکارش کردی؟» و
+  دستور داد بدون پرسیدن، خودم اگر کم‌کاری شده انجام دهم. بررسی نشان داد که در تسک قبلی کل بلاک
+  <code>&lt;div class="mainSlider mt-lg-5"&gt;</code> (که شامل swiper بنرهای
+  <code>mainSlider/1..8.webp</code> بود) با کارت محصولات عوض شده و <b>بنر تصویری حذف شده است</b>.</p>
+  <p>راه‌حل اجراشده (بدون پرسش): بنر تصویری به‌عنوان مصرف‌کننده‌ی همان جایگاه رزروشده‌ی
+  <code>site_banners/placement='main'</code> برگردانده شد — یعنی CRUD ادمینی که در تسک قبلی ساخته بودم همین
+  الان برایش کامل کار می‌کند (لیست فیلترشده، سایدبار جدا، آپلود دسکتاپ+موبایل، بازه زمانی، وضعیت) — و کارت
+  محصولات هم سرِ جایش باقی ماند. هر دو داخل یک wrapper با شرط <code>{{if or …}}</code> رندر می‌شوند.</p>
+</section>
+
+<section>
+  <h2>۲. درخواست اصلی</h2>
+  <blockquote>«این اسلایدر اصلی که بالا هست رو چکارش کردی؟ این رو اگ نزدی بزن همه ازم سوال نکن پیشنهاد خودت»
+  [اسکرین‌شات: بنر تصویری تمام‌عرض با متن «تخفیف تا ۱۵٪ برای پاکیزگی…» و دکمه «خرید»، بالای ردیف لوگوهای دایره‌ای]</blockquote>
+</section>
+
+<section>
+  <h2>۳. زمینه و کشف</h2>
+  <ul>
+    <li><b>ابزار:</b> با توجه به اینکه نشانی فایل/بلاک از قبل معلوم بود، مستقیم سراغ grep رفتم (نیاز به
+      <code>graphify query</code> نبود): <code>grep -n 'mainSlider' templates/site/home2.html</code>.</li>
+    <li><b>یافته:</b> بلاک در خط ۴۷۵ فقط شامل <code>{{template "home2_main_slider" .}}</code> بود؛ swiper
+      اصلی (کلاس <code>mainSlider-swiper</code> با pagination و دکمه‌های prev/next) اصلاً در HTML نبود.</li>
+    <li><b>نکته‌ی کلیدی:</b> جایگاه <code>placement='main'</code> در جدول <code>site_banners</code> در تسک
+      قبلی «رزرو» شده بود و هیچ خواننده‌ای نداشت ← دقیقاً همان جایی که باید این بنر می‌رفت.</li>
+    <li><b>دارایی‌ها:</b> عکس‌های دسکتاپ در <code class="path">public/images/mainSlider/1..8.webp</code> و
+      نسخه موبایل در <code class="path">public/images/mainSlider/mobile/</code> از قبل (از تسک مسیر استاتیک‌ها)
+      داخل ریپو بودند.</li>
+    <li><b>JS موجود:</b> <code>mainSlider()</code> در <code class="path">public/js/main.js:452</code> از قبل
+      تعریف شده و در اسکریپت inline صفحه صدا زده می‌شد — فقط لازم بود المان وجود داشته باشد + گارد شود.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۴. تصمیم‌ها و چرایی (ADR-style)</h2>
+
+  <h3>ADR-1: بنر تصویری از کجا دیتاش را بگیرد؟</h3>
+  <table>
+    <tr><th>گزینه</th><th>توضیح</th><th>وضعیت</th></tr>
+    <tr><td>الف) <code>site_banners/placement='main'</code> <span class="tag">انتخاب‌شده</span></td>
+      <td>همان جدول و همان CRUD که در تسک قبلی ساخته شد؛ فقط مصرف‌کننده‌اش (هندلر home2 + قالب) اضافه شد.
+        فیلتر لیست، آیتم سایدبار، آپلود دسکتاپ/موبایل و بازه زمانی همه مجانی بودند.</td><td class="ok">✅</td></tr>
+    <tr><td>ب) جدول جدید <code>hero_sliders</code></td><td>تکرار کامل لایه‌ها برای همان مفهوم.</td><td class="bad">❌</td></tr>
+    <tr><td>ج) برگرداندن کد هاردکد قبلی</td><td>دقیقاً مشکلی که کاربر خواسته بود حل شود (ادمین‌محور نبودن).</td><td class="bad">❌</td></tr>
+    <tr><td>د) استفاده از <code>banners</code> پروموشن</td><td>آن جدول مفهوم layout دوتایی/چهار تایی دارد و برای یک
+      بنر تمام‌عرض اشتباه است.</td><td class="bad">❌</td></tr>
+  </table>
+
+  <h3>ADR-2: چیدمان دو بخش در یک wrapper</h3>
+  <ul>
+    <li><b>مسئله:</b> دستور قبلی کاربر می‌گفت دیتای کارت محصولات داخل <code>&lt;div class="mainSlider mt-lg-5"&gt;</code>
+      برود؛ درخواست جدید هم بنر تصویریِ بالای صفحه را می‌خواست.</li>
+    <li><b>انتخاب:</b> هر دو <b>داخل همان wrapper</b>، با ترتیب «اول بنر تصویری، بعد کارت محصولات»:
+<pre><code>{{if or .MAIN_SLIDER_BANNERS .MAIN_SLIDER}}
+&lt;div class="mainSlider mt-lg-5"&gt;
+    {{if .MAIN_SLIDER_BANNERS}}{{template "home2_hero_slider" .}}{{end}}
+    {{if .MAIN_SLIDER}}{{template "home2_main_slider" .}}{{end}}
+&lt;/div&gt;
+{{end}}</code></pre>
+      بنابراین هیچ‌کدام از دو دستور قبلی نقض نمی‌شود و اگر هیچ‌کدام داده نداشتند کل wrapper حذف می‌شود.</li>
+    <li><b>رد:</b> دو wrapper جدا (ناسازگار با دستور قبلی «دیتاش را در این فیلد بذار»)؛ یا حذف یکی (همین باگ قبلی).</li>
+    <li><b>ریسک:</b> اگر مدیر بخواهد ترتیب را عوض کند باید HTML را جابه‌جا کند — برای این مرحله پذیرفته شد.</li>
+  </ul>
+
+  <h3>ADR-3: تک اسلایدر با دو تصویر، به‌جای دو اسلایدر جدا</h3>
+  <ul>
+    <li><b>انتخاب:</b> یک <code>.mainSlider-swiper</code> و داخل هر slide دو <code>&lt;img&gt;</code>:
+      نسخه دسکتاپ با <code>d-none d-lg-block</code> و نسخه موبایل با <code>d-lg-none</code>.</li>
+    <li><b>دلیل:</b> در کد اصلی قالب دو المان <code>.mainSlider-swiper</code> جدا بود ولی
+      <code>new Swiper(".mainSlider-swiper")</code> فقط <b>اولین</b> المان را می‌گیرد (query selector)؛ یعنی
+      اسلایدر موبایل اصلاً init نمی‌شد. با یک اسلایدر واحد، هر دو نسخه تصویر درست نمایش داده می‌شوند.</li>
+    <li><b>ریسک:</b> دو <code>&lt;img&gt;</code> در هر slide ← سایز کمی بیشتر در HTML (بی‌اهمیت).</li>
+  </ul>
+
+  <h3>ADR-4: گاردِ فراخوانی <code>mainSlider()</code></h3>
+  <ul>
+    <li><b>مسئله:</b> حالا swiper بنر اختیاری است؛ اگر بنری نباشد و <code>mainSlider()</code> روی المان null
+      خطا بدهد، اسکریپت inline متوقف می‌شود و <b>کارت محصولات هم init نمی‌شود</b> (و عمودی می‌شود).</li>
+    <li><b>انتخاب:</b> <code>if (document.querySelector('.mainSlider-swiper')) mainSlider()</code>.</li>
+    <li><b>رد:</b> حذف کامل (بنر تصویری که برگرداندیم باید autoplay/pagination داشته باشد).</li>
+  </ul>
+
+  <h3>ADR-5: ایدمپوتنت‌بودن سیدر از سطح جدول به سطح ردیف</h3>
+  <ul>
+    <li><b>مسئله:</b> بررسی <code>title LIKE 'بنر سایت نمونه%'</code> باعث می‌شد ۴ ردیف جدید بنر اصلی هرگز
+      ساخته نشوند (دیتابیس قبلاً سید شده بود).</li>
+    <li><b>انتخاب:</b> بررسی <code>WHERE title = ?</code> به‌ازای هر ردیف + شمارنده‌ی
+      <code>created/skipped</code> — همان الگویی که برای اسلایدرها در تسک قبلی زدم.</li>
+    <li><b>نتیجه‌ی عملی:</b> <code>[seed] site banners ......... done (4 created, 2 already present: header + hero)</code>.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۵. مراحل انجام کار</h2>
+  <ol>
+    <li>بررسی وضعیت فعلی قالب (grep روی <code>mainSlider</code>) و تأییدِ غیبت swiper بنر.</li>
+    <li>افزودن مسیر دارایی بنرهای اصلی به سیدر:
+      <pre><code>heroBannerAssetDir = "public/images/mainSlider"
+func copyHeroBannerAsset(name string) (string, error) {
+    return copyAssetTo(name, heroBannerAssetDir, siteBannerUploadDir)
+}
+// siteBannerCopyFn(placement) → هدر از public/images/banner، اصلی از public/images/mainSlider</code></pre>
+    </li>
+    <li>۴ ردیف سید به <code>demoSiteBanners()</code> (۳ اسلاید فعال دسکتاپ+موبایل + ۱ غیرفعال برای تست حذف) و
+      تبدیل ایدمپوتنت‌بودن به سطح عنوان.</li>
+    <li>هندلر <code>HomePage2</code>: واکشی بنرهای فعالِ جایگاه main ← کلیدهای
+      <code>MAIN_SLIDER_BANNERS</code> و یک‌پارچه‌سازی مسیر به <code>SITE_BANNER_PATH</code>.</li>
+    <li>پارشال جدید <code class="path">templates/site/home2_hero_slider.html</code> (swiper + pagination + دکمه‌ها).</li>
+    <li>بازنویسی بلاک <code>.mainSlider</code> در home2 با شرط <code>or</code> و گاردِ
+      <code>mainSlider()</code> در اسکریپت inline؛ تغییر کلید مسیر بنر هدر به <code>SITE_BANNER_PATH</code>.</li>
+    <li>پنل ادمین: آیتم سایدبار «بنر اسلایدر اصلی» ← <code>/admins/site-banners?placement=main</code>، هایلایت
+      اختصاصی در <code>WithGlobalData</code>، دکمه فیلتر «بنر اسلایدر اصلی» در صفحه لیست، تغییر نام والد به
+      «بنرهای سایت».</li>
+    <li><code>go run . seed</code>، بالا آوردن سرور تست روی پورت 8099، تست سناریوها، توقف سرور تست.</li>
+    <li>اجرای <code>go build</code> / <code>go vet</code> / <code>go test</code> و نوشتن این گزارش.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>۶. تغییرات فایل‌ها</h2>
+  <table>
+    <tr><th>مسیر</th><th>نوع</th><th>خلاصه</th></tr>
+    <tr><td class="path">templates/site/home2_hero_slider.html</td><td>add</td>
+      <td>پارشال swiper بنر تصویری (دسکتاپ+موبایل، لینک اختیاری، pagination، دکمه‌ها)</td></tr>
+    <tr><td class="path">templates/site/home2.html</td><td>edit</td>
+      <td>wrapper مشترک با <code>{{if or .MAIN_SLIDER_BANNERS .MAIN_SLIDER}}</code>؛ فراخوانی گاردشده‌ی
+        <code>mainSlider()</code>؛ کلید مسیر ← <code>SITE_BANNER_PATH</code></td></tr>
+    <tr><td class="path">interfaces/http/handlers/web/handlers.go</td><td>edit</td>
+      <td>واکشی بنرهای فعالِ <code>placement=main</code> + کلیدهای <code>MAIN_SLIDER_BANNERS/SITE_BANNER_PATH</code></td></tr>
+    <tr><td class="path">infrastructure/seeders/demo_shop.go</td><td>edit</td>
+      <td><code>heroBannerAssetDir</code> + <code>copyHeroBannerAsset</code> + ۴ ردیف بنر اصلی +
+        ایدمپوتنت per-title</td></tr>
+    <tr><td class="path">templates/layouts/sidebar.html</td><td>edit</td>
+      <td>آیتم «بنر اسلایدر اصلی» + تغییر نام والد به «بنرهای سایت»</td></tr>
+    <tr><td class="path">interfaces/http/response/render.go</td><td>edit</td>
+      <td>هایلایت <code>site-banners-main</code> برای <code>?placement=main</code></td></tr>
+    <tr><td class="path">templates/admin/admin_index_site_banner.html</td><td>edit</td>
+      <td>دکمه فیلتر «بنر اسلایدر اصلی»</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>۷. باگ‌ها و مشکلات برخوردشده</h2>
+  <table>
+    <tr><th>مشکل</th><th>علامت</th><th>ریشه</th><th>رفع</th><th>تأیید</th></tr>
+    <tr>
+      <td>حذف بنر تصویری (باگ تسک قبلی)</td>
+      <td class="bad">هیچ <code>.mainSlider-swiper</code>‌ای در خروجی نبود</td>
+      <td>بلاک کامل <code>.mainSlider</code> با پارشال کارت محصولات جایگزین شده بود</td>
+      <td>wrapper مشترک با دو شرط مستقل</td>
+      <td class="ok">۳ اسلاید بنر + کارت محصولات همزمان</td>
+    </tr>
+    <tr>
+      <td>سیدر ردیف‌های جدید را نمی‌ساخت</td>
+      <td class="warn">«already seeded» برای جدول site_banners</td>
+      <td>بررسی ایدمپوتنت سطح جدول با پیشوند عنوان</td>
+      <td>بررسی per-title + شمارنده</td>
+      <td class="ok">«4 created, 2 already present»</td>
+    </tr>
+    <tr>
+      <td>خطرِ init نشدن کارت محصولات</td>
+      <td class="warn">اگر بنری نبود، اسکریپت inline می‌توانست بایستد</td>
+      <td><code>mainSlider()</code> روی المانِ غایب + ترتیب صدا زدن‌ها</td>
+      <td><code>document.querySelector</code> گارد</td>
+      <td class="ok">تست «بنر غیرفعال» ← کارت محصولات همچنان افقی و کامل</td>
+    </tr>
+    <tr>
+      <td>دو اسلایدر در کد اصلی قالب، فقط یکی init می‌شد</td>
+      <td class="warn">در کد منبع قالب</td>
+      <td><code>new Swiper(".mainSlider-swiper")</code> اولین المان را برمی‌دارد</td>
+      <td>تک اسلایدر + دو <code>&lt;img&gt;</code> واکنش‌گرا داخل هر slide</td>
+      <td class="ok">هر دو نسخه تصویر در HTML حاضرند</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>۸. تست و اعتبارسنجی</h2>
+  <pre><code>go build ./... &amp;&amp; go vet ./...   # بدون خروجی (موفق)
+go test ./...                    # FAILS:0
+gofmt -l . (بدون vendor)         # خروجی خالی
+go run . seed                    # [seed] site banners ......... done (4 created, 2 already present: header + hero)</code></pre>
+
+  <p>سرور تست روی <code>APP_PORT=8099</code> (سرور شما روی 8010 دست‌نخورده ماند) و سناریوها:</p>
+  <table>
+    <tr><th>سناریو</th><th>عمل</th><th>نتیجه</th></tr>
+    <tr><td>هر دو بخش فعال</td><td><code>GET /home2</code></td>
+      <td class="ok">wrapper یکی، swiper بنر با ۳ اسلاید (<code>seed/1..3.webp</code> +
+        <code>seed/mobile/1..3.webp</code>) + بخش کارت محصولات</td></tr>
+    <tr><td>بنر اصلی غیرفعال</td><td><code>UPDATE … SET status=false WHERE placement='main'</code></td>
+      <td class="ok">تعداد <code>mainSlider-swiper</code> = <b>۰</b>، کارت محصولات = <b>۱</b></td></tr>
+    <tr><td>کارت محصولات غیرفعال</td><td><code>UPDATE product_sliders SET status='draft'</code></td>
+      <td class="ok">کارت = <b>۰</b>، بنر = <b>۱</b>، wrapper همچنان هست</td></tr>
+    <tr><td>هر دو غیرفعال</td><td>ترکیب دو مورد بالا</td><td class="ok">کل wrapper حذف می‌شود (تست قبلی: ۰/۰)</td></tr>
+    <tr><td>فیلتر ادمین</td><td><code>GET /admins/site-banners?placement=main</code></td>
+      <td class="ok">۲۰۰، ۴ ردیف (فقط بنرهای اصلی)، ۰ ردیف هدر، سایدبار active</td></tr>
+    <tr><td>لیست کامل</td><td><code>GET /admins/site-banners</code></td>
+      <td class="ok">۶ ردیف (۲ هدر + ۴ اصلی) + ۳ دکمه فیلتر</td></tr>
+    <tr><td>پیش‌انتخاب جایگاه</td><td><code>GET /admins/site-banners/create?placement=main</code></td>
+      <td class="ok"><code>option main selected</code> = «بنر تصویری اسلایدر اصلی»</td></tr>
+    <tr><td>رگرسیون</td><td><code>GET /</code>، <code>GET /home2</code>، بنر هدر</td>
+      <td class="ok">هر دو ۲۰۰؛ بنر هدر همچنان سرِ جایش (۲ اسلات)</td></tr>
+  </table>
+  <div class="grid">
+    <div class="card"><b>3+1</b><span>اسلاید فعال + ۱ نمونه غیرفعال</span></div>
+    <div class="card"><b>۶</b><span>ردیف در لیست ادمین</span></div>
+    <div class="card"><b>۰</b><span>تست شکست‌خورده</span></div>
+    <div class="card"><b>۲</b><span>بخش مستقل در یک wrapper</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>۹. نکات آموزشی</h2>
+  <ul>
+    <li><b>جایگاه رزروشده را همان اول مصرف‌کننده بدهید یا حذفش کنید:</b> ستون <code>placement='main'</code>
+      در تسک قبلی بدون مصرف‌کننده «کد مرده» بود؛ بهترین کار این بود که همان موقع یا مصرف‌کننده‌اش را ببندید
+      یا در گزارش به‌عنوان TODO ثبتش کنید (اینجا ثبت شده بود ولی فراموش شد تا کاربر تذکر دهد).</li>
+    <li><b>یک «اسکرین‌شات» اغلب یعنی چیزی حذف/جابه‌جا شده:</b> سریع‌ترین بررسی، مقایسه‌ی ساختار DOM قبل/بعد
+      با grep روی کلاس‌های کلیدی است، نه خواندن کل قالب.</li>
+    <li><b><code>new Swiper(".selector")</code> فقط اولین المان را می‌گیرد — اگر دو المان هم‌کلاس
+      دارید (دسکتاپ/موبایل)، یا باید هر دو را جدا init کنید یا المان‌ها را با کلاس/مدیاکوئری داخل یک swiper
+      ادغام کنید (ادغام راحت‌تر و کم‌باگ‌تر است).</li>
+    <li><b>اختیاری کردن یک بخش، زنجیره‌ای از خطاها می‌سازد:</b> وقتی المانی ممکن است نباشد، هر فراخوانی JS
+      که بعدش است باید گارد بخورد؛ وگرنه یک <code>null</code> بی‌گناه کل اسکریپت بعدی را می‌کُشد.</li>
+    <li><b>شرط <code>{{if or .A .B}}</code>:</b> در Go template، slice خالی و pointer nil «نادرست» هستند — پس
+      می‌توانید بدون متغیر کمکی، کل wrapper را وقتی هیچ داده‌ای نیست حذف کنید (برعکس struct صفر که همیشه true است).</li>
+    <li><b>ایدمپوتنت‌بودن را همیشه سطح ردیف نگه دارید:</b> هر بار که سیدر را گسترش دادید (اسلایدرها، بعد بنرهای
+      سایت) همان اشتباه سطح-جدول تکرار شد؛ الگوی per-key دیگر این مشکل را ندارد.</li>
+    <li><b>پس از هر تغییر Go، سرور ری‌استارت لازم دارد</strong> ولی تمپلیت‌ها live خوانده می‌شوند — این
+      تفاوت باعث می‌شود خطاهای «کد قدیمی» به‌صورت عجیب و غیرمنتظره ظاهر شوند.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۱۰. کارهای باقی‌مانده / ریسک‌ها</h2>
+  <ul>
+    <li><span class="bad">ری‌استارت سرور روی 8010 الزامی است</span> (کد Go از 01:19 قدیمی است):
+      <code>Ctrl+C</code> و دوباره <code>go run . serve</code>.</li>
+    <li><span class="warn">ترتبیب ثابت:</span> بنر تصویری همیشه بالای کارت محصولات است؛ اگر خواستید قابل
+      تغییر باشد باید یک ستون «ترتیب بخش» اضافه کنید.</li>
+    <li><span class="warn">autoplay/loop:</span> تنظیمات اسلایدر از <code>mainSlider()</code> در main.js می‌آید
+      (loop + autoplay 7s + pagination). تغییر آن یعنی تغییر فایل asset مشترک.</li>
+    <li><span class="warn">کارت‌های دایره‌ای زیر بنر</span> در اسکرین‌شات شما بخش <code>.main-services</code>
+      (یا لوگوی برندها) است و به این تسک مربوط نبود؛ اگر منظورتان آن بود بگویید تا بعداً بررسی شود.</li>
+    <li><span class="warn">بدون commit</span> — هیچ فایلی stage نشده است.</li>
+    <li><span class="warn">دارایی‌های طراحی:</span> از <code>public/images/mainSlider/</code> کپی می‌شوند؛
+      اگر تصویر جدیدی خواستید از طریق همان فرم ادمین آپلود کنید (پسوندهای jpg/png/jpeg/webp مجازند).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۱۱. چک‌لیست وضعیت نهایی صفحه‌ی /home2</h2>
+  <ul>
+    <li><span class="ok">✓</span> بنر هدر (موبایل + دسکتاپ، لینک‌دار، حذف‌شدنی) — ادمین: «بنرهای سایت ← لیست/ایجاد»</li>
+    <li><span class="ok">✓</span> بنر تصویری اسلایدر اصلی (swiper با pagination و فلش، ۲ نسخه تصویر) —
+      ادمین: همان منو، فیلتر «بنر اسلایدر اصلی»</li>
+    <li><span class="ok">✓</span> کارت محصولات اسلایدر اصلی (تیتر/زیرعنوان/مشاهده همه/۱۰ کارت) —
+      ادمین: «اسلایدر محصولات ← اسلایدر اصلی»</li>
+    <li><span class="ok">✓</span> کاروسل شگفت‌انگیزها از <code>SLIDERS</code> (تسک قبلی، دست‌نخورده)</li>
+    <li><span class="ok">✓</span> هر سه بخش در نبود داده کلاً حذف می‌شوند</li>
+  </ul>
+</section>
+
+<footer>گزارش تولیدشده در ۲۰۲۶-۰۹-۳۰ ۰۵:۵۶ · فایل: reports/2026-09-30_0556_restore-hero-image-slider.html</footer>
+
+</div>
+</body>
+</html>

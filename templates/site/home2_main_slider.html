@@ -1,0 +1,65 @@
+{{define "home2_main_slider"}}
+    {{$slider := .MAIN_SLIDER}}
+    <section class="mainSlider-card bg-white border-gray-200 radius-large overflow-hidden py-4 px-3 px-lg-4">
+        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+            <div class="me-3">
+                <h2 class="h4 color-gray-900 mb-1">{{$slider.Title}}</h2>
+                {{if $slider.Subtitle}}
+                    <span class="text-medium color-gray-500">{{$slider.Subtitle}}</span>
+                {{end}}
+            </div>
+
+            <a class="d-flex align-items-center gap-1 border-gray-200 radius-u px-3 py-2 text-strong-2 color-gray-700"
+                href="{{$slider.CatalogURL}}">
+                <span>مشاهده همه</span>
+                <i class="icon-chevronLeft icon-fs-small"></i>
+            </a>
+        </div>
+
+        <div class="swiper mainSlider-products-swiper position-relative">
+            <div class="swiper-wrapper">
+                {{range $slider.Products}}
+                    <div class="swiper-slide">
+                        <a class="mainSlider-product h-p-100 px-3 py-3 bg-white d-flex flex-column radius-medium"
+                            href="{{.ProductURL}}">
+                            {{if .Image}}
+                                <img loading="lazy" class="mainSlider-product-img mb-2"
+                                    src="{{$slider.MediaPath}}{{.Image}}" alt="{{.Title}}" />
+                            {{end}}
+
+                            <div class="mainSlider-product-title text-truncate-2">{{.Title}}</div>
+
+                            {{if gt .OriginalPrice .Price}}
+                                <div class="align-self-start mt-auto">
+                                    <span
+                                        class="fanumber currency color-gray-300 text-medium text-decoration-line-through">{{.OriginalPrice}}</span>
+                                </div>
+                            {{end}}
+
+                            <div class="d-flex align-items-center justify-content-between mt-1">
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="h5 fanumber currency">{{.Price}}</span>
+                                    <i class="icon-toman icon-fs-small color-gray-700"></i>
+                                </div>
+
+                                {{if gt .DiscountPercent 0}}
+                                    <span
+                                        class="discount-percent d-flex align-items-center justify-content-center bg-error-100 color-white radius-medium">
+                                        <span class="text-strong fanumber">{{.DiscountPercent}}٪</span>
+                                    </span>
+                                {{end}}
+                            </div>
+
+                            {{if not .InStock}}
+                                <span class="mainSlider-product-outofstock text-medium mt-1">ناموجود</span>
+                            {{end}}
+                        </a>
+                    </div>
+                {{end}}
+            </div>
+
+            <div class="swiper-btn-prev mainSlider-products-prev icon-chevronRight"></div>
+            <div class="swiper-btn-next mainSlider-products-next icon-chevronLeft"></div>
+        </div>
+    </section>
+{{end}}

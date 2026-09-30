@@ -5,6 +5,7 @@ import (
 
 	"net/http"
 	"shop/application/dto/admin"
+	"shop/domain/entities"
 	"shop/pkg/converters"
 	"shop/pkg/helpers"
 	"shop/pkg/sessions"
@@ -38,6 +39,15 @@ func WithGlobalData(c *gin.Context, data gin.H) gin.H {
 	// Computed centrally so every present and future page is covered without
 	// touching individual handlers.
 	activeMenu, activeParent := ActiveAdminMenu(c.Request.URL.Path, c.Query("today"))
+	// ?position=main on the slider list highlights «اسلایدر اصلی» instead of
+	// the generic list entry (the path alone cannot tell them apart).
+	if activeMenu == "sliders-list" && c.Query("position") == entities.SliderPositionMain {
+		activeMenu = "sliders-main"
+	}
+	// ?placement=main on the site-banner list highlights «بنر اسلایدر اصلی»
+	if activeMenu == "site-banners-list" && c.Query("placement") == entities.SiteBannerPlacementMain {
+		activeMenu = "site-banners-main"
+	}
 	data["ACTIVE_MENU"] = activeMenu
 	data["ACTIVE_PARENT"] = activeParent
 
@@ -135,6 +145,12 @@ func ActiveAdminMenu(path, today string) (menu, parent string) {
 		return "banners-create", "banners"
 	case path == "/admins/banners" || hasPathPrefix(path, "/admins/banners/"):
 		return "banners-list", "banners"
+
+	// site banners (بنر هدر)
+	case path == "/admins/site-banners/create":
+		return "site-banners-create", "site-banners"
+	case path == "/admins/site-banners" || hasPathPrefix(path, "/admins/site-banners/"):
+		return "site-banners-list", "site-banners"
 
 	// product sliders
 	case path == "/admins/sliders/create":

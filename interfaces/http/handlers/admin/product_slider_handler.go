@@ -7,6 +7,7 @@ import (
 
 	responses "shop/application/dto/admin"
 	"shop/domain/domain_err"
+	"shop/domain/entities"
 	"shop/infrastructure/messages"
 	"shop/interfaces/http/requests/admin"
 	"shop/interfaces/http/response"
@@ -50,6 +51,7 @@ func (a *AdminHandler) sliderFormData(c *gin.Context) (requests.CreateProductSli
 	req.Position = strings.TrimSpace(req.Position)
 	req.Status = requests.SliderStatus(c.Request.PostForm)
 	req.Title = strings.TrimSpace(req.Title)
+	req.Subtitle = strings.TrimSpace(req.Subtitle)
 	return req, true
 }
 
@@ -73,9 +75,29 @@ func (a *AdminHandler) IndexProductSlider(c *gin.Context) {
 		return
 	}
 
+	// ?position=main → «اسلایدر اصلی» (sidebar link), otherwise every slot
+	position := strings.TrimSpace(c.Query("position"))
+	title := "اسلایدرهای محصولات"
+	if position != "" {
+		if !entities.ValidSliderPosition(position) {
+			sessions.Set(c, "message", domain_err.RecordNotFound)
+			c.Redirect(http.StatusFound, "/admins/sliders")
+			return
+		}
+		title = "اسلایدر اصلی"
+		filtered := make([]*entities.ProductSlider, 0, len(sliders))
+		for _, s := range sliders {
+			if s.Position == position {
+				filtered = append(filtered, s)
+			}
+		}
+		sliders = filtered
+	}
+
 	response.Render(c, http.StatusOK, "admin_index_slider", gin.H{
-		"TITLE":   "اسلایدرهای محصولات",
-		"SLIDERS": responses.ToSliders(sliders),
+		"TITLE":           title,
+		"SLIDERS":         responses.ToSliders(sliders),
+		"POSITION_FILTER": position,
 	})
 	return
 }

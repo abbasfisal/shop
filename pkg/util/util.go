@@ -222,3 +222,14 @@ func GetProductStoragePath() string {
 	return "/uploads/media/products/"
 
 }
+
+// GetSiteBannerStoragePath is the fixed site-banner image URL prefix (bucket
+// when storage is active, the local /uploads mount otherwise). Falls back to
+// the banners prefix when STORAGE_SITE_BANNER_PATH is not configured, so a
+// deploy that only sets the banner path keeps working.
+func GetSiteBannerStoragePath() string {
+	if os.Getenv("STORAGE_STATUS") == "active" {
+		return fmt.Sprintf("https://%s.parspack.net/uploads/media/site-banners/", os.Getenv("STORAGE_BUCKET_NAME"))
+	}
+	return "/uploads/media/site-banners/"
+}

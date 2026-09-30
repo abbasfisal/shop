@@ -1,0 +1,141 @@
+{{define "site_banner_form"}}
+    {{$banner := .BANNER}}
+    {{$placement := .PLACEMENT}}
+    {{$status := .STATUS}}
+    {{if $banner}}
+        {{$placement = $banner.Placement}}
+        {{if $banner.Status}}{{$status = "1"}}{{else}}{{$status = "0"}}{{end}}
+    {{end}}
+
+    <form action="{{if $banner}}/admins/site-banners/{{$banner.ID}}{{else}}/admins/site-banners{{end}}"
+          method="post" enctype="multipart/form-data">
+        {{if $banner}}
+            <input type="hidden" name="current_image" value="{{$banner.Image}}">
+            <input type="hidden" name="current_mobile_image" value="{{$banner.MobileImage}}">
+        {{end}}
+
+        <div class="card">
+            <div class="card-header"><b>اطلاعات بنر سایت</b></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>عنوان *</label>
+                        <input type="text" class="form-control" name="title"
+                               placeholder="مثلاً بنر بالای سایت — تابستانه"
+                               value="{{if index .OLD "title"}}{{index .OLD "title"}}{{else if $banner}}{{$banner.Title}}{{end}}">
+                        <small class="text-muted">فقط در پنل ادمین نمایش داده می‌شود</small>
+                        <span class="text-danger">{{.ERRORS.title}}</span>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>جایگاه *</label>
+                        <select class="form-control" name="placement">
+                            <option value="header" {{if eq $placement "header"}}selected{{end}}>بنر هدر (بالای سایت)</option>
+                            <option value="main" {{if eq $placement "main"}}selected{{end}}>بنر تصویری اسلایدر اصلی</option>
+                        </select>
+                        <small class="text-muted">جایگاه «اسلایدر اصلی» برای بنر تصویری رزرو شده است</small>
+                        <span class="text-danger">{{.ERRORS.placement}}</span>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>وضعیت *</label>
+                        <select class="form-control" name="status">
+                            <option value="1" {{if eq $status "1"}}selected{{end}}>فعال</option>
+                            <option value="0" {{if eq $status "0"}}selected{{end}}>غیرفعال</option>
+                        </select>
+                        <small class="text-muted">غیرفعال → بنر در فروشگاه نمایش داده نمی‌شود</small>
+                        <span class="text-danger">{{.ERRORS.status}}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>لینک</label>
+                        <input type="text" class="form-control" name="link"
+                               placeholder="https://... یا یک مسیر داخلی"
+                               value="{{if index .OLD "link"}}{{index .OLD "link"}}{{else if $banner}}{{$banner.Link}}{{end}}">
+                        <small class="text-muted">در صورت خالی بودن، روی بنر کلیک نمی‌شود</small>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>ترتیب نمایش</label>
+                        <input type="number" class="form-control" name="sort_order" min="0"
+                               value="{{if index .OLD "sort_order"}}{{index .OLD "sort_order"}}{{else if $banner}}{{$banner.SortOrder}}{{else}}0{{end}}">
+                        <small class="text-muted">عدد کوچک‌تر زودتر نمایش داده می‌شود</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>شروع (اختیاری)</label>
+                        <input type="date" class="form-control" name="starts_at"
+                               value="{{if index .OLD "starts_at"}}{{index .OLD "starts_at"}}{{else if $banner}}{{$banner.StartsAt}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.starts_at}}</span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>پایان (اختیاری)</label>
+                        <input type="date" class="form-control" name="ends_at"
+                               value="{{if index .OLD "ends_at"}}{{index .OLD "ends_at"}}{{else if $banner}}{{$banner.EndsAt}}{{end}}">
+                        <span class="text-danger">{{.ERRORS.ends_at}}</span>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>تصویر دسکتاپ *</label>
+                        <input type="file" name="image" class="form-control-file">
+                        {{if $banner}}
+                            <div class="mt-2">
+                                <img src="{{$.MEDIA_PATH}}{{$banner.Image}}" alt="banner" height="60">
+                            </div>
+                            <small class="text-muted">برای جایگزینی، فایل جدید انتخاب کنید</small>
+                        {{else}}
+                            <small class="text-muted">بنر نسخه دسکتاپ (کل عرض هدر)</small>
+                        {{end}}
+                        <span class="text-danger">{{.ERRORS.image}}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>تصویر موبایل (اختیاری)</label>
+                        <input type="file" name="mobile_image" class="form-control-file">
+                        {{if $banner}}
+                            <div class="mt-2">
+                                {{if $banner.MobileImage}}
+                                    <img src="{{$.MEDIA_PATH}}{{$banner.MobileImage}}" alt="banner mobile" height="60">
+                                {{else}}
+                                    <span class="text-muted">تعریف نشده — از تصویر دسکتاپ استفاده می‌شود</span>
+                                {{end}}
+                            </div>
+                            {{if $banner.MobileImage}}
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="remove_mobile_image"
+                                           value="1" id="removeMobileImage">
+                                    <label class="form-check-label" for="removeMobileImage">
+                                        حذف تصویر موبایل (استفاده از تصویر دسکتاپ)
+                                    </label>
+                                </div>
+                            {{end}}
+                        {{else}}
+                            <small class="text-muted">اگر خالی بماند، نسخه دسکتاپ برای موبایل هم نمایش داده می‌شود</small>
+                        {{end}}
+                        <span class="text-danger">{{.ERRORS.mobile_image}}</span>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>راهنما</label>
+                        <div class="p-3 bg-light border rounded text-muted small">
+                            ۱. تصویر دسکتاپ و موبایل جداگانه آپلود کنید (نسبت تصویر موبایل عمودی‌تر است).<br>
+                            ۲. اگر بنر فعالی نداشته باشید یا بازه زمانی‌اش تمام شده باشد،
+                            بخش بنر در فروشگاه کلاً حذف می‌شود (جای خالی نمی‌ماند).<br>
+                            ۳. لینک خالی یعنی بنر غیرکلیکی.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            {{if $banner}}بروزرسانی بنر{{else}}ذخیره بنر{{end}}
+                        </button>
+                        <a href="/admins/site-banners" class="btn btn-secondary btn-lg">انصراف</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{{end}}

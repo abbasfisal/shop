@@ -32,19 +32,25 @@ import (
 
 const demoPrefix = "DEMO-"
 const demoBannerTitlePrefix = "پروموشن نمونه"
+const demoSiteBannerTitlePrefix = "بنر سایت نمونه"
 const demoSliderSlugPrefix = "demo-"
 
 // theme assets copied into the banner upload folder
 const (
 	bannerAssetDir  = "public/shop/img/banner"
 	bannerUploadDir = "public/uploads/media/banners/seed"
-	productImageDir = "2024/09/27"
+	// design assets used by the site banners (home2: header + hero slider)
+	siteBannerAssetDir  = "public/images/banner"
+	heroBannerAssetDir  = "public/images/mainSlider"
+	siteBannerUploadDir = "public/uploads/media/site-banners/seed"
+	productImageDir     = "2024/09/27"
 )
 
 // SeedDemoShop is called by Seed() right before the read models are built.
 func SeedDemoShop(db *gorm.DB) {
 	seedDemoProducts(db)
 	seedPromoBanners(db)
+	seedSiteBanners(db)
 	seedDemoSliders(db)
 	seedFeeRates(db)
 }
@@ -392,11 +398,119 @@ func seedPromoBanners(db *gorm.DB) {
 }
 
 // ------------------------------------------------------------
+// 2b. site banners (بنر هدر) — یکی فعال + یکی غیرفعال برای تست عدم نمایش
+// ------------------------------------------------------------
+
+type demoSiteBanner struct {
+	Title       string
+	Placement   string
+	Link        string
+	Status      bool
+	SortOrder   int
+	Image       string // file name inside siteBannerAssetDir
+	MobileImage string // خالی → در فروشگاه از تصویر دسکتاپ استفاده می‌شود
+}
+
+func demoSiteBanners() []demoSiteBanner {
+	return []demoSiteBanner{
+		// فعال → بالای صفحه‌ی /home2 نمایش داده می‌شود
+		{Title: demoSiteBannerTitlePrefix + " — بنر هدر",
+			Placement: entities.SiteBannerPlacementHeader, Link: "/search/apparel",
+			Status: true, SortOrder: 1, Image: "top2.gif", MobileImage: "top2.gif"},
+
+		// غیرفعال → بخش بنر در فروشگاه کلاً حذف می‌شود
+		{Title: demoSiteBannerTitlePrefix + " — بنر هدر (غیرفعال)",
+			Placement: entities.SiteBannerPlacementHeader, Link: "/",
+			Status: false, SortOrder: 2, Image: "1.webp"},
+
+		// بنر تصویری اسلایدر اصلی (بالای صفحه‌ی /home2) — ۳ اسلاید
+		{Title: demoSiteBannerTitlePrefix + " — اسلایدر اصلی ۱",
+			Placement: entities.SiteBannerPlacementMain, Link: "/search/category-home-kitchen",
+			Status: true, SortOrder: 1, Image: "1.webp", MobileImage: "mobile/1.webp"},
+		{Title: demoSiteBannerTitlePrefix + " — اسلایدر اصلی ۲",
+			Placement: entities.SiteBannerPlacementMain, Link: "/search/apparel",
+			Status: true, SortOrder: 2, Image: "2.webp", MobileImage: "mobile/2.webp"},
+		{Title: demoSiteBannerTitlePrefix + " — اسلایدر اصلی ۳",
+			Placement: entities.SiteBannerPlacementMain, Link: "/",
+			Status: true, SortOrder: 3, Image: "3.webp", MobileImage: "mobile/3.webp"},
+
+		// غیرفعال → اسلایدر اصلی کلاً حذف می‌شود
+		{Title: demoSiteBannerTitlePrefix + " — اسلایدر اصلی (غیرفعال)",
+			Placement: entities.SiteBannerPlacementMain, Link: "/",
+			Status: false, SortOrder: 4, Image: "4.webp"},
+	}
+}
+
+// siteBannerCopyFn picks the asset folder of a placement (header lives in
+// public/images/banner, the hero slider in public/images/mainSlider).
+func siteBannerCopyFn(placement string) func(string) (string, error) {
+	if placement == entities.SiteBannerPlacementMain {
+		return copyHeroBannerAsset
+	}
+	return copySiteBannerAsset
+}
+
+func seedSiteBanners(db *gorm.DB) {
+	created, skipped := 0, 0
+	for _, spec := range demoSiteBanners() {
+		// per-title idempotency: a spec added later (e.g. the hero slider)
+		// still gets seeded on an already-seeded database
+		var exists int64
+		db.Model(&entities.SiteBanner{}).Where("title = ?", spec.Title).Count(&exists)
+		if exists > 0 {
+			skipped++
+			continue
+		}
+
+		copyAsset := siteBannerCopyFn(spec.Placement)
+		imageName, err := copyAsset(spec.Image)
+		if err != nil {
+			fmt.Printf("[seed] site banner image %s failed: %v\n", spec.Image, err)
+			continue
+		}
+		mobileName := ""
+		if spec.MobileImage != "" {
+			if mobileName, err = copyAsset(spec.MobileImage); err != nil {
+				fmt.Printf("[seed] site banner mobile image %s failed: %v\n", spec.MobileImage, err)
+				mobileName = ""
+			}
+		}
+
+		row := entities.SiteBanner{
+			Title:       spec.Title,
+			Placement:   spec.Placement,
+			Link:        spec.Link,
+			Status:      spec.Status,
+			SortOrder:   spec.SortOrder,
+			Image:       imageName,
+			MobileImage: mobileName,
+		}
+		// Select forces every listed column: without it GORM drops zero values
+		// (status=false would become true because the column has DEFAULT TRUE).
+		if err := db.
+			Select("Title", "Placement", "Link", "Status", "SortOrder", "Image", "MobileImage").
+			Create(&row).Error; err != nil {
+			fmt.Printf("[seed] site banner %q failed: %v\n", spec.Title, err)
+			continue
+		}
+		created++
+	}
+
+	if created == 0 {
+		fmt.Printf("[seed] site banners ......... already seeded (%d)\n", skipped)
+		return
+	}
+	fmt.Printf("[seed] site banners ......... done (%d created, %d already present: header + hero)\n",
+		created, skipped)
+}
+
+// ------------------------------------------------------------
 // 3. homepage product sliders (one per position)
 // ------------------------------------------------------------
 
 type demoSlider struct {
 	Title        string
+	Subtitle     string
 	Slug         string
 	Position     string
 	CategorySlug string
@@ -413,6 +527,12 @@ func demoSliders(now time.Time) []demoSlider {
 	endsSoon := ptr(now.AddDate(0, 0, 90))
 
 	return []demoSlider{
+		// اسلایدر اصلی — بالای صفحه‌ی /home2 (قالب شبیه دیجی‌کالا)
+		{Title: "ویتامین‌ها و مواد معدنی", Subtitle: "بر اساس سلیقه شما",
+			Slug:     demoSliderSlugPrefix + "main",
+			Position: entities.SliderPositionMain,
+			Status:   entities.ProductStatusPublished, Products: 10, PreferDemo: true},
+
 		{Title: "جدیدترین محصولات", Slug: demoSliderSlugPrefix + "newest",
 			Position: entities.SliderPositionAfterSlider,
 			Status:   entities.ProductStatusPublished, Products: 6, PreferDemo: true},
@@ -439,19 +559,23 @@ func demoSliders(now time.Time) []demoSlider {
 }
 
 func seedDemoSliders(db *gorm.DB) {
-	var count int64
-	db.Model(&entities.ProductSlider{}).Where("slug LIKE ?", demoSliderSlugPrefix+"%").Count(&count)
-	if count > 0 {
-		fmt.Printf("[seed] product sliders ....... already seeded (%d)\n", count)
-		return
-	}
-
 	now := time.Now()
+	created, skipped := 0, 0
 	for _, spec := range demoSliders(now) {
+		// per-slug idempotency: a newer spec (e.g. the main slider added
+		// later) still gets seeded on an already-seeded database
+		var exists int64
+		db.Model(&entities.ProductSlider{}).Where("slug = ?", spec.Slug).Count(&exists)
+		if exists > 0 {
+			skipped++
+			continue
+		}
+
 		startsAt, endsAt := spec.StartsAt, spec.EndsAt
 
 		slider := entities.ProductSlider{
 			Title:    spec.Title,
+			Subtitle: spec.Subtitle,
 			Slug:     spec.Slug,
 			Position: spec.Position,
 			Status:   spec.Status,
@@ -468,6 +592,7 @@ func seedDemoSliders(db *gorm.DB) {
 			fmt.Printf("[seed] slider %q failed: %v\n", spec.Title, err)
 			continue
 		}
+		created++
 
 		for i, productID := range demoSliderProductIDs(db, spec.Products, spec.PreferDemo) {
 			link := entities.SliderProduct{
@@ -481,7 +606,12 @@ func seedDemoSliders(db *gorm.DB) {
 		}
 	}
 
-	fmt.Println("[seed] product sliders ....... done (4 positions + draft, ≤10 products each)")
+	if created == 0 {
+		fmt.Printf("[seed] product sliders ....... already seeded (%d)\n", skipped)
+		return
+	}
+	fmt.Printf("[seed] product sliders ....... done (%d created, %d already present, ≤10 products each)\n",
+		created, skipped)
 }
 
 // ------------------------------------------------------------
@@ -551,8 +681,22 @@ func demoBrandID(db *gorm.DB, slug string) uint {
 // copyBannerAsset copies a theme banner into the upload folder so the seeded
 // banners resolve to a real image URL (returns the relative stored path).
 func copyBannerAsset(name string) (string, error) {
-	src := filepath.Join(bannerAssetDir, name)
-	dst := filepath.Join(bannerUploadDir, name)
+	return copyAssetTo(name, bannerAssetDir, bannerUploadDir)
+}
+
+func copySiteBannerAsset(name string) (string, error) {
+	return copyAssetTo(name, siteBannerAssetDir, siteBannerUploadDir)
+}
+
+func copyHeroBannerAsset(name string) (string, error) {
+	return copyAssetTo(name, heroBannerAssetDir, siteBannerUploadDir)
+}
+
+// copyAssetTo copies <srcDir>/<name> into <dstDir>/<name> (idempotent) and
+// returns the stored path relative to the upload dir: "seed/<name>".
+func copyAssetTo(name, srcDir, dstDir string) (string, error) {
+	src := filepath.Join(srcDir, name)
+	dst := filepath.Join(dstDir, name)
 
 	if _, err := os.Stat(dst); err == nil {
 		return filepath.ToSlash(filepath.Join("seed", name)), nil

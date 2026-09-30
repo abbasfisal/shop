@@ -13,6 +13,7 @@ import (
 // entities.MaxSliderProducts products.
 type CreateProductSliderRequest struct {
 	Title      string `form:"title"`
+	Subtitle   string `form:"subtitle"` // زیرعنوان اختیاری (زیر تیتر)
 	Slug       string `form:"slug"`
 	Position   string `form:"position"`
 	CategoryID string `form:"category_id"`

@@ -43,6 +43,7 @@ func (p SliderProduct) ProductURL() string {
 type ProductSlider struct {
 	ID            uint
 	Title         string
+	Subtitle      string
 	Slug          string
 	Position      string
 	PositionLabel string
@@ -128,6 +129,7 @@ func ToSlider(s *entities.ProductSlider) *ProductSlider {
 	out := &ProductSlider{
 		ID:            s.ID,
 		Title:         s.Title,
+		Subtitle:      s.Subtitle,
 		Slug:          s.Slug,
 		Position:      s.Position,
 		PositionLabel: entities.SliderPositionLabel(s.Position),

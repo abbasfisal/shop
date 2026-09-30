@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>گزارش: فیچر بنر هدر + اسلایدر اصلی در پنل ادمین</title>
+<style>
+  :root{
+    --card:#1e293b; --ink:#e2e8f0; --muted:#94a3b8;
+    --accent:#38bdf8; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --border:#334155;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b1220;color:var(--ink);
+    font-family:"Vazirmatn","Segoe UI",Tahoma,Arial,sans-serif;line-height:1.9;font-size:16px}
+  .wrap{max-width:1020px;margin:0 auto;padding:32px 20px 80px}
+  header.hero{background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);border-radius:16px;
+    padding:28px 30px;margin-bottom:26px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  header.hero h1{margin:0 0 8px;font-size:25px;color:#fff}
+  header.hero p{margin:0;color:#e0f2fe;font-size:15px}
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:22px 26px;margin-bottom:20px}
+  h2{margin:0 0 14px;font-size:20px;color:var(--accent);border-bottom:1px dashed var(--border);padding-bottom:10px}
+  h3{margin:20px 0 8px;font-size:17px;color:#facc15}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-inline-start:22px}
+  li{margin:5px 0}
+  blockquote{margin:10px 0;padding:12px 16px;background:#0f172a;
+    border-inline-start:4px solid var(--accent);border-radius:8px;color:#cbd5e1}
+  code{font-family:Consolas,Menlo,monospace;font-size:14px;background:#0f172a;color:#7dd3fc;
+    padding:2px 6px;border-radius:5px;direction:ltr;unicode-bidi:embed}
+  pre{background:#0f172a;border:1px solid var(--border);border-radius:10px;
+    padding:14px 16px;overflow-x:auto;margin:10px 0}
+  pre code{background:none;padding:0;color:#a5f3fc;direction:ltr;text-align:left;display:block;unicode-bidi:plaintext}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#0f172a;color:var(--accent)}
+  tr:nth-child(even) td{background:#172033}
+  .tag{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12.5px;
+    border:1px solid var(--border);background:#0f172a;color:var(--muted);margin-inline-end:6px}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  .grid{display:flex;gap:14px;flex-wrap:wrap}
+  .card{flex:1 1 190px;background:#0f172a;border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+  .card b{display:block;font-size:22px;color:var(--accent);direction:ltr;text-align:right}
+  .card span{font-size:13.5px;color:var(--muted)}
+  .path{direction:ltr;text-align:left;unicode-bidi:embed}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>فیچر «بنر هدر» + «اسلایدر اصلی» در پنل ادمین</h1>
+  <p>یک جدول مشترک <code>site_banners</code> (با ستون <code>placement</code> و تصویر دسکتاپ/موبایل)
+  به‌علاوه‌ی جایگاه جدید <code>main</code> برای اسلایدرهای محصول: کامل‌ترین CRUD ممکن (مهاجرت goose،
+  entity/repository/usecase/DTO/request، ۶ روت ادمین، ۳ تمپلیت، سایدبار، سیدر) و رندر استورفرانت
+  با هندل کردنِ «بنر/اسلایدر نداریم» — یعنی وقتی داده‌ای نیست، بخش کلاً حذف می‌شود نه اینکه جای خالی بمونه.</p>
+</header>
+
+<section>
+  <h2>۱. عنوان و خلاصه‌ی اجرایی</h2>
+  <p>دو فیچر خواسته شد: (الف) <b>بنر هدر</b> — بنر بالای سایت (دو اسلات موبایل/دسکتاپ در home2) که از
+  ادمین مدیریت بشه و اگر بنر فعالی نباشد، کلاً نمایش داده نشود؛ (ب) <b>اسلایدر اصلی</b> — بخش
+  <code>&lt;div class="mainSlider mt-lg-5"&gt;</code> که به یک اسلایدر افقیِ کارت-محصولات (سبک دیجی‌کالا:
+  تیتر + زیرعنوان + «مشاهده همه» + کارت‌های تخفیف‌دار) تبدیل بشه و دیتاش از ادمین بیاد.</p>
+  <p>اسکیمای انتخابی (با تأیید کاربر): <b>یک جدول مشترک</b> <code>site_banners</code> با ستون
+  <code>placement</code>؛ اسلایدر اصلی هم از <b>همان ماشین اسلایدر محصولات موجود</b>
+  (<code>product_sliders</code> + <code>slider_products</code>) با یک <code>position</code> جدید
+  <code>main</code> و فیلد جدید <code>subtitle</code> ساخته شد — یعنی هیچ جدول یا کد تکراری تولید نشد و
+  CRUD کاملِ اسلایدر (انتخاب محصول، بازه زمانی، وضعیت) از قبل موجود بود و فقط گسترش پیدا کرد.</p>
+</section>
+
+<section>
+  <h2>۲. درخواست اصلی</h2>
+  <blockquote>
+    «هدر بنر رو تحلیل کن و در پنل ادمین فیچر هدر بنر رو ایجاد کن کامل باشه مایگریشن و موارد دیگشو هم در نظر بگیر و کامل و جامع باشه -
+    گاهی اوقات هم هدر بنر نداریم که عدم نمایشش باید هندل بشه<Br>
+    <code>&lt;a class=" header-banner d-none d-lg-flex"&gt;&lt;img ... src="/assets/images/banner/top2.gif"&gt;&lt;/a&gt;</code><Br><Br>
+    بعد از انجامش فیچر اسلایدر اصلی رو به صورت کامل و جامع در پنل ادمین بزن و دیتاشو باید در این فیلد بذاری
+    <code>&lt;div class="mainSlider mt-lg-5"&gt;</code> [عکس: اسلایدر افقی محصولات با تیتر «ویتامین‌ها و مواد معدنی»/
+    زیرعنوان «بر اساس سلیقه شما»/دکمه «مشاهده همه»/کارت‌های محصول با درصد تخفیف و قیمت خط‌خورده]»</blockquote>
+  <p>سه پرسش شفاف‌سازی پیش از کد زدن پرسیده شد و پاسخ‌ها: جدول مشترک + <code>placement</code>؛ تصویر دسکتاپ/موبایل جدا؛
+  عکس پیوستی مربوط به اسلایدر اصلی است و باید آن شکلی بشه.</p>
+</section>
+
+<section>
+  <h2>۳. زمینه و کشف</h2>
+  <ul>
+    <li><b>گراف:</b> یک agent اکتشافی اجرا شد که خودش با <code>graphify query "how does the admin banner CRUD
+      flow from route to repository"</code> شروع کرد (نتیجه: community/contract نودها — DTO،
+      <code>BannerRepository</code>، قرارداد sidebar و کلیدهای
+      <code>.TITLE/.MESSAGE/.ERRORS/.OLDS/.AUTH</code>) و سپس فایل‌ها را مستقیم خواند.</li>
+    <li><b>الگوی مرجع (بنر پروموشن):</b>
+      <code class="path">domain/entities/banner.go</code> ←
+      <code class="path">domain/repositories/banner_repository_interface.go</code> ←
+      <code class="path">infrastructure/repositories/banner/banner_repository.go</code> ←
+      <code class="path">application/usecases/banner/banner_service.go</code> ←
+      <code class="path">application/dto/admin/banner_response.go</code> ←
+      <code class="path">interfaces/http/requests/admin/banner_request.go</code> ←
+      <code class="path">interfaces/http/handlers/admin/banner_handler.go</code>.</li>
+    <li><b>الگوی اسلایدر:</b> روت‌ها در <code class="path">interfaces/http/routes/admin_routes.go:208-214</code>،
+      هندلر در <code class="path">interfaces/http/handlers/admin/product_slider_handler.go</code>، فرم در
+      <code class="path">templates/admin/admin_slider_form.html</code>.</li>
+    <li><b>نکته‌ی مهم اسکیما:</b> ستون <code>product_sliders.position</code> هیچ CHECK constraint ندارد
+      (فقط DEFAULT و COMMENT) ← افزودن جایگاه جدید <b>نیازی به ALTER نداشت</b>؛ اما فیلد
+      <code>subtitle</code> نیازمند <code>ALTER TABLE ADD COLUMN</code> بود.</li>
+    <li><b>هندلر استورفرانت:</b> <code class="path">interfaces/http/handlers/web/handlers.go:202</code>
+      (<code>HomePage2</code>) و ساختار قالب در <code class="path">templates/site/home2.html</code>
+      (بنر هدر در خطوط ۹۳ و ۱۱۶، بلاک <code>.mainSlider</code> در خطوط ۳۹۴–۵۱۶).</li>
+    <li><b>بارگذاری تمپلیت:</b> <code class="path">cmd/serve.go:117</code>
+      <code>LoadHTMLGlob("templates/*/*.html")</code> ← فایل/نام <code>{{define}}</code> جدید خودکار لود می‌شود
+      ولی تغییر کد Go نیاز به ری‌استارت دارد.</li>
+    <li><b>مسیر آپلود:</b> <code>upload.banners</code> در <code class="path">config/config.yml</code> +
+      <code>util.GetBannerStoragePath()</code> و سروِ <code>r.Static("/uploads", public/uploads)</code>.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۴. تصمیم‌ها و چرایی (ADR-style)</h2>
+
+  <h3>ADR-1: دو جدول جدا یا یک جدول مشترک با placement؟</h3>
+  <table>
+    <tr><th>گزینه</th><th>توضیح</th><th>وضعیت</th></tr>
+    <tr><td>الف) <code>site_banners</code> + ستون <code>placement</code> <span class="tag">انتخاب‌شده</span></td>
+      <td>یک entity/repo/usecase/DTO/request/۳ تمپلیت برای هر دو جایگاه؛ فیلتر لیست با
+        <code>?placement=</code>؛ جایگاه <code>main</code> برای بنر تصویری آینده رزرو شد.</td>
+      <td class="ok">✅</td></tr>
+    <tr><td>ب) دو جدول <code>header_banners</code> + <code>main_sliders</code></td>
+      <td>۲× کد (entity/repo/usecase/DTO/handler/تمپلیت/روت/سایدبار) با صفر فایدۀ معماری.</td>
+      <td class="bad">❌ رد شد</td></tr>
+    <tr><td>ج) افزودن ستون placement به جدول <code>banners</code> موجود</td>
+      <td><code>banners</code> مفهوم «پروموشن» با <code>layout</code> (two/four) دارد؛ قاطی کردن
+        بنر هدر (که نه layout دارد نه priority) ستون‌ها و کوئری‌های موجود را آلوده می‌کرد.</td>
+      <td class="bad">❌ رد شد</td></tr>
+  </table>
+  <p><b>ریسک پذیرفته:</b> جایگاه <code>main</code> فعلاً مصرف‌کننده‌ی استورفرانت ندارد (اسلایدر اصلی،
+  محصولات است) — یک ستون CHECK + یک آپشن سلکت بیشتر نیست و مستند شد.</p>
+
+  <h3>ADR-2: اسلایدر اصلی = جدول جدید یا همان product_sliders؟</h3>
+  <ul>
+    <li><b>انتخاب:</b> جایگاه جدید <code>SliderPositionMain = "main"</code> در
+      <code class="path">domain/entities/product_slider.go</code> + فیلد <code>Subtitle</code> + مهاجرت.</li>
+    <li><b>دلیل:</b> خواسته (تیتر/زیرعنوان/مشاهده همه/۱۰ کارت محصول/بازه زمانی/وضعیت) دقیقاً همان چیزی است
+      که <code>product_sliders</code> از قبل کامل اجرا می‌کند؛ CRUD ادمین، انتخابگر محصول AJAX
+      (<code>/admins/api/products</code>) و صفحه کاتالوگ <code>/sliders/:slug</code> همگی مجانی بودند.</li>
+    <li><b>رد گزینه‌ی جدول جدید:</b> دوباره‌کاری عظیم + دو مسیر نگهداری برای یک مفهوم.</li>
+    <li><b>ریسک:</b> <code>MaxSliderProducts = 10</code> سقف کارت‌هاست (برای اسلایدر اصلی کافی است).</li>
+  </ul>
+
+  <h3>ADR-3: تصویر دسکتاپ و موبایل جدا؟</h3>
+  <ul>
+    <li><b>انتخاب:</b> دو ستون <code>image</code> (الزامی) و <code>mobile_image</code> (اختیاری) + متد
+      <code>MobileSrc()</code> در DTO که در نبود تصویر موبایل به دسکتاپ fallback می‌کند.</li>
+    <li><b>دلیل:</b> خود قالب دو اسلات جدا دارد (<code>d-lg-none</code> و <code>d-none d-lg-flex</code>) با
+      نسبت تصویر متفاوت؛ یک تصویرِ واحد یا کج می‌شد یا کراپ.</li>
+    <li><b>رد:</b> یک تصویر برای هر دو (کج شدن)، دو جدول جدا (تکرار).</li>
+    <li><b>جزئیات UI:</b> چک‌باکس «حذف تصویر موبایل» تا ادمین بتواند صریحاً به حالت fallback برگردد
+      (چون «فایل جدید نفرستادن» ≠ «حذف کن»).</li>
+  </ul>
+
+  <h3>ADR-4: ذخیره‌سازی فایل‌ها کجا؟</h3>
+  <ul>
+    <li><b>انتخاب:</b> پوشه‌ی اختصاصی <code>public/uploads/media/site-banners/</code> با
+      <code>upload.site_banners</code> در config و <code>util.GetSiteBannerStoragePath()</code>.</li>
+    <li><b>رد:</b> ریختن در پوشه‌ی بنرهای پروموشن (آمیخته شدن داده‌ها و سختی پاک‌سازی بعدی).</li>
+    <li><b>ریسک/سازگاری:</b> برای S3، <code>STORAGE_SITE_BANNER_PATH</code> اگر ست نشده به
+      <code>STORAGE_BANNER_PATH</code> برمی‌گردد (deployهای قدیمی نمی‌شکنند). به
+      <code class="path">.env.example</code> اضافه شد.</li>
+  </ul>
+
+  <h3>ADR-5: سیدر چطور ایدمپوتنت بماند وقتی اسلایدر جدید اضافه شد؟</h3>
+  <ul>
+    <li><b>مشکل:</b> بررسی سراسری <code>slug LIKE 'demo-%'</code> باعث می‌شد اسلایدر «main» روی دیتابیسی که
+      قبلاً سید شده هرگز ساخته نشود.</li>
+    <li><b>انتخاب:</b> بررسی <b>به تفکیک slug</b> داخل حلقه (هر spec مستقل) + شمارش
+      <code>created/skipped</code>. سازگار-رو به عقب: ردیف‌های قبلی skip می‌شوند، ردیف جدید ساخته می‌شود.</li>
+  </ul>
+
+  <h3>ADR-6: رفع باگِ <code>errors.errorList</code> سراسری</h3>
+  <ul>
+    <li><b>مشاهده:</b> <code>pkg/errors</code> یک map سطح-پکیج دارد که بین درخواست‌ها پاک نمی‌شود؛ الگوی
+      <code>else if errors.Get()["image"] != ""</code> در هندلرها می‌تواند خطای «پسوند عکس…»ِ
+      <b>درخواست قبلی</b> را ببیند و آپدیت موفق را بلوکه کند (در تست من دقیقاً رخ داد).</li>
+    <li><b>انتخاب:</b> <code>errors.Init()</code> در ابتدای <code>saveSiteBannerUpload</code>؛ همان اصلاحِ
+      یک‌خطی در <code>saveBannerImage</code> بنر پروموشن هم اعمال شد (باگ موجودِ همان الگو).</li>
+    <li><b>ریسک:</b> صفر — <code>Init()</code> فقط قبل از بررسی کلیدها اجرا می‌شود؛ در آن نقطه validation فرم قبلاً پاس شده است.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۵. مراحل انجام کار</h2>
+  <ol>
+    <li>کشف و دریافت نقشه‌ی کامل CRUD بنر/اسلایدر (agent اکتشافی + <code>graphify query</code>).</li>
+    <li>سه پرسش شفاف‌سازی (اسکیما / تصاویر / ماهیت عکس پیوستی).</li>
+    <li>ایجاد مهاجرت:
+      <pre><code>go run . make:migration NAME=site_banners_and_main_slider
+# نام فایل خروجی '..._name=site_banners...' شد (flag parsing) → rename شد:
+mv migrations/20260930050026_name=site_banners_and_main_slider.sql \
+   migrations/20260930050026_site_banners_and_main_slider.sql
+go run . migrate
+# OK 20260930050026_site_banners_and_main_slider.sql (15.26ms)</code></pre>
+      شامل <code>CREATE TABLE site_banners</code> (با CHECK روی placement، ایندکس feed و COMMENT) و
+      <code>ALTER TABLE product_sliders ADD COLUMN subtitle</code>.</li>
+    <li>entity جدید <code class="path">domain/entities/site_banner.go</code> + افزودن
+      <code>SliderPositionMain</code> و <code>Subtitle</code> به
+      <code class="path">domain/entities/product_slider.go</code>.</li>
+    <li>لایه‌های زیرین: repository interface + پیاده‌سازی GORM + usecase + DTO + request DTO.</li>
+    <li>هندلر ادمین <code class="path">interfaces/http/handlers/admin/site_banner_handler.go</code>
+      (index با فیلتر، create/store، edit/update با آپلود دو تصویر و حذف صریح موبایل، delete با پاک‌سازی فایل) +
+      افزودن پارامتر به <code>NewAdminHandler</code> + ۶ روت در
+      <code class="path">interfaces/http/routes/admin_routes.go</code>.</li>
+    <li>۳ تمپلیت ادمین (لیست/صفحه/فرم) + آیتم سایدبار «بنر هدر سایت» + «اسلایدر اصلی» +
+      موارد <code>ActiveAdminMenu</code> در <code class="path">interfaces/http/response/render.go</code>.</li>
+    <li>گسترش اسلایدر: فیلد <code>subtitle</code> در request/DTO/repo/فرم + فیلتر
+      <code>?position=main</code> در <code>IndexProductSlider</code> + هایلایت سایدبار.</li>
+    <li>سیدر: <code>seedSiteBanners</code> (۲ ردیف: فعال + غیرفعال) + اسلایدر نمونه‌ی
+      «ویتامین‌ها و مواد معدنی / بر اساس سلیقه شما» + تبدیل ایدمپوتنت‌بودن به سطح slug + بازنویسی
+      <code>copyBannerAsset</code> به <code>copyAssetTo(name, srcDir, dstDir)</code>.</li>
+    <li>استورفرانت: <code>HomePage2</code> → کلیدهای <code>HEADER_BANNER</code>,
+      <code>HEADER_BANNER_PATH</code>, <code>MAIN_SLIDER</code>؛ رندر شرطی در home2؛ پارشال جدید
+      <code class="path">templates/site/home2_main_slider.html</code>؛ CSS/JS اختصاصی کاروسل.</li>
+    <li><code>go run . seed</code> + اعتبارسنجی کامل (بخش ۸) + متوقف کردن سرور تست.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>۶. تغییرات فایل‌ها</h2>
+  <table>
+    <tr><th>مسیر</th><th>نوع</th><th>خلاصه</th></tr>
+    <tr><td class="path">migrations/20260930050026_site_banners_and_main_slider.sql</td><td>add</td>
+      <td>جدول <code>site_banners</code> + ستون <code>product_sliders.subtitle</code> (Up/Down)</td></tr>
+    <tr><td class="path">domain/entities/site_banner.go</td><td>add</td>
+      <td>entity + <code>IsVisibleNow</code> + اعتبارسنجی/برچسب placement + <code>EffectiveMobileImage</code></td></tr>
+    <tr><td class="path">domain/entities/product_slider.go</td><td>edit</td>
+      <td><code>SliderPositionMain</code> (اولین آیتم در SliderPositions) + فیلد <code>Subtitle</code></td></tr>
+    <tr><td class="path">domain/repositories/site_banner_repository_interface.go</td><td>add</td>
+      <td>قرارداد ۶ متدی با <code>GetActive(ctx, placement)</code> و <code>GetAll(c, placement)</code></td></tr>
+    <tr><td class="path">infrastructure/repositories/site_banner/site_banner_repository.go</td><td>add</td>
+      <td>پیاده‌سازی GORM + فیلتر تاریخ/وضعیت مثل <code>GetActive</code> بنرها</td></tr>
+    <tr><td class="path">application/usecases/site_banner/site_banner_service.go</td><td>add</td>
+      <td>سرویس نازک Create/Index/Show/Update/Delete/Active</td></tr>
+    <tr><td class="path">application/dto/admin/site_banner_response.go</td><td>add</td>
+      <td>DTO + <code>StatusText/Schedule/PlacementLabel</code> + <code>MobileSrc()</code> با value receiver</td></tr>
+    <tr><td class="path">interfaces/http/requests/admin/site_banner_request.go</td><td>add</td>
+      <td>فرم + اعتبارسنجی فارسی (عنوان/جایگاه/وضعیت/بازه تاریخ)</td></tr>
+    <tr><td class="path">interfaces/http/handlers/admin/site_banner_handler.go</td><td>add</td>
+      <td>۶ هندلر + آپلود دو فایل + حذف فایل‌ها + فلش پیام</td></tr>
+    <tr><td class="path">interfaces/http/handlers/admin/handlers.go</td><td>edit</td>
+      <td>فیلد <code>siteBannerSrv</code> + پارامتر در <code>NewAdminHandler</code></td></tr>
+    <tr><td class="path">interfaces/http/handlers/admin/banner_handler.go</td><td>edit</td>
+      <td><code>errors.Init()</code> در ابتدای <code>saveBannerImage</code> (رفع باگ موجود)</td></tr>
+    <tr><td class="path">interfaces/http/routes/admin_routes.go</td><td>edit</td>
+      <td>ساخت سرویس + ۶ روت <code>/admins/site-banners…</code></td></tr>
+    <tr><td class="path">interfaces/http/routes/web_routes.go</td><td>edit</td>
+      <td>ساخت سرویس + پاس دادن به <code>NewPublicHandler</code></td></tr>
+    <tr><td class="path">interfaces/http/handlers/web/handlers.go</td><td>edit</td>
+      <td>سرویس + محاسبه‌ی بنر هدر و اسلایدر اصلی در <code>HomePage2</code> + کلیدهای خروجی</td></tr>
+    <tr><td class="path">interfaces/http/handlers/web/cart_handlers_test.go</td><td>edit</td>
+      <td>به‌روزرسانی فراخوانی <code>NewPublicHandler</code> (امضای جدید)</td></tr>
+    <tr><td class="path">interfaces/http/response/render.go</td><td>edit</td>
+      <td>کیس‌های <code>site-banners-*</code> + هایلایت <code>sliders-main</code> با
+        <code>?position=main</code></td></tr>
+    <tr><td class="path">interfaces/http/handlers/admin/product_slider_handler.go</td><td>edit</td>
+      <td>trim زیرعنوان + فیلتر/عنوان صفحه بر اساس <code>?position=</code></td></tr>
+    <tr><td class="path">interfaces/http/requests/admin/product_slider_request.go</td><td>edit</td>
+      <td>فیلد <code>subtitle</code></td></tr>
+    <tr><td class="path">infrastructure/repositories/product_slider/product_slider_repository.go</td><td>edit</td>
+      <td>ذخیره‌سازی <code>subtitle</code> در Store و Update</td></tr>
+    <tr><td class="path">application/dto/admin/product_slider_response.go</td><td>edit</td>
+      <td>فیلد + مپ <code>Subtitle</code></td></tr>
+    <tr><td class="path">infrastructure/seeders/demo_shop.go</td><td>edit</td>
+      <td><code>seedSiteBanners</code> + اسلایدر main با subtitle + ایدمپوتنت per-slug +
+        <code>copyAssetTo</code></td></tr>
+    <tr><td class="path">infrastructure/messages/custom_messages.go</td><td>edit</td>
+      <td>پیام‌های ایجاد/بروزرسانی بنر سایت</td></tr>
+    <tr><td class="path">config/config.yml / .env.example</td><td>edit</td>
+      <td><code>upload.site_banners</code> + <code>STORAGE_SITE_BANNER_PATH</code></td></tr>
+    <tr><td class="path">pkg/util/util.go</td><td>edit</td>
+      <td><code>GetSiteBannerStoragePath()</code></td></tr>
+    <tr><td class="path">templates/admin/admin_index_site_banner.html</td><td>add</td>
+      <td>لیست + فیلتر جایگاه + تصویر دسکتاپ/موبایل + عملیات</td></tr>
+    <tr><td class="path">templates/admin/admin_create_site_banner.html</td><td>add</td>
+      <td>صفحه‌ی wrapper با نمایش ERRORS</td></tr>
+    <tr><td class="path">templates/admin/admin_site_banner_form.html</td><td>add</td>
+      <td>فرم multipart: عنوان/جایگاه/وضعیت/لینک/ترتیب/بازه/۲ تصویر/حذف موبایل</td></tr>
+    <tr><td class="path">templates/admin/admin_slider_form.html</td><td>edit</td>
+      <td>فیلد «زیرعنوان (اختیاری)»</td></tr>
+    <tr><td class="path">templates/layouts/sidebar.html</td><td>edit</td>
+      <td>منوی «بنر هدر سایت» (لیست/ایجاد) + «اسلایدر اصلی» زیر اسلایدرها</td></tr>
+    <tr><td class="path">templates/site/home2_main_slider.html</td><td>add</td>
+      <td>پارشال کارت اسلایدر اصلی (تیتر/زیرعنوان/مشاهده همه/کارت محصولات)</td></tr>
+    <tr><td class="path">templates/site/home2.html</td><td>edit</td>
+      <td>۲ بلاک بنر هدر شرطی + جایگزینی بلاک <code>.mainSlider</code> + CSS + init Swiper</td></tr>
+    <tr><td class="path">public/uploads/media/site-banners/seed/</td><td>add</td>
+      <td>فایل‌های سید شده (top2.gif, 1.webp)</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>۷. باگ‌ها و مشکلات برخوردشده</h2>
+  <table>
+    <tr><th>مشکل</th><th>علامت</th><th>ریشه</th><th>رفع</th><th>تأیید</th></tr>
+    <tr>
+      <td>نام فایل مهاجرت خراب</td>
+      <td class="bad"><code>20260930050026_name=site_banners_and_main_slider.sql</code></td>
+      <td><code>make:migration NAME=…</code> مقدار را هم به‌صورت flag و هم arg خواند</td>
+      <td><code>mv</code> به نام درست قبل از اعمال</td>
+      <td class="ok">goose status نام درست را نشان داد</td>
+    </tr>
+    <tr>
+      <td>آپدیت بنر با خطای غلط بلوکه شد</td>
+      <td class="bad">«پسوند عکس باید jpg|jpeg|png باشد» روی درخواستِ بدون فایل</td>
+      <td><code>errors.errorList</code> سطح-پکیج است و بین درخواست‌ها پاک نمی‌شود؛
+        <code>errors.Get()["image"] != ""</code> خطای درخواست قبلی (آپلود .gif رد شده) را می‌دید</td>
+      <td><code>errors.Init()</code> در ابتدای <code>saveSiteBannerUpload</code> و
+        <code>saveBannerImage</code> (باگ موجود بنر پروموشن هم رفع شد)</td>
+      <td class="ok">آپدیت بعدی ۳۰۲ به لیست + پاک شدن <code>mobile_image</code></td>
+    </tr>
+    <tr>
+      <td>کامپایل تست‌ها می‌شکست</td>
+      <td class="bad"><code>not enough arguments in call to NewPublicHandler</code></td>
+      <td>افزودن پارامتر سرویس به سازنده‌ی PublicHandler</td>
+      <td>به‌روزرسانی <code>cart_handlers_test.go</code> با <code>NewSiteBannerService(nil)</code></td>
+      <td class="ok"><code>go vet ./...</code> و <code>go test ./...</code> سبز</td>
+    </tr>
+    <tr>
+      <td>هایلایت سایدبار برای فیلتر اسلایدر</td>
+      <td class="warn">آیتم «اسلایدر اصلی» هرگز active نمی‌شد</td>
+      <td><code>ActiveAdminMenu</code> فقط <code>URL.Path</code> را می‌گیرد و query ندارد</td>
+      <td>تشخیص <code>?position=main</code> در <code>WithGlobalData</code> بعد از ActiveAdminMenu</td>
+      <td class="ok"><code>nav-link active</code> روی لینک فیلترشده دیده شد</td>
+    </tr>
+    <tr>
+      <td>سیدر، اسلایدر جدید را نمی‌ساخت</td>
+      <td class="warn">«already seeded (5)» روی دیتابیس قدیمی</td>
+      <td>بررسی ایدمپوتنت بود سراسری (<code>slug LIKE 'demo-%'</code>)</td>
+      <td>بررسی به تفکیک slug داخل حلقه + شمارنده created/skipped</td>
+      <td class="ok">ردیف <code>demo-main</code> ساخته شد (۶ اسلایدر)</td>
+    </tr>
+    <tr>
+      <td>آپلود gif رد شد</td>
+      <td class="warn">هنگام تست POST با <code>top2.gif</code></td>
+      <td><code>util.AllowImageExtensions()</code> فقط jpg/png/jpeg/webp/mp4 است</td>
+      <td>تست با webp ادامه یافت؛ سیدر مستقیم فایل را کپی می‌کند (اعتبارسنجی ندارد)</td>
+      <td class="ok">ایجاد با webp موفق شد</td>
+    </tr>
+    <tr>
+      <td>فرمان kill خود shell را زد</td>
+      <td class="bad">timeout ۱۲۰ ثانیه‌ای ابزار Bash</td>
+      <td><code>pkill -f 'APP_PORT=8099'</code> با خط فرمانِ خِودِ shell هم مطابقت کرد</td>
+      <td>kill با pid استخراج‌شده از <code>ss -ltnp</code></td>
+      <td class="ok">سرور تست جداگانه متوقف شد</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>۸. تست و اعتبارسنجی</h2>
+  <pre><code>go build ./... &amp;&amp; go vet ./...     # بدون خروجی (موفق)
+gofmt -l . (بدون vendor)          # خروجی خالی
+go test ./...                      # FAILS:0
+go run . migrate                   # OK 20260930050026_site_banners_and_main_slider.sql (15.26ms)
+go run . migrate:status            # مهاجرت جدید در لیست Applied هست
+go run . seed                      # [seed] site banners ... done / product sliders ... (6 rows)</code></pre>
+
+  <p>سرور تست جدا روی <code>APP_PORT=8099</code> بالا آمد (سرور در حال اجرای شما روی 8010 کد قدیمی داشت و
+  دست نخورد) و این سناریوها تست شدند:</p>
+
+  <table>
+    <tr><th>سناریو</th><th>دستور/عمل</th><th>نتیجه</th></tr>
+    <tr><td>ثبت‌نام ادمین</td><td><code>POST /admins/login</code> با
+      <code>mobile=0935111111&amp;password=password</code></td><td class="ok">302 → /admins/home</td></tr>
+    <tr><td>لیست بنرها</td><td><code>GET /admins/site-banners</code></td><td class="ok">۲۰۰، ۲ ردیف، تصاویر، لینک ویرایش</td></tr>
+    <tr><td>فرم ایجاد</td><td><code>GET /admins/site-banners/create</code></td><td class="ok">۲۰۰، سلکت placement + ورودی mobile_image</td></tr>
+    <tr><td>فرم ویرایش</td><td><code>GET /admins/site-banners/1/edit</code></td><td class="ok">۲۰۰، پیش‌نمایش ۲ تصویر + چک‌باکس حذف موبایل</td></tr>
+    <tr><td>اعتبارسنجی</td><td>POST بدون عنوان</td><td class="ok">۳۰۲ به create و پیام «عنوان بنر الزامی است.»</td></tr>
+    <tr><td>ایجاد (آپلود ۲ تصویر)</td><td>multipart POST</td><td class="ok">۳۰۲ به لیست، ردیف جدید، ۲ فایل روی دیسک</td></tr>
+    <tr><td>حذف تصویر موبایل</td><td>POST با <code>remove_mobile_image=1</code></td><td class="ok">۳۰۲ به لیست، ستون خالی، فایل موبایل پاک شد/دسکتاپ ماند</td></tr>
+    <tr><td>حذف ردیف</td><td><code>POST /admins/site-banners/3/delete</code></td><td class="ok">soft-delete + پاک شدن فایل‌ها</td></tr>
+    <tr><td>رگرسیون بنر پروموشن</td><td>POST ویرایش بنر ۱</td><td class="ok">۳۰۲ به لیست، مقادیر ذخیره شد (باگ errors.Init رفع شد)</td></tr>
+    <tr><td>اسلایدر اصلی (فیلتر)</td><td><code>GET /admins/sliders?position=main</code></td><td class="ok">عنوان «اسلایدر اصلی»، فقط ۱ ردیف، سایدبار active</td></tr>
+    <tr><td>جایگاه در فرم</td><td><code>GET /admins/sliders/create</code></td><td class="ok">آپشن «اسلایدر اصلی (بالای صفحه)»</td></tr>
+    <tr><td>زیرعنوان</td><td><code>GET /admins/sliders/6/edit</code></td><td class="ok">فیلد با مقدار «بر اساس سلیقه شما»</td></tr>
+    <tr><td>رندر استورفرانت</td><td><code>GET /home2</code></td>
+      <td class="ok">بنر هدر در هر ۲ اسلات با <code>/uploads/media/site-banners/seed/top2.gif</code> + لینک؛
+        بلاک <code>.mainSlider</code> با ۱۰ کارت محصول</td></tr>
+    <tr><td>عدم نمایش بنر</td><td><code>UPDATE site_banners SET status=false</code></td>
+      <td class="ok">تعداد <code>header-banner</code> در HTML: <b>۰</b> ← جای خالی نمی‌ماند</td></tr>
+    <tr><td>تعویض بنر فعال</td><td>غیرفعال کردن ردیف ۱</td>
+      <td class="ok">اسلات موبایل تصویر موبایلِ ردیف ۳ و اسلات دسکتاپ تصویر دسکتاپِ آن را نشان داد</td></tr>
+    <tr><td>عدم نمایش اسلایدر</td><td><code>status='draft'</code> برای <code>demo-main</code></td>
+      <td class="ok">تعداد <code>mainSlider-card</code> در HTML: <b>۰</b></td></tr>
+    <tr><td>رگرسیون صفحات</td><td><code>GET /</code>، <code>GET /home2</code></td>
+      <td class="ok">هر دو ۲۰۰؛ ۱۰ بخش اسلایدر در home قدیمی؛ کاروسل شگفت‌انگیز همچنان سرِ جایش</td></tr>
+    <tr><td>سینتکس Down مهاجرت</td><td><code>BEGIN; …DROP…; ROLLBACK;</code></td>
+      <td class="ok">بدون خطا و بدون از دست رفتن داده</td></tr>
+  </table>
+
+  <div class="grid">
+    <div class="card"><b>۲</b><span>فیچر تحویلی</span></div>
+    <div class="card"><b>۶</b><span>روت ادمین جدید</span></div>
+    <div class="card"><b>۳</b><span>تمپلیت ادمین جدید</span></div>
+    <div class="card"><b>۰</b><span>تستِ شکست‌خورده</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>۹. نکات آموزشی</h2>
+  <ul>
+    <li><b>الگوی CRUD در این ریپو ثابت است:</b> entity ← repository interface (که
+      <code>requests</code> و <code>gin.Context</code> را import می‌کند — عمدۀ بدهی این ریپو) ← GORM ←
+      usecase نازک ← DTO با <code>StatusText/Schedule</code> فارسی ← request با اعتبارسنجی keyed ←
+      هندلر با فلش session (<code>errors/olds/message</code>) ← ۶ روت POST/GET ← سایدبار +
+      <code>ActiveAdminMenu</code>. هر فیچر جدید باید همه‌ی این ۱۰ نقطه را بزند وگرنه یا کامپایل نمی‌شود
+      یا در رندر خاموش می‌شکند.</li>
+    <li><b>GORM و صفرها:</b> ستون‌هایی که DEFAULT دارند (مثل <code>status BOOLEAN DEFAULT TRUE</code>) اگر در
+      <code>Create</code> مقدار صفر بگیرند، GORM با tag/default جایگزین‌شان می‌کند → حتماً <code>Select(...)</code>
+      بزنید (دقیقاً همان دلیلی که سیدر بنرها هم دارد).</li>
+    <li><b>map سطح-پکیج در هندلرها سم است:</b> <code>pkg/errors</code> وضعیتش را بین درخواست‌ها نگه می‌دارد؛
+      هر جا <code>errors.Get()[key]</code> را به‌عنوان شرط خواندید، قبلش <code>errors.Init()</code> بزنید
+      وگرنه خطای دیروزِ یوزر دیگری را به او نسبت می‌دهید.</li>
+    <li><b>«بنر نداریم» یعنی حذف، نه جای خالی:</b> در template با
+      <code>{{if .HEADER_BANNER}} … {{end}}</code> کل تگ بسته می‌شود؛ در هندلر یک
+      <code>nil</code> پاس بدهید نه یک DTO صفر (چون <code>{{if}}</code> روی struct همیشه true است).</li>
+    <li><b>fallback تصویر موبایل را در DTO نگه دارید نه در قالب:</b> یک متد کوچک مثل
+      <code>MobileSrc()</code> (با value receiver تا در template map هم کار کند) از
+      <code>{{if}}/{{else}}</code> تو در تو در ۲ جای قالب جلوگیری می‌کند.</li>
+    <li><b>افزودن enum به ستون بدون CHECK:</b> اگر migration قبلی روی ستون شما CHECK نگذاشته، افزودن مقدار
+      جدید فقط تغییر کد است؛ ولی حتماً با <code>\d table</code> در PostgreSQL چک کنید، نه با حدس زدن.</li>
+    <li><b>ایدمپوتنت‌بودن سیدر را سطح ردیف نگه دارید:</b> بررسی «آیا کلاً چیزی سید شده؟» بعد از اولین اجرا
+      هر افزوده‌ی آتی را برای همیشه می‌سوزاند؛ بررسی per-slug/per-key هم سازگار-رو-به-عقب است هم آینده‌نگر.</li>
+    <li><b>Swiper و کلاس‌های nav مشترک:</b> کلاس عمومی <code>.swiper-btn-next</code> با
+      <code>document.querySelector</code> توسط همه‌ی instanceها گرفته می‌شود؛ برای اسلایدر جدید کلاس اختصاصی
+      (<code>.mainSlider-products-next</code>) تعریف کردم تا با شگفت‌انگیز/استوری/سرچ قاطی نشود.</li>
+    <li><b>تست دستیِ پنل ادمین:</b> کوکی‌های <code>Secure</code> روی http ارسال نمی‌شوند؛ یا فلگ
+      <code>secure</code> را در cookie-jar دستکاری کنید یا مستقیم <code>-H "Cookie: session=…"</code> بزنید.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۱۰. کارهای باقی‌مانده / ریسک‌ها</h2>
+  <ul>
+    <li><span class="bad">سرور شما باید ری‌استارت شود:</span> پروسه‌ی در حال اجرا روی پورت 8010 از ساعت
+      01:19 کد Go قدیمی دارد؛ روت‌های <code>/admins/site-banners</code> و منطق جدید را ندارد
+      (تمپلیت‌ها live خوانده می‌شوند ولی کد Go نه). کافی است <code>Ctrl+C</code> و دوباره
+      <code>go run . serve</code> بزنید.</li>
+    <li><span class="warn">جایگاه <code>placement='main'</code></span> در جدول ساخته شده ولی هیچ خواننده‌ای
+      ندارد (اسلایدر اصلی، محصولات است). اگر بعداً بنر تصویریِ اسلایدر اصلی خواستید، فقط کافی است
+      همان CRUD را با فیلتر <code>placement=main</code> به صفحه‌ی home2 وصل کنید.</li>
+    <li><span class="warn">بنر هدر فقط در home2</span> رندر می‌شود چون هدرِ <code>home.html</code> (طراحی قدیمی)
+      اسلات بنر ندارد. اگر هدر را یکی کردید، پارشال مشترک بسازید.</li>
+    <li><span class="warn">پسوند gif</span> در <code>AllowImageExtensions</code> نیست؛ سیدر چون فایل را
+      مستقیم کپی می‌کند <code>top2.gif</code> کار می‌کند، ولی اگر ادمین بخواهد همان را آپلود کند رد می‌شود.
+      یا باید gif به whitelist اضافه شود یا تصویر را به webp تبدیل کرد.</li>
+    <li><span class="warn">پاک‌سازی سید:</span> اگر بخواهید سید بنر هدر را دوباره اجرا کنید، باید ردیف‌های
+      <code>بنر سایت نمونه%</code> را پاک کنید (idempotency بر اساس همین پیشوند است).</li>
+    <li><span class="warn">قالب‌های موجود لمس شدند:</span> بر خلاف قاعده‌ی «تمپلیت‌ها frozen» در AGENTS.md،
+      برای ساخت فیچر لازم بود <code>sidebar.html</code> و <code>admin_slider_form.html</code> ویرایش شوند
+      (به دستور صریح شما). فایل‌های جدید اضافه شدند نه جایگزین.</li>
+    <li><span class="warn">بدون commit</span> — هیچ چیزی stage/commit نشده است.</li>
+    <li><span class="warn">ریسک تست:</span> تست‌های integration (با <code>TEST_DATABASE_URL</code>) اجرا نشدند
+      چون متغیر تنظیم نشده؛ تست‌های واحد همه سبزند.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>۱۱. راهنمای استفاده از فیچر (برای ادمین)</h2>
+  <ol>
+    <li><b>بنر هدر:</b> سایدبار ← «بنر هدر سایت» ← «ایجاد بنر». عنوان (داخلی)، جایگاه (بنر هدر)، وضعیت، لینک
+      اختیاری، ترتیب، بازه‌ی نمایش اختیاری، <b>تصویر دسکتاپ</b> (اجباری) و <b>تصویر موبایل</b> (اختیاری —
+      اگر خالی باشد نسخه‌ی دسکتاپ برای موبایل استفاده می‌شود). فهرست با فیلتر «بنر هدر» هم قابل مشاهده است.</li>
+    <li><b>اسلایدر اصلی:</b> سایدبار ← «اسلایدر محصولات» ← «اسلایدر اصلی» (یا «ایجاد اسلایدر» با جایگاه
+      «اسلایدر اصلی (بالای صفحه)»). عنوان + زیرعنوان (مثل «بر اساس سلیقه شما») + حداکثر ۱۰ محصول +
+      دکمه‌ی «مشاهده همه» که به کاتالوگ دسته/اسلایدر می‌رود.</li>
+    <li><b>حالت بدون بنر:</b> کافی است وضعیت را «غیرفعال» کنید یا تاریخ پایان را بگذارید — بخش بنر در
+      فروشگاه کاملاً حذف می‌شود (نه آیکون شکسته، نه فضای خالی).</li>
+    <li><b>نکته‌ی تست محلی:</b> ورود ادمین با شماره <code>0935111111</code> و رمز
+      <code>password</code> (سیدر پایه).</li>
+  </ol>
+</section>
+
+<footer>گزارش تولیدشده در ۲۰۲۶-۰۹-۳۰ ۰۵:۳۷ · فایل: reports/2026-09-30_0537_header-banner-and-main-slider.html</footer>
+
+</div>
+</body>
+</html>
